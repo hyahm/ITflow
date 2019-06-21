@@ -1,0 +1,1 @@
+insert into roles(role) values('env'),('project'),('user'),('version'),('level'),('important'),('posistion'),('status'),('log');

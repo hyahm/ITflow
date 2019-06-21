@@ -1,0 +1,27 @@
+go/bin
+go/bug.conf
+go/src/bug.conf
+go/pkg
+go/.idea
+go/src/main/curl.go
+go/src/github.com
+vue/.DS_Store
+vue/node_modules/
+vue/dist/
+vue/npm-debug.log*
+vue/yarn-debug.log*
+vue/yarn-error.log*
+vue/**/*.log
+vue/test/unit/coverage
+vue/test/e2e/reports
+vue/selenium-debug.log
+# Editor directories and files
+vue/.idea
+vue/.vscode
+vue/*.suo
+vue/*.ntvs*
+vue/*.njsproj
+vue/*.sln
+vue/package-lock.json
+vue/config/index.js
+vue/src/config/config.js

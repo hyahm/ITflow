@@ -1,0 +1,21 @@
+const baseUrl = 'http://127.0.0.1:10001'
+
+const g = {
+// cookie 过期时间，单位分，与后端保持一致
+  expirament: 120,
+  downloadUrl: baseUrl + '/share/down', // 下载用到的地址
+  username: 'admin@qq.com',
+  password: 'admin',
+  uploadUrl: baseUrl + '/uploadimg',
+  headImgUrl: baseUrl + '/upload/headimg',
+  shareUpload: baseUrl + '/share/upload', // 共享文件夹上传接口
+  apiUrl: baseUrl,
+  pubkey: `-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCyXfaibtNAqJtvDrsEGZG7yi4D
+BPNkSHZD4DYQtNDHNJUkP4pTB9tZvQ1+d02Tt/YHNy8N+z0rRSVQwISt2VuPwNta
+ldeprfs35msB5BFP4H0OlwZ2Woz7ImhNq7TrR0Usc6ExjlCxZg6zxnEL90vE4y/i
+kiMMhwhKp/HYBQjlfQIDAQAB
+-----END PUBLIC KEY-----`
+}
+
+export default g
