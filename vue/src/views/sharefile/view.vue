@@ -37,7 +37,7 @@
           <span v-show="scope.row.name != '..'" style="float: right;margin-right: 10px" >
             <a v-if="scope.row.isowner" @click="removeHandle(scope.row.id)" ><svg-icon style="margin-right: 10px" icon-class="remove" /></a>
             <a v-if="scope.row.isowner" @click="changeHandle(scope.row)" ><svg-icon style="margin-right: 10px" icon-class="rename" /></a>
-            <a v-if="scope.row.isfile" :download="scope.row.name" :href="downloadurl + '?id=' + scope.row.id + '&token=' + Token"><svg-icon style="margin-right: 10px" icon-class="download" /></a>
+            <a v-if="scope.row.isfile" download :download="scope.row.name" :href="downloadurl + '?id=' + scope.row.id + '&token=' + Token"><svg-icon style="margin-right: 10px" icon-class="download" /></a>
             <!--<svg-icon style="margin-right: 10px" icon-class="moveto" />-->
           </span>
           <span style="clear: both"/>
@@ -184,6 +184,7 @@ export default {
     this.getgrouplist()
   },
   methods: {
+    // 目录切换目录
     handleTo(e) {
       for (let i = 0; i < this.path.length; i++) {
         if (i === 0) {
@@ -199,6 +200,7 @@ export default {
       }
       this.sharelist()
     },
+    // 获取用户列表， 赋予权限
     getuserlist() {
       getUsers().then(resp => {
         if (resp.data.statuscode === 0) {
@@ -210,6 +212,7 @@ export default {
         this.rdwrlist = this.users
       })
     },
+    // 获取用户列表， 赋予权限
     getgrouplist() {
       getGroup().then(resp => {
         if (resp.data.statuscode === 0) {
@@ -219,6 +222,7 @@ export default {
         }
       })
     },
+    // 分配权限
     handleRead() {
       if (this.form.readuser) {
         this.readlist = this.users
@@ -237,8 +241,10 @@ export default {
         this.form.writename = this.rdwrlist[0]
       }
     },
+    // 显示共享的文件
     sharelist() {
       shareList(this.pwd).then(resp => {
+        console.log(resp.data)
         this.realname = resp.data.realname
         if (resp.data.statuscode === 0) {
           this.tableData = resp.data.sharelist
@@ -274,6 +280,7 @@ export default {
         }
       })
     },
+    // 进入文件夹
     handleEnter(dir) {
       // 返回上一级
       if (dir === '..') {
@@ -303,8 +310,12 @@ export default {
       this.pwd = dir
       this.sharelist()
     },
+    // 上传文件
     handleSuccess(res, file) {
+      console.log('上传文件成功')
+      console.log(res)
       if (res.statuscode === 0) {
+        console.log(this.tableData)
         this.tableData.push({
           id: res.id,
           name: res.filename,
@@ -314,12 +325,15 @@ export default {
           isowner: true
           // size: file.
         })
+      } else {
+        this.$message.error('上传文件失败')
       }
     },
     handleError(error) {
       this.$message.error(error)
     },
     confirm() {
+      // 重命名
       this.form.filepath = this.pwd
       if (this.form.id > 0) {
         renameFile(this.form).then(resp => {
@@ -333,6 +347,7 @@ export default {
           }
         })
       } else {
+        // 创建文件夹
         mkDir(this.form).then(resp => {
           if (resp.data.statuscode === 0) {
             this.tableData.push({
@@ -359,6 +374,7 @@ export default {
       this.foldername = ''
       this.dialogFormVisible = false
     },
+    // 添加文件夹
     addFolder() {
       this.form = {
         id: -1,

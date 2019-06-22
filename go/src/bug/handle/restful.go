@@ -73,7 +73,7 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 				} else {
 					// 判断是都是可读的用户组
 					var ids string
-					err = conn.GetOne("select ids from groups where id=?", rid).Scan(&ids)
+					err = conn.GetOne("select ids from usergroup where id=?", rid).Scan(&ids)
 					if err != nil {
 						galog.Error(err.Error())
 						w.Write(errorcode.ErrorConnentMysql())
@@ -102,7 +102,7 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 				} else {
 					// 判断是都是可编辑的用户组
 					var ids string
-					err = conn.GetOne("select ids from groups where id=?", eid).Scan(&ids)
+					err = conn.GetOne("select ids from usergroup where id=?", eid).Scan(&ids)
 					if err != nil {
 						galog.Error(err.Error())
 						w.Write(errorcode.ErrorConnentMysql())
@@ -425,7 +425,7 @@ func checkapiperm(conn *gadb.Db, pid string, uid int64) (bool, error) {
 		} else {
 			// 判断是都是可读的用户组
 			var ids string
-			err = conn.GetOne("select ids from groups where id=?", rid).Scan(&ids)
+			err = conn.GetOne("select ids from usergroup where id=?", rid).Scan(&ids)
 			if err != nil {
 				return false, err
 			}
@@ -444,7 +444,7 @@ func checkapiperm(conn *gadb.Db, pid string, uid int64) (bool, error) {
 		} else {
 			// 判断是都是可编辑的用户组
 			var ids string
-			err = conn.GetOne("select ids from groups where id=?", eid).Scan(&ids)
+			err = conn.GetOne("select ids from usergroup where id=?", eid).Scan(&ids)
 			if err != nil {
 
 				return false, nil
@@ -485,7 +485,7 @@ func checkeditperm(conn *gadb.Db, pid string, uid int64) (bool, error) {
 		} else {
 			// 判断是都是可编辑的用户组
 			var ids string
-			err = conn.GetOne("select ids from groups where id=?", eid).Scan(&ids)
+			err = conn.GetOne("select ids from usergroup where id=?", eid).Scan(&ids)
 			if err != nil {
 
 				return false, nil
