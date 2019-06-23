@@ -24,6 +24,10 @@ exclude=[]
 apihelp=true
 # 项目名
 apiname=itflow
+# ssl, 使用ssl
+ssl = true
+certfile=
+keyfile=
 
 [redis]
 redispwd =
