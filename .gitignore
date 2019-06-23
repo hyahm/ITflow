@@ -23,5 +23,3 @@ vue/*.ntvs*
 vue/*.njsproj
 vue/*.sln
 vue/package-lock.json
-vue/config/index.js
-vue/src/config/config.js
