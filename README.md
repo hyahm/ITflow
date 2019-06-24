@@ -8,8 +8,6 @@
 ### 展示页面： 
    展示页面会更新为最新可使用的代码  
    [ITflow](http://bug.hyahm.com "ITflow")  
-     
-   [下载地址](https://www.hyahm.com/article/276 "ITflow")  
    
  
 
