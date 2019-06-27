@@ -180,10 +180,16 @@ func RunHttp(c chan os.Signal) {
 
 	listenaddr := gaconfig.ReadString("listenaddr")
 	fmt.Println("listen on " + listenaddr)
-	err := http.ListenAndServe(listenaddr, router)
-	if err != nil {
-		log.Fatal(err)
+	if gaconfig.ReadBool("ssl") {
+		if err := http.ListenAndServeTLS(listenaddr,gaconfig.ReadString("certfile"), gaconfig.ReadString("keyfile"), router) ; err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		if err := http.ListenAndServe(listenaddr, router); err != nil {
+			log.Fatal(err)
+		}
 	}
+
 
 	signal.Notify(c, os.Interrupt, os.Kill)
 }

@@ -55,27 +55,10 @@ func rangeTime() string {
 }
 
 func RsaDecrypt(pwd string, privatekey string, b64 bool) ([]byte, error) {
-
+	if privatekey == "" {
+		return nil, errors.New("私钥不能为空")
+	}
 	mm := []byte(pwd)
-	if b64 {
-		mm, _ = base64.StdEncoding.DecodeString(pwd)
-	}
-
-	block, _ := pem.Decode([]byte(privatekey))
-	if block == nil {
-		return nil, errors.New("private key error!")
-	}
-
-	priv, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-
-	if err != nil {
-		return nil, err
-	}
-	return rsa.DecryptPKCS1v15(rand.Reader, priv, mm)
-}
-
-func RsaDecryptByte(pwd string, privatekey string, b64 bool) ([]byte, error) {
-	var mm []byte
 	if b64 {
 		mm, _ = base64.StdEncoding.DecodeString(pwd)
 	}

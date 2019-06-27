@@ -1,4 +1,5 @@
-const baseUrl = 'http://127.0.0.1:10001'
+// const baseUrl = 'http://127.0.0.1:10001'
+const baseUrl = 'https://api.hyahm.coms:10001'
 
 const g = {
 // cookie 过期时间，单位分，与后端保持一致

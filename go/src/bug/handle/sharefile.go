@@ -5,6 +5,7 @@ import (
 	"bug/bugconfig"
 	"bug/model"
 	"encoding/json"
+	"fmt"
 	"gadb"
 	"gaencrypt"
 	"galog"
@@ -233,6 +234,7 @@ func ShareList(w http.ResponseWriter, r *http.Request) {
 }
 
 func ShareUpload(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("coming")
 	headers(w, r)
 	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusOK)
@@ -273,50 +275,60 @@ func ShareUpload(w http.ResponseWriter, r *http.Request) {
 			writeuser bool
 			wid       int64
 		)
-		err = conn.GetOne("select id,ownerid,writeuser,wid from sharefile where isfile=false and filepath=? and name=?",
-			filepath.Dir(dir), filepath.Base(dir)).Scan(&testid, &ownerid, &writeuser, &wid)
-		if err != nil {
-			galog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
 		var rwid int64
 		var isuser bool
 		var hasperm bool
-		if ownerid == bugconfig.CacheNickNameUid[nickname] {
-			rwid = ownerid
-			isuser = true
+		// 判断是否存在这个目录
+		if filepath.Base(dir) == "." {
+			//根目录
 			hasperm = true
 		} else {
-			if writeuser {
-				if wid == bugconfig.CacheNickNameUid[nickname] {
-					rwid = ownerid
-					isuser = true
-					hasperm = true
-				}
+			err = conn.GetOne("select id,ownerid,writeuser,wid from sharefile where isfile=false and filepath=? and name=?",
+				filepath.Dir(dir), filepath.Base(dir)).Scan(&testid, &ownerid, &writeuser, &wid)
+			if err != nil {
+				galog.Error(err.Error())
+				w.Write(errorcode.ErrorConnentMysql())
+				return
+			}
+			//判断是否有权限
+
+			if ownerid == bugconfig.CacheNickNameUid[nickname] {
+				rwid = ownerid
+				isuser = true
+				hasperm = true
 			} else {
-				var ids string
-				err = conn.GetOne("select ids from groups where id=?", wid).Scan(&ids)
-				if err != nil {
-					galog.Error(err.Error())
-					w.Write(errorcode.ErrorConnentMysql())
-					return
-				}
-				for _, v := range strings.Split(ids, ",") {
-					if v == strconv.FormatInt(bugconfig.CacheNickNameUid[nickname], 10) {
-						rwid = wid
-						isuser = false
+				if writeuser {
+					if wid == bugconfig.CacheNickNameUid[nickname] {
+						rwid = ownerid
+						isuser = true
 						hasperm = true
-						break
+					}
+				} else {
+					var ids string
+					err = conn.GetOne("select ids from usergroup where id=?", wid).Scan(&ids)
+					if err != nil {
+						galog.Error(err.Error())
+						w.Write(errorcode.ErrorConnentMysql())
+						return
+					}
+					for _, v := range strings.Split(ids, ",") {
+						if v == strconv.FormatInt(bugconfig.CacheNickNameUid[nickname], 10) {
+							rwid = wid
+							isuser = false
+							hasperm = true
+							break
+						}
 					}
 				}
 			}
 		}
+
 		if !hasperm {
 			galog.Error("has no permssion")
 			w.Write(errorcode.ErrorNoPermission())
 			return
 		}
+		// 插入数据
 		updatetime := time.Now().Unix()
 		ssql := "insert into sharefile(filepath,name,isfile,size,readuser,rid,ownerid,writeuser,wid,updatetime) values(?,?,?,?,?,?,?,?,?,?)"
 		errorcode.Id, err = conn.Insert(ssql, filepath.Clean(dir), header.Filename, true, header.Size, isuser,
@@ -692,6 +704,7 @@ func ShareShow(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		//m := mux.Vars(r)
 		//name := m["name"]
+
 		id := r.FormValue("id")
 		token := r.FormValue("token")
 		conn, err := gadb.NewSqlConfig().ConnDB()
@@ -700,7 +713,6 @@ func ShareShow(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadGateway)
 			return
 		}
-
 		// 只是验证token
 		destoken, err := gaencrypt.RsaDecrypt(token, bugconfig.PrivateKey, true)
 		if err != nil {
@@ -728,26 +740,32 @@ func ShareShow(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadGateway)
 			return
 		}
+		// 如果是所属用户
 		if ownerid == uid {
 			haspermision = true
-		}
-		if readuser && rid == uid {
-			haspermision = true
 		} else {
-			var ids string
-			err = conn.GetOne("select ids from groups where id=?", rid).Scan(&ids)
-			if err != nil {
-				galog.Error(err.Error())
-				w.WriteHeader(http.StatusBadGateway)
-				return
-			}
-			for _, v := range strings.Split(ids, ",") {
-				if v == strconv.FormatInt(uid, 10) {
-					haspermision = true
+			// 如果有权限访问的用户
+			if readuser && rid == uid {
+				haspermision = true
+			} else {
+				// 判断权限组是否有权限
+				var ids string
+				err = conn.GetOne("select ids from usergroup where id=?", rid).Scan(&ids)
+				if err != nil {
+					galog.Error(err.Error())
+					w.WriteHeader(http.StatusBadGateway)
+					return
+				}
+				for _, v := range strings.Split(ids, ",") {
+					if v == strconv.FormatInt(uid, 10) {
+						haspermision = true
+					}
 				}
 			}
 		}
+
 		if !haspermision {
+			galog.Error("no permssion")
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
 		}
@@ -759,6 +777,7 @@ func ShareShow(w http.ResponseWriter, r *http.Request) {
 		}
 		w.Header().Set("Content-Disposition", "attachment;filename="+name)
 		w.Header().Set("Content-Type", "application/octet-stream")
+		fmt.Println(string(f))
 		w.Write(f)
 		return
 	}

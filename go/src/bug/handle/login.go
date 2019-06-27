@@ -57,7 +57,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		// 解密
 		username, err := gaencrypt.RsaDecrypt(login.Username, bugconfig.PrivateKey, true)
 		if err != nil {
-
 			galog.Error(err.Error())
 			w.Write(errorcode.ErrorRsa())
 			return
