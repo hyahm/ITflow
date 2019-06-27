@@ -53,6 +53,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     new HtmlWebpackPlugin({
       filename: config.build.index,
       template: 'index.html',
+      chunksSortMode: 'none',
       inject: true,
       favicon: resolve('favicon.ico'),
       title: 'vue-element-admin',

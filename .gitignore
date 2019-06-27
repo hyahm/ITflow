@@ -1,3 +1,4 @@
+go1.12.5.linux-amd64.tar.gz
 go/bin
 go/bug.conf
 go/src/bug.conf
@@ -23,5 +24,4 @@ vue/*.ntvs*
 vue/*.njsproj
 vue/*.sln
 vue/package-lock.json
-vue/config/index.js
 vue/src/config/config.js
