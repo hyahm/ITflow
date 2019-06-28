@@ -182,6 +182,7 @@ func RunHttp(c chan os.Signal) {
 	fmt.Println("listen on " + listenaddr)
 	if gaconfig.ReadBool("ssl") {
 		if err := http.ListenAndServeTLS(listenaddr,gaconfig.ReadString("certfile"), gaconfig.ReadString("keyfile"), router) ; err != nil {
+			print("has ssl key?")
 			log.Fatal(err)
 		}
 	} else {
