@@ -3,8 +3,8 @@ package bug
 import (
 	"bug/handle"
 	"fmt"
-	"gaconfig"
 	"github.com/gorilla/mux"
+	"github.com/hyahm/goconfig"
 	"log"
 	"net/http"
 	"os"
@@ -178,10 +178,10 @@ func RunHttp(c chan os.Signal) {
 	router.HandleFunc("/default/important", handle.DefaultImportant)
 	router.HandleFunc("/default/level", handle.DefaultLevel)
 
-	listenaddr := gaconfig.ReadString("listenaddr")
+	listenaddr := goconfig.ReadString("listenaddr")
 	fmt.Println("listen on " + listenaddr)
-	if gaconfig.ReadBool("ssl") {
-		if err := http.ListenAndServeTLS(listenaddr,gaconfig.ReadString("certfile"), gaconfig.ReadString("keyfile"), router) ; err != nil {
+	if goconfig.ReadBool("ssl") {
+		if err := http.ListenAndServeTLS(listenaddr,goconfig.ReadString("certfile"), goconfig.ReadString("keyfile"), router) ; err != nil {
 			print("has ssl key?")
 			log.Fatal(err)
 		}

@@ -5,7 +5,7 @@ import (
 	"bug/buglog"
 	"bug/model"
 	"encoding/json"
-	"galog"
+	"github.com/hyahm/golog"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -35,7 +35,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -49,14 +49,14 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 		// 获取参数
 		ss, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorGetData())
 			return
 		}
 
 		err = json.Unmarshal(ss, ub)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -98,7 +98,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 		remarksql := "insert into informations(uid,bid,info,time) values(?,?,?,?)"
 		_, err = conn.Insert(remarksql, bugconfig.CacheNickNameUid[nickname], ub.Id, ub.Remark, time.Now().Unix())
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -106,7 +106,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 
 		_, err = conn.Update("update bugs set sid=?,spusers=? where id=?", sid, ul, ub.Id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -117,7 +117,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 		}
 		err = il.Add(ub.Id, nickname, ub.SelectUsers)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -195,7 +195,7 @@ func TaskList(w http.ResponseWriter, r *http.Request) {
 		conn, name, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -213,7 +213,7 @@ func TaskList(w http.ResponseWriter, r *http.Request) {
 		rows, err := conn.GetRows(getaritclesql, uid)
 
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}

@@ -4,7 +4,7 @@ import (
 	"bug/bugconfig"
 	"errors"
 	"fmt"
-	"galog"
+	"github.com/hyahm/golog"
 	"time"
 )
 
@@ -30,7 +30,7 @@ func (al *AddLog) insert(classify string, content string) error {
 	fmt.Println(bugconfig.Exclude)
 	for _, v := range bugconfig.Exclude {
 		if v == al.Ip {
-			galog.Info("ip: %s is exclude", al.Ip)
+			golog.Info("ip: %s is exclude", al.Ip)
 			return nil
 		}
 	}

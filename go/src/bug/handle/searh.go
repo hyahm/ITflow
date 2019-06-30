@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"gadb"
-	"galog"
+	"github.com/hyahm/golog"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -73,13 +73,13 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
 			}
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -87,14 +87,14 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 
 		searchq, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
 		searchparam := &getBugSearchParam{} // 接收的参数
 		err = json.Unmarshal(searchq, searchparam)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -112,7 +112,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 				bugsql += fmt.Sprintf("and lid=%d ", lid)
 				countbasesql += fmt.Sprintf("and lid=%d ", lid)
 			} else {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorSearch())
 				return
 			}
@@ -131,7 +131,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 				bugsql += fmt.Sprintf("and pid=%d ", pid)
 				countbasesql += fmt.Sprintf("and pid=%d ", pid)
 			} else {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorSearch())
 				return
 			}
@@ -139,7 +139,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 
 		rows, err := conn.GetRows(bugsql + fmt.Sprintf("and sid in (%s)", showstatus))
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -212,7 +212,7 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 		conn, _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -225,14 +225,14 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 
 		searchq, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorGetData())
 			return
 		}
 		searchparam := &getBugManager{}
 		err = json.Unmarshal(searchq, searchparam)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -241,7 +241,7 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 
 		err = conn.GetOne(basesql, args...).Scan(&al.Count)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -254,7 +254,7 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 
 		rows, err := managersearch(alsql, al.Count, searchparam, conn)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -338,25 +338,25 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 	conn, nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		galog.Error(err.Error())
+		golog.Error(err.Error())
 		if err == NotFoundToken {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			return nil, errorcode.ErrorConnentMysql()
 		}
-		galog.Error(err.Error())
+		golog.Error(err.Error())
 		return nil, errorcode.ErrorConnentMysql()
 	}
 	defer conn.Db.Close()
 
 	searchq, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		galog.Error(err.Error())
+		golog.Error(err.Error())
 		return nil, errorcode.ErrorParams()
 	}
 	searchparam := &getBugSearchParam{} // 接收的参数
 	err = json.Unmarshal(searchq, searchparam)
 	if err != nil {
-		galog.Error(err.Error())
+		golog.Error(err.Error())
 		return nil, errorcode.ErrorParams()
 	}
 	al := &model.AllArticleList{}
@@ -373,7 +373,7 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 			bugsql += fmt.Sprintf("and lid=%d ", lid)
 			countbasesql += fmt.Sprintf("and lid=%d ", lid)
 		} else {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			return nil, errorcode.ErrorSearch()
 		}
 	}
@@ -391,14 +391,14 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 			bugsql += fmt.Sprintf("and pid=%d ", pid)
 			countbasesql += fmt.Sprintf("and pid=%d ", pid)
 		} else {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			return nil, errorcode.ErrorSearch()
 		}
 	}
 
 	err = conn.GetOne(countbasesql+fmt.Sprintf("and sid in (%s)", showstatus), bugconfig.CacheNickNameUid[nickname]).Scan(&al.Count)
 	if err != nil {
-		galog.Error(err.Error())
+		golog.Error(err.Error())
 		return nil, errorcode.ErrorConnentMysql()
 	}
 
@@ -407,7 +407,7 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 
 	rows, err := conn.GetRows(bugsql+fmt.Sprintf("and sid in (%s) limit ?,?", showstatus), bugconfig.CacheNickNameUid[nickname], start, end)
 	if err != nil {
-		galog.Error(err.Error())
+		golog.Error(err.Error())
 		return nil, errorcode.ErrorConnentMysql()
 	}
 

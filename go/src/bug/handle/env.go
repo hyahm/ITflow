@@ -5,7 +5,7 @@ import (
 	"bug/bugconfig"
 	"bug/buglog"
 	"encoding/json"
-	"galog"
+	"github.com/hyahm/golog"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -33,7 +33,7 @@ func EnvList(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -50,7 +50,7 @@ func EnvList(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("env", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -86,7 +86,7 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -102,7 +102,7 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("env", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -118,7 +118,7 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 
 		errorcode.Id, err = conn.InsertWithID(getaritclesql, envname)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -131,7 +131,7 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 		err = il.Add(
 			nickname, errorcode.Id, envname)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -157,7 +157,7 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 		errorcode := &errorstruct{}
 
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -174,7 +174,7 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("env", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -186,13 +186,13 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 		}
 		bpr, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorGetData())
 			return
 		}
 		err = json.Unmarshal(bpr, er)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -201,7 +201,7 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 
 		_, err = conn.Update(getaritclesql, er.EnvName, er.Id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -214,7 +214,7 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 		err = il.Update(
 			nickname, er.Id, er.EnvName)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -240,7 +240,7 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -256,7 +256,7 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("env", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -270,7 +270,7 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 		eid, err := strconv.Atoi(id)
 		if err != nil {
 
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -278,7 +278,7 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 
 		err = conn.GetOne("select count(id) from bugs where eid=?", id).Scan(&count)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -290,7 +290,7 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 
 		_, err = conn.Update(getaritclesql, id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -303,7 +303,7 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 		err = il.Del(
 			nickname, id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}

@@ -2,8 +2,8 @@ package handle
 
 import (
 	"bug/bugconfig"
-	"galog"
 	"github.com/gorilla/mux"
+	"github.com/hyahm/golog"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -26,14 +26,14 @@ func ShowImg(w http.ResponseWriter, r *http.Request) {
 		file, err := os.Open(path.Join(bugconfig.ImgDir, name))
 
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			return
 		}
 		defer file.Close()
 		buff, err := ioutil.ReadAll(file)
 
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			return
 		}
 

@@ -5,7 +5,7 @@ import (
 	"bug/bugconfig"
 	"bug/buglog"
 	"encoding/json"
-	"galog"
+	"github.com/hyahm/golog"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -33,7 +33,7 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -47,13 +47,13 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 		version_add := &addVersion{}
 		s, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorGetData())
 			return
 		}
 		err = json.Unmarshal(s, version_add)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -64,7 +64,7 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("version", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -79,7 +79,7 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 
 		vid, err := conn.InsertWithID(add_version_sql, version_add.Version, version_add.Iphoneurl, version_add.Notiphoneurl, time.Now().Unix(), uid)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -92,7 +92,7 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 		err = il.Add(
 			nickname, vid, version_add.Version)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -136,7 +136,7 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -149,14 +149,14 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 
 		m, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorGetData())
 			return
 		}
 		pl := &pageLimit{}
 		err = json.Unmarshal(m, pl)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -167,7 +167,7 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("version", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -181,7 +181,7 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 
 		rows, err := conn.GetRows(get_version_sql)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -209,7 +209,7 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -228,7 +228,7 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("version", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -240,19 +240,19 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 		}
 		err = conn.GetOne("select count(id) from bugs where id=?", id).Scan(&bugcount)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
 		if bugcount != 0 {
-			galog.Error("vid:%s has bugs", id)
+			golog.Error("vid:%s has bugs", id)
 			w.Write(errorcode.ErrorHasBug())
 			return
 		}
 		deletevl := "delete from version where id=?"
 		errorcode.Id, err = conn.Update(deletevl, id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -271,7 +271,7 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 		err = il.Del(
 			nickname, id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -303,7 +303,7 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -320,7 +320,7 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("version", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -332,13 +332,13 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 		getdata, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorGetData())
 			return
 		}
 		err = json.Unmarshal(getdata, data)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -346,7 +346,7 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 		versionsql := "update version set name=?,urlone=?,urltwo=?,createuid=? where id=?"
 		_, err = conn.Update(versionsql, data.Name, data.Iphone, data.NoIphone, uid, data.Id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -360,7 +360,7 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 		err = il.Update(
 			nickname, data.Id, data.Name)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}

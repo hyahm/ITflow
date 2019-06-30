@@ -6,7 +6,7 @@ import (
 	"bug/buglog"
 	"bug/model"
 	"encoding/json"
-	"galog"
+	"github.com/hyahm/golog"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -23,7 +23,7 @@ func PositionGet(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -40,7 +40,7 @@ func PositionGet(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("position", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -52,7 +52,7 @@ func PositionGet(w http.ResponseWriter, r *http.Request) {
 		}
 		rows, err := conn.GetRows("select id,name,level,hypo from jobs")
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -81,7 +81,7 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -98,7 +98,7 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("position", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -110,14 +110,14 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 		}
 		respbyte, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
 
 		err = json.Unmarshal(respbyte, data)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -134,7 +134,7 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 
 		errorcode.Id, err = conn.InsertWithID("insert into jobs(name,level,hypo) value(?,?,?)", data.Name, data.Level, hid)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -148,7 +148,7 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 		err = il.Add(
 			nickname, errorcode.Id, data.Name)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -173,7 +173,7 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -195,7 +195,7 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("position", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -209,7 +209,7 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 		var count int
 		err = conn.GetOne("select count(id) from user where jid=?", id).Scan(&count)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -220,7 +220,7 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 		// 是否被所属使用
 		err = conn.GetOne("select count(id) from jobs where hypo=?", id).Scan(&count)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -232,7 +232,7 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 
 		_, err = conn.Update(gsql, id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -246,7 +246,7 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 		err = il.Del(
 			nickname, id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -270,7 +270,7 @@ func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -287,7 +287,7 @@ func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("position", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -299,14 +299,14 @@ func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 		respbyte, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
 
 		err = json.Unmarshal(respbyte, data)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -322,7 +322,7 @@ func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 
 		_, err = conn.Update("update jobs set name=?,level=?,hypo=? where id=?", data.Name, data.Level, hid, data.Id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -336,7 +336,7 @@ func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 		err = il.Update(
 			nickname, data.Id, data.Name)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -367,7 +367,7 @@ func GetHypos(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -385,7 +385,7 @@ func GetHypos(w http.ResponseWriter, r *http.Request) {
 
 		rows, err := conn.GetRows("select name  from jobs where level=1")
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -416,7 +416,7 @@ func GetPositions(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -435,7 +435,7 @@ func GetPositions(w http.ResponseWriter, r *http.Request) {
 			var name string
 			err = conn.GetOne("select name from jobs where hypo=?", bugconfig.CacheUidJid[bugconfig.CacheNickNameUid[nickname]]).Scan(&name)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}

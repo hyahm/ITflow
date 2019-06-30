@@ -3,7 +3,7 @@ package handle
 import (
 	"bug/bugconfig"
 	"encoding/json"
-	"galog"
+	"github.com/hyahm/golog"
 	"io/ioutil"
 	"net/http"
 )
@@ -26,7 +26,7 @@ func DefaultStatus(w http.ResponseWriter, r *http.Request) {
 		conn, _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -56,7 +56,7 @@ func DefaultSave(w http.ResponseWriter, r *http.Request) {
 		conn, _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -68,14 +68,14 @@ func DefaultSave(w http.ResponseWriter, r *http.Request) {
 		sl := &DefaultValue{}
 		bytedata, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
 
 		err = json.Unmarshal(bytedata, sl)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -98,7 +98,7 @@ func DefaultSave(w http.ResponseWriter, r *http.Request) {
 		//修改字段
 		_, err = conn.Update("update defaultvalue set status=?, important=?,level=?", sid, iid, lid)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -128,7 +128,7 @@ func DefaultImportant(w http.ResponseWriter, r *http.Request) {
 		conn, _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -161,7 +161,7 @@ func DefaultLevel(w http.ResponseWriter, r *http.Request) {
 		conn, _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return

@@ -2,9 +2,9 @@ package autodb
 
 import (
 	"fmt"
-	"gaconfig"
 	"gadb"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/hyahm/goconfig"
 	"github.com/jinzhu/gorm"
 	"log"
 	"time"
@@ -12,13 +12,13 @@ import (
 
 func InitDb() {
 	connstring := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4",
-		gaconfig.ReadString("mysqluser"),
-		gaconfig.ReadString("mysqlpwd"),
-		gaconfig.ReadString("mysqlhost"),
-		gaconfig.ReadInt("mysqlport"),
-		gaconfig.ReadString("mysqldb"),
+		goconfig.ReadString("mysqluser"),
+		goconfig.ReadString("mysqlpwd"),
+		goconfig.ReadString("mysqlhost"),
+		goconfig.ReadInt("mysqlport"),
+		goconfig.ReadString("mysqldb"),
 	)
-	db, err := gorm.Open(gaconfig.ReadString("sqldriver"), connstring)
+	db, err := gorm.Open(goconfig.ReadString("sqldriver"), connstring)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -116,7 +116,7 @@ func InitDb() {
 			log.Fatal(err)
 		}
 	}
-	if gaconfig.ReadBool("apihelp") {
+	if goconfig.ReadBool("apihelp") {
 		createapi(mysqldb)
 	}
 	fmt.Println("================= check tables success ========================")

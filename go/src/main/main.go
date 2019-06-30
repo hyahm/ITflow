@@ -5,23 +5,25 @@ import (
 	"bug/autodb"
 	"bug/bugconfig"
 	"fmt"
-	"gaconfig"
-	"galog"
+	"github.com/hyahm/goconfig"
+	"github.com/hyahm/golog"
 	"os"
 )
 
 func main() {
 
 	//testimg.TestDoc()
-	gaconfig.InitConf("bug.conf")
+	goconfig.InitConf("bug.conf")
 
 	autodb.InitDb()
 
 	bugconfig.LoadConfig()
-	galog.InitLogger()
+	golog.InitLogger(goconfig.ReadString("logpath"),
+		goconfig.ReadInt64("logsize"),
+		goconfig.ReadBool("logeveryday"))
 
 	////
-	galog.Info("this is an info log")
+	golog.Info("this is an info log")
 	bugservices()
 }
 

@@ -2,7 +2,7 @@ package handle
 
 import (
 	"encoding/json"
-	"galog"
+	"github.com/hyahm/golog"
 	"net/http"
 )
 
@@ -29,7 +29,7 @@ func UserCount(w http.ResponseWriter, r *http.Request) {
 		errorcode := &errorstruct{}
 
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -44,14 +44,14 @@ func UserCount(w http.ResponseWriter, r *http.Request) {
 		getgroupsql := "select count(id) from rolegroup"
 		err = conn.GetOne(getusersql).Scan(&uc.CountUsers)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
 
 		err = conn.GetOne(getgroupsql).Scan(&uc.CountGroups)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -80,7 +80,7 @@ func ProjectCount(w http.ResponseWriter, r *http.Request) {
 		conn, _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -94,7 +94,7 @@ func ProjectCount(w http.ResponseWriter, r *http.Request) {
 		getbugs := "select count(id) from bugs"
 		err = conn.GetOne(getbugs).Scan(&pc.CountBugs)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}

@@ -4,7 +4,7 @@ import (
 	"bug/bugconfig"
 	"database/sql"
 	"encoding/json"
-	"galog"
+	"github.com/hyahm/golog"
 	"html"
 	"io"
 	"io/ioutil"
@@ -139,7 +139,7 @@ func GetEnv(w http.ResponseWriter, r *http.Request) {
 		errorcode := &errorstruct{}
 		conn, _, err := logtokenmysql(r)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 			}
@@ -186,7 +186,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		conn, _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -201,7 +201,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		rows, err := conn.GetRows(getusersql)
 
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -234,7 +234,7 @@ func GetVersion(w http.ResponseWriter, r *http.Request) {
 		conn, _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -286,7 +286,7 @@ func UploadImgs(w http.ResponseWriter, r *http.Request) {
 		errorcode := &errorstruct{}
 		file, h, err := r.FormFile("file")
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -295,7 +295,7 @@ func UploadImgs(w http.ResponseWriter, r *http.Request) {
 
 		cfile, err := os.OpenFile(path.Join(bugconfig.ImgDir, filename), os.O_CREATE|os.O_RDWR, 0755)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorFileNotFound())
 			return
 		}
@@ -303,7 +303,7 @@ func UploadImgs(w http.ResponseWriter, r *http.Request) {
 
 		_, err = io.Copy(cfile, file)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorFileNotFound())
 			return
 		}
@@ -364,7 +364,7 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 		db, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -377,14 +377,14 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 
 		image, header, err := r.FormFile("upload")
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
 		imgcode := make([]byte, header.Size)
 		_, err = image.Read(imgcode)
 		if err != nil {
-			galog.Error("parse uploadImage struct fail,%v", err)
+			golog.Error("parse uploadImage struct fail,%v", err)
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
@@ -393,7 +393,7 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 		filename := prefix + ".png"
 		err = ioutil.WriteFile(path.Join(bugconfig.ImgDir, filename), imgcode, 0655) //buffer输出到jpg文件中（不做处理，直接写到文件）
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
@@ -410,7 +410,7 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 
 		_, err = db.Update(uploadimg, url.Url, nickname)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.WriteHeader(http.StatusBadGateway)
 			return
 		}
@@ -435,7 +435,7 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 		errorcode := &errorstruct{}
 		conn, _, err := logtokenmysql(r)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -448,7 +448,7 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 		getinfosql := "select uid,info,time from informations where bid=?"
 		rows, err := conn.GetRows(getinfosql, bid)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -465,7 +465,7 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 		var vid int64
 		err = conn.GetOne(getlistsql, bid).Scan(&sl.Title, &sl.Content, &vid, &statusid, &sl.Id)
 		if err != nil && err != sql.ErrNoRows {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}

@@ -6,7 +6,7 @@ import (
 	"errors"
 	"gadb"
 	"gaencrypt"
-	"galog"
+	"github.com/hyahm/golog"
 	"net/http"
 	"strconv"
 	"strings"
@@ -33,12 +33,12 @@ func logtokenmysql(r *http.Request) (*gadb.Db, string, error) {
 	a := r.Header.Get("X-Token")
 	destoken, err := gaencrypt.RsaDecrypt(a, bugconfig.PrivateKey, true)
 	if err != nil {
-		galog.Error(err.Error())
+		golog.Error(err.Error())
 		return mdb, "", NotFoundToken
 	}
 	nickname, err := asset.Getvalue(string(destoken))
 	if err != nil {
-		galog.Error(err.Error())
+		golog.Error(err.Error())
 		return mdb, "", NotFoundToken
 
 	}

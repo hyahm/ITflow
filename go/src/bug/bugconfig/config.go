@@ -2,8 +2,8 @@ package bugconfig
 
 import (
 	"fmt"
-	"gaconfig"
 	"gadb"
+	"github.com/hyahm/goconfig"
 	"log"
 	"os"
 	"runtime"
@@ -81,17 +81,17 @@ var (
 )
 
 func LoadConfig() {
-	ImgDir = gaconfig.ReadString("imgdir")
+	ImgDir = goconfig.ReadString("imgdir")
 	err := os.MkdirAll(ImgDir,0755)
 	if err != nil {
 		log.Fatal(err)
 	}
-	PrivateKey = gaconfig.ReadFile("privatekeyfile")
-	ShowBaseUrl = gaconfig.ReadString("showbaseurl")
-	Salt = gaconfig.ReadString("salt")
-	ShareDir = gaconfig.ReadString("sharedir")
+	PrivateKey = goconfig.ReadFile("privatekeyfile")
+	ShowBaseUrl = goconfig.ReadString("showbaseurl")
+	Salt = goconfig.ReadString("salt")
+	ShareDir = goconfig.ReadString("sharedir")
 	ShareDir = addXieGang(ShareDir)
-	Exclude = gaconfig.ReadStringArray("exclude")
+	Exclude = goconfig.ReadStringArray("exclude")
 	// 创建共享文件夹
 	err = os.MkdirAll(ShareDir, 0755)
 	if err != nil {
@@ -142,7 +142,7 @@ func LoadConfig() {
 	CacheNameTid = make(map[string]int64, 0)
 	CacheEmail = &Email{}
 
-	Expirontion = gaconfig.ReadInt("redisexpiration")
+	Expirontion = goconfig.ReadInt("redisexpiration")
 	DEADLINE = time.Minute * time.Duration(Expirontion)
 	fmt.Println("cookie过期时间为：", Expirontion, "m")
 	mconf := gadb.NewSqlConfig()

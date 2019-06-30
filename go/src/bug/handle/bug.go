@@ -8,7 +8,7 @@ import (
 	"bug/public"
 	"encoding/json"
 	"fmt"
-	"galog"
+	"github.com/hyahm/golog"
 	"html"
 	"io/ioutil"
 	"net/http"
@@ -34,7 +34,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 		errorcode := &errorstruct{}
 
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -70,7 +70,7 @@ func ShowStatus(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -106,7 +106,7 @@ func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -147,7 +147,7 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
 		conn, name, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -161,7 +161,7 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
 		err = conn.GetOne("select email,realname from user where nickname=?", name).Scan(&sl.Email, &sl.Realname)
 
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -185,7 +185,7 @@ func UpdateInfo(w http.ResponseWriter, r *http.Request) {
 		errorcode := &errorstruct{}
 
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -198,13 +198,13 @@ func UpdateInfo(w http.ResponseWriter, r *http.Request) {
 
 		ss, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorGetData())
 			return
 		}
 		err = json.Unmarshal(ss, sl)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -213,7 +213,7 @@ func UpdateInfo(w http.ResponseWriter, r *http.Request) {
 		_, err = conn.Update("update user set email=?,realname=?,nickname=? where id=?", sl.Email, sl.Realname, sl.Nickname, uid)
 
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -233,7 +233,7 @@ func UpdateInfo(w http.ResponseWriter, r *http.Request) {
 
 		err = insertlog(conn, "updateinfo", name+"修改了用户信息", r)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -256,7 +256,7 @@ func UpdateRoles(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -269,14 +269,14 @@ func UpdateRoles(w http.ResponseWriter, r *http.Request) {
 
 		ss, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorGetData())
 			return
 		}
 
 		err = json.Unmarshal(ss, sl)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -295,14 +295,14 @@ func UpdateRoles(w http.ResponseWriter, r *http.Request) {
 
 		_, err = conn.Update("update user set rid=? where id=?", rid, sl.Id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
 
 		err = insertlog(conn, "updaterole", nickname+"修改了角色权限", r)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -337,7 +337,7 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -354,7 +354,7 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("log", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -367,7 +367,7 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 		dsql := "select id,exectime,classify,content,ip from log order by id desc"
 		rows, err := conn.GetRows(dsql)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -394,7 +394,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -407,14 +407,14 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		listlog := &model.List_log{}
 		bytedata, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorGetData())
 			return
 		}
 
 		err = json.Unmarshal(bytedata, alllog)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -425,7 +425,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("log", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -465,7 +465,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("endsql:", endsql)
 		err = conn.GetOne("select count(id) from log " + endsql).Scan(&listlog.Count)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -476,7 +476,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("------", start, "------", end)
 		rows, err := conn.GetRows(basesql+endsql+" limit ?,?", start, end)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -546,7 +546,7 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -559,14 +559,14 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 
 		searchq, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorGetData())
 			return
 		}
 
 		err = json.Unmarshal(searchq, param)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -581,7 +581,7 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 
 		_, err = conn.Update(basesql, sid, param.Id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -594,7 +594,7 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 		err = il.Update(
 			param.Id, nickname, param.Status)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -616,7 +616,7 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -629,13 +629,13 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 
 		searchq, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorGetData())
 			return
 		}
 		err = json.Unmarshal(searchq, param)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -654,7 +654,7 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 
 		_, err = conn.Update(basesql, showstatus, bugconfig.CacheNickNameUid[nickname])
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -678,7 +678,7 @@ func GetAllBugs(w http.ResponseWriter, r *http.Request) {
 		conn, _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -691,7 +691,7 @@ func GetAllBugs(w http.ResponseWriter, r *http.Request) {
 
 		searchq, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			al.Code = 7
 			send, _ := json.Marshal(al)
 			w.Write(send)
@@ -700,7 +700,7 @@ func GetAllBugs(w http.ResponseWriter, r *http.Request) {
 		searchparam := &getBugSearchParam{}
 		err = json.Unmarshal(searchq, searchparam)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			al.Code = 5
 			send, _ := json.Marshal(al)
 			w.Write(send)
@@ -709,7 +709,7 @@ func GetAllBugs(w http.ResponseWriter, r *http.Request) {
 
 		err = conn.GetOne("select count(id) from bugs").Scan(&al.Count)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			al.Code = 5
 			send, _ := json.Marshal(al)
 			w.Write(send)
@@ -720,7 +720,7 @@ func GetAllBugs(w http.ResponseWriter, r *http.Request) {
 		alsql := "select id,createtime,importent,status,bugtitle,uid,level,pid,env,spusers from bugs where dustbin=0 order by id desc limit ?,?"
 		rows, err := conn.GetRows(alsql, start, end)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			al.Code = 1
 			send, _ := json.Marshal(al)
 			w.Write(send)
@@ -761,7 +761,7 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 		conn, name, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -774,21 +774,21 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 
 		searchq, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorGetData())
 			return
 		}
 		searchparam := &getBugSearchParam{}
 		err = json.Unmarshal(searchq, searchparam)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
 		uid := bugconfig.CacheNickNameUid[name]
 		err = conn.GetOne("select count(id) from bugs where uid=?", uid).Scan(&al.Count)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -797,7 +797,7 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 		alsql := "select id,createtime,importent,status,bugtitle,uid,level,pid,env,spusers from bugs where uid=? and dustbin=0 order by id desc limit ?,?"
 		rows, err := conn.GetRows(alsql, uid, start, end)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -834,7 +834,7 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -847,7 +847,7 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 		var uid int64
 		err = conn.GetOne("select uid from bugs where id=?", id).Scan(&uid)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -857,7 +857,7 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 		}
 		_, err = conn.Update("update bugs set dustbin=true where id=?", id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -868,7 +868,7 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 		}
 		err = il.Del(id, nickname)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -901,7 +901,7 @@ func BugEdit(w http.ResponseWriter, r *http.Request) {
 		conn, _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -922,7 +922,7 @@ func BugEdit(w http.ResponseWriter, r *http.Request) {
 		alsql := "select iid,bugtitle,lid,pid,eid,spusers,vid,content from bugs where id=?"
 		err = conn.GetOne(alsql, id).Scan(&iid, &al.Title, &lid, &pid, &eid, &uidlist, &vid, &al.Content)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}

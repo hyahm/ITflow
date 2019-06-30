@@ -3,8 +3,8 @@ package autodb
 import (
 	"database/sql"
 	"fmt"
-	"gaconfig"
 	"gadb"
+	"github.com/hyahm/goconfig"
 	"log"
 	"strconv"
 	"strings"
@@ -13,17 +13,17 @@ import (
 func createapi(conn *gadb.Db) {
 	var pid int64
 	// 判断是否存在项目名
-	err := conn.GetOne("select id from apiproject where name=?", gaconfig.ReadString("apiname")).Scan(&pid)
+	err := conn.GetOne("select id from apiproject where name=?", goconfig.ReadString("apiname")).Scan(&pid)
 	if err != nil && err != sql.ErrNoRows {
 		log.Fatal(err)
 	}
 	// 不存在就创建
 	if pid == 0 {
-		pid, err = conn.InsertWithID("insert into apiproject(name,ownerid,auth) values(?,1,0)", gaconfig.ReadString("apiname"))
+		pid, err = conn.InsertWithID("insert into apiproject(name,ownerid,auth) values(?,1,0)", goconfig.ReadString("apiname"))
 		if err != nil {
 			log.Fatal(err)
 		}
-	} else if gaconfig.ReadBool("apicover") {
+	} else if goconfig.ReadBool("apicover") {
 
 		_, err = conn.Update("delete from apilist where pid=?", pid)
 		if err != nil {

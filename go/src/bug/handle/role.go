@@ -6,7 +6,7 @@ import (
 	"bug/buglog"
 	"bug/model"
 	"encoding/json"
-	"galog"
+	"github.com/hyahm/golog"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -25,7 +25,7 @@ func RoleList(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -42,7 +42,7 @@ func RoleList(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("rolegroup", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -55,7 +55,7 @@ func RoleList(w http.ResponseWriter, r *http.Request) {
 		s := "select id,name,rolelist from rolegroup"
 		rows, err := conn.GetRows(s)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -88,7 +88,7 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -110,7 +110,7 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("rolegroup", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -124,7 +124,7 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 		var count int
 		err = conn.GetOne(ssql, id).Scan(&count)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -135,7 +135,7 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 		isql := "delete from  rolegroup where id = ?"
 		_, err = conn.Update(isql, id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -148,7 +148,7 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 		err = il.Del(
 			nickname, id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -172,7 +172,7 @@ func EditRole(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -189,7 +189,7 @@ func EditRole(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("rolegroup", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -201,13 +201,13 @@ func EditRole(w http.ResponseWriter, r *http.Request) {
 		}
 		bytedata, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
 		err = json.Unmarshal(bytedata, data)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -218,7 +218,7 @@ func EditRole(w http.ResponseWriter, r *http.Request) {
 		gsql := "update rolegroup set name=?,rolelist=?  where id=?"
 		_, err = conn.Update(gsql, data.Name, strings.Join(rl, ","), data.Id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -231,7 +231,7 @@ func EditRole(w http.ResponseWriter, r *http.Request) {
 		err = il.Update(
 			nickname, data.Id, data.Name)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -255,7 +255,7 @@ func AddRole(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -272,7 +272,7 @@ func AddRole(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("rolegroup", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -284,18 +284,18 @@ func AddRole(w http.ResponseWriter, r *http.Request) {
 		}
 		respbyte, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
 		err = json.Unmarshal(respbyte, data)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
 		if data.Name == "" {
-			galog.Error("name is empty")
+			golog.Error("name is empty")
 			w.Write(errorcode.ErrorNull())
 			return
 		}
@@ -306,7 +306,7 @@ func AddRole(w http.ResponseWriter, r *http.Request) {
 		gsql := "insert rolegroup(name,rolelist) values(?,?)"
 		errorcode.Id, err = conn.InsertWithID(gsql, data.Name, strings.Join(ids, ","))
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -320,7 +320,7 @@ func AddRole(w http.ResponseWriter, r *http.Request) {
 		err = il.Add(
 			nickname, errorcode.Id, data.Name)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -344,7 +344,7 @@ func RoleGroupName(w http.ResponseWriter, r *http.Request) {
 		conn, _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return

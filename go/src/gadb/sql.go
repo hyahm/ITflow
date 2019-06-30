@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"gaconfig"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/hyahm/goconfig"
 	"log"
 	"strconv"
 	"strings"
@@ -27,12 +27,12 @@ type Sconfig struct {
 
 func NewSqlConfig() *Sconfig {
 	return &Sconfig{
-		UserName: gaconfig.ReadString("mysqluser"),
-		Password: gaconfig.ReadString("mysqlpwd"),
-		Host:     gaconfig.ReadString("mysqlhost"),
-		Port:     gaconfig.ReadInt("mysqlport"),
-		DbName:   gaconfig.ReadString("mysqldb"),
-		Driver:   gaconfig.ReadString("sqldriver"),
+		UserName: goconfig.ReadString("mysqluser"),
+		Password: goconfig.ReadString("mysqlpwd"),
+		Host:     goconfig.ReadString("mysqlhost"),
+		Port:     goconfig.ReadInt("mysqlport"),
+		DbName:   goconfig.ReadString("mysqldb"),
+		Driver:   goconfig.ReadString("sqldriver"),
 	}
 }
 
@@ -162,7 +162,7 @@ func (d *Db) GetOne(cmd string, args ...interface{}) *sql.Row {
 }
 
 //func (d *Db) SelectSlice_Slice(cmd string, args ...interface{}) (record [][]string, r int, err error) {
-//	logger := galog.NewLog()
+//	logger := golog.NewLog()
 //	starttime := time.Now()
 //	selectsql := cmdtostring(cmd, args...)
 //	row, err1 := d.Db.QueryContext(context.Background(), cmd, args...)
@@ -219,7 +219,7 @@ func (d *Db) GetOne(cmd string, args ...interface{}) *sql.Row {
 //
 ////[]map[string]string
 //func (d *Db) SelectJson_String(cmd string, args ...interface{}) (vuestr string, err error) {
-//	logger := galog.NewLog()
+//	logger := golog.NewLog()
 //	starttime := time.Now()
 //	row, err1 := d.Db.QueryContext(context.Background(), cmd, args...)
 //	if err1 != nil {
@@ -268,7 +268,7 @@ func (d *Db) GetOne(cmd string, args ...interface{}) *sql.Row {
 //}
 //
 //func (d *Db) SelectJson_StringWithIndex(cmd string, args ...interface{}) (j string, err error) {
-//	logger := galog.NewLog()
+//	logger := golog.NewLog()
 //	starttime := time.Now()
 //
 //	row, err1 := d.Db.QueryContext(context.Background(), cmd, args...)
@@ -321,7 +321,7 @@ func (d *Db) GetOne(cmd string, args ...interface{}) *sql.Row {
 //}
 //
 //func (d *Db) SelectJson_String_Add(addkey string, addvalue string, cmd string, args ...interface{}) (j string, err error) {
-//	logger := galog.NewLog()
+//	logger := golog.NewLog()
 //	starttime := time.Now()
 //
 //	row, err1 := d.Db.QueryContext(context.Background(), cmd, args...)

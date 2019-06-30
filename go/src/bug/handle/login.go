@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"gadb"
 	"gaencrypt"
-	"galog"
+	"github.com/hyahm/golog"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -33,7 +33,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		errorcode := &errorstruct{}
 		s, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorGetData())
 			return
 		}
@@ -41,7 +41,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 		err = json.Unmarshal(s, login)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -49,7 +49,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		conn, err := gadb.NewSqlConfig().ConnDB()
 
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -57,7 +57,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		// 解密
 		username, err := gaencrypt.RsaDecrypt(login.Username, bugconfig.PrivateKey, true)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorRsa())
 			return
 		}
@@ -65,7 +65,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		tmp, err := gaencrypt.RsaDecrypt(login.Password, bugconfig.PrivateKey, true)
 		if err != nil {
 
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorRsa())
 			return
 		}
@@ -80,18 +80,18 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		err = conn.GetOne(getsql, string(username), enpassword).Scan(&login.Username)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				galog.Error("username or password error")
+				golog.Error("username or password error")
 				w.Write(errorcode.ErrorUserNameOrPassword())
 				return
 			}
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
 
 		err = asset.Setkey(login.Token, login.Username)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentRedis())
 			return
 		}
@@ -103,7 +103,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		}
 		err = il.Login("nickname: %s has login", login.Username)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -125,7 +125,7 @@ func Loginout(w http.ResponseWriter, r *http.Request) {
 		errorcode := &errorstruct{}
 		conn, err := gadb.NewSqlConfig().ConnDB()
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -134,7 +134,7 @@ func Loginout(w http.ResponseWriter, r *http.Request) {
 		token := r.FormValue("token")
 		nickname, err := asset.Getvalue(token)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentRedis())
 			return
 		}
@@ -145,7 +145,7 @@ func Loginout(w http.ResponseWriter, r *http.Request) {
 		}
 		err = il.Login("nickname: %s has logout", nickname)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -168,7 +168,7 @@ func UserInfo(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -184,7 +184,7 @@ func UserInfo(w http.ResponseWriter, r *http.Request) {
 		var level int
 		err = conn.GetOne(sql, nickname).Scan(&rid, &level, &userinfo.Avatar)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}

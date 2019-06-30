@@ -6,7 +6,7 @@ import (
 	"bug/model"
 	"encoding/json"
 	"fmt"
-	"galog"
+	"github.com/hyahm/golog"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -24,7 +24,7 @@ func HeaderList(w http.ResponseWriter, r *http.Request) {
 		conn, _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -38,7 +38,7 @@ func HeaderList(w http.ResponseWriter, r *http.Request) {
 		gsql := "select id,name,hhids,remark from header"
 		rows, err := conn.GetRows(gsql)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -50,7 +50,7 @@ func HeaderList(w http.ResponseWriter, r *http.Request) {
 			if hs != "" {
 				hrow, err := conn.GetRows(fmt.Sprintf("select id,k,v from headerlist where id in (%v)", hs))
 				if err != nil {
-					galog.Error(err.Error())
+					golog.Error(err.Error())
 					w.Write(errorcode.ErrorConnentMysql())
 					return
 				}
@@ -81,7 +81,7 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -98,14 +98,14 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 		data := &model.Data_header{}
 		respbyte, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
 
 		err = json.Unmarshal(respbyte, data)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -114,7 +114,7 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 		for _, v := range data.Hhids {
 			id, err := conn.InsertWithID("insert into headerlist(k,v) values(?,?)", v.Key, v.Value)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -124,7 +124,7 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 		gsql := "insert into header(name,hhids,remark) values(?,?,?)"
 		errorcode.Id, err = conn.Insert(gsql, data.Name, ids, data.Remark)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -137,7 +137,7 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 		err = il.Add(
 			nickname, errorcode.Id, data.Name)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -161,7 +161,7 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -185,7 +185,7 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 		var count int
 		err = conn.GetOne(" select count(id) from apilist where hid=?", id).Scan(&count)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -198,7 +198,7 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 		var hids string
 		err = conn.GetOne("select hhids from header where id=?", id).Scan(&hids)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -206,7 +206,7 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 		if hids != "" {
 			_, err = conn.Update(fmt.Sprintf("delete from headerlist where id in (%v)", hids))
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -214,7 +214,7 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 		// 删除header
 		_, err = conn.Update("delete from header where id=?", id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -228,7 +228,7 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 		err = il.Del(
 			nickname, id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -253,7 +253,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -270,14 +270,14 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 		respbyte, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
 
 		err = json.Unmarshal(respbyte, data)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -285,7 +285,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 		var oldheadids string
 		err = conn.GetOne("select hhids from header where id=?", data.Id).Scan(&oldheadids)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -298,7 +298,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 			if v.Id > 0 {
 				_, err = conn.Update("update headerlist set k=?,v=? where id=?", v.Key, v.Value, v.Id)
 				if err != nil {
-					galog.Error(err.Error())
+					golog.Error(err.Error())
 					w.Write(errorcode.ErrorConnentMysql())
 					return
 				}
@@ -321,7 +321,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 				//否则就添加,id也要返回
 				hl.Id, err = conn.InsertWithID("insert into headerlist(k,v) values(?,?)", v.Key, v.Value)
 				if err != nil {
-					galog.Error(err.Error())
+					golog.Error(err.Error())
 					w.Write(errorcode.ErrorConnentMysql())
 					return
 				}
@@ -335,7 +335,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 		if len(delhhids) > 0 {
 			_, err = conn.Update(fmt.Sprintf("delete from headerlist where id in (%s)", strings.Join(delhhids, ",")))
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -345,7 +345,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 		hids := strings.Join(idstr, ",")
 		_, err = conn.Update("update header set name=?,hhids=?,remark=? where id=?", data.Name, hids, data.Remark, data.Id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -358,7 +358,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 		err = il.Update(
 			nickname, data.Id, data.Name)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -389,7 +389,7 @@ func HeaderGet(w http.ResponseWriter, r *http.Request) {
 		conn, _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return

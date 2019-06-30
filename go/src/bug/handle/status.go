@@ -6,7 +6,7 @@ import (
 	"bug/buglog"
 	"bug/model"
 	"encoding/json"
-	"galog"
+	"github.com/hyahm/golog"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -34,7 +34,7 @@ func StatusList(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -50,7 +50,7 @@ func StatusList(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("status", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -86,7 +86,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -102,7 +102,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("status", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -114,7 +114,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 		}
 		ss, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorGetData())
 			return
 		}
@@ -123,7 +123,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 
 		errorcode.Id, err = conn.InsertWithID("insert into status(name) values(?)", s.Name)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -137,7 +137,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 		err = il.Add(
 			nickname, errorcode.Id, s.Name)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -164,7 +164,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -177,7 +177,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 		id := r.FormValue("id")
 		sid, err := strconv.Atoi(id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -188,7 +188,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("status", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -202,12 +202,12 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 		var bcount int
 		err = conn.GetOne("select count(id) from bugs where sid=?", sid).Scan(&bcount)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
 		if bcount > 0 {
-			galog.Error("sid:%d 删除失败", sid)
+			golog.Error("sid:%d 删除失败", sid)
 			w.Write(errorcode.ErrorHasBug())
 			return
 		}
@@ -229,7 +229,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 
 		_, err = conn.Update("delete from  status where id=?", sid)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -239,7 +239,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 			bugconfig.CacheDefault["status"] = 0
 			_, err = conn.Update("update defaultvalue set status=0 ")
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -253,7 +253,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 		err = il.Del(
 			nickname, sid)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -281,7 +281,7 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return
@@ -298,7 +298,7 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 		} else {
 			permssion, err = asset.CheckPerm("status", nickname, conn)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -310,21 +310,21 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 		ss, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorGetData())
 			return
 		}
 		s := &status{}
 		err = json.Unmarshal(ss, s)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorGetData())
 			return
 		}
 
 		_, err = conn.Update("update status set name=? where id=?", s.Name, s.Id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -338,7 +338,7 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 		err = il.Update(
 			nickname, s.Id, s.Name)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -367,7 +367,7 @@ func StatusGroupName(w http.ResponseWriter, r *http.Request) {
 		conn, _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			if err == NotFoundToken {
 				w.Write(errorcode.ErrorNotFoundToken())
 				return

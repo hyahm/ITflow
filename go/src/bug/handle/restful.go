@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"gadb"
-	"galog"
+	"github.com/hyahm/golog"
 	"html"
 	"io/ioutil"
 	"net/http"
@@ -27,7 +27,7 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 		tl := &model.List_restful{}
 		conn, nickname, err := logtokenmysql(r)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -35,7 +35,7 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 
 		rows, err := conn.GetRows("select id,name,ownerid,auth,readuser,edituser,rid,eid from apiproject")
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -75,7 +75,7 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 					var ids string
 					err = conn.GetOne("select ids from usergroup where id=?", rid).Scan(&ids)
 					if err != nil {
-						galog.Error(err.Error())
+						golog.Error(err.Error())
 						w.Write(errorcode.ErrorConnentMysql())
 						return
 					}
@@ -104,7 +104,7 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 					var ids string
 					err = conn.GetOne("select ids from usergroup where id=?", eid).Scan(&ids)
 					if err != nil {
-						galog.Error(err.Error())
+						golog.Error(err.Error())
 						w.Write(errorcode.ErrorConnentMysql())
 						return
 					}
@@ -141,19 +141,19 @@ func RestUpdate(w http.ResponseWriter, r *http.Request) {
 		tl := &model.Data_restful{}
 		conn, nickname, err := logtokenmysql(r)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
 		respbyte, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
 		err = json.Unmarshal(respbyte, tl)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -198,7 +198,7 @@ func RestUpdate(w http.ResponseWriter, r *http.Request) {
 			tl.Edituser,
 			rid, eid, tl.Id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -211,7 +211,7 @@ func RestUpdate(w http.ResponseWriter, r *http.Request) {
 		err = il.Update(
 			nickname, tl.Id, tl.Name)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -232,7 +232,7 @@ func RestAdd(w http.ResponseWriter, r *http.Request) {
 		errorcode := &errorstruct{}
 		conn, nickname, err := logtokenmysql(r)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -241,13 +241,13 @@ func RestAdd(w http.ResponseWriter, r *http.Request) {
 		dr := &model.Data_restful{}
 		bytedata, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
 		err = json.Unmarshal(bytedata, dr)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -275,7 +275,7 @@ func RestAdd(w http.ResponseWriter, r *http.Request) {
 		errorcode.Id, err = conn.Insert(restsql,
 			dr.Name, uid, dr.Auth, dr.Readuser, dr.Edituser, rid, eid)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -288,7 +288,7 @@ func RestAdd(w http.ResponseWriter, r *http.Request) {
 		err = il.Add(
 			nickname, errorcode.Id, dr.Name)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -310,7 +310,7 @@ func RestDel(w http.ResponseWriter, r *http.Request) {
 		id := r.FormValue("id")
 		conn, nickname, err := logtokenmysql(r)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -318,7 +318,7 @@ func RestDel(w http.ResponseWriter, r *http.Request) {
 		// 只有创建者才能删除
 		eff, err := conn.Update("delete from apiproject where id=? and ownerid=?", id, bugconfig.CacheNickNameUid[nickname])
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -326,7 +326,7 @@ func RestDel(w http.ResponseWriter, r *http.Request) {
 		if eff > 0 {
 			_, err = conn.Update("delete from apilist where pid=? ", id)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -340,7 +340,7 @@ func RestDel(w http.ResponseWriter, r *http.Request) {
 		err = il.Del(
 			nickname, id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -363,7 +363,7 @@ func ApiList(w http.ResponseWriter, r *http.Request) {
 		conn, nickname, err := logtokenmysql(r)
 		pid := r.FormValue("pid")
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -371,14 +371,14 @@ func ApiList(w http.ResponseWriter, r *http.Request) {
 		//判断这个用户是否有权限访问
 		hasperm, err := checkapiperm(conn, pid, bugconfig.CacheNickNameUid[nickname])
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
 		if hasperm {
 			rows, err := conn.GetRows("select id,name from apilist where pid=?", pid)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -408,7 +408,7 @@ func checkapiperm(conn *gadb.Db, pid string, uid int64) (bool, error) {
 	err := conn.GetOne("select ownerid,auth,readuser,edituser,rid,eid from apiproject where id=?", pid).Scan(
 		&oid, &auth, &readuser, &edituser, &rid, &eid)
 	if err != nil {
-		galog.Error(err.Error())
+		golog.Error(err.Error())
 		return false, err
 	}
 	if uid == oid {
@@ -469,7 +469,7 @@ func checkeditperm(conn *gadb.Db, pid string, uid int64) (bool, error) {
 	err := conn.GetOne("select ownerid,auth,edituser,eid from apiproject where id=?", pid).Scan(
 		&oid, &auth, &edituser, &eid)
 	if err != nil {
-		galog.Error(err.Error())
+		golog.Error(err.Error())
 		return false, err
 	}
 	if uid == oid {
@@ -514,19 +514,19 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 		tl := &model.Get_apilist{}
 		conn, nickname, err := logtokenmysql(r)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
 		respbyte, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
 		err = json.Unmarshal(respbyte, tl)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -535,7 +535,7 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 		var oldopts string
 		err = conn.GetOne("select opts from apilist where id=?", tl.Id).Scan(&oldopts)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -549,7 +549,7 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 						_, err = conn.Update("update options set info=?,name=?,tid=?,df=?,need=? where id=?",
 							v.Info, v.Name, tid, v.Default, v.Need, v.Id)
 						if err != nil {
-							galog.Error(err.Error())
+							golog.Error(err.Error())
 							w.Write(errorcode.ErrorConnentMysql())
 							return
 						}
@@ -568,7 +568,7 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 						tmpid, err := conn.Insert("insert into options(info,name,tid,df,need) values(?,?,?,?,?)",
 							v.Info, v.Name, tid, v.Default, v.Need)
 						if err != nil {
-							galog.Error(err.Error())
+							golog.Error(err.Error())
 							w.Write(errorcode.ErrorConnentMysql())
 							return
 						}
@@ -580,7 +580,7 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 			//删除多余的
 			_, err = conn.Update(fmt.Sprintf("delete from options where id in (%s)", oldopts))
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -593,7 +593,7 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 			_, err = conn.Update("update apilist set url=?,information=?,opts=?,methods=?,result=?,name=?,hid=?,calltype=?,resp=? where id=?",
 				tl.Url, html.EscapeString(tl.Information), oids, strings.Join(ms, ","), html.EscapeString(tl.Result), tl.Name, bugconfig.CacheHeaderHid[tl.Header], tl.CallType, html.EscapeString(tl.Resp), tl.Id)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -611,7 +611,7 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 		err = il.Update(
 			nickname, tl.Id, tl.Name)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -632,7 +632,7 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 		errorcode := &errorstruct{}
 		conn, nickname, err := logtokenmysql(r)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -640,30 +640,30 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 		al := &model.Get_apilist{}
 		respbyte, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
 		fmt.Println(string(respbyte))
 		err = json.Unmarshal(respbyte, al)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
 		if al.Name == "" {
-			galog.Error("name is empty")
+			golog.Error("name is empty")
 			w.Write(errorcode.ErrorNull())
 			return
 		}
 		if al.Url == "" {
-			galog.Error("url is empty")
+			golog.Error("url is empty")
 			w.Write(errorcode.ErrorNull())
 			return
 		}
 
 		if len(al.Methods) == 0 {
-			galog.Error("methoad is empty")
+			golog.Error("methoad is empty")
 			w.Write(errorcode.ErrorNull())
 			return
 		}
@@ -674,7 +674,7 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 				tmpid, err := conn.Insert("insert into options(info,name,tid,df,need) values(?,?,?,?,?)",
 					v.Info, v.Name, tid, v.Default, v.Need)
 				if err != nil {
-					galog.Error(err.Error())
+					golog.Error(err.Error())
 					w.Write(errorcode.ErrorConnentMysql())
 					return
 				}
@@ -699,7 +699,7 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 		var ok bool
 		if al.Header != "" {
 			if hid, ok = bugconfig.CacheHeaderHid[al.Header]; !ok {
-				galog.Error("key not found")
+				golog.Error("key not found")
 				w.Write(errorcode.ErrorKeyNotFound())
 				return
 			}
@@ -709,7 +709,7 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 			al.Pid, al.Url, html.EscapeString(al.Information), oid, ms,
 			html.EscapeString(al.Result), al.Name, bugconfig.CacheNickNameUid[nickname], hid, al.CallType, html.EscapeString(al.Resp))
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -723,7 +723,7 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 		err = il.Add(
 			nickname, errorcode.Id, al.Name)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -745,7 +745,7 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 		id := r.FormValue("id")
 		conn, nickname, err := logtokenmysql(r)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -755,14 +755,14 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 		var uid int64
 		err = conn.GetOne("select pid,opts,uid from apilist where id=?", id).Scan(&pid, &oids, &uid)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
 		var oid int64
 		err = conn.GetOne("select ownerid from apiproject where id=?", pid).Scan(&oid)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -775,7 +775,7 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 			for _, v := range ol {
 				_, err = conn.Update("delete from options where id=?", v)
 				if err != nil {
-					galog.Error(err.Error())
+					golog.Error(err.Error())
 					w.Write(errorcode.ErrorConnentMysql())
 					return
 				}
@@ -784,7 +784,7 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 
 		_, err = conn.Update("delete from apilist where id=?", id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -797,7 +797,7 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 		err = il.Del(
 			nickname, id)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -821,7 +821,7 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 
 		conn, nickname, err := logtokenmysql(r)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -848,7 +848,7 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 		sl.Resp = html.UnescapeString(sl.Resp)
 		sl.Result = html.UnescapeString(sl.Result)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -857,13 +857,13 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 		if hid > 0 {
 			err = conn.GetOne("select hhids,remark from header where id=?", hid).Scan(&ids, &sl.Remark)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
 			hrows, err := conn.GetRows(fmt.Sprintf("select k,v from headerlist where id in (%v)", ids))
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -876,7 +876,7 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 		// 判断权限
 		hasperm, err := checkapiperm(conn, strconv.Itoa(sl.Pid), bugconfig.CacheNickNameUid[nickname])
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -889,7 +889,7 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 
 			orows, err := conn.GetRows(fmt.Sprintf("select id,info,name,tid,df,need from options where id in (%s)", oids))
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -927,7 +927,7 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 
 		conn, nickname, err := logtokenmysql(r)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -954,7 +954,7 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 		sl.Resp = html.UnescapeString(sl.Resp)
 		sl.Result = html.UnescapeString(sl.Result)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -963,7 +963,7 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 		if hid > 0 {
 			err = conn.GetOne("select name,hhids,remark from header where id=?", hid).Scan(&sl.Header, &ids, &sl.Remark)
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -971,7 +971,7 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 		// 判断权限
 		hasperm, err := checkapiperm(conn, strconv.Itoa(sl.Pid), bugconfig.CacheNickNameUid[nickname])
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
@@ -984,7 +984,7 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 
 			orows, err := conn.GetRows(fmt.Sprintf("select id,info,name,tid,df,need from options where id in (%s)", oids))
 			if err != nil {
-				galog.Error(err.Error())
+				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
 				return
 			}
@@ -1031,13 +1031,13 @@ func ApiResp(w http.ResponseWriter, r *http.Request) {
 		bb := &resp{}
 		bytedata, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
 		err = json.Unmarshal(bytedata, bb)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write(errorcode.ErrorParams())
 			return
 		}
@@ -1053,21 +1053,21 @@ func ApiResp(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write([]byte("请求失败, 请确认添加了url或者参数错误"))
 			return
 		}
 		//处理返回结果
 		response, err := client.Do(reqest)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write([]byte("请求失败, 请确认添加了url或者参数错误"))
 			return
 		}
 		defer response.Body.Close()
 		send, err := ioutil.ReadAll(response.Body)
 		if err != nil {
-			galog.Error(err.Error())
+			golog.Error(err.Error())
 			w.Write([]byte("获取数据失败"))
 		}
 		//fmt.Println(string(xx))

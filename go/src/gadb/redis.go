@@ -1,8 +1,8 @@
 package gadb
 
 import (
-	"gaconfig"
 	"github.com/go-redis/redis"
+	"github.com/hyahm/goconfig"
 )
 
 //var client *redis.Client
@@ -19,9 +19,9 @@ type Rconfig struct {
 
 func NewRedis() *Rconfig {
 	return &Rconfig{
-		RedisDb:   gaconfig.ReadInt("redisdb"),
-		RedisHost: gaconfig.ReadString("redishost"),
-		RedisPwd:  gaconfig.ReadString("redispwd"),
+		RedisDb:   goconfig.ReadInt("redisdb"),
+		RedisHost: goconfig.ReadString("redishost"),
+		RedisPwd:  goconfig.ReadString("redispwd"),
 	}
 }
 

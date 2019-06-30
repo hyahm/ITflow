@@ -3,7 +3,7 @@ package asset
 import (
 	"bug/bugconfig"
 	"gadb"
-	"galog"
+	"github.com/hyahm/golog"
 	"strings"
 )
 
@@ -12,7 +12,7 @@ func CheckPerm(role string, nickname string, conn *gadb.Db) (bool, error) {
 	var rolestring string
 	err := conn.GetOne("select rolelist from rolegroup where id=?", rid).Scan(&rolestring)
 	if err != nil {
-		galog.Error(err.Error())
+		golog.Error(err.Error())
 		return false, err
 	}
 	for _, v := range strings.Split(rolestring, ",") {
