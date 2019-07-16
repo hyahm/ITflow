@@ -6,5 +6,7 @@ stages:
       shellScript: |-
         echo `pwd`
         echo "11111111111111"
+    env:
+      GOPATH: '`pwd`'
 timeout: 60
 notification: {}
