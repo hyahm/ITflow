@@ -1,0 +1,8 @@
+stages:
+- name: script
+  steps:
+  - runScriptConfig:
+      image: golang:latest
+      shellScript: pwd
+timeout: 60
+notification: {}
