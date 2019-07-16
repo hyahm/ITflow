@@ -4,9 +4,13 @@ stages:
   - runScriptConfig:
       image: golang:latest
       shellScript: |-
-        echo `pwd`
-        echo "11111111111111"
+        go get github.com/go-redis/redis
+        go get github.com/go-sql-driver/mysql
+        go get github.com/gorilla/mux
+        go get github.com/jinzhu/gorm
+        go install main
+        ls bin
     env:
-      GOPATH: '`pwd`'
+      GOPATH: /go/ITflow
 timeout: 60
 notification: {}
