@@ -3,6 +3,8 @@ stages:
   steps:
   - runScriptConfig:
       image: golang:latest
-      shellScript: pwd
+      shellScript: |-
+        pwd
+        echo "11111111111111"
 timeout: 60
 notification: {}
