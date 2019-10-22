@@ -6,6 +6,7 @@ import (
 	"github.com/hyahm/golog"
 	"github.com/hyahm/gomysql"
 	"itflow/bug"
+	"itflow/bug/autodb"
 	"itflow/bug/bugconfig"
 	"log"
 	"os"
@@ -13,21 +14,23 @@ import (
 
 func main() {
 
-	//testimg.TestDoc()
 	goconfig.InitConf("bug.conf")
 	conf := &gomysql.Sqlconfig{
-		DbName: goconfig.ReadString("mysql.db"),
-		Host: goconfig.ReadString("mysql.host"),
+		DbName:   goconfig.ReadString("mysql.db"),
+		Host:     goconfig.ReadString("mysql.host"),
 		UserName: goconfig.ReadString("mysql.user"),
 		Password: goconfig.ReadString("mysql.pwd"),
-		Port: goconfig.ReadInt("mysql.port"),
+		Port:     goconfig.ReadInt("mysql.port"),
 	}
-	err := gomysql.SaveConf("bug",conf)
+
+	err := gomysql.SaveConf("bug", conf)
 	if err != nil {
 		log.Fatalln(err)
 	}
 	bugconfig.LoadConfig()
-	//autodb.InitDb()
+	if goconfig.ReadBool("initdb") {
+		autodb.InitDb()
+	}
 
 	golog.InitLogger(goconfig.ReadString("logpath"),
 		goconfig.ReadInt64("logsize"),
