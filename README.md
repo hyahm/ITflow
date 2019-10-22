@@ -1,13 +1,7 @@
 ### 简介
   一个开源的bug管理系统，IT人员开发全过程，文件存储，接口文档, 单接口测试功能
 
-文档地址： http://itflow.doc.hyahm.com 
-
-# 目前在完善自己的blog， 完成差不多， 会继续更新 内容
-
-已经可以用的gitbook在线文档， 支持导入导出， 目前在研究怎么爬取gitbook书籍， 主要是html转markdown遇到问题，有经验的欢迎加入开发  
-测试的gitbook地址： http://test.doc.hyahm.com  
-地址： https://www.hyahm.com  
+文档地址： http://itflow.doc.hyahm.com  
 
 ### 功能
 - [x] 增加bug，改变bug状态，转交bug 
