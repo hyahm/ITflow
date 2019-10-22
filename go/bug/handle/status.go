@@ -1,13 +1,13 @@
 package handle
 
 import (
+	"encoding/json"
+	"github.com/hyahm/golog"
+	"io/ioutil"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
 	"itflow/bug/model"
-	"encoding/json"
-	"github.com/hyahm/golog"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -31,7 +31,7 @@ func StatusList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -42,13 +42,13 @@ func StatusList(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("status", nickname, conn)
+			permssion, err = asset.CheckPerm("status", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -83,7 +83,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -94,13 +94,13 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("status", nickname, conn)
+			permssion, err = asset.CheckPerm("status", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -121,7 +121,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 		s := &status{}
 		err = json.Unmarshal(ss, s)
 
-		errorcode.Id, err = conn.InsertWithID("insert into status(name) values(?)", s.Name)
+		errorcode.Id, err = bugconfig.Bug_Mysql.Insert("insert into status(name) values(?)", s.Name)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -130,7 +130,6 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "status",
 		}
@@ -161,7 +160,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodGet {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -172,7 +171,6 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
 
 		id := r.FormValue("id")
 		sid, err := strconv.Atoi(id)
@@ -186,7 +184,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("status", nickname, conn)
+			permssion, err = asset.CheckPerm("status", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -200,7 +198,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 		}
 		// 如果bug有这个状态，就不能修改
 		var bcount int
-		err = conn.GetOne("select count(id) from bugs where sid=?", sid).Scan(&bcount)
+		err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs where sid=?", sid).Scan(&bcount)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -227,7 +225,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		_, err = conn.Update("delete from  status where id=?", sid)
+		_, err = bugconfig.Bug_Mysql.Update("delete from  status where id=?", sid)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -237,7 +235,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 
 		if bugconfig.CacheDefault["status"] == int64(sid) {
 			bugconfig.CacheDefault["status"] = 0
-			_, err = conn.Update("update defaultvalue set status=0 ")
+			_, err = bugconfig.Bug_Mysql.Update("update defaultvalue set status=0 ")
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -246,7 +244,6 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 		}
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "status",
 		}
@@ -278,7 +275,7 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -289,14 +286,13 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
 
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("status", nickname, conn)
+			permssion, err = asset.CheckPerm("status", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -322,7 +318,7 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = conn.Update("update status set name=? where id=?", s.Name, s.Id)
+		_, err = bugconfig.Bug_Mysql.Update("update status set name=? where id=?", s.Name, s.Id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -331,7 +327,6 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "status",
 		}
@@ -364,7 +359,7 @@ func StatusGroupName(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, _, err := logtokenmysql(r)
+		_, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -375,7 +370,6 @@ func StatusGroupName(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
 
 		sl := &model.List_StatusName{}
 		for _, v := range bugconfig.CacheSgidGroup {

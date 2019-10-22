@@ -3,6 +3,7 @@ package handle
 import (
 	"encoding/json"
 	"github.com/hyahm/golog"
+	"itflow/bug/bugconfig"
 	"net/http"
 )
 
@@ -25,7 +26,7 @@ func UserCount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, _, err := logtokenmysql(r)
+		 _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 
 		if err != nil {
@@ -37,19 +38,19 @@ func UserCount(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		uc := &userCount{}
 
 		getusersql := "select count(id) from user"
 		getgroupsql := "select count(id) from rolegroup"
-		err = conn.GetOne(getusersql).Scan(&uc.CountUsers)
+		err = bugconfig.Bug_Mysql.GetOne(getusersql).Scan(&uc.CountUsers)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
 
-		err = conn.GetOne(getgroupsql).Scan(&uc.CountGroups)
+		err = bugconfig.Bug_Mysql.GetOne(getgroupsql).Scan(&uc.CountGroups)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -77,7 +78,7 @@ func ProjectCount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, _, err := logtokenmysql(r)
+		 _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -88,11 +89,11 @@ func ProjectCount(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		pc := &projectCount{}
 
 		getbugs := "select count(id) from bugs"
-		err = conn.GetOne(getbugs).Scan(&pc.CountBugs)
+		err = bugconfig.Bug_Mysql.GetOne(getbugs).Scan(&pc.CountBugs)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())

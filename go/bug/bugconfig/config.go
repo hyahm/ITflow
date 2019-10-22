@@ -2,8 +2,9 @@ package bugconfig
 
 import (
 	"fmt"
-	"itflow/gadb"
 	"github.com/hyahm/goconfig"
+	"github.com/hyahm/gomysql"
+	"itflow/gadb"
 	"log"
 	"os"
 	"runtime"
@@ -13,6 +14,7 @@ import (
 //const SALT = "hjkkaksjdhfryuooweqzmbvc"
 
 var (
+	Bug_Mysql  *gomysql.Db
 	ImgDir      string
 	PrivateKey  string
 	ShowBaseUrl string
@@ -81,8 +83,13 @@ var (
 )
 
 func LoadConfig() {
+
 	ImgDir = goconfig.ReadString("imgdir")
 	err := os.MkdirAll(ImgDir,0755)
+	if err != nil {
+		log.Fatal(err)
+	}
+	Bug_Mysql, err  = gomysql.GetDb("bug")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -147,17 +154,13 @@ func LoadConfig() {
 	fmt.Println("cookie过期时间为：", Expirontion, "m")
 	mconf := gadb.NewSqlConfig()
 	fmt.Printf("%+v \n", mconf)
-	db, err := mconf.ConnDB()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Db.Close()
-	fmt.Println("connect db successed")
-	initCache(db)
+
+
+	initCache()
 
 	// 添加一个admin 用户的权限，默认全是1
 
-	cacheemail(db)
+	cacheemail()
 
 	_,err = gadb.NewRedis().Connect()
 

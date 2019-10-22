@@ -1,13 +1,13 @@
 package handle
 
 import (
+	"encoding/json"
+	"github.com/hyahm/golog"
+	"io/ioutil"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
 	"itflow/bug/model"
-	"encoding/json"
-	"github.com/hyahm/golog"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -22,7 +22,7 @@ func RoleList(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
 
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -33,14 +33,14 @@ func RoleList(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		data := &model.List_roles{}
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("rolegroup", nickname, conn)
+			permssion, err = asset.CheckPerm("rolegroup", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -53,7 +53,7 @@ func RoleList(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		s := "select id,name,rolelist from rolegroup"
-		rows, err := conn.GetRows(s)
+		rows, err := bugconfig.Bug_Mysql.GetRows(s)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -85,7 +85,7 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
 
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -96,7 +96,7 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		id := r.FormValue("id")
 		id32, err := strconv.Atoi(id)
 		if err != nil {
@@ -108,7 +108,7 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("rolegroup", nickname, conn)
+			permssion, err = asset.CheckPerm("rolegroup", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -122,7 +122,7 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 		}
 		ssql := "select count(id) from user where rid=?"
 		var count int
-		err = conn.GetOne(ssql, id).Scan(&count)
+		err = bugconfig.Bug_Mysql.GetOne(ssql, id).Scan(&count)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -133,7 +133,7 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		isql := "delete from  rolegroup where id = ?"
-		_, err = conn.Update(isql, id)
+		_, err = bugconfig.Bug_Mysql.Update(isql, id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -141,7 +141,6 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 		}
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "rolegroup",
 		}
@@ -169,7 +168,7 @@ func EditRole(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -180,14 +179,14 @@ func EditRole(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		data := &model.Data_roles{}
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("rolegroup", nickname, conn)
+			permssion, err = asset.CheckPerm("rolegroup", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -216,7 +215,7 @@ func EditRole(w http.ResponseWriter, r *http.Request) {
 			rl = append(rl, strconv.FormatInt(bugconfig.CacheRoleRid[v], 10))
 		}
 		gsql := "update rolegroup set name=?,rolelist=?  where id=?"
-		_, err = conn.Update(gsql, data.Name, strings.Join(rl, ","), data.Id)
+		_, err = bugconfig.Bug_Mysql.Update(gsql, data.Name, strings.Join(rl, ","), data.Id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -224,7 +223,6 @@ func EditRole(w http.ResponseWriter, r *http.Request) {
 		}
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "rolegroup",
 		}
@@ -252,7 +250,7 @@ func AddRole(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -263,14 +261,14 @@ func AddRole(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		data := &model.Data_roles{}
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("rolegroup", nickname, conn)
+			permssion, err = asset.CheckPerm("rolegroup", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -304,7 +302,7 @@ func AddRole(w http.ResponseWriter, r *http.Request) {
 			ids = append(ids, strconv.FormatInt(bugconfig.CacheRoleRid[v], 10))
 		}
 		gsql := "insert rolegroup(name,rolelist) values(?,?)"
-		errorcode.Id, err = conn.InsertWithID(gsql, data.Name, strings.Join(ids, ","))
+		errorcode.Id, err = bugconfig.Bug_Mysql.Insert(gsql, data.Name, strings.Join(ids, ","))
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -313,7 +311,6 @@ func AddRole(w http.ResponseWriter, r *http.Request) {
 
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "rolegroup",
 		}
@@ -341,7 +338,7 @@ func RoleGroupName(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
 
-		conn, _, err := logtokenmysql(r)
+		_, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -352,7 +349,7 @@ func RoleGroupName(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		data := &model.Get_roles{}
 		for _, v := range bugconfig.CacheRidGroup {
 			data.Roles = append(data.Roles, v)

@@ -21,7 +21,7 @@ func HeaderList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, _, err := logtokenmysql(r)
+		 _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -32,11 +32,11 @@ func HeaderList(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		data := &model.List_headers{}
 
 		gsql := "select id,name,hhids,remark from header"
-		rows, err := conn.GetRows(gsql)
+		rows, err := bugconfig.Bug_Mysql.GetRows(gsql)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -48,7 +48,7 @@ func HeaderList(w http.ResponseWriter, r *http.Request) {
 			var hs string
 			rows.Scan(&one.Id, &one.Name, &hs, &one.Remark)
 			if hs != "" {
-				hrow, err := conn.GetRows(fmt.Sprintf("select id,k,v from headerlist where id in (%v)", hs))
+				hrow, err := bugconfig.Bug_Mysql.GetRows(fmt.Sprintf("select id,k,v from headerlist where id in (%v)", hs))
 				if err != nil {
 					golog.Error(err.Error())
 					w.Write(errorcode.ErrorConnentMysql())
@@ -78,7 +78,7 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -89,7 +89,7 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] != bugconfig.SUPERID {
 			w.Write(errorcode.ErrorNoPermission())
@@ -112,7 +112,7 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 
 		idstr := make([]string, 0)
 		for _, v := range data.Hhids {
-			id, err := conn.InsertWithID("insert into headerlist(k,v) values(?,?)", v.Key, v.Value)
+			id, err := bugconfig.Bug_Mysql.Insert("insert into headerlist(k,v) values(?,?)", v.Key, v.Value)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -122,7 +122,7 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 		}
 		ids := strings.Join(idstr, ",")
 		gsql := "insert into header(name,hhids,remark) values(?,?,?)"
-		errorcode.Id, err = conn.Insert(gsql, data.Name, ids, data.Remark)
+		errorcode.Id, err = bugconfig.Bug_Mysql.Insert(gsql, data.Name, ids, data.Remark)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -130,7 +130,6 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 		}
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "header",
 		}
@@ -158,7 +157,7 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodGet {
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -169,7 +168,7 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		id := r.FormValue("id")
 		id32, err := strconv.Atoi(id)
 		if err != nil {
@@ -183,7 +182,7 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 		}
 		// 查看这个header 是否有文档在用
 		var count int
-		err = conn.GetOne(" select count(id) from apilist where hid=?", id).Scan(&count)
+		err = bugconfig.Bug_Mysql.GetOne(" select count(id) from apilist where hid=?", id).Scan(&count)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -196,7 +195,7 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 		}
 		// 先要删除子header
 		var hids string
-		err = conn.GetOne("select hhids from header where id=?", id).Scan(&hids)
+		err = bugconfig.Bug_Mysql.GetOne("select hhids from header where id=?", id).Scan(&hids)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -204,7 +203,7 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 		}
 		// 不为空就删
 		if hids != "" {
-			_, err = conn.Update(fmt.Sprintf("delete from headerlist where id in (%v)", hids))
+			_, err = bugconfig.Bug_Mysql.Update(fmt.Sprintf("delete from headerlist where id in (%v)", hids))
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -212,7 +211,7 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		// 删除header
-		_, err = conn.Update("delete from header where id=?", id)
+		_, err = bugconfig.Bug_Mysql.Update("delete from header where id=?", id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -221,7 +220,6 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "header",
 		}
@@ -250,7 +248,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -261,7 +259,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		data := &model.Data_header{}
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] != bugconfig.SUPERID {
@@ -283,7 +281,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 		// 原来的header
 		var oldheadids string
-		err = conn.GetOne("select hhids from header where id=?", data.Id).Scan(&oldheadids)
+		err = bugconfig.Bug_Mysql.GetOne("select hhids from header where id=?", data.Id).Scan(&oldheadids)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -296,7 +294,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 		for _, v := range data.Hhids {
 			// 如果id > 0 就修改，
 			if v.Id > 0 {
-				_, err = conn.Update("update headerlist set k=?,v=? where id=?", v.Key, v.Value, v.Id)
+				_, err = bugconfig.Bug_Mysql.Update("update headerlist set k=?,v=? where id=?", v.Key, v.Value, v.Id)
 				if err != nil {
 					golog.Error(err.Error())
 					w.Write(errorcode.ErrorConnentMysql())
@@ -319,7 +317,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 					Value: v.Value,
 				}
 				//否则就添加,id也要返回
-				hl.Id, err = conn.InsertWithID("insert into headerlist(k,v) values(?,?)", v.Key, v.Value)
+				hl.Id, err = bugconfig.Bug_Mysql.Insert("insert into headerlist(k,v) values(?,?)", v.Key, v.Value)
 				if err != nil {
 					golog.Error(err.Error())
 					w.Write(errorcode.ErrorConnentMysql())
@@ -333,7 +331,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 
 		// 删除多余的
 		if len(delhhids) > 0 {
-			_, err = conn.Update(fmt.Sprintf("delete from headerlist where id in (%s)", strings.Join(delhhids, ",")))
+			_, err = bugconfig.Bug_Mysql.Update(fmt.Sprintf("delete from headerlist where id in (%s)", strings.Join(delhhids, ",")))
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -343,7 +341,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 
 		// 修改header
 		hids := strings.Join(idstr, ",")
-		_, err = conn.Update("update header set name=?,hhids=?,remark=? where id=?", data.Name, hids, data.Remark, data.Id)
+		_, err = bugconfig.Bug_Mysql.Update("update header set name=?,hhids=?,remark=? where id=?", data.Name, hids, data.Remark, data.Id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -351,7 +349,6 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "header",
 		}
@@ -386,7 +383,7 @@ func HeaderGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, _, err := logtokenmysql(r)
+		 _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -397,7 +394,6 @@ func HeaderGet(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
 		data := &headerstruct{}
 
 		for _, v := range bugconfig.CacheHidHeader {

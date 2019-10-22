@@ -1,12 +1,12 @@
 package handle
 
 import (
-	"itflow/bug/bugconfig"
-	"itflow/bug/buglog"
-	"itflow/bug/model"
 	"encoding/json"
 	"github.com/hyahm/golog"
 	"io/ioutil"
+	"itflow/bug/bugconfig"
+	"itflow/bug/buglog"
+	"itflow/bug/model"
 	"net/http"
 	"strconv"
 	"strings"
@@ -32,7 +32,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -43,7 +43,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		ub := &passBug{}
 
 		// 获取参数
@@ -64,7 +64,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 		// 判断这个bug是不是自己的任务，只有自己的任务才可以转交
 		var splist string
 		var hasperm bool
-		err = conn.GetOne("select spusers from bugs where id=?", ub.Id).Scan(&splist)
+		err = bugconfig.Bug_Mysql.GetOne("select spusers from bugs where id=?", ub.Id).Scan(&splist)
 		myuid := strconv.FormatInt(bugconfig.CacheNickNameUid[nickname], 10)
 		for _, v := range strings.Split(splist, ",") {
 			if myuid == v {
@@ -96,7 +96,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 		ul := strings.Join(idstr, ",")
 		//添加进information表, 应该要弄成事务,插入转交信息
 		remarksql := "insert into informations(uid,bid,info,time) values(?,?,?,?)"
-		_, err = conn.Insert(remarksql, bugconfig.CacheNickNameUid[nickname], ub.Id, ub.Remark, time.Now().Unix())
+		_, err = bugconfig.Bug_Mysql.Insert(remarksql, bugconfig.CacheNickNameUid[nickname], ub.Id, ub.Remark, time.Now().Unix())
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -104,14 +104,13 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 		}
 		//更改bug
 
-		_, err = conn.Update("update bugs set sid=?,spusers=? where id=?", sid, ul, ub.Id)
+		_, err = bugconfig.Bug_Mysql.Update("update bugs set sid=?,spusers=? where id=?", sid, ul, ub.Id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "bug",
 		}
@@ -192,7 +191,7 @@ func TaskList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, name, err := logtokenmysql(r)
+		name, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -203,14 +202,14 @@ func TaskList(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		al := &model.AllArticleList{}
 
 		uid := bugconfig.CacheNickNameUid[name]
 
 		getaritclesql := "select id,createtime,importent,status,bugtitle,uid,level,pid,spusers from bugs where id in (select bid from userandbug where uid=?)  order by id desc "
 
-		rows, err := conn.GetRows(getaritclesql, uid)
+		rows, err := bugconfig.Bug_Mysql.GetRows(getaritclesql, uid)
 
 		if err != nil {
 			golog.Error(err.Error())

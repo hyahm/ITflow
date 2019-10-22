@@ -2,11 +2,9 @@ package buglog
 
 import (
 	"fmt"
-	"itflow/gadb"
 )
 
 type AddLog struct {
-	Conn     *gadb.Db
 	Ip       string
 	Classify string
 }

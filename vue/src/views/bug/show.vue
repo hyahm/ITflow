@@ -30,7 +30,6 @@
 
       </el-card>
 
-      <!--<code>{{$t('components.backToTopTips2')}}</code>-->
       <div id="tinymcecontent" class="placeholder-container" v-html="bug.content"/>
       <div v-for="(cc, index) in bug.comment" :key="index" style="margin-bottom: 5px">
         <el-card class="box-card">
@@ -46,14 +45,11 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item :label="$t('table.status')">
+        <el-form-item label="状态">
           <el-select v-model="bug.status" class="filter-item" placeholder="Please select">
             <el-option v-for="(item, index) in statusOptions" :key="index" :label="item" :value="item" />
           </el-select>
         </el-form-item>
-        <!--<el-form-item :label="$t('table.importance')">-->
-        <!--<el-rate style="margin-top:8px;" v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max='5'></el-rate>-->
-        <!--</el-form-item>-->
         <el-form-item style="margin-bottom: 40px;" label="任务给：">
           <el-select
             v-model="temp.selectusers"
@@ -66,14 +62,13 @@
               :value="item" />
           </el-select>
         </el-form-item>
-        <el-form-item :label="$t('table.reason')">
+        <el-form-item label="理由">
           <el-input :autosize="{ minRows: 2, maxRows: 4}" v-model="temp.remark" type="textarea" placeholder="Please input" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <!--<el-button v-if="dialogStatus=='create'" type="primary" @click="createData">{{$t('table.confirm')}}</el-button>-->
-        <el-button type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="updateData">确认</el-button>
       </div>
     </el-dialog>
   </div>

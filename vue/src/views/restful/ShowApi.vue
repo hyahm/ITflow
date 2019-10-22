@@ -92,12 +92,11 @@
 <script>
 import { apiOne, apiResp } from '@/api/restful'
 import VueMarkdown from 'vue-markdown'
-import JsonViewer from 'vue-json-viewer'
+// import JsonViewer from 'vue-json-viewer'
 export default {
   name: 'ShowApi',
   components: {
-    VueMarkdown,
-    JsonViewer
+    VueMarkdown
   },
   filters: {
     jsonpretty: function(value) {

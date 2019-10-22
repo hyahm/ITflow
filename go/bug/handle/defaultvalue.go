@@ -23,7 +23,7 @@ func DefaultStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, _, err := logtokenmysql(r)
+		 _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -34,7 +34,7 @@ func DefaultStatus(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		sl := &DefaultValue{}
 		//如果是管理员的话,所有的都可以
 		sl.DefaultStatus = bugconfig.CacheSidStatus[bugconfig.CacheDefault["status"]]
@@ -53,7 +53,7 @@ func DefaultSave(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, _, err := logtokenmysql(r)
+		 _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -64,7 +64,7 @@ func DefaultSave(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		sl := &DefaultValue{}
 		bytedata, err := ioutil.ReadAll(r.Body)
 		if err != nil {
@@ -96,7 +96,7 @@ func DefaultSave(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		//修改字段
-		_, err = conn.Update("update defaultvalue set status=?, important=?,level=?", sid, iid, lid)
+		_, err = bugconfig.Bug_Mysql.Update("update defaultvalue set status=?, important=?,level=?", sid, iid, lid)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -125,7 +125,7 @@ func DefaultImportant(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, _, err := logtokenmysql(r)
+		 _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -136,7 +136,7 @@ func DefaultImportant(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		data := &defaultImportant{}
 		data.DefaultImportant = bugconfig.CacheIidImportant[bugconfig.CacheDefault["important"]]
 		send, _ := json.Marshal(data)
@@ -158,7 +158,7 @@ func DefaultLevel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, _, err := logtokenmysql(r)
+		_, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -169,7 +169,7 @@ func DefaultLevel(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		data := &defaultLevel{}
 		data.DefaultLevel = bugconfig.CacheLidLevel[bugconfig.CacheDefault["level"]]
 		send, _ := json.Marshal(data)

@@ -30,7 +30,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, _, err := logtokenmysql(r)
+		 _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 
 		if err != nil {
@@ -42,7 +42,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		sl := &statusList{}
 		for _, v := range bugconfig.CacheSidStatus {
 			sl.StatusList = append(sl.StatusList, v)
@@ -67,7 +67,7 @@ func ShowStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -78,7 +78,7 @@ func ShowStatus(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		sl := &mystatus{}
 		// 遍历出每一个status id
 		for _, v := range strings.Split(bugconfig.CacheUidFilter[bugconfig.CacheNickNameUid[nickname]], ",") {
@@ -103,7 +103,7 @@ func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -114,7 +114,7 @@ func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		sl := &statusList{}
 		//如果是管理员的话,所有的都可以
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
@@ -144,7 +144,7 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, name, err := logtokenmysql(r)
+		name, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -155,10 +155,10 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		sl := &userinfo{}
 
-		err = conn.GetOne("select email,realname from user where nickname=?", name).Scan(&sl.Email, &sl.Realname)
+		err = bugconfig.Bug_Mysql.GetOne("select email,realname from user where nickname=?", name).Scan(&sl.Email, &sl.Realname)
 
 		if err != nil {
 			golog.Error(err.Error())
@@ -181,7 +181,7 @@ func UpdateInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, name, err := logtokenmysql(r)
+		 name, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 
 		if err != nil {
@@ -193,7 +193,7 @@ func UpdateInfo(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		sl := &userinfo{}
 
 		ss, err := ioutil.ReadAll(r.Body)
@@ -210,7 +210,7 @@ func UpdateInfo(w http.ResponseWriter, r *http.Request) {
 		}
 		uid := bugconfig.CacheNickNameUid[name]
 		// 修改用户信息
-		_, err = conn.Update("update user set email=?,realname=?,nickname=? where id=?", sl.Email, sl.Realname, sl.Nickname, uid)
+		_, err = bugconfig.Bug_Mysql.Update("update user set email=?,realname=?,nickname=? where id=?", sl.Email, sl.Realname, sl.Nickname, uid)
 
 		if err != nil {
 			golog.Error(err.Error())
@@ -231,7 +231,7 @@ func UpdateInfo(w http.ResponseWriter, r *http.Request) {
 
 		bugconfig.CacheUidNickName[int64(uid)] = sl.Nickname
 
-		err = insertlog(conn, "updateinfo", name+"修改了用户信息", r)
+		err = insertlog("updateinfo", name+"修改了用户信息", r)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -253,7 +253,7 @@ func UpdateRoles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -264,7 +264,7 @@ func UpdateRoles(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		sl := &model.Table_roles{}
 
 		ss, err := ioutil.ReadAll(r.Body)
@@ -293,14 +293,14 @@ func UpdateRoles(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = conn.Update("update user set rid=? where id=?", rid, sl.Id)
+		_, err = bugconfig.Bug_Mysql.Update("update user set rid=? where id=?", rid, sl.Id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
 
-		err = insertlog(conn, "updaterole", nickname+"修改了角色权限", r)
+		err = insertlog( "updaterole", nickname+"修改了角色权限", r)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -334,7 +334,7 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -345,14 +345,14 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		alllog := &loglist{}
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("log", nickname, conn)
+			permssion, err = asset.CheckPerm("log", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -365,7 +365,7 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		dsql := "select id,exectime,classify,content,ip from log order by id desc"
-		rows, err := conn.GetRows(dsql)
+		rows, err := bugconfig.Bug_Mysql.GetRows(dsql)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -391,7 +391,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -402,7 +402,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		alllog := &model.Search_log{}
 		listlog := &model.List_log{}
 		bytedata, err := ioutil.ReadAll(r.Body)
@@ -423,7 +423,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("log", nickname, conn)
+			permssion, err = asset.CheckPerm("log", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -462,8 +462,8 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		//获取总行数
-		fmt.Println("endsql:", endsql)
-		err = conn.GetOne("select count(id) from log " + endsql).Scan(&listlog.Count)
+
+		err = bugconfig.Bug_Mysql.GetOne("select count(id) from log " + endsql).Scan(&listlog.Count)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -473,8 +473,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		start, end := public.GetPagingLimitAndPage(listlog.Count, alllog.Page, alllog.Limit)
 		listlog.Page = start / alllog.Limit
 
-		fmt.Println("------", start, "------", end)
-		rows, err := conn.GetRows(basesql+endsql+" limit ?,?", start, end)
+		rows, err := bugconfig.Bug_Mysql.GetRows(basesql+endsql+" limit ?,?", start, end)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -543,7 +542,7 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -554,7 +553,7 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		param := &getChangeStatus{}
 
 		searchq, err := ioutil.ReadAll(r.Body)
@@ -579,7 +578,7 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 
 		basesql := "update bugs set sid=? where id=?"
 
-		_, err = conn.Update(basesql, sid, param.Id)
+		_, err = bugconfig.Bug_Mysql.Update(basesql, sid, param.Id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -587,7 +586,6 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 		}
 
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "status",
 		}
@@ -613,7 +611,7 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -624,7 +622,7 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		param := &mystatus{}
 
 		searchq, err := ioutil.ReadAll(r.Body)
@@ -652,7 +650,7 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 		//
 		basesql := "update user set showstatus=? where id=?"
 
-		_, err = conn.Update(basesql, showstatus, bugconfig.CacheNickNameUid[nickname])
+		_, err = bugconfig.Bug_Mysql.Update(basesql, showstatus, bugconfig.CacheNickNameUid[nickname])
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -675,7 +673,7 @@ func GetAllBugs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, _, err := logtokenmysql(r)
+		 _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -686,7 +684,7 @@ func GetAllBugs(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		al := &model.AllArticleList{}
 
 		searchq, err := ioutil.ReadAll(r.Body)
@@ -707,7 +705,7 @@ func GetAllBugs(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = conn.GetOne("select count(id) from bugs").Scan(&al.Count)
+		err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs").Scan(&al.Count)
 		if err != nil {
 			golog.Error(err.Error())
 			al.Code = 5
@@ -718,7 +716,7 @@ func GetAllBugs(w http.ResponseWriter, r *http.Request) {
 		start, end := public.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
 
 		alsql := "select id,createtime,importent,status,bugtitle,uid,level,pid,env,spusers from bugs where dustbin=0 order by id desc limit ?,?"
-		rows, err := conn.GetRows(alsql, start, end)
+		rows, err := bugconfig.Bug_Mysql.GetRows(alsql, start, end)
 		if err != nil {
 			golog.Error(err.Error())
 			al.Code = 1
@@ -758,7 +756,7 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, name, err := logtokenmysql(r)
+		 name, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -769,7 +767,7 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		al := &model.AllArticleList{}
 
 		searchq, err := ioutil.ReadAll(r.Body)
@@ -786,7 +784,7 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		uid := bugconfig.CacheNickNameUid[name]
-		err = conn.GetOne("select count(id) from bugs where uid=?", uid).Scan(&al.Count)
+		err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs where uid=?", uid).Scan(&al.Count)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -795,7 +793,7 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 		start, end := public.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
 
 		alsql := "select id,createtime,importent,status,bugtitle,uid,level,pid,env,spusers from bugs where uid=? and dustbin=0 order by id desc limit ?,?"
-		rows, err := conn.GetRows(alsql, uid, start, end)
+		rows, err := bugconfig.Bug_Mysql.GetRows(alsql, uid, start, end)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -831,7 +829,7 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodGet {
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -842,10 +840,10 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		id := r.FormValue("id")
 		var uid int64
-		err = conn.GetOne("select uid from bugs where id=?", id).Scan(&uid)
+		err = bugconfig.Bug_Mysql.GetOne("select uid from bugs where id=?", id).Scan(&uid)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -855,14 +853,13 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorNoPermission())
 			return
 		}
-		_, err = conn.Update("update bugs set dustbin=true where id=?", id)
+		_, err = bugconfig.Bug_Mysql.Update("update bugs set dustbin=true where id=?", id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "bug",
 		}
@@ -898,7 +895,7 @@ func BugEdit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodGet {
-		conn, _, err := logtokenmysql(r)
+		 _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -909,7 +906,7 @@ func BugEdit(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		al := &editList{}
 
 		id := r.FormValue("id")
@@ -920,7 +917,7 @@ func BugEdit(w http.ResponseWriter, r *http.Request) {
 		var lid int64
 		var vid int64
 		alsql := "select iid,bugtitle,lid,pid,eid,spusers,vid,content from bugs where id=?"
-		err = conn.GetOne(alsql, id).Scan(&iid, &al.Title, &lid, &pid, &eid, &uidlist, &vid, &al.Content)
+		err = bugconfig.Bug_Mysql.GetOne(alsql, id).Scan(&iid, &al.Title, &lid, &pid, &eid, &uidlist, &vid, &al.Content)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())

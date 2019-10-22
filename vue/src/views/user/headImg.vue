@@ -20,7 +20,6 @@
 
 <script>
 import myUpload from 'vue-image-crop-upload'
-import g from '@/config/config'
 import { getToken } from '@/utils/auth'
 export default {
   name: 'HeadImg',
@@ -31,7 +30,7 @@ export default {
     return {
       show: false,
       imgname: 'head',
-      url: g.headImgUrl,
+      url: process.env.VUE_APP_BASE_API + '/upload/headimg',
       params: {
         token: getToken(),
         name: 'avatar'

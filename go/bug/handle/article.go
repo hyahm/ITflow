@@ -137,7 +137,7 @@ func GetEnv(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
 		errorcode := &errorstruct{}
-		conn, _, err := logtokenmysql(r)
+		_, err := logtokenmysql(r)
 		if err != nil {
 			golog.Error(err.Error())
 			if err == NotFoundToken {
@@ -146,7 +146,7 @@ func GetEnv(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		el := &envList{}
 
 		for _, v := range bugconfig.CacheEidName {
@@ -183,7 +183,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, _, err := logtokenmysql(r)
+		 _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -194,11 +194,11 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		ul := &userList{}
 
 		getusersql := "select realname from user"
-		rows, err := conn.GetRows(getusersql)
+		rows, err := bugconfig.Bug_Mysql.GetRows(getusersql)
 
 		if err != nil {
 			golog.Error(err.Error())
@@ -231,7 +231,7 @@ func GetVersion(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, _, err := logtokenmysql(r)
+		 _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -242,7 +242,7 @@ func GetVersion(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		vl := &versionList{}
 
 		for _, v := range bugconfig.CacheVidName {
@@ -361,7 +361,7 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 	}
 	if r.Method == http.MethodPost {
 		url := &uploadimage{}
-		db, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -372,8 +372,6 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-
-		defer db.Db.Close()
 
 		image, header, err := r.FormFile("upload")
 		if err != nil {
@@ -408,7 +406,7 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 		url.Uploaded = 1
 		uploadimg := "update user set headimg = ? where nickname=?"
 
-		_, err = db.Update(uploadimg, url.Url, nickname)
+		_, err = bugconfig.Bug_Mysql.Update(uploadimg, url.Url, nickname)
 		if err != nil {
 			golog.Error(err.Error())
 			w.WriteHeader(http.StatusBadGateway)
@@ -433,7 +431,7 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 		bid := r.FormValue("id")
 		sl := &showArticle{}
 		errorcode := &errorstruct{}
-		conn, _, err := logtokenmysql(r)
+		 _, err := logtokenmysql(r)
 		if err != nil {
 			golog.Error(err.Error())
 			if err == NotFoundToken {
@@ -443,10 +441,9 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
 
 		getinfosql := "select uid,info,time from informations where bid=?"
-		rows, err := conn.GetRows(getinfosql, bid)
+		rows, err := bugconfig.Bug_Mysql.GetRows(getinfosql, bid)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -463,7 +460,7 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 		getlistsql := "select bugtitle,content,vid,sid,id from bugs where id=?"
 		var statusid int64
 		var vid int64
-		err = conn.GetOne(getlistsql, bid).Scan(&sl.Title, &sl.Content, &vid, &statusid, &sl.Id)
+		err = bugconfig.Bug_Mysql.GetOne(getlistsql, bid).Scan(&sl.Title, &sl.Content, &vid, &statusid, &sl.Id)
 		if err != nil && err != sql.ErrNoRows {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())

@@ -1,4 +1,4 @@
-import Layout from '@/views/layout/Layout'
+import Layout from '@/layout'
 
 const userRoute = {
   path: '/user',
@@ -6,7 +6,7 @@ const userRoute = {
   redirect: '/user/list',
   name: 'userManager',
   meta: {
-    title: 'userManager',
+    title: '用户管理',
     icon: 'setting'
   },
   children: [
@@ -15,7 +15,7 @@ const userRoute = {
       component: () => import('@/views/user/adduser'),
       name: 'adduser',
       meta: {
-        title: 'adduser',
+        title: '添加用户',
         icon: 'edit',
         roles: ['admin', 'user']
       }
@@ -25,7 +25,7 @@ const userRoute = {
       component: () => import('@/views/user/changepwd'),
       name: 'changepwd',
       meta: {
-        title: 'changepwd',
+        title: '修改密码',
         noCache: true,
         icon: 'edit'
       }
@@ -35,7 +35,7 @@ const userRoute = {
       component: () => import('@/views/user/usermanager'),
       name: 'usermanager',
       meta: {
-        title: 'usermanager',
+        title: '用户管理',
         icon: 'user',
         roles: ['admin', 'usermanager']
       }
@@ -45,7 +45,7 @@ const userRoute = {
       component: () => import('@/views/user/headImg'),
       name: 'uploadhead',
       meta: {
-        title: 'uploadhead',
+        title: '头像管理',
         icon: 'user'
       }
     }

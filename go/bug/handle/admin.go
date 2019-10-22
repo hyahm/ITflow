@@ -3,7 +3,6 @@ package handle
 import (
 	"itflow/bug/bugconfig"
 	"database/sql"
-	"itflow/gadb"
 	"itflow/gaencrypt"
 	"net/http"
 	"strings"
@@ -22,14 +21,9 @@ func Reset(w http.ResponseWriter, r *http.Request) {
 	}
 	if r.Method == http.MethodGet {
 		password := r.FormValue("password")
-		mconf := gadb.NewSqlConfig()
-		db, err := mconf.ConnDB()
-		if err != nil {
-			w.Write([]byte(err.Error() + "\n"))
-			return
-		}
+
 		var count int
-		err = db.GetOne("select count(id) from user where department=?", "admin").Scan(&count)
+		err := bugconfig.Bug_Mysql.GetOne("select count(id) from user where department=?", "admin").Scan(&count)
 		if err != nil {
 			if err == sql.ErrNoRows || count != 1 {
 				w.Write([]byte("有且只能有一个admin账户 \n"))
@@ -39,12 +33,12 @@ func Reset(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		password = gaencrypt.PwdEncrypt(password, bugconfig.Salt)
-		_, err = db.Update("update user set password=? where department=?", password, "admin")
+		_, err = bugconfig.Bug_Mysql.Update("update user set password=? where department=?", password, "admin")
 		if err != nil {
 			w.Write([]byte(err.Error() + "\n"))
 			return
 		}
-		err = insertlog(db, "resetadminpassword", "密码为:"+password, r)
+		err = insertlog( "resetadminpassword", "密码为:"+password, r)
 		if err != nil {
 			w.Write([]byte(err.Error() + "\n"))
 			return

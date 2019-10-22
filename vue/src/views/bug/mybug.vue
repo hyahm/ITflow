@@ -4,25 +4,15 @@
       我提交的bug，可以编辑和关闭，不能删除， 选择器的状态是显示所选的状态，永久保存，多页面生效
     </p>
     <div class="filter-container">
-      <el-input :placeholder="$t('table.title')" v-model="listQuery.title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <!--<el-select v-model="listQuery.status" :placeholder="$t('table.status')" clearable style="width: 90px" class="filter-item">-->
-      <!--<el-option v-for="(item, index) in statuslist" :key="index" :label="item" :value="item"/>-->
-      <!--</el-select>-->
-      <el-select v-model="listQuery.level" :placeholder="$t('table.level')" clearable style="width: 90px" class="filter-item">
+      <el-input placeholder="标题" v-model="listQuery.title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-select v-model="listQuery.level" placeholder="级别" clearable style="width: 90px" class="filter-item">
         <el-option v-for="(item, index) in levels" :key="index" :label="item" :value="item"/>
       </el-select>
-      <el-select v-model="listQuery.project" :placeholder="$t('table.project')" clearable class="filter-item" style="width: 130px">
+      <el-select v-model="listQuery.project" placeholder="项目" clearable class="filter-item" style="width: 130px">
         <el-option v-for="(item, index) in projectnames" :key="index" :label="item" :value="item"/>
       </el-select>
 
-      <!--<el-select @change='handleFilter' style="width: 140px" class="filter-item" v-model="listQuery.sort">-->
-      <!--<el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key">-->
-      <!--</el-option>-->
-      <!--</el-select>-->
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
-      <!--<el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-edit">{{$t('table.add')}}</el-button>-->
-      <!--<el-button class="filter-item" type="primary" :loading="downloadLoading" v-waves icon="el-icon-download" @click="handleDownload">{{$t('table.export')}}</el-button>-->
-      <!--<el-checkbox class="filter-item" style='margin-left:15px;' @change='tableKey=tableKey+1' v-model="showReviewer">{{$t('table.reviewer')}}</el-checkbox>-->
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-dropdown :hide-on-click="false" :show-timeout="100" trigger="click" style="vertical-align: top;">
         <el-button plain >
           状态({{ statuslength }})
@@ -40,37 +30,37 @@
     <!--<PlatformDropdown v-model="listQuery.status" />-->
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%">
 
-      <el-table-column :label="$t('table.id')" align="center" width="50">
+      <el-table-column label="id" align="center" width="50">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.date')" width="150px" align="center">
+      <el-table-column label="时间" width="150px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.date | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.project')" width="100px" align="center">
+      <el-table-column label="项目" width="100px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.projectname }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.level')" width="80px" align="center">
+      <el-table-column label="级别" width="80px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.level }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.importance')" width="100px" align="center">
+      <el-table-column label="重要性" width="100px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.importance }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.status')" align="center" width="110">
+      <el-table-column label="状态" align="center" width="110">
         <template slot-scope="scope">
           <el-select v-model="scope.row.status" class="filter-item" @change="changestatus(scope.row)" >
             <el-option v-for="(item, index) in statuslist" :key="index" :label="item" :value="item"/>
@@ -79,7 +69,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.title')" min-width="300px" align="center">
+      <el-table-column label="标题" min-width="300px" align="center">
         <template slot-scope="scope">
 
           <router-link :to="'/showbug/'+scope.row.id" class="link-type" align="center">
@@ -87,7 +77,7 @@
           </router-link>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.handle')" align="center" width="300">
+      <el-table-column label="方法" align="center" width="300">
         <template slot-scope="scope">
           <span>{{ scope.row.handle }}</span>
           <!--<span v-if="scope.row.handle" class="link-type" @click='handleFetchPv(scope.row.pageviews)'>{{scope.row.pageviews}}</span>-->
@@ -95,12 +85,12 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <router-link :to="'/bug/edit/'+scope.row.id">
-            <el-button type="primary" size="mini" >{{ $t('list.edit') }}</el-button>
+            <el-button type="primary" size="mini" >编辑</el-button>
           </router-link>
-          <el-button type="success" size="mini" @click="handleClose(scope.row)">{{ $t('list.close') }}</el-button>
+          <el-button type="success" size="mini" @click="handleClose(scope.row)">关闭</el-button>
           <!--<el-button type="danger" size="mini" @click="handleRemove(scope.row)">{{ $t('list.remove') }}</el-button>-->
         </template>
       </el-table-column>

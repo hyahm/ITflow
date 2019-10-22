@@ -1,4 +1,4 @@
-import Layout from '@/views/layout/Layout'
+import Layout from '@/layout'
 
 const setting = {
   path: '/setting',
@@ -6,7 +6,7 @@ const setting = {
   redirect: '/setting/list',
   name: 'setting',
   meta: {
-    title: 'setting',
+    title: 'bug设置',
     icon: 'setting',
     roles: ['admin', 'create version', 'create project', 'create env']
   },
@@ -16,7 +16,7 @@ const setting = {
       component: () => import('@/views/setting/pubversion'),
       name: 'pubversion',
       meta: {
-        title: 'pubversion',
+        title: '发布版本',
         icon: 'guide',
         roles: ['admin', 'version']
       }
@@ -26,7 +26,7 @@ const setting = {
       component: () => import('@/views/setting/versionlist'),
       name: 'versionlist',
       meta: {
-        title: 'versionlist',
+        title: '版本列表',
         icon: 'bug',
         roles: ['admin', 'version']
       }
@@ -36,7 +36,7 @@ const setting = {
       component: () => import('@/views/setting/project'),
       name: 'projectmanager',
       meta: {
-        title: 'project',
+        title: '项目管理',
         icon: 'bug',
         roles: ['admin', 'project']
       }
@@ -44,9 +44,9 @@ const setting = {
     {
       path: 'enver',
       component: () => import('@/views/setting/env'),
-      name: 'envmanager',
+      name: '环境管理',
       meta: {
-        title: 'env',
+        title: '环境管理',
         icon: 'bug',
         roles: ['admin', 'env']
       }

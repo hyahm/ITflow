@@ -1,12 +1,12 @@
 package handle
 
 import (
-	"itflow/bug/asset"
-	"itflow/bug/bugconfig"
-	"itflow/bug/buglog"
 	"encoding/json"
 	"github.com/hyahm/golog"
 	"io/ioutil"
+	"itflow/bug/asset"
+	"itflow/bug/bugconfig"
+	"itflow/bug/buglog"
 	"net/http"
 	"strconv"
 	"strings"
@@ -30,7 +30,7 @@ func ProjectList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -41,14 +41,14 @@ func ProjectList(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		projects := &projectlist{}
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("project", nickname, conn)
+			permssion, err = asset.CheckPerm("project", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -83,7 +83,7 @@ func AddProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -95,13 +95,13 @@ func AddProject(w http.ResponseWriter, r *http.Request) {
 			return
 
 		}
-		defer conn.Db.Close()
+
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("project", nickname, conn)
+			permssion, err = asset.CheckPerm("project", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -117,7 +117,7 @@ func AddProject(w http.ResponseWriter, r *http.Request) {
 
 		getaritclesql := "insert into projectname(name) values(?)"
 
-		errorcode.Id, err = conn.InsertWithID(getaritclesql, name)
+		errorcode.Id, err = bugconfig.Bug_Mysql.Insert(getaritclesql, name)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -125,7 +125,6 @@ func AddProject(w http.ResponseWriter, r *http.Request) {
 		}
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "project",
 		}
@@ -154,7 +153,7 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 
 		if err != nil {
@@ -166,14 +165,14 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		pr := &projectrow{}
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("project", nickname, conn)
+			permssion, err = asset.CheckPerm("project", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -199,14 +198,13 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 		}
 		getaritclesql := "update projectname set name=? where id=?"
 
-		_, err = conn.Update(getaritclesql, pr.ProjectName, pr.Id)
+		_, err = bugconfig.Bug_Mysql.Update(getaritclesql, pr.ProjectName, pr.Id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "project",
 		}
@@ -237,7 +235,7 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodGet {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -248,13 +246,13 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("project", nickname, conn)
+			permssion, err = asset.CheckPerm("project", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -275,7 +273,7 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 		}
 		// 是否有bug使用
 		var count int
-		err = conn.GetOne("select count(id) from bugs where pid=?", id).Scan(&count)
+		err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs where pid=?", id).Scan(&count)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -289,14 +287,13 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 
 		getaritclesql := "delete from projectname where id=?"
 
-		_, err = conn.Insert(getaritclesql, id)
+		_, err = bugconfig.Bug_Mysql.Insert(getaritclesql, id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "project",
 		}

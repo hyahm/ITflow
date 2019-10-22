@@ -1,12 +1,12 @@
 package handle
 
 import (
-	"itflow/bug/asset"
-	"itflow/bug/bugconfig"
-	"itflow/bug/buglog"
 	"encoding/json"
 	"github.com/hyahm/golog"
 	"io/ioutil"
+	"itflow/bug/asset"
+	"itflow/bug/bugconfig"
+	"itflow/bug/buglog"
 	"net/http"
 	"strconv"
 	"strings"
@@ -30,7 +30,7 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -41,8 +41,6 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-
-		defer conn.Db.Close()
 
 		version_add := &addVersion{}
 		s, err := ioutil.ReadAll(r.Body)
@@ -62,7 +60,7 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("version", nickname, conn)
+			permssion, err = asset.CheckPerm("version", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -77,7 +75,7 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 		uid := bugconfig.CacheNickNameUid[nickname]
 		add_version_sql := "insert into version(name,urlone,urltwo,createtime,createuid) values(?,?,?,?,?)"
 
-		vid, err := conn.InsertWithID(add_version_sql, version_add.Version, version_add.Iphoneurl, version_add.Notiphoneurl, time.Now().Unix(), uid)
+		vid, err := bugconfig.Bug_Mysql.Insert(add_version_sql, version_add.Version, version_add.Iphoneurl, version_add.Notiphoneurl, time.Now().Unix(), uid)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -85,7 +83,6 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 		}
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "version",
 		}
@@ -133,7 +130,7 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -144,7 +141,7 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		al := &versionInfoList{}
 
 		m, err := ioutil.ReadAll(r.Body)
@@ -165,7 +162,7 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("version", nickname, conn)
+			permssion, err = asset.CheckPerm("version", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -179,7 +176,7 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 		}
 		get_version_sql := "select id,name,urlone,urltwo,createtime from version order by id desc"
 
-		rows, err := conn.GetRows(get_version_sql)
+		rows, err := bugconfig.Bug_Mysql.GetRows(get_version_sql)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -206,7 +203,7 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodGet {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -217,7 +214,6 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
 
 		id := r.FormValue("id")
 		var bugcount int
@@ -226,7 +222,7 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("version", nickname, conn)
+			permssion, err = asset.CheckPerm("version", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -238,7 +234,7 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorNoPermission())
 			return
 		}
-		err = conn.GetOne("select count(id) from bugs where id=?", id).Scan(&bugcount)
+		err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs where id=?", id).Scan(&bugcount)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -250,7 +246,7 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		deletevl := "delete from version where id=?"
-		errorcode.Id, err = conn.Update(deletevl, id)
+		errorcode.Id, err = bugconfig.Bug_Mysql.Update(deletevl, id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -264,7 +260,6 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 		}
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "version",
 		}
@@ -300,7 +295,7 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -311,14 +306,14 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		data := &updateversion{}
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("version", nickname, conn)
+			permssion, err = asset.CheckPerm("version", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -344,7 +339,7 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 		uid := bugconfig.CacheNickNameUid[nickname]
 		versionsql := "update version set name=?,urlone=?,urltwo=?,createuid=? where id=?"
-		_, err = conn.Update(versionsql, data.Name, data.Iphone, data.NoIphone, uid, data.Id)
+		_, err = bugconfig.Bug_Mysql.Update(versionsql, data.Name, data.Iphone, data.NoIphone, uid, data.Id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -353,7 +348,6 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "version",
 		}

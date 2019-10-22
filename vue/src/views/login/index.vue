@@ -1,20 +1,14 @@
 <template>
   <div class="login-container">
 
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-
-      <div class="title-container">
-        <h3 class="title">{{ $t('login.title') }}</h3>
-        <lang-select class="set-language"/>
-      </div>
-
+    <el-form ref="loginForm" :model="loginForm"  class="login-form" auto-complete="on" label-position="left">
       <el-form-item prop="username">
         <span class="svg-container svg-container_login">
           <svg-icon icon-class="user" />
         </span>
         <el-input
           v-model="loginForm.username"
-          :placeholder="$t('login.username')"
+          placeholder="用户名"
           name="username"
           type="text"
           auto-complete="on"
@@ -28,7 +22,7 @@
         <el-input
           :type="passwordType"
           v-model="loginForm.password"
-          :placeholder="$t('login.password')"
+          placeholder="密码"
           name="password"
           auto-complete="on"
           @keyup.enter.native="handleLogin" />
@@ -37,64 +31,23 @@
         </span>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">{{ $t('login.logIn') }}</el-button>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
 
-      <!--<div class="tips">-->
-      <!--<span>{{$t('login.username')}} : admin</span>-->
-      <!--<span>{{$t('login.password')}} : {{$t('login.any')}}</span>-->
-      <!--</div>-->
-      <!--<div class="tips">-->
-      <!--<span style="margin-right:18px;">{{$t('login.username')}} : editor</span>-->
-      <!--<span>{{$t('login.password')}} : {{$t('login.any')}}</span>-->
-      <!--</div>-->
-
-      <!--<el-button class="thirdparty-button" type="primary" @click="showDialog=true">{{$t('login.thirdparty')}}</el-button>-->
     </el-form>
-
-    <el-dialog :title="$t('login.thirdparty')" :visible.sync="showDialog" append-to-body>
-      {{ $t('login.thirdpartyTips') }}
-      <br>
-      <br>
-      <br>
-      <social-sign />
-    </el-dialog>
-
   </div>
 </template>
 
 <script>
-import { isvalidUsername } from '@/utils/validate'
-import LangSelect from '@/components/LangSelect'
-import SocialSign from './socialsignin'
+// import { isvalidUsername } from '@/utils/validate'
 import { encrypt } from '@/utils/auth'
-import g from '@/config/config'
 
 export default {
   name: 'Login',
-  components: { LangSelect, SocialSign },
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!isvalidUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
-      }
-    }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 1) {
-        callback(new Error('The password  not be empty'))
-      } else {
-        callback()
-      }
-    }
     return {
       loginForm: {
-        username: g.username,
-        password: g.password
-      },
-      loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        username: process.env.VUE_APP_USERNAME,
+        password: process.env.VUE_APP_PASSWORD
       },
       passwordType: 'password',
       loading: false,
@@ -119,15 +72,11 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          const pwd = this.loginForm.password
-          const login = {
-            username: encrypt(this.loginForm.username),
-            password: encrypt(pwd)
-          }
-          this.$store.dispatch('LoginByUsername', login).then(() => {
+          this.$store.dispatch('user/login', this.loginForm).then(() => {
             this.loading = false
+            console.log('9999999')
             this.$router.push('/dashboard')
-          }).catch((err) => {
+          }).catch(() => {
             this.loading = false
           })
         } else {

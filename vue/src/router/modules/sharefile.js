@@ -1,4 +1,4 @@
-import Layout from '@/views/layout/Layout'
+import Layout from '@/layout'
 
 const shareRouter = {
   path: '/share',
@@ -15,7 +15,7 @@ const shareRouter = {
       component: () => import('@/views/sharefile/view'),
       name: 'sharelist',
       meta: {
-        title: 'sharefile',
+        title: '共享文件',
         icon: 'edit'
       }
     }

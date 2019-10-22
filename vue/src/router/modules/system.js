@@ -1,4 +1,4 @@
-import Layout from '@/views/layout/Layout'
+import Layout from '@/layout'
 
 const system = {
   path: '/system',
@@ -6,7 +6,7 @@ const system = {
   redirect: '/system/list',
   name: 'system',
   meta: {
-    title: 'system',
+    title: '系统设置',
     icon: 'setting'
   },
   children: [
@@ -25,7 +25,7 @@ const system = {
       component: () => import('@/views/system/status'),
       name: 'bugstatus',
       meta: {
-        title: 'bugStatus',
+        title: 'bug状态',
         icon: 'user',
         roles: ['admin', 'status']
       }
@@ -35,7 +35,7 @@ const system = {
       component: () => import('@/views/system/bugmanager'),
       name: 'bugmanager',
       meta: {
-        title: 'bugmanager',
+        title: 'bug管理',
         icon: 'email',
         roles: ['admin']
       }
@@ -45,7 +45,7 @@ const system = {
       component: () => import('@/views/system/Log'),
       name: 'log',
       meta: {
-        title: 'log',
+        title: '日志',
         icon: 'email',
         roles: ['admin', 'log']
       }
@@ -55,7 +55,7 @@ const system = {
       component: () => import('@/views/system/bugGroup'),
       name: 'buggroup',
       meta: {
-        title: 'buggroup',
+        title: 'bug组',
         icon: 'user',
         roles: ['admin', 'statusgroup']
       }
@@ -65,7 +65,7 @@ const system = {
       component: () => import('@/views/system/roleGroup'),
       name: 'rolegroup',
       meta: {
-        title: 'rolegroup',
+        title: '角色组',
         icon: 'user',
         roles: ['admin', 'rolegroup']
       }
@@ -75,7 +75,7 @@ const system = {
       component: () => import('@/views/system/defaultValue'),
       name: 'defaultvalue',
       meta: {
-        title: 'defaultvalue',
+        title: '默认值',
         icon: 'user',
         roles: ['admin']
       }
@@ -85,7 +85,7 @@ const system = {
       component: () => import('@/views/system/Important'),
       name: 'important',
       meta: {
-        title: 'important',
+        title: '重要性',
         icon: 'user',
         roles: ['admin', 'important']
       }
@@ -95,7 +95,7 @@ const system = {
       component: () => import('@/views/system/Level'),
       name: 'level',
       meta: {
-        title: 'level',
+        title: '优先级',
         icon: 'user',
         roles: ['admin', 'level']
       }
@@ -105,7 +105,7 @@ const system = {
       component: () => import('@/views/system/position'),
       name: 'position',
       meta: {
-        title: 'position',
+        title: '职位',
         icon: 'user',
         roles: ['admin', 'position']
       }
@@ -115,7 +115,7 @@ const system = {
       component: () => import('@/views/system/UserGroup'),
       name: 'usergroup',
       meta: {
-        title: 'usergroup',
+        title: '用户组',
         icon: 'user',
         roles: ['admin', 'usergroup']
       }

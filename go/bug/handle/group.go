@@ -29,7 +29,7 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -40,14 +40,14 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		data := &getDepartment{}
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("statusgroup", nickname, conn)
+			permssion, err = asset.CheckPerm("statusgroup", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -80,7 +80,7 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 		ss := strings.Join(ids, ",")
 
 		isql := "insert into statusgroup(name,sids) values(?,?)"
-		errorcode.Id, err = conn.InsertWithID(isql, data.Department, ss)
+		errorcode.Id, err = bugconfig.Bug_Mysql.Insert(isql, data.Department, ss)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -89,7 +89,6 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "statusgroup",
 		}
@@ -118,7 +117,7 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
 
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -129,14 +128,14 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		data := &getDepartment{}
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("statusgroup", nickname, conn)
+			permssion, err = asset.CheckPerm("statusgroup", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -174,7 +173,7 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 		}
 		ss := strings.Join(ssids, ",")
 		isql := "update statusgroup set name =?,sids=? where id = ?"
-		_, err = conn.Update(isql, data.Department, ss, data.Id)
+		_, err = bugconfig.Bug_Mysql.Update(isql, data.Department, ss, data.Id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -183,7 +182,6 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "statusgroup",
 		}
@@ -222,7 +220,7 @@ func BugGroupList(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
 
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -233,13 +231,13 @@ func BugGroupList(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("statusgroup", nickname, conn)
+			permssion, err = asset.CheckPerm("statusgroup", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -253,7 +251,7 @@ func BugGroupList(w http.ResponseWriter, r *http.Request) {
 		}
 		data := &departmentList{}
 		s := "select id,name,sids from statusgroup"
-		rows, err := conn.GetRows(s)
+		rows, err := bugconfig.Bug_Mysql.GetRows(s)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -291,7 +289,7 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
 
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -302,7 +300,7 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		id := r.FormValue("id")
 		id32, err := strconv.Atoi(id)
 		if err != nil {
@@ -314,7 +312,7 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("statusgroup", nickname, conn)
+			permssion, err = asset.CheckPerm("statusgroup", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -328,7 +326,7 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 		}
 		ssql := "select count(id) from user where bugsid=?"
 		var count int
-		err = conn.GetOne(ssql, id).Scan(&count)
+		err = bugconfig.Bug_Mysql.GetOne(ssql, id).Scan(&count)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -339,7 +337,7 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		isql := "delete from  statusgroup where id = ?"
-		_, err = conn.Update(isql, id)
+		_, err = bugconfig.Bug_Mysql.Update(isql, id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -347,7 +345,6 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 		}
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "statusgroup",
 		}
@@ -375,7 +372,7 @@ func GroupGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -386,14 +383,14 @@ func GroupGet(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		data := &model.Send_groups{}
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("usergroup", nickname, conn)
+			permssion, err = asset.CheckPerm("usergroup", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -406,7 +403,7 @@ func GroupGet(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		gsql := "select id,name,ids from usergroup"
-		rows, err := conn.GetRows(gsql)
+		rows, err := bugconfig.Bug_Mysql.GetRows(gsql)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -437,7 +434,7 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -448,13 +445,13 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("usergroup", nickname, conn)
+			permssion, err = asset.CheckPerm("usergroup", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -490,7 +487,7 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 			ids = append(ids, strconv.FormatInt(uid, 10))
 		}
 		gsql := "insert usergroup(name,ids,cuid) values(?,?,?)"
-		errorcode.Id, err = conn.Insert(gsql, data.Name, strings.Join(ids, ","), bugconfig.CacheNickNameUid[nickname])
+		errorcode.Id, err = bugconfig.Bug_Mysql.Insert(gsql, data.Name, strings.Join(ids, ","), bugconfig.CacheNickNameUid[nickname])
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -499,7 +496,6 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "usergroup",
 		}
@@ -525,7 +521,7 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodGet {
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -536,13 +532,13 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("usergroup", nickname, conn)
+			permssion, err = asset.CheckPerm("usergroup", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -565,7 +561,7 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 		// 判断共享文件是否有在使用
 
 		var hasshare bool
-		sharerows, err := conn.GetRows("select readuser,rid,wid,writeuser from  sharefile")
+		sharerows, err := bugconfig.Bug_Mysql.GetRows("select readuser,rid,wid,writeuser from  sharefile")
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -597,7 +593,7 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 		}
 		// 判断接口是否有在使用
 		var hasrest bool
-		restrows, err := conn.GetRows("select readuser,edituser,rid,eid from  apiproject")
+		restrows, err := bugconfig.Bug_Mysql.GetRows("select readuser,edituser,rid,eid from  apiproject")
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -627,7 +623,7 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 		}
 
 		gsql := "delete from usergroup where id=? and cuid=?"
-		_, err = conn.Update(gsql, id, bugconfig.CacheNickNameUid[nickname])
+		_, err = bugconfig.Bug_Mysql.Update(gsql, id, bugconfig.CacheNickNameUid[nickname])
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -635,7 +631,6 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 		}
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "usergroup",
 		}
@@ -662,7 +657,7 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -673,14 +668,14 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		data := &model.Get_groups{}
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("usergroup", nickname, conn)
+			permssion, err = asset.CheckPerm("usergroup", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -713,7 +708,7 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 				ids = ids + "," + strconv.FormatInt(bugconfig.CacheRealNameUid[v], 10)
 			}
 		}
-		_, err = conn.Update(gsql, data.Name, ids, data.Id, bugconfig.CacheNickNameUid[nickname])
+		_, err = bugconfig.Bug_Mysql.Update(gsql, data.Name, ids, data.Id, bugconfig.CacheNickNameUid[nickname])
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -722,7 +717,6 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "usergroup",
 		}

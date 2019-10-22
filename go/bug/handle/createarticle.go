@@ -27,7 +27,7 @@ func GetProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, _, err := logtokenmysql(r)
+		 _, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -38,7 +38,7 @@ func GetProject(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		pl := &projectList{}
 
 		for _, v := range bugconfig.CachePidName {
@@ -58,7 +58,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -69,7 +69,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		data := &getArticle{}
 		if bugconfig.CacheDefault["status"] <= 0 {
 			w.Write(errorcode.ErrorKeyNotFound())
@@ -140,7 +140,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 
 			insertsql := "insert into bugs(uid,bugtitle,sid,content,iid,createtime,lid,pid,eid,spusers,vid) values(?,?,?,?,?,?,?,?,?,?,?)"
 
-			bugid, err = conn.InsertWithID(insertsql,
+			bugid, err = bugconfig.Bug_Mysql.Insert(insertsql,
 				uid, data.Title, bugconfig.CacheDefault["status"], html.EscapeString(data.Content),
 				iid, errorcode.UpdateTime, lid,
 				pid, eid, spusers, vid)
@@ -151,7 +151,6 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 			}
 
 			il := buglog.AddLog{
-				Conn:     conn,
 				Ip:       strings.Split(r.RemoteAddr, ":")[0],
 				Classify: "bug",
 			}
@@ -168,7 +167,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 
 			insertsql := "update bugs set bugtitle=?,content=?,iid=?,updatetime=?,lid=?,pid=?,eid=?,spusers=?,vid=? where id=?"
 
-			_, err = conn.Update(insertsql, data.Title, html.EscapeString(data.Content), iid,
+			_, err = bugconfig.Bug_Mysql.Update(insertsql, data.Title, html.EscapeString(data.Content), iid,
 				time.Now().Unix(), lid, pid, eid, spusers, vid, data.Id)
 			if err != nil {
 				golog.Error(err.Error())
@@ -178,7 +177,6 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 
 			//// 插入日志
 			il := buglog.AddLog{
-				Conn:     conn,
 				Ip:       strings.Split(r.RemoteAddr, ":")[0],
 				Classify: "bug",
 			}

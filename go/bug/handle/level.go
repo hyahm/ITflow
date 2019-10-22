@@ -1,13 +1,13 @@
 package handle
 
 import (
+	"encoding/json"
+	"github.com/hyahm/golog"
+	"io/ioutil"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
 	"itflow/bug/model"
-	"encoding/json"
-	"github.com/hyahm/golog"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -20,7 +20,7 @@ func LevelGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -31,14 +31,14 @@ func LevelGet(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		data := &model.List_levels{}
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("level", nickname, conn)
+			permssion, err = asset.CheckPerm("level", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -71,7 +71,7 @@ func LevelAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -82,14 +82,14 @@ func LevelAdd(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		data := &model.Data_level{}
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("level", nickname, conn)
+			permssion, err = asset.CheckPerm("level", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -114,7 +114,7 @@ func LevelAdd(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorParams())
 			return
 		}
-		errorcode.Id, err = conn.InsertWithID("insert into level(name) value(?)", data.Name)
+		errorcode.Id, err = bugconfig.Bug_Mysql.Insert("insert into level(name) value(?)", data.Name)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -123,7 +123,6 @@ func LevelAdd(w http.ResponseWriter, r *http.Request) {
 
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "level",
 		}
@@ -152,7 +151,7 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodGet {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -163,7 +162,7 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		id := r.FormValue("id")
 		id32, err := strconv.Atoi(id)
 		if err != nil {
@@ -176,7 +175,7 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("level", nickname, conn)
+			permssion, err = asset.CheckPerm("level", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -191,7 +190,7 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 
 		// 判断bug是否在使用
 		var count int
-		err = conn.GetOne("select count(id) from bugs where lid=?", id32).Scan(&count)
+		err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs where lid=?", id32).Scan(&count)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -207,7 +206,7 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		gsql := "delete from level where id=?"
-		_, err = conn.Update(gsql, id)
+		_, err = bugconfig.Bug_Mysql.Update(gsql, id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -216,7 +215,6 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "level",
 		}
@@ -245,7 +243,7 @@ func LevelUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -256,14 +254,14 @@ func LevelUpdate(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		data := &model.Update_level{}
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("level", nickname, conn)
+			permssion, err = asset.CheckPerm("level", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -290,7 +288,7 @@ func LevelUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 		gsql := "update level set name=? where id=?"
 
-		_, err = conn.Update(gsql, data.Name, data.Id)
+		_, err = bugconfig.Bug_Mysql.Update(gsql, data.Name, data.Id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -298,7 +296,6 @@ func LevelUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "level",
 		}
@@ -334,7 +331,7 @@ func GetLevels(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, _, err := logtokenmysql(r)
+		_, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -345,7 +342,7 @@ func GetLevels(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		data := &levelslist{}
 		for _, v := range bugconfig.CacheLidLevel {
 			data.Levels = append(data.Levels, v)

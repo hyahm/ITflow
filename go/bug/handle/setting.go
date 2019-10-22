@@ -1,14 +1,14 @@
 package handle
 
 import (
+	"encoding/json"
+	"fmt"
+	"github.com/hyahm/golog"
+	"io/ioutil"
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
 	"itflow/bug/mail"
-	"encoding/json"
-	"fmt"
 	"itflow/gaencrypt"
-	"github.com/hyahm/golog"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -34,7 +34,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -45,7 +45,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		getuser := &getAddUser{}
 
 		gu, err := ioutil.ReadAll(r.Body)
@@ -116,7 +116,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		var level int64
-		err = conn.GetOne("select level from jobs where id=?", jid).Scan(&level)
+		err = bugconfig.Bug_Mysql.GetOne("select level from jobs where id=?", jid).Scan(&level)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -126,7 +126,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		showstatus := strings.Join(ids, ",")
 		enpassword := gaencrypt.PwdEncrypt(getuser.Password, bugconfig.Salt)
 		createusersql := "insert into user(nickname,password,email,headimg,createtime,createuid,realname,showstatus,disable,bugsid,level,rid,jid) values(?,?,?,?,?,?,?,?,?,?,?,?,?)"
-		errorcode.Id, err = conn.InsertWithID(createusersql,
+		errorcode.Id, err = bugconfig.Bug_Mysql.Insert(createusersql,
 			getuser.Nickname, enpassword, getuser.Email,
 			"", time.Now().Unix(), bugconfig.CacheNickNameUid[nickname],
 			getuser.RealName, showstatus, false,
@@ -156,7 +156,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 			mail.SendMail("创建用户成功", content, []string{getuser.Email})
 		}
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "user",
 		}
@@ -182,7 +181,7 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodGet {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -193,7 +192,7 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		id := r.FormValue("id")
 		id32, err := strconv.Atoi(id)
 		if err != nil {
@@ -202,7 +201,7 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 		}
 		// 判断是否有bug
 		var count int
-		err = conn.GetOne("select count(id) from bugs where uid=?", id).Scan(&count)
+		err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs where uid=?", id).Scan(&count)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -214,7 +213,7 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// 查看用户组是否存在此用户
-		userrows, err := conn.GetRows("select ids from usergroup")
+		userrows, err := bugconfig.Bug_Mysql.GetRows("select ids from usergroup")
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -235,7 +234,7 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-		_, err = conn.Update("delete from user where id=?", id)
+		_, err = bugconfig.Bug_Mysql.Update("delete from user where id=?", id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -243,7 +242,6 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 		}
 
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "user",
 		}
@@ -278,7 +276,7 @@ func DisableUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodGet {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -289,16 +287,16 @@ func DisableUser(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		id := r.FormValue("id")
 
-		_, err = conn.Update("update user set disable=ABS(disable-1) where id=?", id)
+		_, err = bugconfig.Bug_Mysql.Update("update user set disable=ABS(disable-1) where id=?", id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		_, err = conn.Update("update bugs set dustbin=ABS(dustbin-1) where uid=?", id)
+		_, err = bugconfig.Bug_Mysql.Update("update bugs set dustbin=ABS(dustbin-1) where uid=?", id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -306,7 +304,6 @@ func DisableUser(w http.ResponseWriter, r *http.Request) {
 		}
 
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "user",
 		}
@@ -350,7 +347,7 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -361,7 +358,7 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		if bugconfig.SUPERID != bugconfig.CacheNickNameUid[nickname] {
 			w.Write(errorcode.ErrorNoPermission())
 			return
@@ -373,7 +370,7 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 		//switch level {
 		//case 0:
 		getallsql := "select id,createtime,realname,nickname,email,disable,rid,bugsid,jid from user where level<>0"
-		adminrows, err := conn.GetRows(getallsql)
+		adminrows, err := bugconfig.Bug_Mysql.GetRows(getallsql)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -436,7 +433,7 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -447,7 +444,7 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		if bugconfig.SUPERID != bugconfig.CacheNickNameUid[nickname] {
 			w.Write(errorcode.ErrorNoPermission())
 			return
@@ -508,7 +505,7 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 
 		getallsql := "update user set realname=?,nickname=?,email=?,rid=?,bugsid=?,jid=? where id=?"
-		_, err = conn.Update(getallsql,
+		_, err = bugconfig.Bug_Mysql.Update(getallsql,
 			uls.Realname, uls.Nickname, uls.Email, rid, bsid, bugconfig.CacheJobnameJid[uls.Position],
 			uls.Id,
 		)
@@ -519,7 +516,6 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "user",
 		}
@@ -562,7 +558,7 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, name, err := logtokenmysql(r)
+		name, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -573,7 +569,6 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
 
 		getuser := &pwd{}
 		gu, err := ioutil.ReadAll(r.Body)
@@ -593,7 +588,7 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 		getaritclesql := "select count(id) from user where id=? and password=?"
 		oldpassword := gaencrypt.PwdEncrypt(getuser.Oldpassword, bugconfig.Salt)
 		var n int
-		err = conn.GetOne(getaritclesql, uid, oldpassword).Scan(&n)
+		err = bugconfig.Bug_Mysql.GetOne(getaritclesql, uid, oldpassword).Scan(&n)
 		if err != nil || n != 1 {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorUserNameOrPassword())
@@ -602,13 +597,13 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 		newpassword := gaencrypt.PwdEncrypt(getuser.Newpassword, bugconfig.Salt)
 		chpwdsql := "update user set password=? where id=?"
 
-		_, err = conn.Update(chpwdsql, newpassword, uid)
+		_, err = bugconfig.Bug_Mysql.Update(chpwdsql, newpassword, uid)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		err = insertlog(conn, "resetpassword", "用户"+name+"修改了密码", r)
+		err = insertlog("resetpassword", "用户"+name+"修改了密码", r)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -635,7 +630,7 @@ func GetRoles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, _, err := logtokenmysql(r)
+		_, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -646,7 +641,7 @@ func GetRoles(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		rl := &getroles{}
 		for _, v := range bugconfig.CacheRidRole {
 			rl.Rolelist = append(rl.Rolelist, v)
@@ -667,7 +662,7 @@ func GetThisRoles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodGet {
-		conn, _, err := logtokenmysql(r)
+		_, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -678,21 +673,13 @@ func GetThisRoles(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		rl := &getroles{}
 
 		id := r.FormValue("id")
-		//id32, err := strconv.Atoi(id)
-		//if err != nil {
-		//	fmt.Println("88888")
-		//	golog.Error("参数错误")
-		//	w.Write(errorcode.ErrorParams())
-		//	return
-		//}
-		//fmt.Println(id32)
-		//fmt.Println(bugconfig.CacheRidRoles[int64(id32)])
+
 		var rolestring string
-		err = conn.GetOne("select rolestring from user where id=?", id).Scan(&rolestring)
+		err = bugconfig.Bug_Mysql.GetOne("select rolestring from user where id=?", id).Scan(&rolestring)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -720,7 +707,7 @@ func GetGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, _, err := logtokenmysql(r)
+		_, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -731,7 +718,7 @@ func GetGroup(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		sg := &sendGroup{}
 
 		send, _ := json.Marshal(sg)
@@ -754,7 +741,7 @@ func ResetPwd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, _, err := logtokenmysql(r)
+		_, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -765,7 +752,7 @@ func ResetPwd(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		rp := &resetPassword{}
 
 		body, err := ioutil.ReadAll(r.Body)
@@ -783,7 +770,7 @@ func ResetPwd(w http.ResponseWriter, r *http.Request) {
 		newpassword := gaencrypt.PwdEncrypt(rp.Password, bugconfig.Salt)
 
 		updatepwdsql := "update user set password=? where id=?"
-		_, err = conn.Update(updatepwdsql, newpassword, rp.Id)
+		_, err = bugconfig.Bug_Mysql.Update(updatepwdsql, newpassword, rp.Id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())

@@ -34,7 +34,7 @@ func (al *AddLog) insert(classify string, content string) error {
 			return nil
 		}
 	}
-	_, err := al.Conn.Insert("insert into log(exectime,classify,content,ip) values(?,?,?,?)",
+	_, err := bugconfig.Bug_Mysql.Insert("insert into log(exectime,classify,content,ip) values(?,?,?,?)",
 		time.Now().Unix(), classify, content, al.Ip,
 	)
 	if err != nil {

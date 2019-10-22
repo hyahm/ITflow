@@ -1,4 +1,4 @@
-import Layout from '@/views/layout/Layout'
+import Layout from '@/layout'
 
 const bugRouter = {
   path: '/bug',
@@ -15,7 +15,7 @@ const bugRouter = {
       component: () => import('@/views/bug/create'),
       name: 'createArticle',
       meta: {
-        title: 'createArticle',
+        title: '创建bug',
         icon: 'edit'
       }
     },
@@ -23,21 +23,21 @@ const bugRouter = {
       path: 'edit/:id(\\d+)',
       component: () => import('@/views/bug/edit'),
       name: 'editArticle',
-      meta: { title: 'editArticle', noCache: true },
+      meta: { title: '编辑bug', noCache: true },
       hidden: true
     },
     {
       path: 'mybug',
       component: () => import('@/views/bug/mybug'),
       name: 'articleList',
-      meta: { title: 'articleList', icon: 'guide' }
+      meta: { title: '我的bug', icon: 'guide' }
     },
     {
       path: 'allbugs',
       component: () => import('@/views/bug/allbugs'),
       name: 'bugs',
       meta: {
-        title: 'allbugs',
+        title: '所有bug',
         icon: 'bug'
       }
     },
@@ -46,7 +46,7 @@ const bugRouter = {
       component: () => import('@/views/bug/mytask'),
       name: 'mytask',
       meta: {
-        title: 'mytask',
+        title: '我的任务',
         icon: 'bug'
       }
     }

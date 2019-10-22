@@ -107,7 +107,6 @@
 import { shareList, mkDir, removeFile, renameFile } from '@/api/sharefile'
 import { getUsers } from '@/api/get'
 import { getGroup } from '@/api/group'
-import g from '@/config/config'
 import { getToken } from '@/utils/auth'
 export default {
   name: 'ViewList',
@@ -135,7 +134,7 @@ export default {
       name: '',
       pwd: '.',
       type: '',
-      uploadurl: g.shareUpload,
+      uploadurl: process.env.VUE_APP_BASE_API + '/share/upload',
       header: {
         'X-Token': getToken()
         // 'Content-Type': 'multipart/form-data'
@@ -147,7 +146,7 @@ export default {
       newname: '',
       downloadname: '',
       urlpwd: '',
-      downloadurl: g.downloadUrl,
+      downloadurl: process.env.VUE_APP_BASE_API + '/uploadimg',
       Token: encodeURIComponent(getToken()),
       users: [],
       groups: [],

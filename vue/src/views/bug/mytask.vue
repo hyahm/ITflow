@@ -4,14 +4,14 @@
       我接到的bug，可以转交和改变状态， 选择器的状态是显示所选的状态，永久保存，多页面生效
     </p>
     <div class="filter-container">
-      <el-input :placeholder="$t('table.title')" v-model="listQuery.title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-select v-model="listQuery.level" :placeholder="$t('table.level')" clearable style="width: 90px" class="filter-item">
+      <el-input placeholder="标题" v-model="listQuery.title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-select v-model="listQuery.level" placeholder="优先级" clearable style="width: 90px" class="filter-item">
         <el-option v-for="(item, index) in levels" :key="index" :label="item" :value="item"/>
       </el-select>
-      <el-select v-model="listQuery.project" :placeholder="$t('table.project')" clearable class="filter-item" style="width: 130px">
+      <el-select v-model="listQuery.project" placeholder="项目" clearable class="filter-item" style="width: 130px">
         <el-option v-for="(item, index) in projectnames" :key="index" :label="item" :value="item"/>
       </el-select>
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-dropdown :hide-on-click="false" :show-timeout="100" trigger="click" style="vertical-align: top;">
         <el-button plain >
           状态({{ statuslength }})
@@ -35,24 +35,24 @@
       fit
       highlight-current-row
       style="width: 100%;min-height:350px;">
-      <el-table-column :label="$t('table.id')" align="center" width="65">
+      <el-table-column label="id" align="center" width="65">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.date')" width="150px" align="center">
+      <el-table-column label="时间" width="150px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.date | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.project')" width="110px" align="center">
+      <el-table-column label="项目" width="110px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.projectname }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.title')" min-width="150px" align="center">
+      <el-table-column label="标题" min-width="150px" align="center">
         <template slot-scope="scope">
           <router-link :to="'/showbug/'+scope.row.id" class="link-type">
             <span class="link-type" >{{ scope.row.title }}</span>
@@ -60,24 +60,24 @@
           <!--<el-tag>{{scope.row.type | typeFilter}}</el-tag>-->
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.author')" width="110px" align="center">
+      <el-table-column label="作者" width="110px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.author }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.level')" width="80px" align="center">
+      <el-table-column label="优先级" width="80px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.level }}</span>
           <!--<svg-icon v-for="n in +scope.row.importance" icon-class="star" class="meta-item__icon" :key="n"></svg-icon>-->
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.importance')" width="80px" align="center">
+      <el-table-column label="重要性" width="80px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.importance }}</span>
           <!--<svg-icon v-for="n in +scope.row.importance" icon-class="star" class="meta-item__icon" :key="n"></svg-icon>-->
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.status')" class-name="status-col" width="120">
+      <el-table-column label="状态" class-name="status-col" width="120">
         <template slot-scope="scope">
           <el-select v-model="scope.row.status" class="filter-item" placeholder="修改状态" @change="changestatus(scope.row)">
             <el-option v-for="(item, index) in statuslist" :key="index" :label="item" :value="item"/>
@@ -85,9 +85,9 @@
           <!--<el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>-->
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" align="center" width="130" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="130" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handlePass(scope.row)">{{ $t('table.pass') }}</el-button>
+          <el-button type="primary" size="mini" @click="handlePass(scope.row)">通过</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -127,9 +127,9 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
+        <el-button @click="dialogFormVisible = false">取消</el-button>
         <!--<el-button v-if="dialogStatus=='create'" type="primary" @click="createData">{{$t('table.confirm')}}</el-button>-->
-        <el-button type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
+        <el-button type="primary" @click="updateData">确认</el-button>
       </div>
     </el-dialog>
 

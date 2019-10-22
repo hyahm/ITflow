@@ -1,12 +1,11 @@
 package handle
 
 import (
+	"errors"
+	"fmt"
+	"github.com/hyahm/golog"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
-	"errors"
-	"itflow/gadb"
-	"itflow/gaencrypt"
-	"github.com/hyahm/golog"
 	"net/http"
 	"strconv"
 	"strings"
@@ -23,30 +22,23 @@ func headers(w http.ResponseWriter, r *http.Request) {
 
 var NotFoundToken = errors.New("not found token")
 
-func logtokenmysql(r *http.Request) (*gadb.Db, string, error) {
-	mc := gadb.NewSqlConfig()
-
-	mdb, err := mc.ConnDB()
-	if err != nil {
-		return mdb, "", err
+func logtokenmysql(r *http.Request) (string, error) {
+	for k, v := range r.Header {
+		fmt.Printf("%s : %s \n", k, v)
 	}
 	a := r.Header.Get("X-Token")
-	destoken, err := gaencrypt.RsaDecrypt(a, bugconfig.PrivateKey, true)
+	fmt.Println(a)
+	nickname, err := asset.Getvalue(a)
 	if err != nil {
 		golog.Error(err.Error())
-		return mdb, "", NotFoundToken
-	}
-	nickname, err := asset.Getvalue(string(destoken))
-	if err != nil {
-		golog.Error(err.Error())
-		return mdb, "", NotFoundToken
+		return "", NotFoundToken
 
 	}
 	err = asset.Settimeout(a)
 	if err != nil {
-		return mdb, "", err
+		return "", err
 	}
-	return mdb, string(nickname), nil
+	return string(nickname), nil
 }
 
 func sortpermlist(permlist []string) []string {
@@ -114,11 +106,11 @@ func formatUserlistToRealname(userlist string) []string {
 }
 
 // 插入到log表中
-func insertlog(conn *gadb.Db, classify string, content string, r *http.Request) error {
+func insertlog(classify string, content string, r *http.Request) error {
 	logsql := "insert into log(exectime,classify,content,ip) values(?,?,?,?)"
 	ip := strings.Split(r.RemoteAddr, ":")[0]
 	if ip != "127.0.0.1" {
-		_, err := conn.Insert(logsql, time.Now().Unix(), classify, content, ip)
+		_, err := bugconfig.Bug_Mysql.Insert(logsql, time.Now().Unix(), classify, content, ip)
 		if err != nil {
 			return err
 		}

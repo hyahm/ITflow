@@ -1,71 +1,24 @@
 import request from '@/utils/request'
 
-export function createUser(data) {
+export function login(data) {
   return request({
-    url: '/user/create',
+    url: '/user/login',
     method: 'post',
-    data: data
+    data
   })
 }
 
-export function updatePassword(data) {
+export function getInfo(token) {
   return request({
-    url: '/password/update',
-    method: 'post',
-    data: data
-  })
-}
-
-export function userList() {
-  return request({
-    url: '/user/list',
-    method: 'post'
-  })
-}
-
-export function resetPwd(data) {
-  return request({
-    url: '/password/reset',
-    method: 'post',
-    data: data
-  })
-}
-
-export function updateInfo(data) {
-  return request({
-    url: '/info/update',
-    method: 'post',
-    data: data
-  })
-}
-
-export function getInfo() {
-  return request({
-    url: '/get/info',
-    method: 'post'
-  })
-}
-
-export function updateUser(data) {
-  return request({
-    url: '/user/update',
-    method: 'post',
-    data: data
-  })
-}
-
-export function userRemove(id) {
-  return request({
-    url: '/user/remove',
+    url: '/user/info',
     method: 'get',
-    params: { id }
+    params: { token }
   })
 }
 
-export function userDisable(id) {
+export function logout() {
   return request({
-    url: '/user/disable',
-    method: 'get',
-    params: { id }
+    url: '/user/logout',
+    method: 'post'
   })
 }

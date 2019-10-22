@@ -17,8 +17,8 @@ func RunHttp(c chan os.Signal) {
 
 	//
 
-	router.HandleFunc("/login/login", handle.Login)
-	router.HandleFunc("/login/logout", handle.Loginout)
+	router.HandleFunc("/user/login", handle.Login)
+	router.HandleFunc("/user/logout", handle.Loginout)
 	//
 	router.HandleFunc("/dashboard/usercount", handle.UserCount)
 	router.HandleFunc("/dashboard/projectcount", handle.ProjectCount)
@@ -49,9 +49,7 @@ func RunHttp(c chan os.Signal) {
 	router.HandleFunc("/bug/edit", handle.BugEdit)
 	router.HandleFunc("/bug/mybugs", handle.GetMyBugs)
 	router.HandleFunc("/bug/close", handle.CloseBug)
-	//router.HandleFunc("/bug/", handle.GetMyBugs)
 
-	//router.HandleFunc("/bug/getallbugs", handle.GetAllBugs)
 	router.HandleFunc("/bug/changestatus", handle.ChangeBugStatus)
 	router.HandleFunc("/status/filter", handle.ChangeFilterStatus)
 	router.HandleFunc("/status/show", handle.ShowStatus)

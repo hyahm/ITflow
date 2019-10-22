@@ -1,15 +1,15 @@
 package handle
 
 import (
+	"database/sql"
+	"encoding/json"
+	"github.com/hyahm/golog"
+	"io/ioutil"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
-	"database/sql"
-	"encoding/json"
 	"itflow/gadb"
 	"itflow/gaencrypt"
-	"github.com/hyahm/golog"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -46,38 +46,29 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		conn, err := gadb.NewSqlConfig().ConnDB()
-
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-		defer conn.Db.Close()
 		// 解密
-		username, err := gaencrypt.RsaDecrypt(login.Username, bugconfig.PrivateKey, true)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorRsa())
-			return
-		}
+		//username, err := gaencrypt.RsaDecrypt(login.Username, bugconfig.PrivateKey, true)
+		//if err != nil {
+		//	golog.Error(err.Error())
+		//	w.Write(errorcode.ErrorRsa())
+		//	return
+		//}
+		//
+		//tmp, err := gaencrypt.RsaDecrypt(login.Password, bugconfig.PrivateKey, true)
+		//if err != nil {
+		//
+		//	golog.Error(err.Error())
+		//	w.Write(errorcode.ErrorRsa())
+		//	return
+		//}
+		login.Username = strings.Trim(login.Username, " ")
 
-		tmp, err := gaencrypt.RsaDecrypt(login.Password, bugconfig.PrivateKey, true)
-		if err != nil {
-
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorRsa())
-			return
-		}
-
-		login.Username = ""
-		login.Password = ""
-		login.Token = gaencrypt.Token(string(username), bugconfig.Salt)
-		enpassword := gaencrypt.PwdEncrypt(string(tmp), bugconfig.Salt)
+		login.Token = gaencrypt.Token(login.Username, bugconfig.Salt)
+		enpassword := gaencrypt.PwdEncrypt(login.Password, bugconfig.Salt)
 
 		getsql := "select nickname from user where email=? and password=? and disable=0"
 
-		err = conn.GetOne(getsql, string(username), enpassword).Scan(&login.Username)
+		err = bugconfig.Bug_Mysql.GetOne(getsql, login.Username, enpassword).Scan(&login.Username)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				golog.Error("username or password error")
@@ -97,7 +88,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		}
 
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "login",
 		}
@@ -140,8 +130,7 @@ func Loginout(w http.ResponseWriter, r *http.Request) {
 		}
 		asset.Delkey(token)
 		il := buglog.AddLog{
-			Conn: conn,
-			Ip:   strings.Split(r.RemoteAddr, ":")[0],
+			Ip: strings.Split(r.RemoteAddr, ":")[0],
 		}
 		err = il.Login("nickname: %s has logout", nickname)
 		if err != nil {
@@ -156,6 +145,7 @@ type userInfo struct {
 	Roles  []string `json:"roles"`
 	Code   int      `json:"statuscode"`
 	Avatar string   `json:"avatar"`
+	Name   string   `json:"name"`
 }
 
 func UserInfo(w http.ResponseWriter, r *http.Request) {
@@ -164,9 +154,9 @@ func UserInfo(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+	if r.Method == http.MethodGet {
 		errorcode := &errorstruct{}
+		nickname, err := logtokenmysql(r)
 		if err != nil {
 			golog.Error(err.Error())
 			if err == NotFoundToken {
@@ -176,13 +166,13 @@ func UserInfo(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		userinfo := &userInfo{}
 
-		sql := "select rid,level,headimg from user where nickname=?"
+		sql := "select rid,level,headimg,nickname from user where nickname=?"
 		var rid string
 		var level int
-		err = conn.GetOne(sql, nickname).Scan(&rid, &level, &userinfo.Avatar)
+		err = bugconfig.Bug_Mysql.GetOne(sql, nickname).Scan(&rid, &level, &userinfo.Avatar, &userinfo.Name)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -194,7 +184,7 @@ func UserInfo(w http.ResponseWriter, r *http.Request) {
 		} else {
 			var rl string
 			getrole := "select rolelist from rolegroup where id=?"
-			conn.GetOne(getrole, rid).Scan(&rl)
+			bugconfig.Bug_Mysql.GetOne(getrole, rid).Scan(&rl)
 			for _, v := range strings.Split(rl, ",") {
 				id, _ := strconv.Atoi(v)
 				userinfo.Roles = append(userinfo.Roles, bugconfig.CacheRidRole[int64(id)])

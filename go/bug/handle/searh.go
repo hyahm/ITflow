@@ -1,15 +1,14 @@
 package handle
 
 import (
-	"itflow/bug/bugconfig"
-	"itflow/bug/model"
-	"itflow/bug/public"
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"itflow/gadb"
 	"github.com/hyahm/golog"
 	"io/ioutil"
+	"itflow/bug/bugconfig"
+	"itflow/bug/model"
+	"itflow/bug/public"
 	"net/http"
 	"strconv"
 	"strings"
@@ -70,7 +69,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 		countbasesql := "select count(id) from bugs where dustbin=0 "
 		bugsql := "select id,createtime,iid,sid,bugtitle,lid,pid,eid,spusers from bugs where dustbin=0 "
 
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -83,7 +82,6 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
 
 		searchq, err := ioutil.ReadAll(r.Body)
 		if err != nil {
@@ -137,7 +135,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		rows, err := conn.GetRows(bugsql + fmt.Sprintf("and sid in (%s)", showstatus))
+		rows, err := bugconfig.Bug_Mysql.GetRows(bugsql + fmt.Sprintf("and sid in (%s)", showstatus))
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -209,7 +207,7 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPost {
-		conn, _, err := logtokenmysql(r)
+		_, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -220,7 +218,7 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		al := &model.AllArticleList{}
 
 		searchq, err := ioutil.ReadAll(r.Body)
@@ -239,7 +237,7 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 
 		basesql, args := managertotal("select count(id) from bugs", searchparam)
 
-		err = conn.GetOne(basesql, args...).Scan(&al.Count)
+		err = bugconfig.Bug_Mysql.GetOne(basesql, args...).Scan(&al.Count)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -252,7 +250,7 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 		}
 		alsql := "select id,createtime,importent,status,bugtitle,uid,level,pid,env,spusers,dustbin from bugs"
 
-		rows, err := managersearch(alsql, al.Count, searchparam, conn)
+		rows, err := managersearch(alsql, al.Count, searchparam)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -322,7 +320,7 @@ func managertotal(basesql string, params *getBugManager) (string, []interface{})
 	return basesql, args
 }
 
-func managersearch(basesql string, count int, params *getBugManager, conn *gadb.Db) (*sql.Rows, error) {
+func managersearch(basesql string, count int, params *getBugManager) (*sql.Rows, error) {
 	searchsql, args := managertotal(basesql, params)
 
 	start, end := public.GetPagingLimitAndPage(count, params.Page, params.Limit)
@@ -331,11 +329,11 @@ func managersearch(basesql string, count int, params *getBugManager, conn *gadb.
 	args = append(args, end)
 	searchsql = searchsql + " order by id desc limit ?,? "
 
-	return conn.GetRows(searchsql, args...)
+	return bugconfig.Bug_Mysql.GetRows(searchsql, args...)
 }
 
 func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool) (*model.AllArticleList, []byte) {
-	conn, nickname, err := logtokenmysql(r)
+	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
 		golog.Error(err.Error())
@@ -346,7 +344,6 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 		golog.Error(err.Error())
 		return nil, errorcode.ErrorConnentMysql()
 	}
-	defer conn.Db.Close()
 
 	searchq, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -396,7 +393,7 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 		}
 	}
 
-	err = conn.GetOne(countbasesql+fmt.Sprintf("and sid in (%s)", showstatus), bugconfig.CacheNickNameUid[nickname]).Scan(&al.Count)
+	err = bugconfig.Bug_Mysql.GetOne(countbasesql+fmt.Sprintf("and sid in (%s)", showstatus), bugconfig.CacheNickNameUid[nickname]).Scan(&al.Count)
 	if err != nil {
 		golog.Error(err.Error())
 		return nil, errorcode.ErrorConnentMysql()
@@ -405,7 +402,7 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 	// 获取查询的总个数
 	start, end := public.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
 
-	rows, err := conn.GetRows(bugsql+fmt.Sprintf("and sid in (%s) limit ?,?", showstatus), bugconfig.CacheNickNameUid[nickname], start, end)
+	rows, err := bugconfig.Bug_Mysql.GetRows(bugsql+fmt.Sprintf("and sid in (%s) limit ?,?", showstatus), bugconfig.CacheNickNameUid[nickname], start, end)
 	if err != nil {
 		golog.Error(err.Error())
 		return nil, errorcode.ErrorConnentMysql()

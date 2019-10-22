@@ -30,7 +30,7 @@ func EnvList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -41,14 +41,14 @@ func EnvList(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		env := &envlist{}
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("env", nickname, conn)
+			permssion, err = asset.CheckPerm("env", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -83,7 +83,7 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodGet {
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -94,13 +94,13 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("env", nickname, conn)
+			permssion, err = asset.CheckPerm("env", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -116,7 +116,7 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 
 		getaritclesql := "insert into environment(envname) values(?)"
 
-		errorcode.Id, err = conn.InsertWithID(getaritclesql, envname)
+		errorcode.Id, err = bugconfig.Bug_Mysql.Insert(getaritclesql, envname)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -124,7 +124,6 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 		}
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "env",
 		}
@@ -153,7 +152,7 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 
 		if err != nil {
@@ -165,14 +164,14 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorConnentMysql())
 			return
 		}
-		defer conn.Db.Close()
+
 		er := &envrow{}
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("env", nickname, conn)
+			permssion, err = asset.CheckPerm("env", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -199,7 +198,7 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 
 		getaritclesql := "update environment set envname=? where id=?"
 
-		_, err = conn.Update(getaritclesql, er.EnvName, er.Id)
+		_, err = bugconfig.Bug_Mysql.Update(getaritclesql, er.EnvName, er.Id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -207,7 +206,6 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 		}
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "env",
 		}
@@ -237,7 +235,7 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodGet {
-		conn, nickname, err := logtokenmysql(r)
+		 nickname, err := logtokenmysql(r)
 		errorcode := &errorstruct{}
 		if err != nil {
 			golog.Error(err.Error())
@@ -248,13 +246,13 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorNotFoundToken())
 			return
 		}
-		defer conn.Db.Close()
+
 		var permssion bool
 		// 管理员
 		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 			permssion = true
 		} else {
-			permssion, err = asset.CheckPerm("env", nickname, conn)
+			permssion, err = asset.CheckPerm("env", nickname)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorConnentMysql())
@@ -276,7 +274,7 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 		}
 		var count int
 
-		err = conn.GetOne("select count(id) from bugs where eid=?", id).Scan(&count)
+		err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs where eid=?", id).Scan(&count)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -288,7 +286,7 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 		}
 		getaritclesql := "delete from environment where id=?"
 
-		_, err = conn.Update(getaritclesql, id)
+		_, err = bugconfig.Bug_Mysql.Update(getaritclesql, id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorConnentMysql())
@@ -296,7 +294,6 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 		}
 		// 增加日志
 		il := buglog.AddLog{
-			Conn:     conn,
 			Ip:       strings.Split(r.RemoteAddr, ":")[0],
 			Classify: "env",
 		}
