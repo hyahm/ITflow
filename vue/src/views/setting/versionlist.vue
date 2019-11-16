@@ -129,7 +129,7 @@ export default {
   methods: {
     getversionlist() {
       getVersion(this.listQuery).then(response => {
-        if (response.data.statuscode === 0) {
+        if (response.data.code === 0) {
           if (response.data.versionlist === null) {
             this.list = []
             this.total = 0
@@ -157,7 +157,7 @@ export default {
     },
     confirm() {
       updateVersion(this.form).then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.$message.success('修改成功')
           const l = this.list.length
           for (let i = 0; i < l; i++) {
@@ -186,11 +186,11 @@ export default {
         type: 'warning'
       }).then(() => {
         removeVersion(row.id).then(resp => {
-          if (resp.data.statuscode === 20) {
+          if (resp.data.code === 20) {
             this.$message.error('此版本有bug,无法删除')
             return
           }
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             const l = this.list.length
             for (let i = 0; i < l; i++) {
               if (this.list[i].id === row.id) {

@@ -100,7 +100,7 @@ export default {
     },
     getlist() {
       departmentList().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.departmentlist !== null) {
             this.list = resp.data.departmentlist
           }
@@ -119,11 +119,11 @@ export default {
       this.$confirm('确认关闭？')
         .then(_ => {
           removeDepartment(id).then(resp => {
-            if (resp.data.statuscode === 23) {
+            if (resp.data.code === 23) {
               this.$message.warning('删除失败，此状态组有用户在使用')
               return
             }
-            if (resp.data.statuscode === 0) {
+            if (resp.data.code === 0) {
               const l = this.list.length
               for (let i = 0; i < l; i++) {
                 if (this.list[i].id === id) {
@@ -133,14 +133,14 @@ export default {
               this.$message.success('删除成功')
               return
             }
-            this.$message.success('删除失败,错误码：' + resp.data.statuscode)
+            this.$message.success('删除失败,错误码：' + resp.data.msg)
           })
         })
         .catch(_ => {})
     },
     getstatus() {
       getStatus().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.statuslist = resp.data.statuslist
         }
       })
@@ -151,7 +151,7 @@ export default {
     HandlerAddGroup() {
       if (this.form.id > 0) {
         editDepartment(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             const l = this.list.length
             for (let i = 0; i < l; i++) {
               if (this.list[i].id === this.form.id) {
@@ -166,7 +166,7 @@ export default {
         })
       } else {
         addDepartment(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             this.list.push({
               id: resp.data.id,
               name: this.form.departmentname,

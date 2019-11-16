@@ -186,11 +186,11 @@ export default {
         checkstatus: this.listQuery.showstatus
       }
       statusFilter(data).then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.statuslength = this.listQuery.showstatus.length
           this.listLoading = true
           searchMyBugs(this.listQuery).then(resp => {
-            if (resp.data.statuscode === 0) {
+            if (resp.data.code === 0) {
               this.list = resp.data.articlelist
               this.total = resp.data.total
               this.listQuery.page = resp.data.page
@@ -202,13 +202,13 @@ export default {
     },
     getstatus() {
       getStatus().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.platformsOptions = resp.data.statuslist
         }
       })
       // 可以修改的权限
       getPermStatus().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.statuslist = resp.data.statuslist
         }
       })
@@ -217,7 +217,7 @@ export default {
     getmystatus() {
       // 需要显示的状态
       getShowStatus().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.checkstatus !== null) {
             this.listQuery.showstatus = resp.data.checkstatus
             this.statuslength = this.listQuery.showstatus.length
@@ -227,7 +227,7 @@ export default {
     },
     getpname() {
       getProject().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.projectnames = resp.data.projectlist
         }
       })
@@ -239,7 +239,7 @@ export default {
         type: 'warning'
       }).then(() => {
         closeBug(row.id).then(response => {
-          if (response.data.statuscode === 0) {
+          if (response.data.code === 0) {
             this.list = this.list.filter(items => {
               return items.id !== row.id
             })
@@ -267,7 +267,7 @@ export default {
         status: row.status
       }
       changeStatus(param).then(response => {
-        if (response.data.statuscode === 0) {
+        if (response.data.code === 0) {
           this.$notify({
             title: '成功',
             message: '修改成功',
@@ -286,7 +286,7 @@ export default {
       this.listQuery.page = 1
       this.listLoading = true
       searchMyBugs(this.listQuery).then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.list = resp.data.articlelist
           this.total = resp.data.total
           this.listQuery.page = resp.data.page
@@ -338,7 +338,7 @@ export default {
         limit: this.listQuery.limit
       }
       searchMyBugs(pager).then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.list = resp.data.articlelist
           this.total = resp.data.total
           this.listQuery.page = resp.data.page

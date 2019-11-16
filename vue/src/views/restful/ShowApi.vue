@@ -148,7 +148,7 @@ export default {
     },
     getapi() {
       apiOne(this.id).then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.list = resp.data
           // this.list.resp = JSON.parse(this.list.resp)
           // if (this.list.calltype === 'json') {

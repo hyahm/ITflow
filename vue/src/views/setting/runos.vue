@@ -67,7 +67,7 @@ export default {
   methods: {
     getosname() {
       getOSName().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.oslist === null) {
             this.$message.info('no data')
             return
@@ -82,7 +82,7 @@ export default {
     },
     handleDelete(id) {
       deleteOSName(id).then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           const fl = this.tableData.length
           for (let i = 0; i < fl; i++) {
             if (this.tableData[i].id === id) {
@@ -102,7 +102,7 @@ export default {
       this.dialogFormVisible = false
       if (this.form.id === -1) {
         addOSName(this.form.osname).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             this.tableData.push({
               id: resp.data.id,
               osname: this.form.osname
@@ -111,7 +111,7 @@ export default {
         })
       } else {
         updateOSName(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             const fl = this.form.length
             for (let i = 0; i < fl; i++) {
               if (this.tableData[i].id === this.form.id) {

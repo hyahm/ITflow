@@ -223,14 +223,14 @@ export default {
   methods: {
     defaultimportant() {
       important().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.postForm.important = resp.data.defaultimportant
         }
       })
     },
     getimportants() {
       getImportants().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.importants !== null) {
             this.importants = resp.data.importants
           }
@@ -239,14 +239,14 @@ export default {
     },
     defaultlevel() {
       level().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.postForm.level = resp.data.defaultlevel
         }
       })
     },
     getlevels() {
       getLevels().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.levels !== null) {
             this.levels = resp.data.levels
           }
@@ -255,21 +255,21 @@ export default {
     },
     getenv() {
       getEnv().then(response => {
-        if (response.data.statuscode === 0) {
+        if (response.data.code === 0) {
           this.envnames = response.data.envlist
         }
       })
     },
     getproject() {
       getProject().then(response => {
-        if (response.data.statuscode === 0) {
+        if (response.data.code === 0) {
           this.projectnames = response.data.projectlist
         }
       })
     },
     getversion() {
       getVersion().then(response => {
-        if (response.data.statuscode === 0) {
+        if (response.data.code === 0) {
           this.versions = response.data.versionlist
         }
       }).catch(err => {
@@ -278,7 +278,7 @@ export default {
     },
     getuser() {
       getUsers().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.users !== null) {
             this.users = resp.data.users
           }
@@ -289,7 +289,7 @@ export default {
     },
     fetchData(id) {
       fetchBug(id).then(response => {
-        if (response.data.statuscode === 0) {
+        if (response.data.code === 0) {
           const dd = response.data
           this.postForm.title = dd.title
           this.postForm.content = dd.content
@@ -333,7 +333,7 @@ export default {
       this.$refs.postForm.validate(valid => {
         if (valid) {
           createBug(this.postForm).then(resp => {
-            if (resp.data.statuscode === 0) {
+            if (resp.data.code === 0) {
               if (this.postForm.id === -1) {
                 this.$notify({
                   title: '成功',

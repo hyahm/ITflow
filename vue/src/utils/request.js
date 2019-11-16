@@ -43,7 +43,7 @@ service.interceptors.response.use(
   response => {
     const url = response.request.responseURL
     if (url.indexOf('/login/login') < 0 && url.indexOf('/api/resp') < 0) {
-      if (response.data.statuscode === 400) {
+      if (response.data.code === 400) {
         removeToken()
         location.href = '/login'
       }

@@ -6,21 +6,22 @@ import (
 )
 
 type errorstruct struct {
-	Id         int64                     `json:"id"`
-	AffectId   int64                     `json:"affectid"`
-	Code       int                       `json:"statuscode"`
-	Msg        string                    `json:"message"`
-	Path       *onefd                    `json:"path"`
-	Filename   string                    `json:"filename"`
-	Data       []byte                    `json:"data"`
-	UpdateTime int64                     `json:"updatetime"`
-	Size       int64                     `json:"size"`
-	HeaderList []*model.Table_headerlist `json:"headerlist"`
+	Id         int64                     `json:"id,omitempty"`
+	AffectId   int64                     `json:"affectid,omitempty"`
+	Code       int                       `json:"code"`
+	Msg        string                    `json:"message,omitempty"`
+	Path       *onefd                    `json:"path,omitempty"`
+	Filename   string                    `json:"filename,omitempty"`
+	Data       []byte                    `json:"data,omitempty"`
+	UpdateTime int64                     `json:"updatetime,omitempty"`
+	Size       int64                     `json:"size,omitempty"`
+	HeaderList []*model.Table_headerlist `json:"headerlist,omitempty"`
 }
 
 // can not connect mysql
 func (es *errorstruct) ErrorConnentMysql() []byte {
 	es.Code = 1
+	es.Msg = "连接数据库出错"
 	send, _ := json.Marshal(es)
 	return send
 }
@@ -28,6 +29,7 @@ func (es *errorstruct) ErrorConnentMysql() []byte {
 // connect redis error
 func (es *errorstruct) ErrorConnentRedis() []byte {
 	es.Code = 2
+	es.Msg = "连接redis出错"
 	send, _ := json.Marshal(es)
 	return send
 }
@@ -35,6 +37,7 @@ func (es *errorstruct) ErrorConnentRedis() []byte {
 // token not found or token expirasion
 func (es *errorstruct) ErrorNotFoundToken() []byte {
 	es.Code = 400
+	es.Msg = "not found token"
 	send, _ := json.Marshal(es)
 	return send
 }
@@ -42,6 +45,7 @@ func (es *errorstruct) ErrorNotFoundToken() []byte {
 // get post or get request data error
 func (es *errorstruct) ErrorGetData() []byte {
 	es.Code = 7
+	es.Msg = "not get response date"
 	send, _ := json.Marshal(es)
 	return send
 }
@@ -49,6 +53,7 @@ func (es *errorstruct) ErrorGetData() []byte {
 // marshaJson error
 func (es *errorstruct) ErrorMarshalJson() []byte {
 	es.Code = 5
+	es.Msg = "解析json出错"
 	send, _ := json.Marshal(es)
 	return send
 }
@@ -56,6 +61,7 @@ func (es *errorstruct) ErrorMarshalJson() []byte {
 //  params error
 func (es *errorstruct) ErrorParams() []byte {
 	es.Code = 4
+	es.Msg = "参数错误"
 	send, _ := json.Marshal(es)
 	return send
 }
@@ -63,6 +69,7 @@ func (es *errorstruct) ErrorParams() []byte {
 //
 func (es *errorstruct) ErrorImage() []byte {
 	es.Code = 6
+	es.Msg = "图片出错"
 	send, _ := json.Marshal(es)
 	return send
 }
@@ -70,6 +77,7 @@ func (es *errorstruct) ErrorImage() []byte {
 // decrypt error, or not found rsa key
 func (es *errorstruct) ErrorRsa() []byte {
 	es.Code = 8
+	es.Msg = "秘钥失败"
 	send, _ := json.Marshal(es)
 	return send
 }
@@ -77,6 +85,7 @@ func (es *errorstruct) ErrorRsa() []byte {
 // password or username error
 func (es *errorstruct) ErrorUserNameOrPassword() []byte {
 	es.Code = 10
+	es.Msg = "账号或密码错误"
 	send, _ := json.Marshal(es)
 	return send
 }
@@ -84,12 +93,14 @@ func (es *errorstruct) ErrorUserNameOrPassword() []byte {
 // file not found
 func (es *errorstruct) ErrorFileNotFound() []byte {
 	es.Code = 12
+	es.Msg = "没有找到文件"
 	send, _ := json.Marshal(es)
 	return send
 }
 
 func (es *errorstruct) ErrorCannotExec() []byte {
 	es.Code = 11
+	es.Msg = "无法执行"
 	send, _ := json.Marshal(es)
 	return send
 }
@@ -146,24 +157,28 @@ func (es *errorstruct) ErrorIsDefault() []byte {
 
 func (es *errorstruct) ErrorNoPermission() []byte {
 	es.Code = 14
+	es.Msg = "没有权限"
 	send, _ := json.Marshal(es)
 	return send
 }
 
 func (es *errorstruct) ErrorOpenFile() []byte {
 	es.Code = 13
+	es.Msg = "打开文件失败"
 	send, _ := json.Marshal(es)
 	return send
 }
 
 func (es *errorstruct) ErrorKeyNotFound() []byte {
 	es.Code = 30
+	es.Msg = "key not found "
 	send, _ := json.Marshal(es)
 	return send
 }
 
 func (es *errorstruct) ErrorType() []byte {
 	es.Code = 31
+	es.Msg = "类型错误"
 	send, _ := json.Marshal(es)
 	return send
 }
@@ -187,12 +202,6 @@ func (es *errorstruct) ErrorRepeatEmail() []byte {
 	send, _ := json.Marshal(es)
 	return send
 }
-
-//func (es *errorstruct) ErrorOpenFile() []byte {
-//	es.Code = 13
-//	send, _ := json.Marshal(es)
-//	return send
-//}
 
 func (es *errorstruct) ErrorNull() []byte {
 	es.Code = 200

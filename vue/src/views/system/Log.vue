@@ -138,7 +138,7 @@ export default {
     getlog() {
       this.listLoading = true
       getLog().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.list = resp.data.loglist
         }
       })
@@ -147,7 +147,7 @@ export default {
     handleFilter() {
       this.listQuery.page = 1
       searchLog(this.listQuery).then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.loglist !== null) {
             this.list = resp.data.loglist
           } else {

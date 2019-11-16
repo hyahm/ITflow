@@ -168,7 +168,7 @@ export default {
   methods: {
     getheaders() {
       headerGet().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.headers !== null) {
             this.headers = resp.data.headers
           }
@@ -177,7 +177,7 @@ export default {
     },
     gettypes() {
       typeGet().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.headers !== null) {
             this.types = resp.data.types
           }
@@ -190,11 +190,11 @@ export default {
     getrestname() {
       this.$nextTick(() => {
         apiList(this.pid).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             if (resp.data.list !== null) {
               this.list = resp.data.list
             }
-          } else if (resp.data.statuscode === 14) {
+          } else if (resp.data.code === 14) {
             this.$message({
               type: 'info',
               message: '你没有权限访问'
@@ -210,7 +210,7 @@ export default {
     },
     update(row) {
       editOne(row.id).then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.opts === null) {
             resp.data.opts = []
           }
@@ -226,7 +226,7 @@ export default {
         type: 'warning'
       }).then(() => {
         apiDel(id).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             for (let i = 0; i < this.list.length; i++) {
               if (this.list[i].id === id) {
                 this.list.splice(i, 1)
@@ -295,7 +295,7 @@ export default {
       }
       if (this.form.id > 0) {
         apiUpdate(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             for (let i = 0; i < this.list.length; i++) {
               if (this.list[i].id === this.form.id) {
                 this.list[i].name = this.form.name
@@ -310,7 +310,7 @@ export default {
         })
       } else {
         apiAdd(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             this.list.push({
               id: resp.data.id,
               name: this.form.name

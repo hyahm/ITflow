@@ -125,7 +125,7 @@ export default {
   methods: {
     getuserlist() {
       getUsers().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.users !== null) {
             this.users = resp.data.users
           }
@@ -136,7 +136,7 @@ export default {
     },
     getgrouplist() {
       getGroup().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.grouplist !== null) {
             this.groups = resp.data.grouplist
           }
@@ -175,7 +175,7 @@ export default {
     },
     getrestname() {
       restList().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.list !== null) {
             this.list = resp.data.list
           }
@@ -194,7 +194,7 @@ export default {
         type: 'warning'
       }).then(() => {
         restDel(id).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             for (let i = 0; i < this.list.length; i++) {
               if (this.list[i].id === id) {
                 this.list.splice(i, 1)
@@ -218,8 +218,7 @@ export default {
       }
       if (this.form.id > 0) {
         restUpdate(this.form).then(resp => {
-          console.log(resp.data)
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             for (let i = 0; i < this.list.length; i++) {
               if (this.list[i].id === this.form.id) {
                 this.list.splice(i, 1, this.form)
@@ -232,7 +231,7 @@ export default {
         })
       } else {
         restAdd(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             const data = this.form
             data.id = resp.data.id
             this.list.push(data)

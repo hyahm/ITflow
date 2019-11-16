@@ -174,7 +174,7 @@ export default {
     },
     gettypes() {
       typeGet().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.headers !== null) {
             this.types = resp.data.types
           }
@@ -186,8 +186,7 @@ export default {
     },
     getrestname() {
       typeList().then(resp => {
-        if (resp.data.statuscode === 0) {
-          console.log(resp.data)
+        if (resp.data.code === 0) {
           if (resp.data.list !== null) {
             this.list = resp.data.list
             const l = this.list.length
@@ -203,7 +202,7 @@ export default {
     update(row) {
       this.form = JSON.parse(JSON.stringify(row))
       typeGet().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.headers !== null) {
             this.types = resp.data.types
             const l = this.types.length
@@ -224,7 +223,7 @@ export default {
         type: 'warning'
       }).then(() => {
         typeDel(id).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             for (let i = 0; i < this.list.length; i++) {
               if (this.list[i].id === id) {
                 this.list.splice(i, 1)
@@ -242,7 +241,7 @@ export default {
     confirm() {
       if (this.form.id > 0) {
         typeUpdate(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             if (this.form.checktype === 1) {
               const data = JSON.parse(JSON.stringify(this.form))
               data.id = resp.data.id
@@ -271,7 +270,7 @@ export default {
       } else {
 
         typeAdd(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             if (this.form.checktype === 1) {
               const data = this.form
               data.id = resp.data.id

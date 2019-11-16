@@ -256,12 +256,12 @@ export default {
   methods: {
     getstatus() {
       getStatus().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.platformsOptions = resp.data.statuslist
         }
       })
       getPermStatus().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.statuslist = resp.data.statuslist
         }
       })
@@ -272,12 +272,12 @@ export default {
       }
       this.statuslength = this.checkstatus.length
       statusFilter(data).then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.statuslength = this.checkstatus.length
           this.listLoading = true
 
           searchMyTasks(this.listQuery).then(resp => {
-            if (resp.data.statuscode === 0) {
+            if (resp.data.code === 0) {
               this.list = resp.data.articlelist
               this.total = resp.data.total
               this.listQuery.page = resp.data.page
@@ -289,7 +289,7 @@ export default {
     },
     getpname() {
       getProject().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.projectnames = resp.data.projectlist
         }
       })
@@ -297,7 +297,7 @@ export default {
     getmystatus() {
       // 需要显示的状态
       getShowStatus().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.checkstatus !== null) {
             this.checkstatus = resp.data.checkstatus
             this.statuslength = this.checkstatus.length
@@ -307,7 +307,7 @@ export default {
     },
     getspuser() {
       getUsers().then(response => {
-        if (response.data.statuscode === 0) {
+        if (response.data.code === 0) {
           this.users = response.data.users
         }
       })
@@ -315,7 +315,7 @@ export default {
     getList() {
       this.listLoading = true
       searchMyTasks(this.listQuery).then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.list = resp.data.articlelist
           this.total = resp.data.total
           this.listQuery.page = resp.data.page
@@ -355,7 +355,7 @@ export default {
     },
     updateData() {
       passBug(this.temp).then(response => {
-        if (response.data.statuscode === 0) {
+        if (response.data.code === 0) {
           const data = response.data
           this.temp.remark = ''
           this.temp.status = data.status
@@ -398,7 +398,7 @@ export default {
         status: row.status
       }
       changeStatus(param).then(response => {
-        if (response.data.statuscode === 0) {
+        if (response.data.code === 0) {
           this.$notify({
             title: '成功',
             message: '修改成功',

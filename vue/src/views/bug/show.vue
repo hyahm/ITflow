@@ -170,7 +170,7 @@ export default {
       if (id % 1 === 0) {
         this.temp.id = parseInt(id)
         showBug(id).then(response => {
-          if (response.data.statuscode === 0) {
+          if (response.data.code === 0) {
             this.bug = response.data
           }
         })
@@ -180,7 +180,7 @@ export default {
       this.dialogFormVisible = true
       this.temp.status = this.bug.status
       passBug(this.temp).then(response => {
-        if (response.data.statuscode === 0) {
+        if (response.data.code === 0) {
           const data = response.data
           this.bug.comment.push({
             date: data.date,

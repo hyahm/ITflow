@@ -241,14 +241,14 @@ export default {
         checkstatus: this.checkstatus
       }
       statusFilter(data).then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.checkstatus !== null) {
             this.checkstatus = resp.data.checkstatus
             this.statuslength = this.checkstatus.length
           }
           this.listLoading = true
           searchAllBugs(this.listQuery).then(resp => {
-            if (resp.data.statuscode === 0) {
+            if (resp.data.code === 0) {
               this.list = resp.data.articlelist
               this.total = resp.data.total
               this.listQuery.page = resp.data.page
@@ -261,7 +261,7 @@ export default {
     getprojectname() {
       // const now = new Date().getTime()
       getProject().then(response => {
-        if (response.data.statuscode === 0) {
+        if (response.data.code === 0) {
           this.projectnames = response.data.projectlist
         }
       })
@@ -272,7 +272,7 @@ export default {
         status: row.status
       }
       changeStatus(param).then(response => {
-        if (response.data.statuscode === 0) {
+        if (response.data.code === 0) {
           this.$notify({
             title: '成功',
             message: '修改成功',
@@ -290,7 +290,7 @@ export default {
     getList() {
       this.listLoading = true
       searchAllBugs(this.listQuery).then(response => {
-        if (response.data.statuscode === 0) {
+        if (response.data.code === 0) {
           this.total = response.data.total
           this.list = response.data.articlelist
         }
@@ -304,7 +304,7 @@ export default {
         this.getList()
       } else {
         searchAllBugs(this.listQuery).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             this.total = resp.data.total
             this.list = resp.data.articlelist
           }
@@ -354,13 +354,13 @@ export default {
     getmystatus() {
       // 允许改变的状态
       getPermStatus().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           // this.checkstatus = resp.data.statuslist
         }
       })
       // 过滤的状态
       showStatus().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.checkstatus !== null) {
             this.checkstatus = resp.data.checkstatus
             this.statuslength = this.checkstatus.length
@@ -370,7 +370,7 @@ export default {
     },
     getstatus() {
       getStatus().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.statuslist != null) {
             this.allstatus = resp.data.statuslist
           }

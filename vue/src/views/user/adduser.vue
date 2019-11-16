@@ -123,7 +123,7 @@ export default {
   methods: {
     getpositions() {
       getPositions().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.positions !== null) {
             this.positions = resp.data.positions
           }
@@ -132,7 +132,7 @@ export default {
     },
     getstatusgroups() {
       getStatusName().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.statuslist !== null) {
             this.statusgroups = resp.data.statuslist
           }
@@ -141,7 +141,7 @@ export default {
     },
     getrolegroups() {
       roleGroupName().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.roles !== null) {
             this.rolegroups = resp.data.roles
           }
@@ -193,7 +193,7 @@ export default {
         return
       }
       createUser(this.postForm).then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.$message({
             message: '添加用户成功',
             type: 'success'

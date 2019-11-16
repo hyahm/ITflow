@@ -72,7 +72,7 @@ export default {
   methods: {
     getstatus() {
       getStatusList().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.statuslist !== null) {
             this.tableData = resp.data.statuslist
           }
@@ -82,7 +82,7 @@ export default {
     confirm() {
       if (this.form.id === -1) {
         addStatus(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             this.tableData.push({
               id: resp.data.id,
               name: this.form.name
@@ -94,7 +94,7 @@ export default {
         })
       } else {
         updateStatus(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             const l = this.tableData.length
             for (let i = 0; i < l; i++) {
               if (this.tableData[i].id === this.form.id) {
@@ -120,15 +120,7 @@ export default {
       }).then(() => {
         removeStatus(id).then(resp => {
           // console
-          if (resp.data.statuscode === 20) {
-            this.$message.error('此状态有bug在使用，请处理后再删除')
-            return
-          }
-          if (resp.data.statuscode === 23) {
-            this.$message.error('此状态有状态组在使用，请处理后再删除')
-            return
-          }
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             const l = this.tableData.length
             for (let i = 0; i < l; i++) {
               if (this.tableData[i].id === id) {
@@ -138,7 +130,7 @@ export default {
             this.$message.success('删除成功')
             return
           }
-          this.$message.error('操作失败')
+          this.$message.error(resp.data.msg)
         })
       }).catch(() => {
         this.$message({

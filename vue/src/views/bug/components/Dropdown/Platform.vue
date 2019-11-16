@@ -39,7 +39,7 @@ export default {
   methods: {
     getstatus() {
       getStatus().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.platformsOptions = resp.data.statuslist
         }
       })

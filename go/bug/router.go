@@ -1,29 +1,24 @@
 package bug
 
 import (
-	"itflow/bug/handle"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hyahm/goconfig"
+	"itflow/bug/handle"
 	"log"
 	"net/http"
-	"os"
-	"os/signal"
+	"strings"
 )
 
-func RunHttp(c chan os.Signal) {
+func RunHttp() {
 
 	router := mux.NewRouter()
-
-	//
 
 	router.HandleFunc("/user/login", handle.Login)
 	router.HandleFunc("/user/logout", handle.Loginout)
 	//
 	router.HandleFunc("/dashboard/usercount", handle.UserCount)
 	router.HandleFunc("/dashboard/projectcount", handle.ProjectCount)
-
-	//router.HandleFunc("/task/list", handle.TaskList)
 
 	router.HandleFunc("/search/allbugs", handle.SearchAllBugs)
 	router.HandleFunc("/search/mybugs", handle.SearchMyBugs)
@@ -177,6 +172,10 @@ func RunHttp(c chan os.Signal) {
 	router.HandleFunc("/default/level", handle.DefaultLevel)
 
 	listenaddr := goconfig.ReadString("listenaddr")
+	if strings.Index(listenaddr, ":") < 0 {
+		print("not and listen addr, make sure config file is right")
+		return
+	}
 	fmt.Println("listen on " + listenaddr)
 	if goconfig.ReadBool("ssl") {
 		if err := http.ListenAndServeTLS(listenaddr,goconfig.ReadString("certfile"), goconfig.ReadString("keyfile"), router) ; err != nil {
@@ -190,5 +189,4 @@ func RunHttp(c chan os.Signal) {
 	}
 
 
-	signal.Notify(c, os.Interrupt, os.Kill)
 }

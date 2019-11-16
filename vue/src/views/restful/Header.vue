@@ -102,7 +102,7 @@ export default {
     },
     getlist() {
       headerList().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.headers !== null) {
             this.list = resp.data.headers
           }
@@ -123,7 +123,7 @@ export default {
         type: 'warning'
       }).then(() => {
         headerDel(id).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             this.list.hhids = resp.data.headerlist
             for (let i = 0; i < this.list.length; i++) {
               if (this.list[i].id === id) {
@@ -142,7 +142,7 @@ export default {
     confirm() {
       if (this.form.id > 0) {
         headerUpdate(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
 
             for (let i = 0; i < this.list.length; i++) {
               if (this.list[i].id === this.form.id) {
@@ -159,7 +159,7 @@ export default {
         })
       } else {
         headerAdd(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             this.list.push({
               id: resp.data.id,
               name: this.form.name,

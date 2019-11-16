@@ -135,7 +135,7 @@ export default {
     handleFilter() {
       if (this.listQuery.id > 0 || this.listQuery.title.length > 0 || this.listQuery.author.length > 0) {
         bugFilter(this.listQuery).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             this.list = resp.data.articlelist
           }
         })
