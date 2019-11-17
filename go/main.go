@@ -47,7 +47,10 @@ func main() {
 
 func bugservices() {
 	r := make(chan os.Signal, 0)
-	signal.Notify(r, os.Interrupt, os.Kill)
+	// 接受kill信号
+	go func() {
+		signal.Notify(r, os.Interrupt, os.Kill)
+	}()
 	go bug.RunHttp()
 	//go gareload.ListenReload(r)
 
