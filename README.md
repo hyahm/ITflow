@@ -3,7 +3,7 @@
 
 文档地址： http://itflow.doc.hyahm.com  
 路由限制了目前代码的优化 ， 先写个路由再优化
-路由雏形：  https://github.com/hyahm/xmux
+路由雏形：  https://github.com/hyahm/xmux， 路由差不多了， 星期天拿来试水
 
 ### 功能
 - [x] 增加bug，改变bug状态，转交bug 
