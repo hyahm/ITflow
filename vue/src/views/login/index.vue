@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
 
-    <el-form ref="loginForm" :model="loginForm"  class="login-form" auto-complete="on" label-position="left">
+    <el-form ref="loginForm" :model="loginForm" class="login-form" auto-complete="on" label-position="left">
       <el-form-item prop="username">
         <span class="svg-container svg-container_login">
           <svg-icon icon-class="user" />
@@ -20,12 +20,13 @@
           <svg-icon icon-class="password" />
         </span>
         <el-input
-          :type="passwordType"
           v-model="loginForm.password"
+          :type="passwordType"
           placeholder="密码"
           name="password"
           auto-complete="on"
-          @keyup.enter.native="handleLogin" />
+          @keyup.enter.native="handleLogin"
+        />
         <span class="show-pwd" @click="showPwd">
           <svg-icon icon-class="eye" />
         </span>
@@ -39,7 +40,7 @@
 
 <script>
 // import { isvalidUsername } from '@/utils/validate'
-import { encrypt } from '@/utils/auth'
+// import { encrypt } from '@/utils/auth'
 
 export default {
   name: 'Login',
@@ -72,11 +73,13 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
+          console.log('111111')
           this.$store.dispatch('user/login', this.loginForm).then(() => {
             this.loading = false
             console.log('9999999')
             this.$router.push('/dashboard')
           }).catch(() => {
+            console.log(111)
             this.loading = false
           })
         } else {

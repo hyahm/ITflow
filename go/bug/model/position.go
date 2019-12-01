@@ -12,12 +12,12 @@ type Data_jobs struct {
 	Name     string `json:"name"`
 	Level    int    `json:"level"`
 	Hyponame string `json:"hyponame"`
-	Code     int    `json:"statuscode"`
+	Code     int    `json:"code"`
 }
 
 type List_jobs struct {
 	Positions []*Table_jobs `json:"positions"`
-	Code      int           `json:"statuscode"`
+	Code      int           `json:"code"`
 }
 
 type Update_jobs struct {

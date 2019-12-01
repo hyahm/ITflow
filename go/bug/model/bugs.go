@@ -17,7 +17,7 @@ type ArticleList struct {
 
 type AllArticleList struct {
 	Al    []*ArticleList `json:"articlelist"`
-	Code  int            `json:"statuscode"`
+	Code  int            `json:"code"`
 	Count int            `json:"total"`
 	Page  int            `json:"page"`
 }

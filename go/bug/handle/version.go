@@ -24,83 +24,72 @@ type addVersion struct {
 
 func AddVersion(w http.ResponseWriter, r *http.Request) {
 
-	headers(w, r)
-	if r.Method == http.MethodOptions {
-		w.WriteHeader(http.StatusOK)
+	nickname, err := logtokenmysql(r)
+	errorcode := &errorstruct{}
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	if r.Method == http.MethodPost {
-		nickname, err := logtokenmysql(r)
-		errorcode := &errorstruct{}
-		if err != nil {
-			golog.Error(err.Error())
-			if err == NotFoundToken {
-				w.Write(errorcode.ErrorNotFoundToken())
-				return
-			}
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
 
-		version_add := &addVersion{}
-		s, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorGetData())
-			return
-		}
-		err = json.Unmarshal(s, version_add)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorParams())
-			return
-		}
-		var permssion bool
-		// 管理员
-		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-			permssion = true
-		} else {
-			permssion, err = asset.CheckPerm("version", nickname)
-			if err != nil {
-				golog.Error(err.Error())
-				w.Write(errorcode.ErrorConnentMysql())
-				return
-			}
-		}
-
-		if !permssion {
-			w.Write(errorcode.ErrorNoPermission())
-			return
-		}
-		uid := bugconfig.CacheNickNameUid[nickname]
-		add_version_sql := "insert into version(name,urlone,urltwo,createtime,createuid) values(?,?,?,?,?)"
-
-		vid, err := bugconfig.Bug_Mysql.Insert(add_version_sql, version_add.Version, version_add.Iphoneurl, version_add.Notiphoneurl, time.Now().Unix(), uid)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-		// 增加日志
-		il := buglog.AddLog{
-			Ip:       strings.Split(r.RemoteAddr, ":")[0],
-			Classify: "version",
-		}
-		err = il.Add(
-			nickname, vid, version_add.Version)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-		// 增加缓存
-		bugconfig.CacheVidName[vid] = version_add.Version
-		bugconfig.CacheVersionNameVid[version_add.Version] = vid
-		send, _ := json.Marshal(errorcode)
-		w.Write(send)
+	version_add := &addVersion{}
+	s, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	w.WriteHeader(http.StatusNotFound)
+	err = json.Unmarshal(s, version_add)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	var permssion bool
+	// 管理员
+	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
+		permssion = true
+	} else {
+		permssion, err = asset.CheckPerm("version", nickname)
+		if err != nil {
+			golog.Error(err.Error())
+			w.Write(errorcode.ErrorE(err))
+			return
+		}
+	}
+
+	if !permssion {
+		w.Write(errorcode.ErrorNoPermission())
+		return
+	}
+	uid := bugconfig.CacheNickNameUid[nickname]
+	add_version_sql := "insert into version(name,urlone,urltwo,createtime,createuid) values(?,?,?,?,?)"
+
+	vid, err := bugconfig.Bug_Mysql.Insert(add_version_sql, version_add.Version, version_add.Iphoneurl, version_add.Notiphoneurl, time.Now().Unix(), uid)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	// 增加日志
+	il := buglog.AddLog{
+		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+		Classify: "version",
+	}
+	err = il.Add(
+		nickname, vid, version_add.Version)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	// 增加缓存
+	bugconfig.CacheVidName[vid] = version_add.Version
+	bugconfig.CacheVersionNameVid[version_add.Version] = vid
+	send, _ := json.Marshal(errorcode)
+	w.Write(send)
+	return
+
 }
 
 type versionInfo struct {
@@ -115,7 +104,7 @@ type versionInfo struct {
 
 type versionInfoList struct {
 	VersionList []*versionInfo `json:"versionlist"`
-	Code        int            `json:"statuscode"`
+	Code        int            `json:"code"`
 }
 
 type pageLimit struct {
@@ -124,161 +113,141 @@ type pageLimit struct {
 }
 
 func VersionList(w http.ResponseWriter, r *http.Request) {
-	headers(w, r)
-	if r.Method == http.MethodOptions {
-		w.WriteHeader(http.StatusOK)
+
+	nickname, err := logtokenmysql(r)
+	errorcode := &errorstruct{}
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	if r.Method == http.MethodPost {
-		nickname, err := logtokenmysql(r)
-		errorcode := &errorstruct{}
-		if err != nil {
-			golog.Error(err.Error())
-			if err == NotFoundToken {
-				w.Write(errorcode.ErrorNotFoundToken())
-				return
-			}
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
 
-		al := &versionInfoList{}
+	al := &versionInfoList{}
 
-		m, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorGetData())
-			return
-		}
-		pl := &pageLimit{}
-		err = json.Unmarshal(m, pl)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorParams())
-			return
-		}
-		var permssion bool
-		// 管理员
-		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-			permssion = true
-		} else {
-			permssion, err = asset.CheckPerm("version", nickname)
-			if err != nil {
-				golog.Error(err.Error())
-				w.Write(errorcode.ErrorConnentMysql())
-				return
-			}
-		}
-
-		if !permssion {
-			w.Write(errorcode.ErrorNoPermission())
-			return
-		}
-		get_version_sql := "select id,name,urlone,urltwo,createtime from version order by id desc"
-
-		rows, err := bugconfig.Bug_Mysql.GetRows(get_version_sql)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-
-		for rows.Next() {
-			rl := &versionInfo{}
-			rows.Scan(&rl.Id, &rl.Version, &rl.Iphoneurl, &rl.Notiphoneurl, &rl.Date)
-			al.VersionList = append(al.VersionList, rl)
-		}
-
-		send, _ := json.Marshal(al)
-		w.Write(send)
+	m, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	w.WriteHeader(http.StatusNotFound)
+	pl := &pageLimit{}
+	err = json.Unmarshal(m, pl)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	var permssion bool
+	// 管理员
+	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
+		permssion = true
+	} else {
+		permssion, err = asset.CheckPerm("version", nickname)
+		if err != nil {
+			golog.Error(err.Error())
+			w.Write(errorcode.ErrorE(err))
+			return
+		}
+	}
+
+	if !permssion {
+		w.Write(errorcode.ErrorNoPermission())
+		return
+	}
+	get_version_sql := "select id,name,urlone,urltwo,createtime from version order by id desc"
+
+	rows, err := bugconfig.Bug_Mysql.GetRows(get_version_sql)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+
+	for rows.Next() {
+		rl := &versionInfo{}
+		rows.Scan(&rl.Id, &rl.Version, &rl.Iphoneurl, &rl.Notiphoneurl, &rl.Date)
+		al.VersionList = append(al.VersionList, rl)
+	}
+
+	send, _ := json.Marshal(al)
+	w.Write(send)
+	return
+
 }
 
 func VersionRemove(w http.ResponseWriter, r *http.Request) {
-	headers(w, r)
-	if r.Method == http.MethodOptions {
-		w.WriteHeader(http.StatusOK)
+
+	nickname, err := logtokenmysql(r)
+	errorcode := &errorstruct{}
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	if r.Method == http.MethodGet {
-		nickname, err := logtokenmysql(r)
-		errorcode := &errorstruct{}
+
+	id := r.FormValue("id")
+	var bugcount int
+	var permssion bool
+	// 管理员
+	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
+		permssion = true
+	} else {
+		permssion, err = asset.CheckPerm("version", nickname)
 		if err != nil {
 			golog.Error(err.Error())
-			if err == NotFoundToken {
-				w.Write(errorcode.ErrorNotFoundToken())
-				return
-			}
-			w.Write(errorcode.ErrorConnentMysql())
+			w.Write(errorcode.ErrorE(err))
 			return
 		}
+	}
 
-		id := r.FormValue("id")
-		var bugcount int
-		var permssion bool
-		// 管理员
-		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-			permssion = true
-		} else {
-			permssion, err = asset.CheckPerm("version", nickname)
-			if err != nil {
-				golog.Error(err.Error())
-				w.Write(errorcode.ErrorConnentMysql())
-				return
-			}
-		}
-
-		if !permssion {
-			w.Write(errorcode.ErrorNoPermission())
-			return
-		}
-		err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs where id=?", id).Scan(&bugcount)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-		if bugcount != 0 {
-			golog.Error("vid:%s has bugs", id)
-			w.Write(errorcode.ErrorHasBug())
-			return
-		}
-		deletevl := "delete from version where id=?"
-		errorcode.Id, err = bugconfig.Bug_Mysql.Update(deletevl, id)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-
-		vid, err := strconv.Atoi(id)
-		if err != nil {
-			w.Write(errorcode.ErrorParams())
-			return
-		}
-		// 增加日志
-		il := buglog.AddLog{
-			Ip:       strings.Split(r.RemoteAddr, ":")[0],
-			Classify: "version",
-		}
-		err = il.Del(
-			nickname, id)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-
-		delete(bugconfig.CacheVersionNameVid, bugconfig.CacheEidName[int64(vid)])
-		delete(bugconfig.CacheVidName, int64(vid))
-
-		send, _ := json.Marshal(errorcode)
-		w.Write(send)
+	if !permssion {
+		w.Write(errorcode.ErrorNoPermission())
 		return
 	}
-	w.WriteHeader(http.StatusNotFound)
+	err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs where id=?", id).Scan(&bugcount)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	if bugcount != 0 {
+		golog.Error("vid:%s has bugs", id)
+		w.Write(errorcode.Errorf("vid:%s has bugs", id))
+		return
+	}
+	deletevl := "delete from version where id=?"
+	errorcode.Id, err = bugconfig.Bug_Mysql.Update(deletevl, id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+
+	vid, err := strconv.Atoi(id)
+	if err != nil {
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	// 增加日志
+	il := buglog.AddLog{
+		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+		Classify: "version",
+	}
+	err = il.Del(
+		nickname, id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+
+	delete(bugconfig.CacheVersionNameVid, bugconfig.CacheEidName[int64(vid)])
+	delete(bugconfig.CacheVidName, int64(vid))
+
+	send, _ := json.Marshal(errorcode)
+	w.Write(send)
+	return
+
 }
 
 type updateversion struct {
@@ -289,82 +258,72 @@ type updateversion struct {
 }
 
 func VersionUpdate(w http.ResponseWriter, r *http.Request) {
-	headers(w, r)
-	if r.Method == http.MethodOptions {
-		w.WriteHeader(http.StatusOK)
+
+	nickname, err := logtokenmysql(r)
+	errorcode := &errorstruct{}
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	if r.Method == http.MethodPost {
-		nickname, err := logtokenmysql(r)
-		errorcode := &errorstruct{}
-		if err != nil {
-			golog.Error(err.Error())
-			if err == NotFoundToken {
-				w.Write(errorcode.ErrorNotFoundToken())
-				return
-			}
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
 
-		data := &updateversion{}
-		var permssion bool
-		// 管理员
-		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-			permssion = true
-		} else {
-			permssion, err = asset.CheckPerm("version", nickname)
-			if err != nil {
-				golog.Error(err.Error())
-				w.Write(errorcode.ErrorConnentMysql())
-				return
-			}
+	data := &updateversion{}
+	var permssion bool
+	// 管理员
+	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
+		permssion = true
+	} else {
+		permssion, err = asset.CheckPerm("version", nickname)
+		if err != nil {
+			golog.Error(err.Error())
+			w.Write(errorcode.ErrorE(err))
+			return
 		}
+	}
 
-		if !permssion {
-			w.Write(errorcode.ErrorNoPermission())
-			return
-		}
-		getdata, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorGetData())
-			return
-		}
-		err = json.Unmarshal(getdata, data)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorParams())
-			return
-		}
-		uid := bugconfig.CacheNickNameUid[nickname]
-		versionsql := "update version set name=?,urlone=?,urltwo=?,createuid=? where id=?"
-		_, err = bugconfig.Bug_Mysql.Update(versionsql, data.Name, data.Iphone, data.NoIphone, uid, data.Id)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-
-		// 增加日志
-		il := buglog.AddLog{
-			Ip:       strings.Split(r.RemoteAddr, ":")[0],
-			Classify: "version",
-		}
-		err = il.Update(
-			nickname, data.Id, data.Name)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-		delete(bugconfig.CacheVersionNameVid, data.Name)
-		bugconfig.CacheVidName[int64(data.Id)] = data.Name
-		bugconfig.CacheVersionNameVid[data.Name] = int64(data.Id)
-
-		send, _ := json.Marshal(errorcode)
-		w.Write(send)
+	if !permssion {
+		w.Write(errorcode.ErrorNoPermission())
 		return
 	}
-	w.WriteHeader(http.StatusNotFound)
+	getdata, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = json.Unmarshal(getdata, data)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	uid := bugconfig.CacheNickNameUid[nickname]
+	versionsql := "update version set name=?,urlone=?,urltwo=?,createuid=? where id=?"
+	_, err = bugconfig.Bug_Mysql.Update(versionsql, data.Name, data.Iphone, data.NoIphone, uid, data.Id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+
+	// 增加日志
+	il := buglog.AddLog{
+		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+		Classify: "version",
+	}
+	err = il.Update(
+		nickname, data.Id, data.Name)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	delete(bugconfig.CacheVersionNameVid, data.Name)
+	bugconfig.CacheVidName[int64(data.Id)] = data.Name
+	bugconfig.CacheVersionNameVid[data.Name] = int64(data.Id)
+
+	send, _ := json.Marshal(errorcode)
+	w.Write(send)
+	return
+
 }

@@ -26,12 +26,12 @@ type Data_sharefile struct {
 	Size       int64  `json:"size"`
 	UpdateTime int64  `json:"updatetime"`
 	Name       string `json:"name"`
-	Code       int    `json:"statuscode"`
+	Code       int    `json:"code"`
 	OldName    string `json:"oldname"`
 }
 
 type List_sharelist struct {
 	FDList   []*Data_sharefile `json:"sharelist"`
-	Code     int               `json:"statuscode"`
+	Code     int               `json:"code"`
 	RealName string            `json:"realname"`
 }

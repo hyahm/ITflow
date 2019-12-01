@@ -12,7 +12,7 @@ type Data_header struct {
 	Name   string              `json:"name"`
 	Hhids  []*Table_headerlist `json:"hhids"`
 	Remark string              `json:"remark"`
-	Code   int                 `json:"statuscode"`
+	Code   int                 `json:"code"`
 }
 
 type Table_headerlist struct {
@@ -23,7 +23,7 @@ type Table_headerlist struct {
 
 type List_headers struct {
 	Headers []*Data_header `json:"headers"`
-	Code    int            `json:"statuscode"`
+	Code    int            `json:"code"`
 }
 
 type Update_header struct {

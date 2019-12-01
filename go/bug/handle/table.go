@@ -20,111 +20,101 @@ type passBug struct {
 	Remark      string   `json:"remark"`
 	SelectUsers []string `json:"selectusers"`
 	Status      string   `json:"status"`
-	Code        int      `json:"statuscode"`
+	Code        int      `json:"code"`
 	User        string   `json:"user"`
 	Mu          *sync.Mutex
 }
 
 func PassBug(w http.ResponseWriter, r *http.Request) {
-	headers(w, r)
-	if r.Method == http.MethodOptions {
-		w.WriteHeader(http.StatusOK)
+
+	nickname, err := logtokenmysql(r)
+	errorcode := &errorstruct{}
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	if r.Method == http.MethodPost {
-		nickname, err := logtokenmysql(r)
-		errorcode := &errorstruct{}
-		if err != nil {
-			golog.Error(err.Error())
-			if err == NotFoundToken {
-				w.Write(errorcode.ErrorNotFoundToken())
-				return
-			}
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
 
-		ub := &passBug{}
+	ub := &passBug{}
 
-		// 获取参数
-		ss, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorGetData())
-			return
-		}
+	// 获取参数
+	ss, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
 
-		err = json.Unmarshal(ss, ub)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorParams())
-			return
-		}
+	err = json.Unmarshal(ss, ub)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
 
-		// 判断这个bug是不是自己的任务，只有自己的任务才可以转交
-		var splist string
-		var hasperm bool
-		err = bugconfig.Bug_Mysql.GetOne("select spusers from bugs where id=?", ub.Id).Scan(&splist)
-		myuid := strconv.FormatInt(bugconfig.CacheNickNameUid[nickname], 10)
-		for _, v := range strings.Split(splist, ",") {
-			if myuid == v {
-				hasperm = true
-				break
-			}
+	// 判断这个bug是不是自己的任务，只有自己的任务才可以转交
+	var splist string
+	var hasperm bool
+	err = bugconfig.Bug_Mysql.GetOne("select spusers from bugs where id=?", ub.Id).Scan(&splist)
+	myuid := strconv.FormatInt(bugconfig.CacheNickNameUid[nickname], 10)
+	for _, v := range strings.Split(splist, ",") {
+		if myuid == v {
+			hasperm = true
+			break
 		}
-		if !hasperm {
+	}
+	if !hasperm {
+		w.Write(errorcode.ErrorNoPermission())
+		return
+	}
+	// 判断状态是否存在
+	var sid int64
+	var ok bool
+	if sid, ok = bugconfig.CacheStatusSid[ub.Status]; !ok {
+		w.Write(errorcode.Error("没有status"))
+		return
+	}
+	idstr := make([]string, 0)
+	for _, v := range ub.SelectUsers {
+		var uid int64
+		if uid, ok = bugconfig.CacheRealNameUid[v]; !ok {
 			w.Write(errorcode.ErrorNoPermission())
 			return
 		}
-		// 判断状态是否存在
-		var sid int64
-		var ok bool
-		if sid, ok = bugconfig.CacheStatusSid[ub.Status]; !ok {
-			w.Write(errorcode.ErrorKeyNotFound())
-			return
-		}
-		idstr := make([]string, 0)
-		for _, v := range ub.SelectUsers {
-			var uid int64
-			if uid, ok = bugconfig.CacheRealNameUid[v]; !ok {
-				w.Write(errorcode.ErrorKeyNotFound())
-				return
-			}
-			idstr = append(idstr, strconv.FormatInt(uid, 10))
-		}
+		idstr = append(idstr, strconv.FormatInt(uid, 10))
+	}
 
-		ul := strings.Join(idstr, ",")
-		//添加进information表, 应该要弄成事务,插入转交信息
-		remarksql := "insert into informations(uid,bid,info,time) values(?,?,?,?)"
-		_, err = bugconfig.Bug_Mysql.Insert(remarksql, bugconfig.CacheNickNameUid[nickname], ub.Id, ub.Remark, time.Now().Unix())
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-		//更改bug
-
-		_, err = bugconfig.Bug_Mysql.Update("update bugs set sid=?,spusers=? where id=?", sid, ul, ub.Id)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-		il := buglog.AddLog{
-			Ip:       strings.Split(r.RemoteAddr, ":")[0],
-			Classify: "bug",
-		}
-		err = il.Add(ub.Id, nickname, ub.SelectUsers)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-		send, _ := json.Marshal(ub)
-		w.Write(send)
+	ul := strings.Join(idstr, ",")
+	//添加进information表, 应该要弄成事务,插入转交信息
+	remarksql := "insert into informations(uid,bid,info,time) values(?,?,?,?)"
+	_, err = bugconfig.Bug_Mysql.Insert(remarksql, bugconfig.CacheNickNameUid[nickname], ub.Id, ub.Remark, time.Now().Unix())
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	w.WriteHeader(http.StatusNotFound)
+	//更改bug
+
+	_, err = bugconfig.Bug_Mysql.Update("update bugs set sid=?,spusers=? where id=?", sid, ul, ub.Id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	il := buglog.AddLog{
+		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+		Classify: "bug",
+	}
+	err = il.Add(ub.Id, nickname, ub.SelectUsers)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	send, _ := json.Marshal(ub)
+	w.Write(send)
+	return
+
 }
 
 //func GetThisTask(w http.ResponseWriter, r *http.Request) {
@@ -184,56 +174,45 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 //}
 
 func TaskList(w http.ResponseWriter, r *http.Request) {
-	headers(w, r)
-	if r.Method == http.MethodOptions {
-		w.WriteHeader(http.StatusOK)
+
+	name, err := logtokenmysql(r)
+	errorcode := &errorstruct{}
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
-	if r.Method == http.MethodPost {
-		name, err := logtokenmysql(r)
-		errorcode := &errorstruct{}
-		if err != nil {
-			golog.Error(err.Error())
-			if err == NotFoundToken {
-				w.Write(errorcode.ErrorNotFoundToken())
-				return
-			}
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
+	al := &model.AllArticleList{}
 
-		al := &model.AllArticleList{}
+	uid := bugconfig.CacheNickNameUid[name]
 
-		uid := bugconfig.CacheNickNameUid[name]
+	getaritclesql := "select id,createtime,importent,status,bugtitle,uid,level,pid,spusers from bugs where id in (select bid from userandbug where uid=?)  order by id desc "
 
-		getaritclesql := "select id,createtime,importent,status,bugtitle,uid,level,pid,spusers from bugs where id in (select bid from userandbug where uid=?)  order by id desc "
+	rows, err := bugconfig.Bug_Mysql.GetRows(getaritclesql, uid)
 
-		rows, err := bugconfig.Bug_Mysql.GetRows(getaritclesql, uid)
-
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-		for rows.Next() {
-			sendlist := &model.ArticleList{}
-			var statusid int64
-			var spusers string
-			var uid int64
-			var pid int64
-			rows.Scan(&sendlist.ID, &sendlist.Date, &sendlist.Importance, &statusid, &sendlist.Title, &uid, &sendlist.Level, &pid, &spusers)
-			sendlist.Handle = formatUserlistToShow(spusers)
-			sendlist.Status = bugconfig.CacheSidStatus[statusid]
-
-			sendlist.Author = bugconfig.CacheUidRealName[uid]
-			sendlist.Projectname = bugconfig.CachePidName[pid]
-
-			al.Al = append(al.Al, sendlist)
-		}
-		send, _ := json.Marshal(al)
-		w.Write(send)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	w.WriteHeader(http.StatusNotFound)
+	for rows.Next() {
+		sendlist := &model.ArticleList{}
+		var statusid int64
+		var spusers string
+		var uid int64
+		var pid int64
+		rows.Scan(&sendlist.ID, &sendlist.Date, &sendlist.Importance, &statusid, &sendlist.Title, &uid, &sendlist.Level, &pid, &spusers)
+		sendlist.Handle = formatUserlistToShow(spusers)
+		sendlist.Status = bugconfig.CacheSidStatus[statusid]
+
+		sendlist.Author = bugconfig.CacheUidRealName[uid]
+		sendlist.Projectname = bugconfig.CachePidName[pid]
+
+		al.Al = append(al.Al, sendlist)
+	}
+	send, _ := json.Marshal(al)
+	w.Write(send)
+	return
+
 }

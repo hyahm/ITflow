@@ -33,7 +33,7 @@ type Email struct {
 	EmailAddr  string `json:"emailaddr"`
 	Password   string `json:"password"`
 	To         string `json:"to"`
-	Code       int    `json:"statuscode"`
+	Code       int    `json:"code"`
 }
 
 // cached

@@ -8,12 +8,12 @@ type Table_importants struct {
 type Data_importants struct {
 	Id   int64  `json:"id"`
 	Name string `json:"name"`
-	Code int    `json:"statuscode"`
+	Code int    `json:"code"`
 }
 
 type List_importants struct {
 	ImportantList []*Table_importants `json:"importantlist"`
-	Code          int                 `json:"statuscode"`
+	Code          int                 `json:"code"`
 }
 
 type Update_importants struct {

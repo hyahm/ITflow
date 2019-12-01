@@ -7,17 +7,17 @@ type Data_types struct {
 	Opts     []*Options `json:"opts"`
 	Listtype string     `json:"listtype"`
 	Default  string     `json:"default"`
-	Code     int        `json:"statuscode"`
+	Code     int        `json:"code"`
 }
 
 type List_types struct {
 	List []*Data_types `json:"list"`
-	Code int           `json:"statuscode"`
+	Code int           `json:"code"`
 }
 
 type Send_types struct {
 	Id   int64      `json:"id"`
-	Code int        `json:"statuscode"`
+	Code int        `json:"code"`
 	Opts []*Options `json:"opts"`
 }
 

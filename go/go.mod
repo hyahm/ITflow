@@ -9,6 +9,7 @@ require (
 	github.com/hyahm/goconfig v0.0.4
 	github.com/hyahm/golog v0.0.2
 	github.com/hyahm/gomysql v0.0.1
+	github.com/hyahm/xmux v0.0.0-20191130104301-3a4f34005842
 	github.com/jinzhu/gorm v1.9.10
 	github.com/kr/pretty v0.1.0 // indirect
 )

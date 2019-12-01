@@ -1,49 +1,49 @@
 package handle
 
 import (
-	"itflow/bug/bugconfig"
 	"database/sql"
+	"github.com/hyahm/golog"
+	"itflow/bug/bugconfig"
 	"itflow/gaencrypt"
 	"net/http"
 	"strings"
 )
 
 func Reset(w http.ResponseWriter, r *http.Request) {
-	headers(w, r)
-	if r.Method == http.MethodOptions {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
+	errorcode := &errorstruct{}
 	addr := strings.Split(r.RemoteAddr, ":")
 	if addr[0] != "127.0.0.1" {
-		w.WriteHeader(http.StatusNonAuthoritativeInfo)
+		golog.Debug("only 127.0.0.1 cat request")
+		w.Write(errorcode.Error("only 127.0.0.1 cat request"))
 		return
 	}
-	if r.Method == http.MethodGet {
-		password := r.FormValue("password")
+	password := r.FormValue("password")
+	var count int
+	err := bugconfig.Bug_Mysql.GetOne("select count(id) from user where department=?", "admin").Scan(&count)
+	if err != nil {
+		if err == sql.ErrNoRows || count != 1 {
+			golog.Debug("有且只能有一个admin账户")
+			w.Write(errorcode.Error("有且只能有一个admin账户 \n"))
+			return
+		}
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	password = gaencrypt.PwdEncrypt(password, bugconfig.Salt)
+	_, err = bugconfig.Bug_Mysql.Update("update user set password=? where department=?", password, "admin")
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = insertlog("resetadminpassword", "密码为:"+password, r)
+	if err != nil {
+		golog.Debug(err.Error())
+		w.Write([]byte(err.Error() + "\n"))
+		return
+	}
+	w.Write([]byte("修改成功 \n"))
+	return
 
-		var count int
-		err := bugconfig.Bug_Mysql.GetOne("select count(id) from user where department=?", "admin").Scan(&count)
-		if err != nil {
-			if err == sql.ErrNoRows || count != 1 {
-				w.Write([]byte("有且只能有一个admin账户 \n"))
-				return
-			}
-			w.Write([]byte(err.Error()))
-			return
-		}
-		password = gaencrypt.PwdEncrypt(password, bugconfig.Salt)
-		_, err = bugconfig.Bug_Mysql.Update("update user set password=? where department=?", password, "admin")
-		if err != nil {
-			w.Write([]byte(err.Error() + "\n"))
-			return
-		}
-		err = insertlog( "resetadminpassword", "密码为:"+password, r)
-		if err != nil {
-			w.Write([]byte(err.Error() + "\n"))
-			return
-		}
-		w.Write([]byte("修改成功 \n"))
-		return
-	}
 }

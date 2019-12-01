@@ -24,7 +24,7 @@ type Data_restful struct {
 }
 
 type List_restful struct {
-	Code int             `json:"statuscode"`
+	Code int             `json:"code"`
 	List []*Data_restful `json:"list"`
 }
 type Table_apilist struct {
@@ -50,7 +50,7 @@ type Get_apilist struct {
 	Name        string        `json:"name"`
 	CallType    string        `json:"calltype"`
 	Resp        string        `json:"resp"`
-	Code        int           `json:"statuscode"`
+	Code        int           `json:"code"`
 }
 
 type Show_apilist struct {
@@ -64,7 +64,7 @@ type Show_apilist struct {
 	Result      string              `json:"result"`
 	Name        string              `json:"name"`
 	CallType    string              `json:"calltype"`
-	Code        int                 `json:"statuscode"`
+	Code        int                 `json:"code"`
 	Remark      string              `json:"remark"`
 	Resp        string              `json:"resp"`
 }
@@ -80,7 +80,7 @@ type One_apilist struct {
 	Result      string        `json:"result"`
 	Name        string        `json:"name"`
 	CallType    string        `json:"calltype"`
-	Code        int           `json:"statuscode"`
+	Code        int           `json:"code"`
 	Remark      string        `json:"remark"`
 	Resp        string        `json:"resp"`
 }
@@ -107,6 +107,6 @@ type Data_api struct {
 
 type Send_Types struct {
 	Id    int64    `json:"id"`
-	Code  int      `json:"statuscode"`
+	Code  int      `json:"code"`
 	Types []string `json:"types"`
 }

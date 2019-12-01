@@ -21,7 +21,7 @@ type Search_log struct {
 
 type List_log struct {
 	LogList []*Table_log `json:"loglist"`
-	Code    int          `json:"statuscode"`
+	Code    int          `json:"code"`
 	Count   int          `json:"count"`
 	Page    int          `json:"page"`
 }

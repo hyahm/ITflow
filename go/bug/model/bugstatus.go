@@ -13,5 +13,5 @@ type Table_status struct {
 
 type List_StatusName struct {
 	StatusList []string `json:"statuslist"`
-	Code       int      `json:"statuscode"`
+	Code       int      `json:"code"`
 }

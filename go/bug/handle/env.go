@@ -1,12 +1,12 @@
 package handle
 
 import (
-	"itflow/bug/asset"
-	"itflow/bug/bugconfig"
-	"itflow/bug/buglog"
 	"encoding/json"
 	"github.com/hyahm/golog"
 	"io/ioutil"
+	"itflow/bug/asset"
+	"itflow/bug/bugconfig"
+	"itflow/bug/buglog"
 	"net/http"
 	"strconv"
 	"strings"
@@ -14,7 +14,7 @@ import (
 
 type envlist struct {
 	Elist []*envrow `json:"envlist"`
-	Code  int       `json:"statuscode"`
+	Code  int       `json:"code"`
 }
 
 type envrow struct {
@@ -23,292 +23,248 @@ type envrow struct {
 }
 
 func EnvList(w http.ResponseWriter, r *http.Request) {
-	headers(w, r)
-	if r.Method == http.MethodOptions {
-		w.WriteHeader(http.StatusOK)
+
+	nickname, err := logtokenmysql(r)
+	errorcode := &errorstruct{}
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
-	if r.Method == http.MethodPost {
-		nickname, err := logtokenmysql(r)
-		errorcode := &errorstruct{}
+	env := &envlist{}
+	var permssion bool
+	// 管理员
+	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
+		permssion = true
+	} else {
+		permssion, err = asset.CheckPerm("env", nickname)
 		if err != nil {
 			golog.Error(err.Error())
-			if err == NotFoundToken {
-				w.Write(errorcode.ErrorNotFoundToken())
-				return
-			}
-			w.Write(errorcode.ErrorConnentMysql())
+			w.Write(errorcode.ErrorE(err))
 			return
 		}
+	}
 
-		env := &envlist{}
-		var permssion bool
-		// 管理员
-		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-			permssion = true
-		} else {
-			permssion, err = asset.CheckPerm("env", nickname)
-			if err != nil {
-				golog.Error(err.Error())
-				w.Write(errorcode.ErrorConnentMysql())
-				return
-			}
-		}
-
-		if !permssion {
-			w.Write(errorcode.ErrorNoPermission())
-			return
-		}
-		for k, v := range bugconfig.CacheEidName {
-			pr := &envrow{
-				Id:      k,
-				EnvName: v,
-			}
-			env.Elist = append(env.Elist, pr)
-		}
-
-		send, _ := json.Marshal(env)
-		w.Write(send)
+	if !permssion {
+		w.Write(errorcode.Error("没有权限"))
 		return
 	}
-	w.WriteHeader(http.StatusNotFound)
+	for k, v := range bugconfig.CacheEidName {
+		pr := &envrow{
+			Id:      k,
+			EnvName: v,
+		}
+		env.Elist = append(env.Elist, pr)
+	}
+
+	send, _ := json.Marshal(env)
+	w.Write(send)
+	return
+
 }
 
 func AddEnv(w http.ResponseWriter, r *http.Request) {
-	headers(w, r)
-	if r.Method == http.MethodOptions {
-		w.WriteHeader(http.StatusOK)
+
+	nickname, err := logtokenmysql(r)
+	errorcode := &errorstruct{}
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
-	if r.Method == http.MethodGet {
-		 nickname, err := logtokenmysql(r)
-		errorcode := &errorstruct{}
+	var permssion bool
+	// 管理员
+	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
+		permssion = true
+	} else {
+		permssion, err = asset.CheckPerm("env", nickname)
 		if err != nil {
 			golog.Error(err.Error())
-			if err == NotFoundToken {
-				w.Write(errorcode.ErrorNotFoundToken())
-				return
-			}
-			w.Write(errorcode.ErrorConnentMysql())
+			w.Write(errorcode.ErrorE(err))
 			return
 		}
+	}
 
-		var permssion bool
-		// 管理员
-		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-			permssion = true
-		} else {
-			permssion, err = asset.CheckPerm("env", nickname)
-			if err != nil {
-				golog.Error(err.Error())
-				w.Write(errorcode.ErrorConnentMysql())
-				return
-			}
-		}
-
-		if !permssion {
-			w.Write(errorcode.ErrorNoPermission())
-			return
-		}
-		envname := r.FormValue("name")
-
-		getaritclesql := "insert into environment(envname) values(?)"
-
-		errorcode.Id, err = bugconfig.Bug_Mysql.Insert(getaritclesql, envname)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-		// 增加日志
-		il := buglog.AddLog{
-			Ip:       strings.Split(r.RemoteAddr, ":")[0],
-			Classify: "env",
-		}
-		err = il.Add(
-			nickname, errorcode.Id, envname)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-		// 添加缓存
-		bugconfig.CacheEidName[errorcode.Id] = envname
-		bugconfig.CacheEnvNameEid[envname] = errorcode.Id
-		send, _ := json.Marshal(errorcode)
-		w.Write(send)
+	if !permssion {
+		w.Write(errorcode.Error("没有权限"))
 		return
 	}
-	w.WriteHeader(http.StatusNotFound)
+	envname := r.FormValue("name")
+
+	getaritclesql := "insert into environment(envname) values(?)"
+
+	errorcode.Id, err = bugconfig.Bug_Mysql.Insert(getaritclesql, envname)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	// 增加日志
+	il := buglog.AddLog{
+		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+		Classify: "env",
+	}
+	err = il.Add(
+		nickname, errorcode.Id, envname)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	// 添加缓存
+	bugconfig.CacheEidName[errorcode.Id] = envname
+	bugconfig.CacheEnvNameEid[envname] = errorcode.Id
+	send, _ := json.Marshal(errorcode)
+	w.Write(send)
+	return
+
 }
 
 func UpdateEnv(w http.ResponseWriter, r *http.Request) {
-	headers(w, r)
-	if r.Method == http.MethodOptions {
-		w.WriteHeader(http.StatusOK)
+
+	nickname, err := logtokenmysql(r)
+	errorcode := &errorstruct{}
+
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
-	if r.Method == http.MethodPost {
-		 nickname, err := logtokenmysql(r)
-		errorcode := &errorstruct{}
-
+	er := &envrow{}
+	var permssion bool
+	// 管理员
+	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
+		permssion = true
+	} else {
+		permssion, err = asset.CheckPerm("env", nickname)
 		if err != nil {
 			golog.Error(err.Error())
-			if err == NotFoundToken {
-				w.Write(errorcode.ErrorNotFoundToken())
-				return
-			}
-			w.Write(errorcode.ErrorConnentMysql())
+			w.Write(errorcode.ErrorE(err))
 			return
 		}
+	}
 
-		er := &envrow{}
-		var permssion bool
-		// 管理员
-		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-			permssion = true
-		} else {
-			permssion, err = asset.CheckPerm("env", nickname)
-			if err != nil {
-				golog.Error(err.Error())
-				w.Write(errorcode.ErrorConnentMysql())
-				return
-			}
-		}
-
-		if !permssion {
-			w.Write(errorcode.ErrorNoPermission())
-			return
-		}
-		bpr, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorGetData())
-			return
-		}
-		err = json.Unmarshal(bpr, er)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorParams())
-			return
-		}
-
-		getaritclesql := "update environment set envname=? where id=?"
-
-		_, err = bugconfig.Bug_Mysql.Update(getaritclesql, er.EnvName, er.Id)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-		// 增加日志
-		il := buglog.AddLog{
-			Ip:       strings.Split(r.RemoteAddr, ":")[0],
-			Classify: "env",
-		}
-		err = il.Update(
-			nickname, er.Id, er.EnvName)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-		// 更新缓存
-		delete(bugconfig.CacheEnvNameEid, bugconfig.CacheEidName[int64(er.Id)])
-		bugconfig.CacheEidName[int64(er.Id)] = er.EnvName
-		bugconfig.CacheEnvNameEid[er.EnvName] = int64(er.Id)
-		send, _ := json.Marshal(errorcode)
-		w.Write(send)
+	if !permssion {
+		w.Write(errorcode.Error("没有权限"))
 		return
 	}
-	w.WriteHeader(http.StatusNotFound)
+	bpr, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = json.Unmarshal(bpr, er)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+
+	getaritclesql := "update environment set envname=? where id=?"
+
+	_, err = bugconfig.Bug_Mysql.Update(getaritclesql, er.EnvName, er.Id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	// 增加日志
+	il := buglog.AddLog{
+		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+		Classify: "env",
+	}
+	err = il.Update(
+		nickname, er.Id, er.EnvName)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	// 更新缓存
+	delete(bugconfig.CacheEnvNameEid, bugconfig.CacheEidName[int64(er.Id)])
+	bugconfig.CacheEidName[int64(er.Id)] = er.EnvName
+	bugconfig.CacheEnvNameEid[er.EnvName] = int64(er.Id)
+	send, _ := json.Marshal(errorcode)
+	w.Write(send)
+	return
+
 }
 
 func DeleteEnv(w http.ResponseWriter, r *http.Request) {
-	headers(w, r)
-	if r.Method == http.MethodOptions {
-		w.WriteHeader(http.StatusOK)
+
+	nickname, err := logtokenmysql(r)
+	errorcode := &errorstruct{}
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
-	if r.Method == http.MethodGet {
-		 nickname, err := logtokenmysql(r)
-		errorcode := &errorstruct{}
+	var permssion bool
+	// 管理员
+	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
+		permssion = true
+	} else {
+		permssion, err = asset.CheckPerm("env", nickname)
 		if err != nil {
 			golog.Error(err.Error())
-			if err == NotFoundToken {
-				w.Write(errorcode.ErrorNotFoundToken())
-				return
-			}
-			w.Write(errorcode.ErrorNotFoundToken())
+			w.Write(errorcode.ErrorE(err))
 			return
 		}
+	}
 
-		var permssion bool
-		// 管理员
-		if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-			permssion = true
-		} else {
-			permssion, err = asset.CheckPerm("env", nickname)
-			if err != nil {
-				golog.Error(err.Error())
-				w.Write(errorcode.ErrorConnentMysql())
-				return
-			}
-		}
-
-		if !permssion {
-			w.Write(errorcode.ErrorNoPermission())
-			return
-		}
-		id := r.FormValue("id")
-		eid, err := strconv.Atoi(id)
-		if err != nil {
-
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorParams())
-			return
-		}
-		var count int
-
-		err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs where eid=?", id).Scan(&count)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-		if count > 0 {
-			w.Write(errorcode.ErrorHasEnv())
-			return
-		}
-		getaritclesql := "delete from environment where id=?"
-
-		_, err = bugconfig.Bug_Mysql.Update(getaritclesql, id)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-		// 增加日志
-		il := buglog.AddLog{
-			Ip:       strings.Split(r.RemoteAddr, ":")[0],
-			Classify: "env",
-		}
-		err = il.Del(
-			nickname, id)
-		if err != nil {
-			golog.Error(err.Error())
-			w.Write(errorcode.ErrorConnentMysql())
-			return
-		}
-		delete(bugconfig.CacheEnvNameEid, bugconfig.CacheEidName[int64(eid)])
-		delete(bugconfig.CacheEidName, int64(eid))
-		send, _ := json.Marshal(errorcode)
-		w.Write(send)
+	if !permssion {
+		w.Write(errorcode.Error("没有权限"))
 		return
 	}
-	w.WriteHeader(http.StatusNotFound)
+	id := r.FormValue("id")
+	eid, err := strconv.Atoi(id)
+	if err != nil {
+
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	var count int
+
+	err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs where eid=?", id).Scan(&count)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	if count > 0 {
+		w.Write(errorcode.Error("存在此env"))
+		return
+	}
+	getaritclesql := "delete from environment where id=?"
+
+	_, err = bugconfig.Bug_Mysql.Update(getaritclesql, id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	// 增加日志
+	il := buglog.AddLog{
+		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+		Classify: "env",
+	}
+	err = il.Del(
+		nickname, id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	delete(bugconfig.CacheEnvNameEid, bugconfig.CacheEidName[int64(eid)])
+	delete(bugconfig.CacheEidName, int64(eid))
+	send, _ := json.Marshal(errorcode)
+	w.Write(send)
+	return
+
 }

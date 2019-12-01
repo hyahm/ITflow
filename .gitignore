@@ -1,11 +1,7 @@
-go1.12.5.linux-amd64.tar.gz
 go/bin
 go/bug.conf
-go/src/bug.conf
 go/pkg
 go/.idea
-go/src/main/curl.go
-go/src/github.com
 vue/.DS_Store
 vue/node_modules/
 vue/dist/

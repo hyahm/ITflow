@@ -12,14 +12,6 @@ import (
 	"time"
 )
 
-func headers(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Access-Control-Allow-Origin", "*")
-	w.Header().Add("Content-Type", "application/x-www-form-urlencoded,application/json; charset=UTF-8")
-
-	w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Access-Token,X-Token")
-
-}
-
 var NotFoundToken = errors.New("not found token")
 
 func logtokenmysql(r *http.Request) (string, error) {
@@ -27,7 +19,6 @@ func logtokenmysql(r *http.Request) (string, error) {
 		fmt.Printf("%s : %s \n", k, v)
 	}
 	a := r.Header.Get("X-Token")
-	fmt.Println(a)
 	nickname, err := asset.Getvalue(a)
 	if err != nil {
 		golog.Error(err.Error())
@@ -45,8 +36,6 @@ func sortpermlist(permlist []string) []string {
 	l := len(bugconfig.CacheSidStatus)
 
 	newlist := make([]string, 0)
-	//["aaaa", "cccc", "dddd"]
-	//["aaaa", "bbbb", "cccc", "dddd"]
 	for i := 0; i < l; i++ {
 		for _, v := range permlist {
 			if bugconfig.CacheSidStatus[int64(i)] == v {

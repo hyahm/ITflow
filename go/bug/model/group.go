@@ -10,10 +10,10 @@ type Get_groups struct {
 	Id    int64    `json:"id"`
 	Name  string   `json:"name"`
 	Users []string `json:"users"`
-	Code  int      `json:"statuscode"`
+	Code  int      `json:"code"`
 }
 
 type Send_groups struct {
 	GroupList []*Get_groups `json:"grouplist"`
-	Code      int           `json:"statuscode"`
+	Code      int           `json:"code"`
 }
