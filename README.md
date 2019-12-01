@@ -2,8 +2,8 @@
   一个开源的bug管理系统，IT人员开发全过程，文件存储，接口文档, 单接口测试功能
 
 文档地址： http://itflow.doc.hyahm.com  
-路由限制了目前代码的优化 ， 先写个路由再优化
-路由雏形：  https://github.com/hyahm/xmux， 路由差不多了， 星期天拿来试水
+
+更改项目路由为：  https://github.com/hyahm/xmux
 
 ### 功能
 - [x] 增加bug，改变bug状态，转交bug 
