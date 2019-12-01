@@ -5,6 +5,7 @@ import (
 	"github.com/hyahm/golog"
 	"github.com/hyahm/gomysql"
 	"itflow/bug"
+	"itflow/bug/autodb"
 	"itflow/bug/bugconfig"
 	"log"
 )
@@ -14,6 +15,23 @@ func main() {
 	goconfig.InitConf("bug.conf")
 
 	//初始化mysql
+	initMysql()
+	// 初始化缓存（后面会使用redis）
+	bugconfig.LoadConfig()
+	// 初始化数据表
+	if goconfig.ReadBool("initdb") {
+		autodb.InitDb()
+	}
+	// 初始化日志
+	golog.InitLogger(goconfig.ReadString("logpath"),
+		goconfig.ReadInt64("logsize"),
+		goconfig.ReadBool("logeveryday"))
+
+	////
+	bug.RunHttp()
+}
+
+func initMysql() {
 	conf := &gomysql.Sqlconfig{
 		DbName:   goconfig.ReadString("mysql.db"),
 		Host:     goconfig.ReadString("mysql.host"),
@@ -26,33 +44,4 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	// 初始化缓存（后面会使用redis）
-	bugconfig.LoadConfig()
-	// 初始化数据表
-	//if goconfig.ReadBool("initdb") {
-	//	autodb.InitDb()
-	//}
-	// 初始化日志
-	golog.InitLogger(goconfig.ReadString("logpath"),
-		goconfig.ReadInt64("logsize"),
-		goconfig.ReadBool("logeveryday"))
-
-	////
-	bugservices()
-}
-
-func bugservices() {
-	//r := make(chan os.Signal, 0)
-	//// 接受kill信号
-	//go func() {
-	//	signal.Notify(r, os.Interrupt, os.Kill)
-	//}()
-	bug.RunHttp()
-	//go gareload.ListenReload(r)
-
-	//fmt.Println("exit code:", <-r)
-	//select {
-	//case <-r:
-	//	fmt.Println("http")
-	//}
 }

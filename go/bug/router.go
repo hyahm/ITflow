@@ -11,7 +11,6 @@ import (
 	"itflow/bug/route"
 	"log"
 	"net/http"
-	"strings"
 )
 
 func RunHttp() {
@@ -42,10 +41,7 @@ func RunHttp() {
 	router.Pattern("/showimg/{imgname}").Get(handle.ShowImg)
 	//
 	listenaddr := goconfig.ReadString("listenaddr")
-	if strings.Index(listenaddr, ":") < 0 {
-		print("not and listen addr, make sure config file is right")
-		return
-	}
+
 	fmt.Println("listen on " + listenaddr)
 	server := http.Server{
 		Addr:         listenaddr,
