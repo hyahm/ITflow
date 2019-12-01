@@ -6,44 +6,51 @@
     <el-table
       :data="tableData"
       height="250"
-      style="width: 100%">
+      style="width: 100%"
+    >
       <el-table-column
         label="Id"
-        width="180">
+        width="180"
+      >
         <template slot-scope="scope">
-          <span >{{ scope.row.id }}</span>
+          <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
       <el-table-column
         label="职位名"
-        width="180">
+        width="180"
+      >
         <template slot-scope="scope">
-          <span >{{ scope.row.name }}</span>
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column
         label="职位级别"
-        width="180">
+        width="180"
+      >
         <template slot-scope="scope">
-          <span >{{ scope.row.level | level }}</span>
+          <span>{{ scope.row.level | level }}</span>
         </template>
       </el-table-column>
       <el-table-column
         label="从属于"
-        width="180">
+        width="180"
+      >
         <template slot-scope="scope">
-          <span >{{ scope.row.hypo }}</span>
+          <span>{{ scope.row.hypo }}</span>
         </template>
       </el-table-column>
       <el-table-column width="200" label="操作">
         <template slot-scope="scope">
           <el-button
             size="mini"
-            @click="handleUpdate(scope.row)">修改</el-button>
+            @click="handleUpdate(scope.row)"
+          >修改</el-button>
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.row.id)">删除</el-button>
+            @click="handleDelete(scope.row.id)"
+          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -51,9 +58,9 @@
       <el-button type="success" plain style="margin: 20px" @click="addstatus">添加职位</el-button>
     </div>
     <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" title="职位管理">
-      <el-form >
+      <el-form>
         <el-form-item label="职位名">
-          <el-input v-model="form.name"/>
+          <el-input v-model="form.name" />
         </el-form-item>
       </el-form>
       <el-form>
@@ -70,7 +77,8 @@
               v-for="(hypo, index) in hypos"
               :key="index"
               :label="hypo"
-              :value="hypo"/>
+              :value="hypo"
+            />
           </el-select>
         </el-form-item>
       </el-form>
@@ -83,7 +91,7 @@
 </template>
 
 <script>
-import { getPositions, addPosition, updatePosition, delPosition, getHypos, PositionsList } from '@/api/position'
+import { addPosition, updatePosition, delPosition, getHypos, PositionsList } from '@/api/position'
 export default {
   name: 'Position',
   filters: {
@@ -120,24 +128,28 @@ export default {
   methods: {
     gethypos() {
       getHypos().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.hypos = resp.data.hypos
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
     getlist() {
       PositionsList().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.positions != null) {
             this.tableData = resp.data.positions
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
     confirm() {
       if (this.form.id === -1) {
         addPosition(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             this.tableData.push({
               id: resp.data.id,
               name: this.form.name,
@@ -145,12 +157,12 @@ export default {
               level: this.form.level
             })
           } else {
-            this.$message.error('操作失败')
+            this.$message.error(resp.data.msg)
           }
         })
       } else {
         updatePosition(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             const l = this.tableData.length
             for (let i = 0; i < l; i++) {
               if (this.tableData[i].id === this.form.id) {
@@ -158,7 +170,7 @@ export default {
               }
             }
           } else {
-            this.$message.error('操作失败')
+            this.$message.error(resp.data.msg)
           }
         })
       }
@@ -175,15 +187,15 @@ export default {
       }).then(() => {
         delPosition(id).then(resp => {
           // console
-          if (resp.data.statuscode === 21) {
+          if (resp.data.code === 21) {
             this.$message.error('此职位有用户在使用')
             return
           }
-          if (resp.data.statuscode === 24) {
+          if (resp.data.code === 24) {
             this.$message.error('此职位在使用')
             return
           }
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             const l = this.tableData.length
             for (let i = 0; i < l; i++) {
               if (this.tableData[i].id === id) {

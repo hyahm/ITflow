@@ -37,18 +37,20 @@
       :visible.sync="dialogVisible"
       :before-close="handleClose"
       title="提示"
-      width="60%">
-      <el-form ref="postForm" class="form-container" >
+      width="60%"
+    >
+      <el-form ref="postForm" class="form-container">
         <el-form-item prop="title" label="状态组名:">
           <el-input
             v-model="form.departmentname"
             :maxlength="100"
             placeholder="请输入状态组名"
-            clearable />
+            clearable
+          />
         </el-form-item>
-        <el-checkbox-group v-model="form.checklist" >
+        <el-checkbox-group v-model="form.checklist">
           <div v-for="(status, index) in statuslist" :key="index">
-            <el-checkbox :label="status"/>
+            <el-checkbox :label="status" />
           </div>
         </el-checkbox-group>
         <!--<el-button type="success" round @click="HandlerAddGroup">添加部门</el-button>-->
@@ -104,6 +106,8 @@ export default {
           if (resp.data.departmentlist !== null) {
             this.list = resp.data.departmentlist
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -161,7 +165,7 @@ export default {
             }
             this.$message.success('修改成功')
           } else {
-            this.$message.error('添加失败')
+            this.$message.error(resp.data.msg)
           }
         })
       } else {
@@ -174,7 +178,7 @@ export default {
             })
             this.$message.success('添加成功')
           } else {
-            this.$message.error('添加失败')
+            this.$message.error(resp.data.msg)
           }
         })
       }

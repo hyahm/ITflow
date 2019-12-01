@@ -30,10 +30,10 @@
 
       </el-card>
 
-      <div id="tinymcecontent" class="placeholder-container" v-html="bug.content"/>
+      <div id="tinymcecontent" class="placeholder-container" v-html="bug.content" />
       <div v-for="(cc, index) in bug.comment" :key="index" style="margin-bottom: 5px">
         <el-card class="box-card">
-          <div >{{ cc.date | parseTime('{y}-{m}-{d} {h}:{i}') }}由{{ cc.user }}转交给{{ cc.passuser }}</div>
+          <div>{{ cc.date | parseTime('{y}-{m}-{d} {h}:{i}') }}由{{ cc.user }}转交给{{ cc.passuser }}</div>
           <div>转交原因：</div>
           <div>{{ cc.info }}</div>
         </el-card>
@@ -54,16 +54,18 @@
           <el-select
             v-model="temp.selectusers"
             multiple
-            placeholder="请选择指定的用户">
+            placeholder="请选择指定的用户"
+          >
             <el-option
               v-for="(item, index) in users"
               :key="index"
               :label="item"
-              :value="item" />
+              :value="item"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="理由">
-          <el-input :autosize="{ minRows: 2, maxRows: 4}" v-model="temp.remark" type="textarea" placeholder="Please input" />
+          <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -78,12 +80,12 @@
 // import BackToTop from '@/components/BackToTop'
 import { showBug, passBug } from '@/api/bugs'
 // import { getUsers, getPermStatus } from '@/api/get'
-import Sticky from '@/components/Sticky' // 粘性header组件
+// import Sticky from '@/components/Sticky' // 粘性header组件
 // import { getProject } from '@/utils/auth'
 
 export default {
   name: 'ShowBug',
-  components: { Sticky },
+  // components: { Sticky },
   data() {
     return {
       users: [],
@@ -169,9 +171,11 @@ export default {
       const id = ul[ul.length - 1]
       if (id % 1 === 0) {
         this.temp.id = parseInt(id)
-        showBug(id).then(response => {
-          if (response.data.code === 0) {
-            this.bug = response.data
+        showBug(id).then(resp => {
+          if (resp.data.code === 0) {
+            this.bug = resp.data
+          } else {
+            this.$message.error(resp.data.msg)
           }
         })
       }
@@ -179,9 +183,9 @@ export default {
     updateData() {
       this.dialogFormVisible = true
       this.temp.status = this.bug.status
-      passBug(this.temp).then(response => {
-        if (response.data.code === 0) {
-          const data = response.data
+      passBug(this.temp).then(resp => {
+        if (resp.data.code === 0) {
+          const data = resp.data
           this.bug.comment.push({
             date: data.date,
             info: data.remark,
@@ -195,6 +199,8 @@ export default {
             message: '操作成功',
             type: 'success'
           })
+        } else {
+          this.$message.error(resp.data.msg)
         }
         this.dialogFormVisible = false
       })

@@ -6,14 +6,15 @@
     <el-form ref="postForm" :model="postForm" class="form-container">
       <div class="createPost-main-container">
         <!--<el-col :span="24" >-->
-        <div style="height: 30px"/>
+        <div style="height: 30px" />
         <el-form-item style="margin-bottom: 40px;" prop="title" label="昵称:">
           <el-input
             v-model="postForm.nickname"
             :maxlength="100"
             placeholder="姓名首字母"
             clearable
-            style="width: 60%;"/>
+            style="width: 60%;"
+          />
         </el-form-item>
 
         <el-form-item style="margin-bottom: 40px;" prop="title" label="姓名:">
@@ -22,7 +23,8 @@
             :maxlength="100"
             placeholder="请输入姓名"
             clearable
-            style="width: 60%;"/>
+            style="width: 60%;"
+          />
         </el-form-item>
 
         <el-form-item style="margin-bottom: 40px;" prop="title" label="邮箱:">
@@ -31,7 +33,8 @@
             :maxlength="100"
             placeholder="请输入邮箱"
             clearable
-            style="width: 60%;"/>
+            style="width: 60%;"
+          />
         </el-form-item>
 
         <el-form-item style="margin-bottom: 40px;" prop="title" label="密码:">
@@ -41,7 +44,8 @@
             placeholder="请输入密码"
             type="password"
             clearable
-            style="width: 60%;"/>
+            style="width: 60%;"
+          />
         </el-form-item>
 
         <el-form-item style="margin-bottom: 40px;" prop="title" label="确认:">
@@ -51,17 +55,18 @@
             placeholder="请输入密码"
             type="password"
             clearable
-            style="width: 60%;"/>
+            style="width: 60%;"
+          />
         </el-form-item>
 
         <el-form-item style="margin-bottom: 40px;" prop="title" label="状态:">
           <el-select v-model="postForm.statusgroup" class="filter-item" style="width: 130px">
-            <el-option v-for="(status, index) in statusgroups" :key="index" :label="status" :value="status"/>
+            <el-option v-for="(status, index) in statusgroups" :key="index" :label="status" :value="status" />
           </el-select>
         </el-form-item>
         <el-form-item style="margin-bottom: 40px;" prop="title" label="角色:">
           <el-select v-model="postForm.rolegroup" class="filter-item" style="width: 130px">
-            <el-option v-for="(role, index) in rolegroups" :key="index" :label="role" :value="role"/>
+            <el-option v-for="(role, index) in rolegroups" :key="index" :label="role" :value="role" />
           </el-select>
         </el-form-item>
         <el-form-item style="margin-bottom: 40px;" prop="title" label="职位:">
@@ -70,16 +75,17 @@
               v-for="(position, index) in positions"
               :key="index"
               :label="position"
-              :value="position"/>
+              :value="position"
+            />
           </el-select>
         </el-form-item>
-        <div >
+        <div>
           <el-button type="success" style="margin-left: 10px" plain @click="adduser">添加</el-button>
           <el-button type="warning" style="margin-left: 20px" plain @click="clean">清空</el-button>
         </div>
-        <div style="margin-bottom: 30px;height: 30px"/>
+        <div style="margin-bottom: 30px;height: 30px" />
       </div>
-    </el-form >
+    </el-form>
   </div>
 </template>
 
@@ -127,6 +133,8 @@ export default {
           if (resp.data.positions !== null) {
             this.positions = resp.data.positions
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -136,6 +144,8 @@ export default {
           if (resp.data.statuslist !== null) {
             this.statusgroups = resp.data.statuslist
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -145,6 +155,8 @@ export default {
           if (resp.data.roles !== null) {
             this.rolegroups = resp.data.roles
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },

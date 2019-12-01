@@ -8,17 +8,20 @@
       fit
       border
       highlight-current-row
-      style="width: 100%">
+      style="width: 100%"
+    >
       <el-table-column
         label="Id"
-        width="60">
+        width="60"
+      >
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.id }}</span>
         </template>
       </el-table-column>
       <el-table-column
         label="项目名"
-        width="400">
+        width="400"
+      >
         <template slot-scope="scope">
           <a :href="'/restful/apilist?id=' + scope.row.id" target="_blank" style="text-decoration:underline;color: blue">{{ scope.row.name }}</a>
         </template>
@@ -27,12 +30,14 @@
         <template slot-scope="scope">
           <el-button
             size="mini"
-            @click="update(scope.row)">修改
+            @click="update(scope.row)"
+          >修改
           </el-button>
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.row.id)">删除
+            @click="handleDelete(scope.row.id)"
+          >删除
           </el-button>
         </template>
       </el-table-column>
@@ -41,7 +46,7 @@
     <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" width="60%" title="接口项目名称">
       <el-form :model="form">
         <el-form-item label="项目名">
-          <el-input v-model="form.name" width="200" auto-complete="off"/>
+          <el-input v-model="form.name" width="200" auto-complete="off" />
         </el-form-item>
         <el-form-item label="权限">
           <el-radio-group v-model="form.auth" @change="handleAuth">
@@ -50,7 +55,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item v-if="form.auth" label="只能查看">
-          <el-radio-group v-model="form.readuser" @change="handleRead" >
+          <el-radio-group v-model="form.readuser" @change="handleRead">
             <el-radio :label="perm">用戶</el-radio>
             <el-radio :label="!perm">組</el-radio>
           </el-radio-group>
@@ -59,11 +64,12 @@
               v-for="(item, index) in readlist"
               :key="index"
               :label="item"
-              :value="item"/>
+              :value="item"
+            />
           </el-select>
         </el-form-item>
         <el-form-item v-if="form.auth" label="查看编辑">
-          <el-radio-group v-model="form.edituser" @change="handleRdWr" >
+          <el-radio-group v-model="form.edituser" @change="handleRdWr">
             <el-radio :label="perm">用戶</el-radio>
             <el-radio :label="!perm">組</el-radio>
           </el-radio-group>
@@ -72,7 +78,8 @@
               v-for="(item, index) in rdwrlist"
               :key="index"
               :label="item"
-              :value="item"/>
+              :value="item"
+            />
           </el-select>
         </el-form-item>
       </el-form>
@@ -129,6 +136,8 @@ export default {
           if (resp.data.users !== null) {
             this.users = resp.data.users
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
         this.readlist = this.users
         this.rdwrlist = this.users
@@ -140,6 +149,8 @@ export default {
           if (resp.data.grouplist !== null) {
             this.groups = resp.data.grouplist
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -179,6 +190,8 @@ export default {
           if (resp.data.list !== null) {
             this.list = resp.data.list
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },

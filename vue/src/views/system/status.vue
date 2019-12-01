@@ -6,30 +6,35 @@
     <el-table
       :data="tableData"
       height="250"
-      style="width: 100%">
+      style="width: 100%"
+    >
       <el-table-column
         label="Id"
-        width="180">
+        width="180"
+      >
         <template slot-scope="scope">
-          <span >{{ scope.row.id }}</span>
+          <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
       <el-table-column
         label="状态名"
-        width="180">
+        width="180"
+      >
         <template slot-scope="scope">
-          <span >{{ scope.row.name }}</span>
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column width="200" label="操作">
         <template slot-scope="scope">
           <el-button
             size="mini"
-            @click="handleUpdate(scope.row)">修改</el-button>
+            @click="handleUpdate(scope.row)"
+          >修改</el-button>
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.row.id)">删除</el-button>
+            @click="handleDelete(scope.row.id)"
+          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -37,9 +42,9 @@
       <el-button type="success" plain style="margin: 20px" @click="addstatus">添加bug状态</el-button>
     </div>
     <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" title="状态管理">
-      <el-form >
+      <el-form>
         <el-form-item label="状态">
-          <el-input v-model="form.name" auto-complete="off"/>
+          <el-input v-model="form.name" auto-complete="off" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -76,6 +81,8 @@ export default {
           if (resp.data.statuslist !== null) {
             this.tableData = resp.data.statuslist
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -89,7 +96,7 @@ export default {
             })
             this.$message.success('添加成功')
           } else {
-            this.$message.error('添加失败')
+            this.$message.error(resp.data.msg)
           }
         })
       } else {
@@ -103,7 +110,7 @@ export default {
             }
             this.$message.success('更新成功')
           } else {
-            this.$message.error('更新失败')
+            this.$message.error(resp.data.msg)
           }
         })
       }
@@ -128,9 +135,9 @@ export default {
               }
             }
             this.$message.success('删除成功')
-            return
+          } else {
+            this.$message.error(resp.data.msg)
           }
-          this.$message.error(resp.data.msg)
         })
       }).catch(() => {
         this.$message({

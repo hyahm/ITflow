@@ -8,17 +8,20 @@
       fit
       border
       highlight-current-row
-      style="width: 100%">
+      style="width: 100%"
+    >
       <el-table-column
         label="Id"
-        width="180">
+        width="180"
+      >
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.id }}</span>
         </template>
       </el-table-column>
       <el-table-column
         label="项目名"
-        width="180">
+        width="180"
+      >
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.projectname }}</span>
         </template>
@@ -27,11 +30,13 @@
         <template slot-scope="scope">
           <el-button
             size="mini"
-            @click="updatep(scope.row)">修改</el-button>
+            @click="updatep(scope.row)"
+          >修改</el-button>
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.row.id)">删除</el-button>
+            @click="handleDelete(scope.row.id)"
+          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -39,7 +44,7 @@
     <el-dialog :visible.sync="dialogFormVisible" width="60%" title="项目管理">
       <el-form :model="form">
         <el-form-item label="项目名">
-          <el-input v-model="form.projectname" width="200" auto-complete="off"/>
+          <el-input v-model="form.projectname" width="200" auto-complete="off" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -72,12 +77,14 @@ export default {
   methods: {
     getprojectname() {
       getProjectName().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.projectlist === null) {
             this.$message.info('no data')
             return
           }
           this.tableData = resp.data.projectlist
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -87,11 +94,7 @@ export default {
     },
     handleDelete(id) {
       deleteProjectName(id).then(resp => {
-        if (resp.data.statuscode === 20) {
-          this.$message.warning('这个项目存在bug，请先删除')
-          return
-        }
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           const fl = this.tableData.length
           for (let i = 0; i < fl; i++) {
             if (this.tableData[i].id === id) {
@@ -99,10 +102,11 @@ export default {
               break
             }
           }
-          this.$message.success("删除成功")
+          this.$message.success('删除成功')
           return
+        } else {
+          this.$message.error(resp.data.msg)
         }
-        this.$message.error("删除失败")
       })
     },
     updatep(row) {
@@ -114,14 +118,14 @@ export default {
       this.dialogFormVisible = false
       if (this.form.id === -1) {
         addProjectName(this.form.projectname).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             this.tableData.push({
               id: resp.data.id,
               projectname: this.form.projectname
             })
-            this.$message.success("添加成功")
+            this.$message.success('添加成功')
           } else {
-            this.$message.error("添加错误")
+            this.$message.error('添加错误')
           }
         })
       } else {
@@ -130,7 +134,7 @@ export default {
             this.$message.warning('存在项目名')
             return
           }
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             const fl = this.tableData.length
             for (let i = 0; i < fl; i++) {
               if (this.tableData[i].id === this.form.id) {
@@ -138,10 +142,10 @@ export default {
                 break
               }
             }
-            this.$message.success("更新成功")
-            return
+            this.$message.success('更新成功')
+          } else {
+            this.$message.error(resp.data.msg)
           }
-          this.$message.success("更新失败")
         })
       }
     },

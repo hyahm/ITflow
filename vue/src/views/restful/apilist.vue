@@ -5,17 +5,20 @@
       fit
       border
       highlight-current-row
-      style="width: 100%">
+      style="width: 100%"
+    >
       <el-table-column
         label="Id"
-        width="60">
+        width="60"
+      >
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.id }}</span>
         </template>
       </el-table-column>
       <el-table-column
         label="接口名"
-        width="400">
+        width="400"
+      >
         <template slot-scope="scope">
           <span style="margin-left: 10px"><a :href="'/restful/showapi?id=' + scope.row.id" target="_blank" style="text-decoration:underline;color: blue">{{ scope.row.name }}</a></span>
         </template>
@@ -24,12 +27,14 @@
         <template slot-scope="scope">
           <el-button
             size="mini"
-            @click="update(scope.row)">编辑
+            @click="update(scope.row)"
+          >编辑
           </el-button>
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.row.id)">删除
+            @click="handleDelete(scope.row.id)"
+          >删除
           </el-button>
         </template>
       </el-table-column>
@@ -41,7 +46,7 @@
     <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" width="60%" title="接口项目名称">
       <el-form :model="form">
         <el-form-item label="接口名">
-          <el-input v-model="form.name" width="200" auto-complete="off"/>
+          <el-input v-model="form.name" width="200" auto-complete="off" />
         </el-form-item>
         <el-form-item label="请求方式">
           <el-select v-model="form.methods" multiple placeholder="请选择">
@@ -49,44 +54,47 @@
               v-for="(item, index) in options"
               :key="index"
               :label="item"
-              :value="item" />
+              :value="item"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="调用的url">
-          <el-input v-model="form.url" width="200" placeholder="只写后面的路径，例如：/login" auto-complete="off"/>
+          <el-input v-model="form.url" width="200" placeholder="只写后面的路径，例如：/login" auto-complete="off" />
         </el-form-item>
         <el-form-item label="请求头">
-          <el-select v-model="form.header" >
-            <el-option v-for="(header, index) in headers" :key="index" :value="header"/>
+          <el-select v-model="form.header">
+            <el-option v-for="(header, index) in headers" :key="index" :value="header" />
           </el-select>
         </el-form-item>
         <el-form-item label="参数">
-          <svg-icon icon-class="add" @click.native="handleAdd"/>
-          <div v-for="(opt, index) in form.opts" :key="index" class="div_opts" >
-            <el-input :value="opt.name" class="key_opts" type="text" placeholder="参数名" @change="handleUpdateName(opt.id, $event)"/>
-            <el-select :value="opt.type" class="select_opts" placeholder="类型" @change="handleUpdateType(opt.id, $event)">
-              <el-option v-for="(t, index) in types" :value="t" :key="index"/>
+          <svg-icon icon-class="add" @click.native="handleAdd" />
+          <div v-for="(option, index) in form.opts" :key="index" class="div_opts">
+            <el-input :value="option.name" class="key_opts" type="text" placeholder="参数名" @change="handleUpdateName(option.id, $event)" />
+            <el-select :value="option.type" class="select_opts" placeholder="类型" @change="handleUpdateType(option.id, $event)">
+              <el-option v-for="(t, i) in types" :key="i" :value="t" />
             </el-select>
-            <el-select :value="opt.need" class="select_opts" placeholder="是否必须" @change="handleUpdateNeed(opt.id, $event)">
-              <el-option v-for="(n, index) in needs" :key="index" :value="n"/>
+            <el-select :value="option.need" class="select_opts" placeholder="是否必须" @change="handleUpdateNeed(option.id, $event)">
+              <el-option v-for="(n, i) in needs" :key="i" :value="n" />
             </el-select>
             <el-input
               :value="opt.default"
               class="default_opts"
               type="text"
               placeholder="默认值"
-              @change="handleUpdateValue(opt.id, $event)"/>
+              @change="handleUpdateValue(opt.id, $event)"
+            />
             <el-input
               :value="opt.info"
               class="info_opts"
               type="text"
               placeholder="说明"
-              @change="handleUpdateInfo(opt.id, $event)"/>
-            <svg-icon icon-class="delete" @click.native="handleDel(opt.id)"/>
+              @change="handleUpdateInfo(opt.id, $event)"
+            />
+            <svg-icon icon-class="delete" @click.native="handleDel(opt.id)" />
           </div>
         </el-form-item>
         <el-form-item label="请求参数实例">
-          <el-input v-model="form.resp" rows="5" placeholder="json" type="textarea" width="200" auto-complete="off"/>
+          <el-input v-model="form.resp" rows="5" placeholder="json" type="textarea" width="200" auto-complete="off" />
         </el-form-item>
         <el-form-item label="回调返回值类型">
           <el-select v-model="form.calltype" clearable placeholder="请选择">
@@ -94,14 +102,15 @@
               v-for="(rt, index) in rtls"
               :key="index"
               :label="rt"
-              :value="rt"/>
+              :value="rt"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="回调返回值">
-          <el-input v-model="form.result" rows="5" placeholder="只有text和json类型" type="textarea" width="200" auto-complete="off"/>
+          <el-input v-model="form.result" rows="5" placeholder="只有text和json类型" type="textarea" width="200" auto-complete="off" />
         </el-form-item>
         <el-form-item label="说明">
-          <el-input v-model="form.information" width="200" rows="5" type="textarea" placeholder="支持markdown" auto-complete="off"/>
+          <el-input v-model="form.information" width="200" rows="5" type="textarea" placeholder="支持markdown" auto-complete="off" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -113,7 +122,7 @@
 </template>
 
 <script>
-import { apiList, apiUpdate, apiDel, apiAdd, apiOne, editOne } from '@/api/restful'
+import { apiList, apiUpdate, apiDel, apiAdd, editOne } from '@/api/restful'
 import { typeGet } from '@/api/type'
 import { headerGet } from '@/api/header'
 // import Icons from "../svg-icons/index"
@@ -172,6 +181,8 @@ export default {
           if (resp.data.headers !== null) {
             this.headers = resp.data.headers
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -181,6 +192,8 @@ export default {
           if (resp.data.headers !== null) {
             this.types = resp.data.types
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -215,6 +228,8 @@ export default {
             resp.data.opts = []
           }
           this.form = resp.data
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
       this.dialogFormVisible = true
@@ -232,6 +247,8 @@ export default {
                 this.list.splice(i, 1)
               }
             }
+          } else {
+            this.$message.error(resp.data.msg)
           }
         })
       }).catch(() => {

@@ -3,8 +3,8 @@
     <p class="warn-content">
       修改密码
     </p>
-    <el-form class="form-container" >
-      <div style="height: 20px"/>
+    <el-form class="form-container">
+      <div style="height: 20px" />
       <el-form-item label="旧密码:">
         <el-input
           v-model="oldpassword"
@@ -12,7 +12,8 @@
           placeholder="请输入标题"
           type="password"
           clearable
-          style="width: 60%;"/>
+          style="width: 60%;"
+        />
       </el-form-item>
 
       <el-form-item label="新密码:">
@@ -22,7 +23,8 @@
           placeholder="请输入标题"
           type="password"
           clearable
-          style="width: 60%;"/>
+          style="width: 60%;"
+        />
       </el-form-item>
 
       <el-form-item label="新密码:">
@@ -32,7 +34,8 @@
           placeholder="请输入标题"
           type="password"
           clearable
-          style="width: 60%;"/>
+          style="width: 60%;"
+        />
       </el-form-item>
 
       <div>
@@ -68,7 +71,7 @@ export default {
         newpassword: this.newpassword
       }
       updatePassword(ch).then(response => {
-        if (response.data.statuscode === 0) {
+        if (response.data.code === 0) {
           this.$message({
             message: '修改密码成功',
             type: 'success'

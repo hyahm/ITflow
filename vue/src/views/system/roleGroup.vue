@@ -36,18 +36,20 @@
       :visible.sync="dialogVisible"
       :before-close="handleClose"
       title="提示"
-      width="60%">
-      <el-form ref="postForm" class="form-container" >
+      width="60%"
+    >
+      <el-form ref="postForm" class="form-container">
         <el-form-item prop="title" label="角色组名:">
           <el-input
             v-model="form.name"
             :maxlength="100"
             placeholder="请角色组名"
-            clearable />
+            clearable
+          />
         </el-form-item>
-        <el-checkbox-group v-model="form.rolelist" >
+        <el-checkbox-group v-model="form.rolelist">
           <div v-for="(role, index) in rolelist" :key="index">
-            <el-checkbox :label="role"/>
+            <el-checkbox :label="role" />
           </div>
         </el-checkbox-group>
         <!--<el-button type="success" round @click="HandlerAddGroup">添加部门</el-button>-->
@@ -89,7 +91,7 @@ export default {
     },
     getlist() {
       roleList().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.datalist === null) {
             this.list = []
           } else {
@@ -110,11 +112,11 @@ export default {
       this.$confirm('确认关闭？')
         .then(_ => {
           removeRole(id).then(resp => {
-            if (resp.data.statuscode === 26) {
+            if (resp.data.code === 26) {
               this.$message.warning('删除失败，此角色组有用户在使用')
               return
             }
-            if (resp.data.statuscode === 0) {
+            if (resp.data.code === 0) {
               const l = this.list.length
               for (let i = 0; i < l; i++) {
                 if (this.list[i].id === id) {
@@ -131,8 +133,10 @@ export default {
     },
     getroles() {
       getRoles().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.rolelist = resp.data.rolelist
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -145,7 +149,7 @@ export default {
       }
       if (this.form.id > 0) {
         editRole(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             const l = this.list.length
             for (let i = 0; i < l; i++) {
               if (this.list[i].id === this.id) {
@@ -155,13 +159,13 @@ export default {
             }
             this.$message.success('修改成功')
           } else {
-            this.$message.error('添加失败')
+            this.$message.error(resp.data.msg)
           }
         })
       } else {
         console.log(this.form)
         addRole(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             this.list.push({
               id: resp.data.id,
               name: this.form.name,
@@ -169,7 +173,7 @@ export default {
             })
             this.$message.success('添加成功')
           } else {
-            this.$message.error('添加失败')
+            this.$message.error(resp.data.msg)
           }
         })
       }

@@ -1,6 +1,6 @@
 <template>
   <div class="createPost-container">
-    <el-form ref="postForm" :model="postForm" :rules="rules" class="form-container" >
+    <el-form ref="postForm" :model="postForm" :rules="rules" class="form-container">
 
       <sticky :class-name="'sub-navbar ' + postForm.status">
         <!--<CommentDropdown v-model="postForm.comment_disabled" />-->
@@ -20,7 +20,8 @@
               :maxlength="100"
               placeholder="请输入标题"
               clearable
-              style="width: 80%;"/>
+              style="width: 80%;"
+            />
           </el-form-item>
         </el-row>
 
@@ -30,7 +31,8 @@
               v-for="(item, index) in projectnames"
               :key="index"
               :label="item"
-              :value="item"/>
+              :value="item"
+            />
           </el-select>
         </el-form-item>
 
@@ -40,7 +42,8 @@
               v-for="(item, index) in envnames"
               :key="index"
               :label="item"
-              :value="item"/>
+              :value="item"
+            />
           </el-select>
         </el-form-item>
 
@@ -50,7 +53,8 @@
               v-for="(item, index) in versions"
               :key="index"
               :label="item"
-              :value="item"/>
+              :value="item"
+            />
           </el-select>
         </el-form-item>
 
@@ -60,7 +64,8 @@
               v-for="(item, index) in levels"
               :key="index"
               :label="item"
-              :value="item"/>
+              :value="item"
+            />
           </el-select>
         </el-form-item>
 
@@ -73,7 +78,8 @@
               v-for="(important, index) in importants"
               :key="index"
               :label="important"
-              :value="important"/>
+              :value="important"
+            />
           </el-select>
         </el-form-item>
 
@@ -83,14 +89,15 @@
               v-for="(item, index) in users"
               :key="index"
               :label="item"
-              :value="item"/>
+              :value="item"
+            />
           </el-select>
         </el-form-item>
 
         <!--</template>-->
-        <el-form-item >
+        <el-form-item>
           <div class="editor-container">
-            <Tinymce ref="editor" v-model="postForm.content"/>
+            <Tinymce ref="editor" v-model="postForm.content" />
           </div>
         </el-form-item>
 
@@ -225,6 +232,8 @@ export default {
       important().then(resp => {
         if (resp.data.code === 0) {
           this.postForm.important = resp.data.defaultimportant
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -234,6 +243,8 @@ export default {
           if (resp.data.importants !== null) {
             this.importants = resp.data.importants
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -241,6 +252,8 @@ export default {
       level().then(resp => {
         if (resp.data.code === 0) {
           this.postForm.level = resp.data.defaultlevel
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -250,27 +263,35 @@ export default {
           if (resp.data.levels !== null) {
             this.levels = resp.data.levels
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
     getenv() {
-      getEnv().then(response => {
-        if (response.data.code === 0) {
-          this.envnames = response.data.envlist
+      getEnv().then(resp => {
+        if (resp.data.code === 0) {
+          this.envnames = resp.data.envlist
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
     getproject() {
-      getProject().then(response => {
-        if (response.data.code === 0) {
-          this.projectnames = response.data.projectlist
+      getProject().then(resp => {
+        if (resp.data.code === 0) {
+          this.projectnames = resp.data.projectlist
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
     getversion() {
-      getVersion().then(response => {
-        if (response.data.code === 0) {
-          this.versions = response.data.versionlist
+      getVersion().then(resp => {
+        if (resp.data.code === 0) {
+          this.versions = resp.data.versionlist
+        } else {
+          this.$message.error(resp.data.msg)
         }
       }).catch(err => {
         console.log(err)
@@ -281,6 +302,8 @@ export default {
         if (resp.data.code === 0) {
           if (resp.data.users !== null) {
             this.users = resp.data.users
+          } else {
+            this.$message.error(resp.data.msg)
           }
         }
       }).catch(err => {
@@ -288,9 +311,9 @@ export default {
       })
     },
     fetchData(id) {
-      fetchBug(id).then(response => {
-        if (response.data.code === 0) {
-          const dd = response.data
+      fetchBug(id).then(resp => {
+        if (resp.data.code === 0) {
+          const dd = resp.data
           this.postForm.title = dd.title
           this.postForm.content = dd.content
           this.postForm.importance = dd.importance
@@ -298,6 +321,8 @@ export default {
           this.postForm.selectuser = dd.handle
           this.postForm.envname = dd.env
           this.postForm.projectname = dd.projectname
+        } else {
+          this.$message.error(resp.data.msg)
         }
       }).catch(err => {
         console.log(err)
@@ -348,11 +373,7 @@ export default {
                 })
               }
             } else {
-              this.$notify({
-                title: '成功',
-                message: '修改失败',
-                type: 'error'
-              })
+              this.$message.error(resp.data.msg)
             }
             // this.$router.push('/bug/allbugs')
           })

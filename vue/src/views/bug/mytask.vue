@@ -4,22 +4,22 @@
       我接到的bug，可以转交和改变状态， 选择器的状态是显示所选的状态，永久保存，多页面生效
     </p>
     <div class="filter-container">
-      <el-input placeholder="标题" v-model="listQuery.title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.title" placeholder="标题" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.level" placeholder="优先级" clearable style="width: 90px" class="filter-item">
-        <el-option v-for="(item, index) in levels" :key="index" :label="item" :value="item"/>
+        <el-option v-for="(item, index) in levels" :key="index" :label="item" :value="item" />
       </el-select>
       <el-select v-model="listQuery.project" placeholder="项目" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="(item, index) in projectnames" :key="index" :label="item" :value="item"/>
+        <el-option v-for="(item, index) in projectnames" :key="index" :label="item" :value="item" />
       </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-dropdown :hide-on-click="false" :show-timeout="100" trigger="click" style="vertical-align: top;">
-        <el-button plain >
+        <el-button plain>
           状态({{ statuslength }})
-          <i class="el-icon-caret-bottom el-icon--right"/>
+          <i class="el-icon-caret-bottom el-icon--right" />
         </el-button>
-        <el-dropdown-menu slot="dropdown" class="no-border" >
+        <el-dropdown-menu slot="dropdown" class="no-border">
           <el-checkbox-group v-model="checkstatus" style="padding-left: 15px;" @change="HandleChange">
-            <el-checkbox v-for="(item, index) in platformsOptions" :label="item" :key="index">
+            <el-checkbox v-for="(item, index) in platformsOptions" :key="index" :label="item">
               {{ item }}
             </el-checkbox>
           </el-checkbox-group>
@@ -28,13 +28,14 @@
     </div>
 
     <el-table
-      v-loading="listLoading"
       :key="tableKey"
+      v-loading="listLoading"
       :data="list"
       border
       fit
       highlight-current-row
-      style="width: 100%;min-height:350px;">
+      style="width: 100%;min-height:350px;"
+    >
       <el-table-column label="id" align="center" width="65">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
@@ -55,7 +56,7 @@
       <el-table-column label="标题" min-width="150px" align="center">
         <template slot-scope="scope">
           <router-link :to="'/showbug/'+scope.row.id" class="link-type">
-            <span class="link-type" >{{ scope.row.title }}</span>
+            <span class="link-type">{{ scope.row.title }}</span>
           </router-link>
           <!--<el-tag>{{scope.row.type | typeFilter}}</el-tag>-->
         </template>
@@ -80,7 +81,7 @@
       <el-table-column label="状态" class-name="status-col" width="120">
         <template slot-scope="scope">
           <el-select v-model="scope.row.status" class="filter-item" placeholder="修改状态" @change="changestatus(scope.row)">
-            <el-option v-for="(item, index) in statuslist" :key="index" :label="item" :value="item"/>
+            <el-option v-for="(item, index) in statuslist" :key="index" :label="item" :value="item" />
           </el-select>
           <!--<el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>-->
         </template>
@@ -93,15 +94,15 @@
     </el-table>
 
     <div class="pagination-container">
-      <el-pagination :current-page="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
+      <el-pagination :current-page="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item >
+        <el-form-item>
           <!--:label="$t('table.aa')"-->
           <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="(item, index) in platformsOptions" :key="index" :label="item" :value="item"/>
+            <el-option v-for="(item, index) in platformsOptions" :key="index" :label="item" :value="item" />
           </el-select>
         </el-form-item>
         <!--<el-form-item :label="$t('table.importance')">-->
@@ -114,16 +115,18 @@
             multiple
             allow-create
             default-first-option
-            placeholder="请选择指定的用户">
+            placeholder="请选择指定的用户"
+          >
             <el-option
               v-for="(item, index) in users"
               :key="index"
               :label="item"
-              :value="item"/>
+              :value="item"
+            />
           </el-select>
         </el-form-item>
         <el-form-item :label="$t('table.reason')">
-          <el-input :autosize="{ minRows: 2, maxRows: 4}" v-model="temp.remark" type="textarea" placeholder="Please input"/>
+          <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -258,11 +261,15 @@ export default {
       getStatus().then(resp => {
         if (resp.data.code === 0) {
           this.platformsOptions = resp.data.statuslist
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
       getPermStatus().then(resp => {
         if (resp.data.code === 0) {
           this.statuslist = resp.data.statuslist
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -284,6 +291,8 @@ export default {
             }
           })
           this.listLoading = false
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -291,6 +300,8 @@ export default {
       getProject().then(resp => {
         if (resp.data.code === 0) {
           this.projectnames = resp.data.projectlist
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -302,13 +313,17 @@ export default {
             this.checkstatus = resp.data.checkstatus
             this.statuslength = this.checkstatus.length
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
     getspuser() {
-      getUsers().then(response => {
-        if (response.data.code === 0) {
-          this.users = response.data.users
+      getUsers().then(resp => {
+        if (resp.data.code === 0) {
+          this.users = resp.data.users
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -319,6 +334,8 @@ export default {
           this.list = resp.data.articlelist
           this.total = resp.data.total
           this.listQuery.page = resp.data.page
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
       this.listLoading = false
@@ -354,9 +371,9 @@ export default {
       this.dialogFormVisible = true
     },
     updateData() {
-      passBug(this.temp).then(response => {
-        if (response.data.code === 0) {
-          const data = response.data
+      passBug(this.temp).then(resp => {
+        if (resp.data.code === 0) {
+          const data = resp.data
           this.temp.remark = ''
           this.temp.status = data.status
           this.temp.selectusers = ''
@@ -364,6 +381,8 @@ export default {
             message: '操作成功',
             type: 'success'
           })
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
       this.dialogFormVisible = false

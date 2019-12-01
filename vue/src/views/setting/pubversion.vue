@@ -1,8 +1,8 @@
 <template>
   <div>
 
-    <el-form class="form-container" >
-      <div style="height: 20px"/>
+    <el-form class="form-container">
+      <div style="height: 20px" />
 
       <el-form-item style="margin-bottom: 40px;" label="版本号:">
         <el-input
@@ -10,7 +10,8 @@
           :maxlength="100"
           placeholder="请输入版本号"
           clearable
-          style="width: 60%;"/>
+          style="width: 60%;"
+        />
       </el-form-item>
 
       <el-form-item style="margin-bottom: 40px;" label="地址一:">
@@ -19,7 +20,8 @@
           :maxlength="100"
           placeholder="请输入iphone下载地址"
           clearable
-          style="width: 60%;"/>
+          style="width: 60%;"
+        />
       </el-form-item>
 
       <el-form-item style="margin-bottom: 40px;" label="地址二:">
@@ -28,7 +30,8 @@
           :maxlength="100"
           placeholder="请输入非iphone下载地址"
           clearable
-          style="width: 60%;"/>
+          style="width: 60%;"
+        />
       </el-form-item>
 
       <div>
@@ -67,12 +70,12 @@ export default {
     },
     addversion() {
       addVersion(this.versionlist).then(response => {
-        if (response.data.statuscode === 1 && response.data.id !== 0) {
+        if (response.data.code === 1 && response.data.id !== 0) {
           this.$message.success('版本存在')
-        } else if (response.data.statuscode === 0) {
+        } else if (response.data.code === 0) {
           this.$message.success('添加成功')
         } else {
-          this.$message.success('错误码' + response.data.statuscode)
+          this.$message.success('错误码' + response.data.code)
         }
       })
     }

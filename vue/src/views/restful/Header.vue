@@ -8,17 +8,20 @@
       fit
       border
       highlight-current-row
-      style="width: 100%">
+      style="width: 100%"
+    >
       <el-table-column
         label="Id"
-        width="60">
+        width="60"
+      >
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.id }}</span>
         </template>
       </el-table-column>
       <el-table-column
         label="类型名"
-        width="400">
+        width="400"
+      >
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.name }}</span>
         </template>
@@ -27,12 +30,14 @@
         <template slot-scope="scope">
           <el-button
             size="mini"
-            @click="update(scope.row)">修改
+            @click="update(scope.row)"
+          >修改
           </el-button>
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.row.id)">删除
+            @click="handleDelete(scope.row.id)"
+          >删除
           </el-button>
         </template>
       </el-table-column>
@@ -41,18 +46,18 @@
     <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" width="60%" title="类型名称">
       <el-form :model="form">
         <el-form-item label="请求头名">
-          <el-input v-model="form.name" width="200" auto-complete="off"/>
+          <el-input v-model="form.name" width="200" auto-complete="off" />
         </el-form-item>
         <el-form-item label="请求头">
-          <svg-icon icon-class="add" @click.native="handleAdd"/>
-          <div v-for="(opt, index) in form.hhids" :key="index" class="div_opts" >
-            <el-input v-model="opt.key" class="key_opts" type="text" placeholder="key"/>
+          <svg-icon icon-class="add" @click.native="handleAdd" />
+          <div v-for="(opt, i) in form.hhids" :key="i" class="div_opts">
+            <el-input v-model="opt.key" class="key_opts" type="text" placeholder="key" />
             <el-input v-model="opt.value" class="value_opts" type="text" placeholder="value" />
-            <svg-icon icon-class="delete" @click.native="handleDel(opt.id)"/>
+            <svg-icon icon-class="delete" @click.native="handleDel(opt.id)" />
           </div>
         </el-form-item>
         <el-form-item label="说明">
-          <el-input v-model="form.remark" type="textarea" width="200" auto-complete="off"/>
+          <el-input v-model="form.remark" type="textarea" width="200" auto-complete="off" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -78,7 +83,7 @@ export default {
         remark: ''
       },
       list: [],
-      index: -1,
+      index: -1
     }
   },
   created() {
@@ -106,6 +111,8 @@ export default {
           if (resp.data.headers !== null) {
             this.list = resp.data.headers
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -130,6 +137,8 @@ export default {
                 this.list.splice(i, 1)
               }
             }
+          } else {
+            this.$message.error(resp.data.msg)
           }
         })
       }).catch(() => {
@@ -143,7 +152,6 @@ export default {
       if (this.form.id > 0) {
         headerUpdate(this.form).then(resp => {
           if (resp.data.code === 0) {
-
             for (let i = 0; i < this.list.length; i++) {
               if (this.list[i].id === this.form.id) {
                 this.list[i].name = this.form.name
@@ -155,7 +163,6 @@ export default {
           } else {
             this.$message.error('修改失败')
           }
-
         })
       } else {
         headerAdd(this.form).then(resp => {
@@ -170,7 +177,6 @@ export default {
           } else {
             this.$message.error('添加失败')
           }
-
         })
       }
       this.dialogFormVisible = false
@@ -181,7 +187,7 @@ export default {
         id: this.index--,
         hhids: [],
         remark: ''
-      },
+      }
       this.dialogFormVisible = true
     },
     cancel() {

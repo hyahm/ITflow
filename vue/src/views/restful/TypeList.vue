@@ -8,17 +8,20 @@
       fit
       border
       highlight-current-row
-      style="width: 100%">
+      style="width: 100%"
+    >
       <el-table-column
         label="Id"
-        width="60">
+        width="60"
+      >
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.id }}</span>
         </template>
       </el-table-column>
       <el-table-column
         label="类型名"
-        width="400">
+        width="400"
+      >
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.name }}</span>
         </template>
@@ -27,12 +30,14 @@
         <template slot-scope="scope">
           <el-button
             size="mini"
-            @click="update(scope.row)">修改
+            @click="update(scope.row)"
+          >修改
           </el-button>
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.row.id)">删除
+            @click="handleDelete(scope.row.id)"
+          >删除
           </el-button>
         </template>
       </el-table-column>
@@ -41,7 +46,7 @@
     <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" width="60%" title="类型名称">
       <el-form :model="form">
         <el-form-item label="类型名">
-          <el-input v-model="form.name" width="200" auto-complete="off"/>
+          <el-input v-model="form.name" width="200" auto-complete="off" />
         </el-form-item>
         <el-form-item>
           <el-radio-group v-model="form.checktype" @change="handleChange">
@@ -54,33 +59,35 @@
                 v-for="(type, index) in types"
                 :key="index"
                 :label="type"
-                :value="type">
-              </el-option>
+                :value="type"
+              />
             </el-select>
           </div>
           <div v-if="form.checktype === 2">
-            <svg-icon icon-class="add" @click.native="handleAdd"/>
-            <div v-for="(opt, index) in form.opts" :key="index" class="div_opts" >
-              <el-input :value="opt.name" class="key_opts" type="text" placeholder="参数名" @change="handleUpdateName(opt.id, $event)"/>
+            <svg-icon icon-class="add" @click.native="handleAdd" />
+            <div v-for="(opt, index) in form.opts" :key="index" class="div_opts">
+              <el-input :value="opt.name" class="key_opts" type="text" placeholder="参数名" @change="handleUpdateName(opt.id, $event)" />
               <el-select :value="opt.type" class="select_opts" placeholder="类型" @change="handleUpdateType(opt.id, $event)">
-                <el-option v-for="(t, index) in types" :value="t" :key="index"/>
+                <el-option v-for="(t, i) in types" :key="i" :value="t" />
               </el-select>
               <el-select :value="opt.need" class="select_opts" placeholder="是否必须" @change="handleUpdateNeed(opt.id, $event)">
-                <el-option v-for="(n, index) in needs" :key="index" :value="n"/>
+                <el-option v-for="(n, i) in needs" :key="i" :value="n" />
               </el-select>
               <el-input
                 :value="opt.default"
                 class="default_opts"
                 type="text"
                 placeholder="默认值"
-                @change="handleUpdateValue(opt.id, $event)"/>
+                @change="handleUpdateValue(opt.id, $event)"
+              />
               <el-input
                 :value="opt.info"
                 class="info_opts"
                 type="text"
                 placeholder="说明"
-                @change="handleUpdateInfo(opt.id, $event)"/>
-              <svg-icon icon-class="delete" @click.native="handleDel(opt.id)"/>
+                @change="handleUpdateInfo(opt.id, $event)"
+              />
+              <svg-icon icon-class="delete" @click.native="handleDel(opt.id)" />
             </div>
           </div>
         </el-form-item>
@@ -95,7 +102,7 @@
 
 <script>
 import { typeList, typeUpdate, typeDel, typeAdd } from '@/api/type'
-import { typeGet, getUpdateType } from '@/api/type'
+import { typeGet } from '@/api/type'
 export default {
   name: 'TypeList',
   data() {
@@ -162,7 +169,6 @@ export default {
         info: ''
       })
       this.oid--
-
     },
     handleUpdateName(id, value) {
       const l = this.form.opts.length
@@ -178,6 +184,8 @@ export default {
           if (resp.data.headers !== null) {
             this.types = resp.data.types
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -196,6 +204,8 @@ export default {
               }
             }
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -212,6 +222,8 @@ export default {
               }
             }
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
       this.dialogFormVisible = true
@@ -229,6 +241,8 @@ export default {
                 this.list.splice(i, 1)
               }
             }
+          } else {
+            this.$message.error(resp.data.msg)
           }
         })
       }).catch(() => {
@@ -248,7 +262,7 @@ export default {
               const l = this.list.length
               for (let i = 0; i < l; i++) {
                 if (this.list[i].id === data.id) {
-                  this.list.splice(i,1,data)
+                  this.list.splice(i, 1, data)
                 }
               }
             }
@@ -261,14 +275,13 @@ export default {
 
               for (let i = 0; i < l; i++) {
                 if (this.list[i].id === data.id) {
-                  this.list.splice(i,1,data)
+                  this.list.splice(i, 1, data)
                 }
               }
             }
           }
         })
       } else {
-
         typeAdd(this.form).then(resp => {
           if (resp.data.code === 0) {
             if (this.form.checktype === 1) {

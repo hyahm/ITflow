@@ -6,24 +6,28 @@
     <el-table
       :data="list"
       height="250"
-      style="width: 100%;">
+      style="width: 100%;"
+    >
       <el-table-column
         label="Id"
-        width="180">
+        width="180"
+      >
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.id }}</span>
         </template>
       </el-table-column>
       <el-table-column
         label="组名"
-        width="180">
+        width="180"
+      >
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column
         label="成员"
-        width="500">
+        width="500"
+      >
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.users }}</span>
         </template>
@@ -32,11 +36,13 @@
         <template slot-scope="scope">
           <el-button
             size="mini"
-            @click="handleUpdate(scope.row)">修改</el-button>
+            @click="handleUpdate(scope.row)"
+          >修改</el-button>
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.row.id)">删除</el-button>
+            @click="handleDelete(scope.row.id)"
+          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -44,7 +50,7 @@
     <el-dialog :visible.sync="dialogFormVisible" title="平台管理">
       <el-form :model="form">
         <el-form-item label="组名">
-          <el-input v-model="form.name" auto-complete="off"/>
+          <el-input v-model="form.name" auto-complete="off" />
         </el-form-item>
         <el-form-item label="用户">
           <el-select v-model="form.users" multiple placeholder="请选择">
@@ -52,7 +58,8 @@
               v-for="(user, index) in users"
               :key="index"
               :label="user"
-              :value="user"/>
+              :value="user"
+            />
           </el-select>
         </el-form-item>
       </el-form>
@@ -97,7 +104,7 @@ export default {
     },
     getgroup() {
       getGroup().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.list = resp.data.grouplist
         }
       })
@@ -113,7 +120,7 @@ export default {
     confirm() {
       if (this.form.id > 0) {
         updateGroup(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             const l = this.list.length
             for (let i = 0; i < l; i++) {
               if (this.list[i].id === this.form.id) {
@@ -123,21 +130,22 @@ export default {
             }
             this.$message.success('修改成功')
             return
+          } else {
+            this.$message.error(resp.data.msg)
           }
-          this.$message.error('修改失败')
         })
       } else {
         addGroup(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             this.list.push({
               id: resp.data.id,
               name: this.form.name,
               users: this.form.users
             })
             this.$message.success('添加用户组成功')
-            return
+          } else {
+            this.$message.error(resp.data.msg)
           }
-          this.$message.error('添加用户组失败')
         })
       }
       this.dialogFormVisible = false
@@ -162,11 +170,11 @@ export default {
         type: 'warning'
       }).then(() => {
         delGroup(id).then(resp => {
-          if (resp.data.statuscode === 23) {
+          if (resp.data.code === 23) {
             this.$message.error('用户组在使用')
             return
           }
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             const l = this.list.length
             for (let i = 0; i < l; i++) {
               if (this.list[i].id === id) {
@@ -176,8 +184,9 @@ export default {
             }
             this.$message.success('删除成功')
             return
+          } else {
+            this.$message.error(resp.data.msg)
           }
-          this.$message.error('删除失败')
         })
       }).catch(() => {
         this.$message({

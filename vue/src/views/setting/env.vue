@@ -6,17 +6,20 @@
     <el-table
       :data="tableData"
       height="250"
-      style="width: 100%">
+      style="width: 100%"
+    >
       <el-table-column
         label="Id"
-        width="180">
+        width="180"
+      >
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.id }}</span>
         </template>
       </el-table-column>
       <el-table-column
         label="环境名"
-        width="180">
+        width="180"
+      >
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.envname }}</span>
         </template>
@@ -25,11 +28,13 @@
         <template slot-scope="scope">
           <el-button
             size="mini"
-            @click="updatep(scope.row)">修改</el-button>
+            @click="updatep(scope.row)"
+          >修改</el-button>
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.row.id)">删除</el-button>
+            @click="handleDelete(scope.row.id)"
+          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -37,7 +42,7 @@
     <el-dialog :visible.sync="dialogFormVisible" width="60%" title="运行环境">
       <el-form :model="form">
         <el-form-item label="环境名">
-          <el-input v-model="form.envname" auto-complete="off"/>
+          <el-input v-model="form.envname" auto-complete="off" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -71,12 +76,14 @@ export default {
   methods: {
     getenvname() {
       getEnvName().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.envlist === null) {
             this.$message.info('no data')
             return
           }
           this.tableData = resp.data.envlist
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -86,11 +93,7 @@ export default {
     },
     handleDelete(id) {
       deleteEnvName(id).then(resp => {
-        if (resp.data.statuscode === 25) {
-          this.$message.warning('此环境存在bug,无法删除')
-          return
-        }
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           const fl = this.tableData.length
           for (let i = 0; i < fl; i++) {
             if (this.tableData[i].id === id) {
@@ -113,19 +116,20 @@ export default {
       this.dialogFormVisible = false
       if (this.form.id === -1) {
         addEnvName(this.form.envname).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             this.tableData.push({
               id: resp.data.id,
               envname: this.form.envname
             })
-            this.$message.success("添加成功")
+            this.$message.success('添加成功')
             return
+          } else {
+            this.$message.error(resp.data.msg)
           }
-          this.$message.error('添加失败')
         })
       } else {
         updateEnvName(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             const fl = this.tableData.length
             for (let i = 0; i < fl; i++) {
               if (this.tableData[i].id === this.form.id) {
@@ -135,8 +139,9 @@ export default {
             }
             this.$message.success('修改成功')
             return
+          } else {
+            this.$message.error(resp.data.msg)
           }
-          this.$message.success('修改失败')
         })
       }
     },

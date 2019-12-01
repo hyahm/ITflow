@@ -6,7 +6,7 @@
     <div class="filter-container">
       <div style="margin-left: 10px">
         <el-select v-model="listQuery.classify" :placeholder="$t('table.level')" clearable style="width: 90px" class="filter-item">
-          <el-option v-for="(item, index) in classifys" :key="index" :label="item" :value="item"/>
+          <el-option v-for="(item, index) in classifys" :key="index" :label="item" :value="item" />
         </el-select>
 
         <el-date-picker
@@ -17,8 +17,8 @@
           range-separator="至"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
-          @change="changeDate">
-        </el-date-picker>
+          @change="changeDate"
+        />
 
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
 
@@ -31,7 +31,8 @@
       border
       fit
       highlight-current-row
-      style="width: 100%;min-height:350px;">
+      style="width: 100%;min-height:350px;"
+    >
       <el-table-column :label="$t('table.id')" align="center" width="65">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
@@ -77,12 +78,12 @@
     <div>
       <el-pagination
         background
-        @current-change="handleCurrentChange"
         :current-page="listQuery.page"
         :page-sizes="[listQuery.limit]"
         layout="total, sizes, prev, pager, next"
-        :total="count">
-      </el-pagination>
+        :total="count"
+        @current-change="handleCurrentChange"
+      />
     </div>
 
   </div>
@@ -131,8 +132,8 @@ export default {
         this.listQuery.starttime = 0
         this.listQuery.endtime = 0
       } else {
-        this.listQuery.starttime = e[0]/1000
-        this.listQuery.endtime = e[1]/1000
+        this.listQuery.starttime = e[0] / 1000
+        this.listQuery.endtime = e[1] / 1000
       }
     },
     getlog() {
@@ -140,6 +141,8 @@ export default {
       getLog().then(resp => {
         if (resp.data.code === 0) {
           this.list = resp.data.loglist
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
       this.listLoading = false
@@ -155,6 +158,8 @@ export default {
           }
           this.count = resp.data.count
           this.listQuery.page = resp.data.page
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     }

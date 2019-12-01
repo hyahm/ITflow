@@ -1,5 +1,5 @@
 <template>
-  <el-row :gutter="40" class="panel-group" >
+  <el-row :gutter="40" class="panel-group">
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
         <div class="card-panel-icon-wrapper icon-people">
@@ -78,7 +78,7 @@ export default {
   methods: {
     getlist() {
       getlist().then(response => {
-        if (response.data.statuscode === 0) {
+        if (response.data.code === 0) {
           this.countusers = response.data.countusers
           this.countgroups = response.data.countgroups
         }
@@ -86,7 +86,7 @@ export default {
     },
     getprojectcount() {
       getprojectlist().then(response => {
-        if (response.data.statuscode === 0) {
+        if (response.data.code === 0) {
           this.countbugs = response.data.countbugs
           this.countcomplete = response.data.countcomplete
         }

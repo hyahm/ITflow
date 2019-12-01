@@ -25,13 +25,14 @@
     </div>
 
     <el-table
-      v-loading="listLoading"
       :key="tableKey"
+      v-loading="listLoading"
       :data="list"
       border
       fit
       highlight-current-row
-      style="width: 100%;">
+      style="width: 100%;"
+    >
       <el-table-column :label="$t('table.id')" align="center" width="65">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
@@ -76,19 +77,19 @@
     </el-table>
 
     <!--<div class="pagination-container">-->
-      <!--<el-pagination :current-page="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>-->
+    <!--<el-pagination :current-page="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>-->
     <!--</div>-->
 
     <el-dialog :visible.sync="dialogFormVisible" width="60%" title="版本管理">
       <el-form :model="form">
         <el-form-item label-width="100" label="版本名">
-          <el-input v-model="form.name" auto-complete="off"/>
+          <el-input v-model="form.name" auto-complete="off" />
         </el-form-item>
         <el-form-item label-width="100" label="地址一">
-          <el-input v-model="form.iphone" auto-complete="off"/>
+          <el-input v-model="form.iphone" auto-complete="off" />
         </el-form-item>
         <el-form-item label-width="100" label="地址二">
-          <el-input v-model="form.noiphone" auto-complete="off"/>
+          <el-input v-model="form.noiphone" auto-complete="off" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -128,15 +129,17 @@ export default {
   },
   methods: {
     getversionlist() {
-      getVersion(this.listQuery).then(response => {
-        if (response.data.code === 0) {
-          if (response.data.versionlist === null) {
+      getVersion(this.listQuery).then(resp => {
+        if (resp.data.code === 0) {
+          if (resp.data.versionlist === null) {
             this.list = []
             this.total = 0
           } else {
-            this.list = response.data.versionlist
-            this.total = response.data.versionlist.length
+            this.list = resp.data.versionlist
+            this.total = resp.data.versionlist.length
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -171,8 +174,9 @@ export default {
           this.$message.success('修改成功')
           this.dialogFormVisible = false
           return
+        } else {
+          this.$message.error(resp.data.msg)
         }
-        this.$message.error('修改失败')
       })
       this.dialogFormVisible = false
     },

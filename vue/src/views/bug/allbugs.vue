@@ -4,22 +4,22 @@
       所有的bug，按道理是不能修改状态的，还不清楚， 选择器的状态是显示所选的状态，永久保存，多页面生效
     </p>
     <div class="filter-container">
-      <el-input :placeholder="$t('table.title')" v-model="listQuery.title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.title" :placeholder="$t('table.title')" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.level" :placeholder="$t('table.level')" clearable style="width: 90px" class="filter-item">
-        <el-option v-for="(item, index) in levels" :key="index" :label="item" :value="item"/>
+        <el-option v-for="(item, index) in levels" :key="index" :label="item" :value="item" />
       </el-select>
       <el-select v-model="listQuery.project" :placeholder="$t('table.project')" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="(item, index) in projectnames" :key="index" :label="item" :value="item"/>
+        <el-option v-for="(item, index) in projectnames" :key="index" :label="item" :value="item" />
       </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
       <el-dropdown :hide-on-click="false" :show-timeout="100" trigger="click" style="vertical-align: top;">
-        <el-button plain >
+        <el-button plain>
           状态({{ statuslength }})
-          <i class="el-icon-caret-bottom el-icon--right"/>
+          <i class="el-icon-caret-bottom el-icon--right" />
         </el-button>
-        <el-dropdown-menu slot="dropdown" class="no-border" >
+        <el-dropdown-menu slot="dropdown" class="no-border">
           <el-checkbox-group v-model="checkstatus" style="padding-left: 15px;" @change="HandleChange">
-            <el-checkbox v-for="(status, index) in allstatus" :label="status" :key="index">
+            <el-checkbox v-for="(status, index) in allstatus" :key="index" :label="status">
               {{ status }}
             </el-checkbox>
           </el-checkbox-group>
@@ -28,13 +28,14 @@
     </div>
 
     <el-table
-      v-loading="listLoading"
       :key="tableKey"
+      v-loading="listLoading"
       :data="list"
       border
       fit
       highlight-current-row
-      style="width: 100%;">
+      style="width: 100%;"
+    >
       <el-table-column :label="$t('table.id')" align="center" width="65">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
@@ -55,7 +56,7 @@
       <el-table-column :label="$t('table.title')" min-width="150px" align="center">
         <template slot-scope="scope">
           <router-link :to="'/showbug/'+scope.row.id" class="link-type">
-            <span class="link-type" >{{ scope.row.title }}</span>
+            <span class="link-type">{{ scope.row.title }}</span>
           </router-link>
           <!--<el-tag>{{scope.row.type | typeFilter}}</el-tag>-->
         </template>
@@ -99,7 +100,7 @@
       <el-table-column :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-select v-model="scope.row.status" style="width: 200px" class="filter-item" placeholder="修改状态" @change="changestatus(scope.row)">
-            <el-option v-for="(status, index) in filterstatus" :key="index" :label="status" :value="status"/>
+            <el-option v-for="(status, index) in filterstatus" :key="index" :label="status" :value="status" />
           </el-select>
         </template>
       </el-table-column>
@@ -115,7 +116,8 @@
         background
         layout="total, sizes, prev, pager, next, jumper"
         @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"/>
+        @current-change="handleCurrentChange"
+      />
     </div>
 
   </div>
@@ -255,14 +257,18 @@ export default {
             }
           })
           this.listLoading = false
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
     getprojectname() {
       // const now = new Date().getTime()
-      getProject().then(response => {
-        if (response.data.code === 0) {
-          this.projectnames = response.data.projectlist
+      getProject().then(resp => {
+        if (resp.data.code === 0) {
+          this.projectnames = resp.data.projectlist
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -289,10 +295,12 @@ export default {
     },
     getList() {
       this.listLoading = true
-      searchAllBugs(this.listQuery).then(response => {
-        if (response.data.code === 0) {
-          this.total = response.data.total
-          this.list = response.data.articlelist
+      searchAllBugs(this.listQuery).then(resp => {
+        if (resp.data.code === 0) {
+          this.total = resp.data.total
+          this.list = resp.data.articlelist
+        } else {
+          this.$message.error(resp.data.msg)
         }
         this.listLoading = false
       })
@@ -307,6 +315,8 @@ export default {
           if (resp.data.code === 0) {
             this.total = resp.data.total
             this.list = resp.data.articlelist
+          } else {
+            this.$message.error(resp.data.msg)
           }
           this.listLoading = false
         })
@@ -365,6 +375,8 @@ export default {
             this.checkstatus = resp.data.checkstatus
             this.statuslength = this.checkstatus.length
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -374,6 +386,8 @@ export default {
           if (resp.data.statuslist != null) {
             this.allstatus = resp.data.statuslist
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     }

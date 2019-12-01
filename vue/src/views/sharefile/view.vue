@@ -2,7 +2,7 @@
   <div>
     <div style="margin-left: 10px;margin-top: 10px;display: flex;align-items: center;">
       <el-breadcrumb separator="/" style="font-size: 20px">
-        <el-breadcrumb-item v-for="(dd, index) in path" :key="index" class="root_span" @click.native="handleTo" ><a>{{ dd }}</a></el-breadcrumb-item>
+        <el-breadcrumb-item v-for="(dd, index) in path" :key="index" class="root_span" @click.native="handleTo"><a>{{ dd }}</a></el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <div style="margin-left: 10px;margin-top: 10px;display: flex;align-items: center;">
@@ -16,7 +16,8 @@
         style="flex-grow:1;display:flex;justify-content: space-between;margin-left: 10px;align-items: center;"
         class="upload-demo"
         name="share"
-        multiple>
+        multiple
+      >
         <!--<i class="el-icon-upload"></i>-->
         <el-button slot="trigger" size="small" type="primary">上传</el-button>
       </el-upload>
@@ -26,36 +27,40 @@
       :data="tableData"
       style="width: 100%"
       @cell-mouse-leave="leaveHandle"
-      @cell-mouse-enter="enterHandle">
+      @cell-mouse-enter="enterHandle"
+    >
       <el-table-column
         prop="name"
-        label="目录">
-        <template slot-scope="scope" >
+        label="目录"
+      >
+        <template slot-scope="scope">
           <svg-icon :icon-class="scope.row.isfile?'file':'folder'" />
           <a v-if="!scope.row.isfile" @click="handleEnter(scope.row.name)"><span>{{ scope.row.name }}</span></a>
           <span v-else>{{ scope.row.name }}</span>
-          <span v-show="scope.row.name != '..'" style="float: right;margin-right: 10px" >
-            <a v-if="scope.row.isowner" @click="removeHandle(scope.row.id)" ><svg-icon style="margin-right: 10px" icon-class="remove" /></a>
-            <a v-if="scope.row.isowner" @click="changeHandle(scope.row)" ><svg-icon style="margin-right: 10px" icon-class="rename" /></a>
-            <a v-if="scope.row.isfile" download :download="scope.row.name" :href="downloadurl + '?id=' + scope.row.id + '&token=' + Token"><svg-icon style="margin-right: 10px" icon-class="download" /></a>
+          <span v-show="scope.row.name != '..'" style="float: right;margin-right: 10px">
+            <a v-if="scope.row.isowner" @click="removeHandle(scope.row.id)"><svg-icon style="margin-right: 10px" icon-class="remove" /></a>
+            <a v-if="scope.row.isowner" @click="changeHandle(scope.row)"><svg-icon style="margin-right: 10px" icon-class="rename" /></a>
+            <a v-if="scope.row.isfile" :download="scope.row.name" :href="downloadurl + '?id=' + scope.row.id + '&token=' + Token"><svg-icon style="margin-right: 10px" icon-class="download" /></a>
             <!--<svg-icon style="margin-right: 10px" icon-class="moveto" />-->
           </span>
-          <span style="clear: both"/>
+          <span style="clear: both" />
         </template>
       </el-table-column>
       <el-table-column
         prop="size"
         width="200"
-        label="大小">
-        <template slot-scope="scope" >
+        label="大小"
+      >
+        <template slot-scope="scope">
           <span v-if="scope.row.date!=0">{{ scope.row.size | parseSize }}</span>
         </template>
       </el-table-column>
       <el-table-column
         prop="size"
         width="200"
-        label="修改日期">
-        <template slot-scope="scope" >
+        label="修改日期"
+      >
+        <template slot-scope="scope">
           <span v-if="scope.row.date!=0">{{ scope.row.updatetime | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
@@ -64,10 +69,10 @@
     <el-dialog :visible.sync="dialogFormVisible" title="文件夹名">
       <el-form>
         <el-form-item label="名称">
-          <el-input v-model="form.name" auto-complete="off"/>
+          <el-input v-model="form.name" auto-complete="off" />
         </el-form-item>
         <el-form-item label="查看下载">
-          <el-radio-group v-model="form.readuser" @change="handleRead" >
+          <el-radio-group v-model="form.readuser" @change="handleRead">
             <el-radio :label="isReadUser">用戶</el-radio>
             <el-radio :label="!isReadUser">組</el-radio>
           </el-radio-group>
@@ -76,11 +81,12 @@
               v-for="(item, index) in readlist"
               :key="index"
               :label="item"
-              :value="item"/>
+              :value="item"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="查看上传">
-          <el-radio-group v-model="form.writeuser" @change="handleRdWr" >
+          <el-radio-group v-model="form.writeuser" @change="handleRdWr">
             <el-radio :label="isWriteUser">用戶</el-radio>
             <el-radio :label="!isWriteUser">組</el-radio>
           </el-radio-group>
@@ -89,7 +95,8 @@
               v-for="(item, index) in rdwrlist"
               :key="index"
               :label="item"
-              :value="item"/>
+              :value="item"
+            />
           </el-select>
         </el-form-item>
 
@@ -206,6 +213,8 @@ export default {
           if (resp.data.users != null) {
             this.users = resp.data.users
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
         this.readlist = this.users
         this.rdwrlist = this.users
@@ -218,6 +227,8 @@ export default {
           if (resp.data.grouplist != null) {
             this.groups = resp.data.grouplist
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -312,9 +323,7 @@ export default {
     // 上传文件
     handleSuccess(res, file) {
       console.log('上传文件成功')
-      console.log(res)
       if (res.statuscode === 0) {
-        console.log(this.tableData)
         this.tableData.push({
           id: res.id,
           name: res.filename,

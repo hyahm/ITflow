@@ -3,17 +3,20 @@
     <el-table
       :data="tableData"
       height="250"
-      style="width: 100%">
+      style="width: 100%"
+    >
       <el-table-column
         label="Id"
-        width="180">
+        width="180"
+      >
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.id }}</span>
         </template>
       </el-table-column>
       <el-table-column
         label="项目名"
-        width="180">
+        width="180"
+      >
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.osname }}</span>
         </template>
@@ -22,11 +25,13 @@
         <template slot-scope="scope">
           <el-button
             size="mini"
-            @click="updatep(scope.row)">修改</el-button>
+            @click="updatep(scope.row)"
+          >修改</el-button>
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.row.id)">删除</el-button>
+            @click="handleDelete(scope.row.id)"
+          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -34,7 +39,7 @@
     <el-dialog :visible.sync="dialogFormVisible" title="平台管理">
       <el-form :model="form">
         <el-form-item :label-width="formLabelWidth" label="平台">
-          <el-input v-model="form.osname" auto-complete="off"/>
+          <el-input v-model="form.osname" auto-complete="off" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -73,6 +78,8 @@ export default {
             return
           }
           this.tableData = resp.data.oslist
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -90,6 +97,8 @@ export default {
               break
             }
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -107,6 +116,8 @@ export default {
               id: resp.data.id,
               osname: this.form.osname
             })
+          } else {
+            this.$message.error(resp.data.msg)
           }
         })
       } else {
@@ -119,6 +130,8 @@ export default {
                 break
               }
             }
+          } else {
+            this.$message.error(resp.data.msg)
           }
         })
       }

@@ -25,13 +25,14 @@
     </div>
 
     <el-table
-      v-loading="listLoading"
       :key="tableKey"
+      v-loading="listLoading"
       :data="userlist"
       border
       fit
       highlight-current-row
-      style="width: 100%;">
+      style="width: 100%;"
+    >
       <el-table-column :label="$t('table.id')" align="center" width="65">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
@@ -62,7 +63,7 @@
       </el-table-column>
       <el-table-column :label="$t('table.statusgroup')" width="110px" align="center">
         <template slot-scope="scope">
-            <span>{{ scope.row.statusgroup }}</span>
+          <span>{{ scope.row.statusgroup }}</span>
         </template>
       </el-table-column>
 
@@ -104,11 +105,10 @@
       :visible.sync="dialogVisible"
       :before-close="handleClose"
       title="提示"
-      width="30%">
-      <el-form ref="postForm" class="form-container" style="padding: 20px">
-
-      </el-form>
-        <!--<el-button type="success" round @click="HandlerAddGroup">添加部门</el-button>-->
+      width="30%"
+    >
+      <el-form ref="postForm" class="form-container" style="padding: 20px" />
+      <!--<el-button type="success" round @click="HandlerAddGroup">添加部门</el-button>-->
       <el-form ref="postForm" class="form-container" style="padding: 20px">
         <el-form-item label="昵称">
           <el-input v-model="form.nickname" />
@@ -125,7 +125,8 @@
               v-for="(role, index) in statusgrouplist"
               :key="index"
               :label="role"
-              :value="role"/>
+              :value="role"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="角色组">
@@ -134,7 +135,8 @@
               v-for="(role, index) in rolegrouplist"
               :key="index"
               :label="role"
-              :value="role"/>
+              :value="role"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="职位：">
@@ -143,7 +145,8 @@
               v-for="(role, index) in positionlist"
               :key="index"
               :label="role"
-              :value="role"/>
+              :value="role"
+            />
           </el-select>
         </el-form-item>
         <!--<el-button type="success" round @click="HandlerAddGroup">添加部门</el-button>-->
@@ -212,25 +215,33 @@ export default {
   methods: {
     getgrouplist() {
       roleGroupName().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.rolegrouplist = resp.data.roles
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
       getStatusName().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.statusgrouplist = resp.data.statuslist
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
       getPositions().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.positionlist = resp.data.positions
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
     getroles() {
       roleGroupName().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.rolelist = resp.data.roles
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -239,7 +250,7 @@ export default {
     },
     HandlerUpdateRoles() {
       updateUser(this.form).then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           const l = this.userlist.length
           for (let i = 0; i < l; i++) {
             if (this.userlist[i].id === this.form.id) {
@@ -248,8 +259,9 @@ export default {
           }
           this.$message.success('修改成功')
           return
+        } else {
+          this.$message.error(resp.data.msg)
         }
-        this.$message.error('修改失败')
       })
       this.dialogVisible = false
     },
@@ -258,8 +270,10 @@ export default {
     },
     getuserList() {
       userList().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.userlist = resp.data.userlist
+        } else {
+          this.$message.error(resp.data.msg)
         }
       }).catch(err => {
         console.log(err)
@@ -276,15 +290,7 @@ export default {
         type: 'warning'
       }).then(() => {
         userRemove(row.id).then(resp => {
-          if (resp.data.statuscode === 20) {
-            this.$message.warning('这个用户有bug，请先移除')
-            return
-          }
-          if (resp.data.statuscode === 23) {
-            this.$message.warning('这个用户有用户组，请先移除')
-            return
-          }
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             const l = this.userlist.length
             for (let i = 0; i < l; i++) {
               if (this.userlist[i].id === row.id) {
@@ -293,8 +299,9 @@ export default {
             }
             this.$message.warning('删除成功')
             return
+          } else {
+            this.$message.error(resp.data.msg)
           }
-          this.$message.warning('删除失败')
         })
       }).catch(() => {
         this.$message({
@@ -305,7 +312,7 @@ export default {
     },
     handleDisable(row) {
       userDisable(row.id).then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           const l = this.userlist.length
           for (let i = 0; i < l; i++) {
             if (this.userlist[i].id === row.id) {
@@ -313,6 +320,8 @@ export default {
               break
             }
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -326,7 +335,7 @@ export default {
           newpassword: value
         }
         resetPwd(data).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             this.$message({
               type: 'success',
               message: '你的密码是: ' + value

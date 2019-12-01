@@ -39,8 +39,6 @@
 </template>
 
 <script>
-// import { isvalidUsername } from '@/utils/validate'
-// import { encrypt } from '@/utils/auth'
 
 export default {
   name: 'Login',
@@ -73,10 +71,8 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          console.log('111111')
           this.$store.dispatch('user/login', this.loginForm).then(() => {
             this.loading = false
-            console.log('9999999')
             this.$router.push('/dashboard')
           }).catch(() => {
             console.log(111)

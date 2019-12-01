@@ -4,23 +4,23 @@
       我提交的bug，可以编辑和关闭，不能删除， 选择器的状态是显示所选的状态，永久保存，多页面生效
     </p>
     <div class="filter-container">
-      <el-input placeholder="标题" v-model="listQuery.title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.title" placeholder="标题" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.level" placeholder="级别" clearable style="width: 90px" class="filter-item">
-        <el-option v-for="(item, index) in levels" :key="index" :label="item" :value="item"/>
+        <el-option v-for="(item, index) in levels" :key="index" :label="item" :value="item" />
       </el-select>
       <el-select v-model="listQuery.project" placeholder="项目" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="(item, index) in projectnames" :key="index" :label="item" :value="item"/>
+        <el-option v-for="(item, index) in projectnames" :key="index" :label="item" :value="item" />
       </el-select>
 
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-dropdown :hide-on-click="false" :show-timeout="100" trigger="click" style="vertical-align: top;">
-        <el-button plain >
+        <el-button plain>
           状态({{ statuslength }})
-          <i class="el-icon-caret-bottom el-icon--right"/>
+          <i class="el-icon-caret-bottom el-icon--right" />
         </el-button>
-        <el-dropdown-menu slot="dropdown" class="no-border" >
+        <el-dropdown-menu slot="dropdown" class="no-border">
           <el-checkbox-group v-model="listQuery.showstatus" style="padding-left: 15px;" @change="HandleChange">
-            <el-checkbox v-for="(item, index) in platformsOptions" :label="item" :key="index">
+            <el-checkbox v-for="(item, index) in platformsOptions" :key="index" :label="item">
               {{ item }}
             </el-checkbox>
           </el-checkbox-group>
@@ -62,8 +62,8 @@
 
       <el-table-column label="状态" align="center" width="110">
         <template slot-scope="scope">
-          <el-select v-model="scope.row.status" class="filter-item" @change="changestatus(scope.row)" >
-            <el-option v-for="(item, index) in statuslist" :key="index" :label="item" :value="item"/>
+          <el-select v-model="scope.row.status" class="filter-item" @change="changestatus(scope.row)">
+            <el-option v-for="(item, index) in statuslist" :key="index" :label="item" :value="item" />
           </el-select>
           <!--<el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>-->
         </template>
@@ -88,7 +88,7 @@
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <router-link :to="'/bug/edit/'+scope.row.id">
-            <el-button type="primary" size="mini" >编辑</el-button>
+            <el-button type="primary" size="mini">编辑</el-button>
           </router-link>
           <el-button type="success" size="mini" @click="handleClose(scope.row)">关闭</el-button>
           <!--<el-button type="danger" size="mini" @click="handleRemove(scope.row)">{{ $t('list.remove') }}</el-button>-->
@@ -105,7 +105,8 @@
         background
         layout="total, sizes, prev, pager, next, jumper"
         @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"/>
+        @current-change="handleCurrentChange"
+      />
     </div>
   </div>
 </template>
@@ -197,6 +198,8 @@ export default {
             }
           })
           this.listLoading = false
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -204,12 +207,16 @@ export default {
       getStatus().then(resp => {
         if (resp.data.code === 0) {
           this.platformsOptions = resp.data.statuslist
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
       // 可以修改的权限
       getPermStatus().then(resp => {
         if (resp.data.code === 0) {
           this.statuslist = resp.data.statuslist
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -222,6 +229,8 @@ export default {
             this.listQuery.showstatus = resp.data.checkstatus
             this.statuslength = this.listQuery.showstatus.length
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -229,6 +238,8 @@ export default {
       getProject().then(resp => {
         if (resp.data.code === 0) {
           this.projectnames = resp.data.projectlist
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -290,6 +301,8 @@ export default {
           this.list = resp.data.articlelist
           this.total = resp.data.total
           this.listQuery.page = resp.data.page
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
       this.listLoading = false
@@ -342,6 +355,8 @@ export default {
           this.list = resp.data.articlelist
           this.total = resp.data.total
           this.listQuery.page = resp.data.page
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
       this.listLoading = false
