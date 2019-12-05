@@ -2,7 +2,6 @@ package handle
 
 import (
 	"errors"
-	"fmt"
 	"github.com/hyahm/golog"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
@@ -15,9 +14,6 @@ import (
 var NotFoundToken = errors.New("not found token")
 
 func logtokenmysql(r *http.Request) (string, error) {
-	for k, v := range r.Header {
-		fmt.Printf("%s : %s \n", k, v)
-	}
 	a := r.Header.Get("X-Token")
 	nickname, err := asset.Getvalue(a)
 	if err != nil {

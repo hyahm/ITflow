@@ -52,6 +52,5 @@ func createapi() {
 			log.Fatal(err)
 		}
 	}
-	fmt.Println("---------------")
 
 }

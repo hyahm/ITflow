@@ -704,7 +704,6 @@ func ShareShow(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Disposition", "attachment;filename="+name)
 	w.Header().Set("Content-Type", "application/octet-stream")
-	fmt.Println(string(f))
 	w.Write(f)
 	return
 

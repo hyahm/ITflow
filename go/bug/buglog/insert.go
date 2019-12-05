@@ -1,10 +1,10 @@
 package buglog
 
 import (
-	"itflow/bug/bugconfig"
 	"errors"
 	"fmt"
 	"github.com/hyahm/golog"
+	"itflow/bug/bugconfig"
 	"time"
 )
 
@@ -27,7 +27,6 @@ func (al *AddLog) insert(classify string, content string) error {
 		return errors.New("ip must be need")
 	}
 	// 如果ip在列表里面，直接跳过
-	fmt.Println(bugconfig.Exclude)
 	for _, v := range bugconfig.Exclude {
 		if v == al.Ip {
 			golog.Info("ip: %s is exclude", al.Ip)

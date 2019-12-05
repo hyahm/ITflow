@@ -54,7 +54,6 @@ func InitDb() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("================= sync database success ========================")
 
 	var count int
 	err = bugconfig.Bug_Mysql.GetOne("select count(id) from user").Scan(&count)
@@ -115,5 +114,4 @@ func InitDb() {
 	if goconfig.ReadBool("apihelp") {
 		createapi()
 	}
-	fmt.Println("================= check tables success ========================")
 }

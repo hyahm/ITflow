@@ -526,7 +526,6 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	fmt.Printf("%+v \n", param.CheckStatus)
 	ids := make([]string, 0)
 	for _, v := range param.CheckStatus {
 		// 如果存在这个状态才添加进来

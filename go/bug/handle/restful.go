@@ -596,7 +596,6 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	fmt.Println(string(respbyte))
 	err = json.Unmarshal(respbyte, al)
 	if err != nil {
 		golog.Error(err.Error())
@@ -845,7 +844,6 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 	sl.Information = html.UnescapeString(sl.Information)
 	sl.Methods = strings.Split(ms, ",")
 	send, _ := json.Marshal(sl)
-	fmt.Println(string(send))
 	w.Write(send)
 	return
 

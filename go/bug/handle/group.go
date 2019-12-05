@@ -130,7 +130,6 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	fmt.Println(string(list))
 	err = json.Unmarshal(list, data)
 	if err != nil {
 		golog.Error(err.Error())

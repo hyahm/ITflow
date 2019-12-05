@@ -84,7 +84,6 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	fmt.Println(string(respbyte))
 	err = json.Unmarshal(respbyte, data)
 	if err != nil {
 		golog.Error(err.Error())
@@ -225,7 +224,6 @@ func TypeAdd(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	fmt.Println(string(bytedata))
 	err = json.Unmarshal(bytedata, data)
 	if err != nil {
 		golog.Error(err.Error())

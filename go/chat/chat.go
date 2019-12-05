@@ -32,7 +32,6 @@ func userRead(conn net.Conn) {
 func userWrite(conn net.Conn) {
 	for {
 		inputReader := bufio.NewReader(os.Stdin)
-		fmt.Print("enter an string:")
 		input, err := inputReader.ReadString('\n')
 		if err != nil {
 			log.Println(err)

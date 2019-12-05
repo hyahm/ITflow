@@ -2,7 +2,6 @@ package bugconfig
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 )
 
@@ -12,7 +11,6 @@ func cacheemail() {
 		if err == sql.ErrNoRows {
 			return
 		}
-		fmt.Println("必须有切只有一行")
 		log.Fatal(err)
 	}
 }

@@ -353,16 +353,20 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 		}
 	}
 
-	err = bugconfig.Bug_Mysql.GetOne(countbasesql+fmt.Sprintf("and sid in (%s)", showstatus), bugconfig.CacheNickNameUid[nickname]).Scan(&al.Count)
+	if showstatus != "" {
+		countbasesql += fmt.Sprintf("and sid in (%s)", showstatus)
+		bugsql += fmt.Sprintf("and sid in (%s) ", showstatus)
+	}
+
+	err = bugconfig.Bug_Mysql.GetOne(countbasesql, bugconfig.CacheNickNameUid[nickname]).Scan(&al.Count)
 	if err != nil {
 		golog.Error(err.Error())
 		return nil, errorcode.ErrorE(err)
 	}
-
 	// 获取查询的总个数
 	start, end := public.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
 
-	rows, err := bugconfig.Bug_Mysql.GetRows(bugsql+fmt.Sprintf("and sid in (%s) limit ?,?", showstatus), bugconfig.CacheNickNameUid[nickname], start, end)
+	rows, err := bugconfig.Bug_Mysql.GetRows(bugsql+" limit ?,?", bugconfig.CacheNickNameUid[nickname], start, end)
 	if err != nil {
 		golog.Error(err.Error())
 		return nil, errorcode.ErrorE(err)

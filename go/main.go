@@ -5,7 +5,6 @@ import (
 	"github.com/hyahm/golog"
 	"github.com/hyahm/gomysql"
 	"itflow/bug"
-	"itflow/bug/autodb"
 	"itflow/bug/bugconfig"
 	"log"
 )
@@ -18,10 +17,10 @@ func main() {
 	initMysql()
 	// 初始化缓存（后面会使用redis）
 	bugconfig.LoadConfig()
-	// 初始化数据表
-	if goconfig.ReadBool("initdb") {
-		autodb.InitDb()
-	}
+	// 初始化数据表, 避免数据错误， 请用sql导入
+	//if goconfig.ReadBool("initdb") {
+	//	autodb.InitDb()
+	//}
 	// 初始化日志
 	golog.InitLogger(goconfig.ReadString("logpath"),
 		goconfig.ReadInt64("logsize"),
