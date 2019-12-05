@@ -1,0 +1,112 @@
+2019-12-05 22:59:59	/Users/cander/data/ITflow/go/bug/handle/searh.go 358
+Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 1
+2019-12-05 23:03:22	/Users/cander/data/ITflow/go/bug/handle/searh.go 355
+select count(id) from bugs where dustbin=0 and uid=? and sid in ()
+2019-12-05 23:03:22	/Users/cander/data/ITflow/go/bug/handle/searh.go 356
+1
+2019-12-05 23:03:22	/Users/cander/data/ITflow/go/bug/handle/searh.go 359
+Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 1
+2019-12-05 23:05:45	/Users/cander/data/ITflow/go/bug/handle/searh.go 355
+
+2019-12-05 23:05:45	/Users/cander/data/ITflow/go/bug/handle/searh.go 356
+select count(id) from bugs where dustbin=0 and uid=? and sid in ()
+2019-12-05 23:05:45	/Users/cander/data/ITflow/go/bug/handle/searh.go 357
+1
+2019-12-05 23:05:45	/Users/cander/data/ITflow/go/bug/handle/searh.go 360
+Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 1
+2019-12-05 23:06:32	/Users/cander/data/ITflow/go/bug/handle/searh.go 355
+_______-------%!(EXTRA string=)
+2019-12-05 23:06:32	/Users/cander/data/ITflow/go/bug/handle/searh.go 356
+select count(id) from bugs where dustbin=0 and uid=? and sid in ()
+2019-12-05 23:06:32	/Users/cander/data/ITflow/go/bug/handle/searh.go 357
+1
+2019-12-05 23:06:32	/Users/cander/data/ITflow/go/bug/handle/searh.go 360
+Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 1
+2019-12-05 23:12:11	/Users/cander/data/ITflow/go/bug/handle/searh.go 355
+_______-------%!(EXTRA string=)
+2019-12-05 23:12:11	/Users/cander/data/ITflow/go/bug/handle/searh.go 360
+and sid in ()
+2019-12-05 23:12:11	/Users/cander/data/ITflow/go/bug/handle/searh.go 361
+1
+2019-12-05 23:12:11	/Users/cander/data/ITflow/go/bug/handle/searh.go 364
+Error 1065: Query was empty
+2019-12-05 23:13:55	/Users/cander/data/ITflow/go/bug/handle/searh.go 355
+_______-------%!(EXTRA string=)
+2019-12-05 23:13:55	/Users/cander/data/ITflow/go/bug/handle/searh.go 360
+select count(id) from bugs where dustbin=0 and uid=? and sid in ()
+2019-12-05 23:13:55	/Users/cander/data/ITflow/go/bug/handle/searh.go 361
+1
+2019-12-05 23:13:55	/Users/cander/data/ITflow/go/bug/handle/searh.go 373
+Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ') limit ?,?' at line 1
+2019-12-05 23:14:58	/Users/cander/data/ITflow/go/bug/handle/searh.go 355
+_______-------%!(EXTRA string=)
+2019-12-05 23:14:58	/Users/cander/data/ITflow/go/bug/handle/searh.go 360
+select count(id) from bugs where dustbin=0 and uid=? and sid in ()
+2019-12-05 23:14:58	/Users/cander/data/ITflow/go/bug/handle/searh.go 361
+1
+2019-12-05 23:14:58	/Users/cander/data/ITflow/go/bug/handle/searh.go 373
+Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ') limit ?,?' at line 1
+2019-12-05 23:15:21	/Users/cander/data/ITflow/go/bug/handle/searh.go 355
+_______-------%!(EXTRA string=)
+2019-12-05 23:15:21	/Users/cander/data/ITflow/go/bug/handle/searh.go 360
+select count(id) from bugs where dustbin=0 and uid=? and sid in ()
+2019-12-05 23:15:21	/Users/cander/data/ITflow/go/bug/handle/searh.go 361
+1
+2019-12-05 23:15:21	/Users/cander/data/ITflow/go/bug/handle/searh.go 373
+Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ') limit ?,?' at line 1
+2019-12-05 23:16:22	/Users/cander/data/ITflow/go/bug/handle/searh.go 355
+_______-------%!(EXTRA string=)
+2019-12-05 23:16:22	/Users/cander/data/ITflow/go/bug/handle/searh.go 360
+select count(id) from bugs where dustbin=0 and uid=? and sid in ()
+2019-12-05 23:16:22	/Users/cander/data/ITflow/go/bug/handle/searh.go 361
+1
+2019-12-05 23:16:22	/Users/cander/data/ITflow/go/bug/handle/searh.go 373
+Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ') limit ?,?' at line 1
+2019-12-05 23:16:45	/Users/cander/data/ITflow/go/bug/handle/searh.go 355
+_______-------%!(EXTRA string=)
+2019-12-05 23:16:45	/Users/cander/data/ITflow/go/bug/handle/searh.go 360
+select count(id) from bugs where dustbin=0 and uid=? and sid in ()
+2019-12-05 23:16:45	/Users/cander/data/ITflow/go/bug/handle/searh.go 361
+1
+2019-12-05 23:16:45	/Users/cander/data/ITflow/go/bug/handle/searh.go 373
+Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ') limit ?,?' at line 1
+2019-12-05 23:17:19	/Users/cander/data/ITflow/go/bug/handle/searh.go 355
+_______-------%!(EXTRA string=)
+2019-12-05 23:17:19	/Users/cander/data/ITflow/go/bug/handle/searh.go 360
+select count(id) from bugs where dustbin=0 and uid=? and sid in ()
+2019-12-05 23:17:19	/Users/cander/data/ITflow/go/bug/handle/searh.go 361
+1
+2019-12-05 23:17:19	/Users/cander/data/ITflow/go/bug/handle/searh.go 373
+Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ') limit ?,?' at line 1
+2019-12-05 23:17:59	/Users/cander/data/ITflow/go/bug/handle/searh.go 355
+_______-------%!(EXTRA string=)
+2019-12-05 23:17:59	/Users/cander/data/ITflow/go/bug/handle/searh.go 360
+select count(id) from bugs where dustbin=0 and uid=? and sid in ()
+2019-12-05 23:17:59	/Users/cander/data/ITflow/go/bug/handle/searh.go 361
+1
+2019-12-05 23:17:59	/Users/cander/data/ITflow/go/bug/handle/searh.go 373
+Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ') limit ?,?' at line 1
+2019-12-05 23:18:02	/Users/cander/data/ITflow/go/bug/handle/searh.go 355
+_______-------%!(EXTRA string=)
+2019-12-05 23:18:02	/Users/cander/data/ITflow/go/bug/handle/searh.go 360
+select count(id) from bugs where dustbin=0 and uid=? and sid in ()
+2019-12-05 23:18:02	/Users/cander/data/ITflow/go/bug/handle/searh.go 361
+1
+2019-12-05 23:18:02	/Users/cander/data/ITflow/go/bug/handle/searh.go 373
+Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ') limit ?,?' at line 1
+2019-12-05 23:19:49	/Users/cander/data/ITflow/go/bug/handle/searh.go 355
+_______-------%!(EXTRA string=)
+2019-12-05 23:19:49	/Users/cander/data/ITflow/go/bug/handle/searh.go 360
+select count(id) from bugs where dustbin=0 and uid=? and sid in ()
+2019-12-05 23:19:49	/Users/cander/data/ITflow/go/bug/handle/searh.go 361
+1
+2019-12-05 23:19:50	/Users/cander/data/ITflow/go/bug/handle/searh.go 373
+Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ') limit ?,?' at line 1
+2019-12-05 23:20:28	/Users/cander/data/ITflow/go/bug/handle/searh.go 372
+sql: expected 1 arguments, got 3
+2019-12-05 23:21:14	/Users/cander/data/ITflow/go/bug/handle/searh.go 373
+sql: expected 1 arguments, got 3
+2019-12-05 23:22:36	/Users/cander/data/ITflow/go/bug/handle/searh.go 116
+Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 1
+2019-12-05 23:22:52	/Users/cander/data/ITflow/go/bug/handle/searh.go 116
+Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 1
