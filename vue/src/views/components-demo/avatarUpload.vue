@@ -2,16 +2,24 @@
   <div class="components-container">
     <code>This is based on
       <a class="link-type" href="//github.com/dai-siki/vue-image-crop-upload"> vue-image-crop-upload</a>.
-      {{$t('components.imageUploadTips')}}
+      图片上传
     </code>
 
-    <pan-thumb :image="image"></pan-thumb>
+    <pan-thumb :image="image" />
 
     <el-button type="primary" icon="upload" style="position: absolute;bottom: 15px;margin-left: 40px;" @click="imagecropperShow=true">Change avatar
     </el-button>
 
-    <image-cropper :width="300" :height="300" url="https://httpbin.org/post" @close='close' @crop-upload-success="cropSuccess" langType="en"
-      :key="imagecropperKey" v-show="imagecropperShow"></image-cropper>
+    <image-cropper
+      :key="imagecropperKey"
+      :width="300"
+      v-show="imagecropperShow"
+      :height="300"
+      url="https://httpbin.org/post"
+      lang-type="en"
+      @close="close"
+      @crop-upload-success="cropSuccess"
+    />
   </div>
 </template>
 
@@ -20,7 +28,7 @@ import ImageCropper from '@/components/ImageCropper'
 import PanThumb from '@/components/PanThumb'
 
 export default {
-  name: 'avatarUpload-demo',
+  name: 'AvatarUploadDemo',
   components: { ImageCropper, PanThumb },
   data() {
     return {

@@ -5,28 +5,28 @@
     </p>
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;padding: 10px">
 
-      <el-table-column :label="$t('table.id')" align="center" width="50">
+      <el-table-column label="id" align="center" width="50">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.rolegroupname')" width="100px" align="center">
+      <el-table-column label="角色组" width="100px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.rolegroup')" width="500" align="center">
+      <el-table-column label="角色组" width="500" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.rolelist }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleEdit(scope.row)">{{ $t('list.edit') }}</el-button>
-          <el-button type="success" size="mini" @click="handleRemove(scope.row.id)">{{ $t('list.remove') }}</el-button>
+          <el-button type="primary" size="mini" @click="handleEdit(scope.row)">编辑</el-button>
+          <el-button type="success" size="mini" @click="handleRemove(scope.row.id)">删除</el-button>
           <!--<el-button type="danger" size="mini" @click="handleRemove(scope.row)">{{ $t('list.remove') }}</el-button>-->
         </template>
       </el-table-column>

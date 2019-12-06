@@ -5,7 +5,7 @@
     </p>
     <div class="filter-container">
       <div style="margin-left: 10px">
-        <el-select v-model="listQuery.classify" :placeholder="$t('table.level')" clearable style="width: 90px" class="filter-item">
+        <el-select v-model="listQuery.classify" placeholder="级别" clearable style="width: 90px" class="filter-item">
           <el-option v-for="(item, index) in classifys" :key="index" :label="item" :value="item" />
         </el-select>
 
@@ -20,7 +20,7 @@
           @change="changeDate"
         />
 
-        <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
+        <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
 
       </div>
 
@@ -33,23 +33,23 @@
       highlight-current-row
       style="width: 100%;min-height:350px;"
     >
-      <el-table-column :label="$t('table.id')" align="center" width="65">
+      <el-table-column label="id" align="center" width="65">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.date')" width="150px" align="center">
+      <el-table-column label="日期" width="150px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.exectime | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.classify')" width="150" align="center">
+      <el-table-column label="分类" width="150" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.classify }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.ip')" width="150" align="center">
+      <el-table-column label="ip" width="150" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.ip }}</span>
         </template>
@@ -63,7 +63,7 @@
       <!--&lt;!&ndash;<el-tag>{{scope.row.type | typeFilter}}</el-tag>&ndash;&gt;-->
       <!--</template>-->
       <!--</el-table-column>-->
-      <el-table-column :label="$t('table.opration')" width="400" align="center">
+      <el-table-column label="操作" width="400" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.content }}</span>
         </template>

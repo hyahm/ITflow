@@ -33,18 +33,18 @@
       highlight-current-row
       style="width: 100%;"
     >
-      <el-table-column :label="$t('table.id')" align="center" width="65">
+      <el-table-column label="id" align="center" width="65">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.date')" width="150px" align="center">
+      <el-table-column label="日期" width="150px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.date | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.version')" width="90px" align="center">
+      <el-table-column label="版本" width="90px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.version }}</span>
           <!--<svg-icon v-for="n in +scope.row.importance" icon-class="star" class="meta-item__icon" :key="n"></svg-icon>-->
@@ -62,13 +62,13 @@
           <!--<el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>-->
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <!--<el-button type="primary" size="mini"  @click="handleUpdate(scope.row)">{{$t('table.pass')}}</el-button>-->
-          <el-button size="mini" type="success" @click="handleModifyStatus(scope.row)">{{ $t('table.change') }}
+          <el-button size="mini" type="success" @click="handleModifyStatus(scope.row)">修改
           </el-button>
           <!--&lt;!&ndash;v-if="scope.row.status!='published'"&ndash;&gt;-->
-          <el-button v-if="scope.row.status!='draft'" size="mini" @click="handleRemove(scope.row,'draft')">{{ $t('table.remove') }}
+          <el-button v-if="scope.row.status!='draft'" size="mini" @click="handleRemove(scope.row,'draft')">删除
           </el-button>
         <!--<el-button  size="mini" type="danger" @click="handleStopStatus(scope.row)">{{ scope.row.stop }}-->
         <!--</el-button>-->

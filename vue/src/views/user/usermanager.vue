@@ -33,69 +33,69 @@
       highlight-current-row
       style="width: 100%;"
     >
-      <el-table-column :label="$t('table.id')" align="center" width="65">
+      <el-table-column label="id" align="center" width="65">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.date')" width="150px" align="center">
+      <el-table-column label="日期" width="150px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.createtime | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.realname')" width="110px" align="center">
+      <el-table-column label="真实姓名" width="110px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.realname }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.nickname')" width="110px" align="center">
+      <el-table-column label="昵称" width="110px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.nickname }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.rolegroup')" width="100px" align="center">
+      <el-table-column label="角色组" width="100px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.rolegroup }}</span>
           <!--<svg-icon v-for="n in +scope.row.importance" icon-class="star" class="meta-item__icon" :key="n"></svg-icon>-->
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.statusgroup')" width="110px" align="center">
+      <el-table-column label="状态组" width="110px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.statusgroup }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.position')" width="110px" align="center">
+      <el-table-column label="职位" width="110px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.position }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.email')" class-name="status-col" width="200">
+      <el-table-column label="邮箱" class-name="status-col" width="200">
         <template slot-scope="scope">
           <span>{{ scope.row.email }}</span>
           <!--<el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>-->
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.status')" class-name="status-col" width="60">
+      <el-table-column label="状态" class-name="status-col" width="60">
         <template slot-scope="scope">
-          <span v-if="scope.row.disable==0">{{ $t('table.enable') }}</span>
-          <span v-else>{{ $t('table.disable') }}</span>
+          <span v-if="scope.row.disable==0">启用</span>
+          <span v-else>禁用</span>
           <!--<el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>-->
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" align="center" width="300" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="300" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleResetPwd(scope.row)">{{ $t('table.changepassword') }}</el-button>
-          <el-button size="mini" type="danger" @click="handlePermission(scope.row)">{{ $t('table.updatepermission') }}
+          <el-button type="primary" size="mini" @click="handleResetPwd(scope.row)">修改密码</el-button>
+          <el-button size="mini" type="danger" @click="handlePermission(scope.row)">更新权限
           </el-button>
-          <el-button size="mini" type="danger" @click="handleRemove(scope.row)">{{ $t('table.remove') }}
+          <el-button size="mini" type="danger" @click="handleRemove(scope.row)">删除
           </el-button>
-          <el-button v-if="scope.row.disable==1" size="mini" type="danger" @click="handleDisable(scope.row)">{{ $t('table.enable') }}
+          <el-button v-if="scope.row.disable==1" size="mini" type="danger" @click="handleDisable(scope.row)">启用
           </el-button>
-          <el-button v-else size="mini" type="danger" @click="handleDisable(scope.row)">{{ $t('table.disable') }}
+          <el-button v-else size="mini" type="danger" @click="handleDisable(scope.row)">禁用
           </el-button>
         </template>
       </el-table-column>
