@@ -122,3 +122,11 @@ Error 1366: Incorrect integer value: '' for column 'spusers' at row 1
 Error 1366: Incorrect integer value: '' for column 'spusers' at row 1
 2019-12-06 10:36:35	/Users/cander/data/ITflow/go/bug/handle/createarticle.go 155
 Error 1366: Incorrect integer value: '' for column 'spusers' at row 1
+2019-12-06 21:35:01	/Users/cander/data/ITflow/go/bug/handle/asset.go 20
+redis: nil
+2019-12-06 21:35:01	/Users/cander/data/ITflow/go/bug/handle/login.go 145
+not found token
+2019-12-06 21:44:58	/Users/cander/data/ITflow/go/bug/handle/role.go 175
+unexpected end of JSON input
+2019-12-06 21:45:02	/Users/cander/data/ITflow/go/bug/handle/role.go 175
+unexpected end of JSON input

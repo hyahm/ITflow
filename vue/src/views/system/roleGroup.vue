@@ -97,6 +97,8 @@ export default {
           } else {
             this.list = resp.data.datalist
           }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -112,10 +114,6 @@ export default {
       this.$confirm('确认关闭？')
         .then(_ => {
           removeRole(id).then(resp => {
-            if (resp.data.code === 26) {
-              this.$message.warning('删除失败，此角色组有用户在使用')
-              return
-            }
             if (resp.data.code === 0) {
               const l = this.list.length
               for (let i = 0; i < l; i++) {
@@ -125,8 +123,9 @@ export default {
               }
               this.$message.success('删除成功')
               return
+            } else {
+              this.$message.error(resp.data.msg)
             }
-            this.$message.success('删除失败,错误码：' + resp.data.statuscode)
           })
         })
         .catch(_ => {})

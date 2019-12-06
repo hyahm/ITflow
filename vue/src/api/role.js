@@ -9,30 +9,39 @@ export function getRoutes() {
 
 export function getRoles() {
   return request({
-    url: '/roles',
+    url: '/role/get',
     method: 'get'
   })
 }
 
 export function addRole(data) {
   return request({
-    url: '/role',
+    url: '/role/add',
     method: 'post',
     data
   })
 }
 
-export function updateRole(id, data) {
+export function editRole(id, data) {
   return request({
-    url: `/role/${id}`,
-    method: 'put',
+    url: '/role/edit',
+    method: 'post',
     data
   })
 }
 
-export function deleteRole(id) {
+export function removeRole(id) {
   return request({
-    url: `/role/${id}`,
-    method: 'delete'
+    url: '/role/remove',
+    method: 'get',
+    params: { id }
   })
 }
+
+export function roleList() {
+  return request({
+    url: `/role/list`,
+    method: 'post'
+  })
+}
+
