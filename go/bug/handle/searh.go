@@ -93,7 +93,6 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 	}
 	// 第三步， 检查Title
 	if searchparam.Title != "" {
-
 		bugsql += fmt.Sprintf("and bugtitle like '%s' ", searchparam.Title)
 		countbasesql += fmt.Sprintf("and bugtitle like '%s' ", searchparam.Title)
 
@@ -110,8 +109,10 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
-	rows, err := bugconfig.Bug_Mysql.GetRows(bugsql + fmt.Sprintf("and sid in (%s)", showstatus))
+	if showstatus != "" {
+		bugsql += fmt.Sprintf("and sid in (%s)", showstatus)
+	}
+	rows, err := bugconfig.Bug_Mysql.GetRows(bugsql)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -158,6 +159,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
+	fmt.Println("-----")
 	// 获取查询的开始位置
 	start, end := public.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
 	al.Al = al.Al[start:end]

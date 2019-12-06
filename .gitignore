@@ -21,3 +21,5 @@ vue/*.njsproj
 vue/*.sln
 vue/package-lock.json
 vue/src/config/config.js
+data
+share

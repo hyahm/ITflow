@@ -110,3 +110,9 @@ sql: expected 1 arguments, got 3
 Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 1
 2019-12-05 23:22:52	/Users/cander/data/ITflow/go/bug/handle/searh.go 116
 Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 1
+2019-12-06 09:54:02	/Users/cander/data/ITflow/go/bug/handle/asset.go 24
+redis: nil
+2019-12-06 09:54:02	/Users/cander/data/ITflow/go/bug/handle/login.go 145
+not found token
+2019-12-06 09:54:14	/Users/cander/data/ITflow/go/bug/handle/searh.go 116
+Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 1

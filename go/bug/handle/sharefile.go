@@ -2,7 +2,6 @@ package handle
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/hyahm/golog"
 	"io"
 	"io/ioutil"

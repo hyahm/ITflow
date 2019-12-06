@@ -351,6 +351,7 @@ export default {
         limit: this.listQuery.limit
       }
       searchMyBugs(pager).then(resp => {
+        console.log(resp.data)
         if (resp.data.code === 0) {
           this.list = resp.data.articlelist
           this.total = resp.data.total

@@ -2,7 +2,6 @@ package buglog
 
 import (
 	"errors"
-	"fmt"
 	"github.com/hyahm/golog"
 	"itflow/bug/bugconfig"
 	"time"

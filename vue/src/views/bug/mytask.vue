@@ -100,14 +100,10 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
         <el-form-item>
-          <!--:label="$t('table.aa')"-->
           <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
             <el-option v-for="(item, index) in platformsOptions" :key="index" :label="item" :value="item" />
           </el-select>
         </el-form-item>
-        <!--<el-form-item :label="$t('table.importance')">-->
-        <!--<el-rate style="margin-top:8px;" v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max='5'></el-rate>-->
-        <!--</el-form-item>-->
         <el-form-item style="margin-bottom: 40px;" label="任务给：">
           <el-select
             v-model="temp.selectusers"
@@ -125,7 +121,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item :label="$t('table.reason')">
+        <el-form-item label="说明">
           <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
         </el-form-item>
       </el-form>
@@ -329,7 +325,9 @@ export default {
     },
     getList() {
       this.listLoading = true
+      console.log('+++++++++++++++')
       searchMyTasks(this.listQuery).then(resp => {
+        console.log(resp.data)
         if (resp.data.code === 0) {
           this.list = resp.data.articlelist
           this.total = resp.data.total
