@@ -116,3 +116,9 @@ redis: nil
 not found token
 2019-12-06 09:54:14	/Users/cander/data/ITflow/go/bug/handle/searh.go 116
 Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 1
+2019-12-06 10:31:56	/Users/cander/data/ITflow/go/bug/handle/createarticle.go 153
+Error 1366: Incorrect integer value: '' for column 'spusers' at row 1
+2019-12-06 10:35:36	/Users/cander/data/ITflow/go/bug/handle/createarticle.go 154
+Error 1366: Incorrect integer value: '' for column 'spusers' at row 1
+2019-12-06 10:36:35	/Users/cander/data/ITflow/go/bug/handle/createarticle.go 155
+Error 1366: Incorrect integer value: '' for column 'spusers' at row 1
