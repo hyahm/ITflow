@@ -2,7 +2,6 @@ package handle
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/hyahm/golog"
 	"html"
 	"io/ioutil"
@@ -103,7 +102,6 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("没有找到version key"))
 		return
 	}
-	fmt.Println("spuser: ", data.Selectusers)
 	ul := make([]string, 0)
 	for _, v := range data.Selectusers {
 		start := strings.Index(v, "(")
@@ -149,7 +147,6 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// update
 		// 更新
-		fmt.Println("spusers", spusers)
 		insertsql := "update bugs set bugtitle=?,content=?,iid=?,updatetime=?,lid=?,pid=?,eid=?,spusers=?,vid=? where id=?"
 
 		_, err = bugconfig.Bug_Mysql.Update(insertsql, data.Title, html.EscapeString(data.Content), iid,
