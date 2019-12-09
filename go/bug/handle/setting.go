@@ -496,9 +496,8 @@ type pwd struct {
 }
 
 func ChangePassword(w http.ResponseWriter, r *http.Request) {
-
-	name, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
+	name, err := logtokenmysql(r)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -512,6 +511,7 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	fmt.Println(string(gu))
 	uid := bugconfig.CacheNickNameUid[name]
 
 	err = json.Unmarshal(gu, getuser)

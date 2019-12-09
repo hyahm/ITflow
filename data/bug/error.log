@@ -130,3 +130,19 @@ not found token
 unexpected end of JSON input
 2019-12-06 21:45:02	/Users/cander/data/ITflow/go/bug/handle/role.go 175
 unexpected end of JSON input
+2019-12-09 22:38:45	/Users/cander/data/ITflow/go/bug/handle/setting.go 519
+unexpected end of JSON input
+2019-12-09 22:38:50	/Users/cander/data/ITflow/go/bug/handle/setting.go 519
+unexpected end of JSON input
+2019-12-09 22:40:21	/Users/cander/data/ITflow/go/bug/handle/setting.go 520
+unexpected end of JSON input
+2019-12-09 22:40:28	/Users/cander/data/ITflow/go/bug/handle/setting.go 520
+unexpected end of JSON input
+2019-12-09 22:41:26	/Users/cander/data/ITflow/go/bug/handle/setting.go 520
+unexpected end of JSON input
+2019-12-09 22:42:33	/Users/cander/data/ITflow/go/bug/handle/setting.go 519
+unexpected end of JSON input
+2019-12-09 22:43:20	/Users/cander/data/ITflow/go/bug/handle/login.go 107
+sql: unknown driver "" (forgotten import?)
+2019-12-09 22:43:35	/Users/cander/data/ITflow/go/bug/handle/login.go 69
+username or password error
