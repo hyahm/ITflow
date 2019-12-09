@@ -30,3 +30,11 @@ export function updatePassword(data) {
     data
   })
 }
+
+export function userList(data) {
+  return request({
+    url: '/user/list',
+    method: 'post',
+    data
+  })
+}

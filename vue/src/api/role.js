@@ -45,3 +45,9 @@ export function roleList() {
   })
 }
 
+export function roleGroupName() {
+  return request({
+    url: `/role/list`,
+    method: 'post'
+  })
+}

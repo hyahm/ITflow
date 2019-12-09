@@ -146,3 +146,5 @@ unexpected end of JSON input
 sql: unknown driver "" (forgotten import?)
 2019-12-09 22:43:35	/Users/cander/data/ITflow/go/bug/handle/login.go 69
 username or password error
+2019-12-09 22:49:09	/Users/cander/data/ITflow/go/bug/handle/setting.go 519
+unexpected end of JSON input
