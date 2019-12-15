@@ -19,7 +19,7 @@ func Reset(w http.ResponseWriter, r *http.Request) {
 	}
 	password := r.FormValue("password")
 	var count int
-	err := bugconfig.Bug_Mysql.GetOne("select count(id) from user where department=?", "admin").Scan(&count)
+	err := bugconfig.Bug_Mysql.GetOne("select count(id) from user where rid=0").Scan(&count)
 	if err != nil {
 		if err == sql.ErrNoRows || count != 1 {
 			golog.Debug("有且只能有一个admin账户")
@@ -31,7 +31,7 @@ func Reset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	password = gaencrypt.PwdEncrypt(password, bugconfig.Salt)
-	_, err = bugconfig.Bug_Mysql.Update("update user set password=? where department=?", password, "admin")
+	_, err = bugconfig.Bug_Mysql.Update("update user set password=? where rid=0", password)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
