@@ -22,7 +22,7 @@ var RSconn *xredis.TypeString
 
 func InitRedis() {
 	rconn , err := xredis.Conn(&redis.Options{
-		Addr:               goconfig.ReadString("redis.password"),
+		Addr:               goconfig.ReadString("redis.host"),
 		Password:           goconfig.ReadString("redis.password"),
 		DB:                 goconfig.ReadInt("redis.db"),
 	})
