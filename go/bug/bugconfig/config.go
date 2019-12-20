@@ -81,6 +81,7 @@ func LoadConfig() {
 
 	ImgDir = goconfig.ReadString("imgdir")
 	err := os.MkdirAll(ImgDir, 0755)
+	fmt.Println(ImgDir)
 	if err != nil {
 		panic(err)
 	}
