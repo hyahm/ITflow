@@ -9,6 +9,7 @@ import (
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
 	"itflow/bug/model"
+	"itflow/db"
 	"log"
 	"net/http"
 	"strconv"
@@ -69,7 +70,7 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 	ss := strings.Join(ids, ",")
 
 	isql := "insert into statusgroup(name,sids) values(?,?)"
-	errorcode.Id, err = bugconfig.Bug_Mysql.Insert(isql, data.Department, ss)
+	errorcode.Id, err = db.Mconn.Insert(isql, data.Department, ss)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -149,7 +150,7 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 	}
 	ss := strings.Join(ssids, ",")
 	isql := "update statusgroup set name =?,sids=? where id = ?"
-	_, err = bugconfig.Bug_Mysql.Update(isql, data.Department, ss, data.Id)
+	_, err = db.Mconn.Update(isql, data.Department, ss, data.Id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -215,7 +216,7 @@ func BugGroupList(w http.ResponseWriter, r *http.Request) {
 	}
 	data := &departmentList{}
 	s := "select id,name,sids from statusgroup"
-	rows, err := bugconfig.Bug_Mysql.GetRows(s)
+	rows, err := db.Mconn.GetRows(s)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -278,7 +279,13 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 	}
 	ssql := "select count(id) from user where bugsid=?"
 	var count int
-	err = bugconfig.Bug_Mysql.GetOne(ssql, id).Scan(&count)
+	row,err := db.Mconn.GetOne(ssql, id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&count)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -289,7 +296,7 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	isql := "delete from  statusgroup where id = ?"
-	_, err = bugconfig.Bug_Mysql.Update(isql, id)
+	_, err = db.Mconn.Update(isql, id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -344,7 +351,7 @@ func GroupGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	gsql := "select id,name,ids from usergroup"
-	rows, err := bugconfig.Bug_Mysql.GetRows(gsql)
+	rows, err := db.Mconn.GetRows(gsql)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -417,7 +424,7 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 		ids = append(ids, strconv.FormatInt(uid, 10))
 	}
 	gsql := "insert usergroup(name,ids,cuid) values(?,?,?)"
-	errorcode.Id, err = bugconfig.Bug_Mysql.Insert(gsql, data.Name, strings.Join(ids, ","), bugconfig.CacheNickNameUid[nickname])
+	errorcode.Id, err = db.Mconn.Insert(gsql, data.Name, strings.Join(ids, ","), bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -481,7 +488,7 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 	// 判断共享文件是否有在使用
 
 	var hasshare bool
-	sharerows, err := bugconfig.Bug_Mysql.GetRows("select readuser,rid,wid,writeuser from  sharefile")
+	sharerows, err := db.Mconn.GetRows("select readuser,rid,wid,writeuser from  sharefile")
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -513,7 +520,7 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 	}
 	// 判断接口是否有在使用
 	var hasrest bool
-	restrows, err := bugconfig.Bug_Mysql.GetRows("select readuser,edituser,rid,eid from  apiproject")
+	restrows, err := db.Mconn.GetRows("select readuser,edituser,rid,eid from  apiproject")
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -543,7 +550,7 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	gsql := "delete from usergroup where id=? and cuid=?"
-	_, err = bugconfig.Bug_Mysql.Update(gsql, id, bugconfig.CacheNickNameUid[nickname])
+	_, err = db.Mconn.Update(gsql, id, bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -618,7 +625,7 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 			ids = ids + "," + strconv.FormatInt(bugconfig.CacheRealNameUid[v], 10)
 		}
 	}
-	_, err = bugconfig.Bug_Mysql.Update(gsql, data.Name, ids, data.Id, bugconfig.CacheNickNameUid[nickname])
+	_, err = db.Mconn.Update(gsql, data.Name, ids, data.Id, bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))

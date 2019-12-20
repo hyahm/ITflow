@@ -8,6 +8,7 @@ import (
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
 	"itflow/bug/model"
+	"itflow/db"
 	"net/http"
 	"strconv"
 	"strings"
@@ -24,7 +25,7 @@ func TypeList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rows, err := bugconfig.Bug_Mysql.GetRows("select id,name,type,opts,tid from types")
+	rows, err := db.Mconn.GetRows("select id,name,type,opts,tid from types")
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -40,7 +41,7 @@ func TypeList(w http.ResponseWriter, r *http.Request) {
 
 		if tr.Types == 2 {
 
-			optrows, err := bugconfig.Bug_Mysql.GetRows(fmt.Sprintf("select id,name,info,tid,df,need  from options where id in (%s)", opts))
+			optrows, err := db.Mconn.GetRows(fmt.Sprintf("select id,name,info,tid,df,need  from options where id in (%s)", opts))
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorE(err))
@@ -92,7 +93,13 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var t int
-	err = bugconfig.Bug_Mysql.GetOne("select type from types where id=?", data.Id).Scan(&t)
+	row, err := db.Mconn.GetOne("select type from types where id=?", data.Id)
+	if t == 0 {
+		golog.Error("can not delete base type")
+		w.Write(errorcode.ErrorNoPermission())
+		return
+	}
+	err = row.Scan(&t)
 	if t == 0 {
 		golog.Error("can not delete base type")
 		w.Write(errorcode.ErrorNoPermission())
@@ -110,7 +117,7 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 				w.Write(errorcode.Error("this type is updating"))
 				return
 			}
-			_, err = bugconfig.Bug_Mysql.Update("update types set name=?,type=?,tid=? where id=?", data.Name, data.Types, tid, data.Id)
+			_, err = db.Mconn.Update("update types set name=?,type=?,tid=? where id=?", data.Name, data.Types, tid, data.Id)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorE(err))
@@ -133,7 +140,7 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 						w.Write(errorcode.Error("this type is updating"))
 						return
 					}
-					_, err = bugconfig.Bug_Mysql.Update("update options set name=?,info=?,tid=?,df=?,need=? where id=?",
+					_, err = db.Mconn.Update("update options set name=?,info=?,tid=?,df=?,need=? where id=?",
 						v.Name, v.Info, tid, v.Default, v.Need, v.Id)
 					if err != nil {
 						golog.Error(err.Error())
@@ -146,7 +153,7 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 				}
 			} else if v.Id < 0 {
 				if tid, ok := bugconfig.CacheNameTid[v.Type]; ok {
-					v.Id, err = bugconfig.Bug_Mysql.Insert("insert into options(name,info,tid,df,need) values(?,?,?,?,?)",
+					v.Id, err = db.Mconn.Insert("insert into options(name,info,tid,df,need) values(?,?,?,?,?)",
 						v.Name, v.Info, tid, v.Default, v.Need)
 					if err != nil {
 						golog.Error(err.Error())
@@ -172,7 +179,7 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		opts := strings.Join(optids, ",")
-		_, err = bugconfig.Bug_Mysql.Update("update types set name=?,type=?,opts=? where id=?", data.Name, data.Types, opts, data.Id)
+		_, err = db.Mconn.Update("update types set name=?,type=?,opts=? where id=?", data.Name, data.Types, opts, data.Id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorE(err))
@@ -234,7 +241,7 @@ func TypeAdd(w http.ResponseWriter, r *http.Request) {
 	case 1:
 		// list 类型
 		if tid, ok := bugconfig.CacheNameTid[data.Listtype]; ok {
-			send.Id, err = bugconfig.Bug_Mysql.Insert("insert into types(name,type,tid) value(?,?,?)", data.Name, data.Types, tid)
+			send.Id, err = db.Mconn.Insert("insert into types(name,type,tid) value(?,?,?)", data.Name, data.Types, tid)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorE(err))
@@ -255,7 +262,7 @@ func TypeAdd(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if tid, ok := bugconfig.CacheNameTid[v.Type]; ok {
-				v.Id, err = bugconfig.Bug_Mysql.Insert("insert into options(name,info,tid,df,need) values(?,?,?,?,?)",
+				v.Id, err = db.Mconn.Insert("insert into options(name,info,tid,df,need) values(?,?,?,?,?)",
 					v.Name, v.Info, tid, v.Default, v.Need)
 				if err != nil {
 					golog.Error(err.Error())
@@ -278,7 +285,7 @@ func TypeAdd(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		opts := strings.Join(optids, ",")
-		send.Id, err = bugconfig.Bug_Mysql.Insert("insert into types(name,type,opts) values(?,?,?)", data.Name, data.Types, opts)
+		send.Id, err = db.Mconn.Insert("insert into types(name,type,opts) values(?,?,?)", data.Name, data.Types, opts)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorE(err))
@@ -339,13 +346,19 @@ func TypeDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var t int
-	err = bugconfig.Bug_Mysql.GetOne("select type from types where id=?", id).Scan(&t)
+	row, err := db.Mconn.GetOne("select type from types where id=?", id)
 	if t == 0 {
 		golog.Error("can not delete base type")
 		w.Write(errorcode.ErrorNoPermission())
 		return
 	}
-	_, err = bugconfig.Bug_Mysql.Update("delete from types where id=?", id)
+	err = row.Scan(&t)
+	if t == 0 {
+		golog.Error("can not delete base type")
+		w.Write(errorcode.ErrorNoPermission())
+		return
+	}
+	_, err = db.Mconn.Update("delete from types where id=?", id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -382,7 +395,7 @@ func GetType(w http.ResponseWriter, r *http.Request) {
 	}
 
 	types := &model.Send_Types{}
-	rows, err := bugconfig.Bug_Mysql.GetRows("select name from types")
+	rows, err := db.Mconn.GetRows("select name from types")
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))

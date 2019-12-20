@@ -7,6 +7,7 @@ import (
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
+	"itflow/db"
 	"net/http"
 	"strconv"
 	"strings"
@@ -96,7 +97,7 @@ func AddProject(w http.ResponseWriter, r *http.Request) {
 
 	getaritclesql := "insert into projectname(name) values(?)"
 
-	errorcode.Id, err = bugconfig.Bug_Mysql.Insert(getaritclesql, name)
+	errorcode.Id, err = db.Mconn.Insert(getaritclesql, name)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -166,7 +167,7 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 	}
 	getaritclesql := "update projectname set name=? where id=?"
 
-	_, err = bugconfig.Bug_Mysql.Update(getaritclesql, pr.ProjectName, pr.Id)
+	_, err = db.Mconn.Update(getaritclesql, pr.ProjectName, pr.Id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -230,7 +231,13 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 	}
 	// 是否有bug使用
 	var count int
-	err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs where pid=?", id).Scan(&count)
+	row, err := db.Mconn.GetOne("select count(id) from bugs where pid=?", id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&count)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -244,7 +251,7 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 
 	getaritclesql := "delete from projectname where id=?"
 
-	_, err = bugconfig.Bug_Mysql.Insert(getaritclesql, id)
+	_, err = db.Mconn.Insert(getaritclesql, id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))

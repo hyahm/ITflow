@@ -2,12 +2,14 @@ package bugconfig
 
 import (
 	"errors"
+	"github.com/hyahm/golog"
+	"itflow/db"
 	"log"
 )
 
 func initCache() {
 
-	statusrows, err := Bug_Mysql.GetRows("select id,name from status")
+	statusrows, err := db.Mconn.GetRows("select id,name from status")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -19,7 +21,7 @@ func initCache() {
 		CacheStatusSid[name] = id
 	}
 
-	rolerows, err := Bug_Mysql.GetRows("select id,role from roles")
+	rolerows, err := db.Mconn.GetRows("select id,role from roles")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -31,7 +33,7 @@ func initCache() {
 		CacheRoleRid[name] = id
 	}
 
-	prows, err := Bug_Mysql.GetRows("select id,name from projectname")
+	prows, err := db.Mconn.GetRows("select id,name from projectname")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,7 +45,7 @@ func initCache() {
 		CacheProjectPid[name] = id
 	}
 
-	jobrows, err := Bug_Mysql.GetRows("select id,name from jobs")
+	jobrows, err := db.Mconn.GetRows("select id,name from jobs")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,7 +57,7 @@ func initCache() {
 		CacheJobnameJid[name] = id
 	}
 
-	erows, err := Bug_Mysql.GetRows("select id,envname from environment")
+	erows, err := db.Mconn.GetRows("select id,envname from environment")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -67,7 +69,7 @@ func initCache() {
 		CacheEnvNameEid[name] = id
 	}
 
-	headerrows, err := Bug_Mysql.GetRows("select id,name from header")
+	headerrows, err := db.Mconn.GetRows("select id,name from header")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -79,7 +81,7 @@ func initCache() {
 		CacheHeaderHid[name] = id
 	}
 
-	realrows, err := Bug_Mysql.GetRows("select id,realname,nickname,email,bugsid,level,showstatus,rid,jid from user")
+	realrows, err := db.Mconn.GetRows("select id,realname,nickname,email,bugsid,level,showstatus,rid,jid from user")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -109,7 +111,7 @@ func initCache() {
 
 	}
 
-	versionrows, err := Bug_Mysql.GetRows("select id,name from version")
+	versionrows, err := db.Mconn.GetRows("select id,name from version")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -122,7 +124,7 @@ func initCache() {
 
 	}
 
-	deprows, err := Bug_Mysql.GetRows("select id,name from statusgroup")
+	deprows, err := db.Mconn.GetRows("select id,name from statusgroup")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -132,7 +134,7 @@ func initCache() {
 		deprows.Scan(&pid, &name)
 		CacheSgidGroup[pid] = name
 	}
-	rgrows, err := Bug_Mysql.GetRows("select id,name from rolegroup")
+	rgrows, err := db.Mconn.GetRows("select id,name from rolegroup")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -142,7 +144,7 @@ func initCache() {
 		rgrows.Scan(&id, &name)
 		CacheRidGroup[id] = name
 	}
-	grouprows, err := Bug_Mysql.GetRows("select id,name from usergroup")
+	grouprows, err := db.Mconn.GetRows("select id,name from usergroup")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -154,7 +156,7 @@ func initCache() {
 		CacheGidGroup[id] = name
 	}
 
-	typerows, err := Bug_Mysql.GetRows("select id,name from types")
+	typerows, err := db.Mconn.GetRows("select id,name from types")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -169,14 +171,19 @@ func initCache() {
 
 	//检查默认值是否只有一行
 	var checkdefaultcount int
-	err = Bug_Mysql.GetOne("select count(status) from defaultvalue").Scan(&checkdefaultcount)
+	row, err  := db.Mconn.GetOne("select count(status) from defaultvalue")
+	if err != nil {
+		golog.Error(err.Error())
+		log.Fatal(err)
+	}
+	err = row.Scan(&checkdefaultcount)
 	if err != nil {
 		log.Fatal(err)
 	}
 	if checkdefaultcount != 1 {
 		log.Fatal(errors.New("defaultvalue表行数只能是1"))
 	}
-	importantrow, err := Bug_Mysql.GetRows("select id,name from importants")
+	importantrow, err := db.Mconn.GetRows("select id,name from importants")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -189,7 +196,7 @@ func initCache() {
 		CacheImportantIid[name] = id
 	}
 
-	levelrow, err := Bug_Mysql.GetRows("select id,name from level")
+	levelrow, err := db.Mconn.GetRows("select id,name from level")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -206,7 +213,11 @@ func initCache() {
 	var status int64
 	var important int64
 	var level int64
-	err = Bug_Mysql.GetOne("select status,important,level from defaultvalue").Scan(&status, &important, &level)
+	row, err = db.Mconn.GetOne("select status,important,level from defaultvalue")
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = row.Scan(&status, &important, &level)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -3,8 +3,8 @@ package handle
 import (
 	"errors"
 	"github.com/hyahm/golog"
-	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
+	"itflow/db"
 	"net/http"
 	"strconv"
 	"strings"
@@ -15,16 +15,17 @@ var NotFoundToken = errors.New("not found token")
 
 func logtokenmysql(r *http.Request) (string, error) {
 	a := r.Header.Get("X-Token")
-	nickname, err := asset.Getvalue(a)
+	nickname, err := db.RSconn.Get(a)
 	if err != nil {
 		golog.Error(err.Error())
 		return "", NotFoundToken
 
 	}
-	err = asset.Settimeout(a)
-	if err != nil {
-		return "", err
-	}
+	// todo: session
+	//err = asset.Settimeout(a)
+	//if err != nil {
+	//	return "", err
+	//}
 	return string(nickname), nil
 }
 
@@ -95,7 +96,7 @@ func insertlog(classify string, content string, r *http.Request) error {
 	logsql := "insert into log(exectime,classify,content,ip) values(?,?,?,?)"
 	ip := strings.Split(r.RemoteAddr, ":")[0]
 	if ip != "127.0.0.1" {
-		_, err := bugconfig.Bug_Mysql.Insert(logsql, time.Now().Unix(), classify, content, ip)
+		_, err := db.Mconn.Insert(logsql, time.Now().Unix(), classify, content, ip)
 		if err != nil {
 			return err
 		}

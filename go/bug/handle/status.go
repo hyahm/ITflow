@@ -8,6 +8,7 @@ import (
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
 	"itflow/bug/model"
+	"itflow/db"
 	"net/http"
 	"strconv"
 	"strings"
@@ -99,7 +100,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 	s := &status{}
 	err = json.Unmarshal(ss, s)
 
-	errorcode.Id, err = bugconfig.Bug_Mysql.Insert("insert into status(name) values(?)", s.Name)
+	errorcode.Id, err = db.Mconn.Insert("insert into status(name) values(?)", s.Name)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -165,7 +166,13 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 	}
 	// 如果bug有这个状态，就不能修改
 	var bcount int
-	err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs where sid=?", sid).Scan(&bcount)
+	row, err := db.Mconn.GetOne("select count(id) from bugs where sid=?", sid)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&bcount)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -192,7 +199,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	_, err = bugconfig.Bug_Mysql.Update("delete from  status where id=?", sid)
+	_, err = db.Mconn.Update("delete from  status where id=?", sid)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -202,7 +209,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 
 	if bugconfig.CacheDefault["status"] == int64(sid) {
 		bugconfig.CacheDefault["status"] = 0
-		_, err = bugconfig.Bug_Mysql.Update("update defaultvalue set status=0 ")
+		_, err = db.Mconn.Update("update defaultvalue set status=0 ")
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorE(err))
@@ -274,7 +281,7 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = bugconfig.Bug_Mysql.Update("update status set name=? where id=?", s.Name, s.Id)
+	_, err = db.Mconn.Update("update status set name=? where id=?", s.Name, s.Id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))

@@ -8,6 +8,7 @@ import (
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
 	"itflow/bug/model"
+	"itflow/db"
 	"net/http"
 	"strconv"
 	"strings"
@@ -41,7 +42,7 @@ func PositionGet(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorNoPermission())
 		return
 	}
-	rows, err := bugconfig.Bug_Mysql.GetRows("select id,name,level,hypo from jobs")
+	rows, err := db.Mconn.GetRows("select id,name,level,hypo from jobs")
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -113,7 +114,7 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	errorcode.Id, err = bugconfig.Bug_Mysql.Insert("insert into jobs(name,level,hypo) value(?,?,?)", data.Name, data.Level, hid)
+	errorcode.Id, err = db.Mconn.Insert("insert into jobs(name,level,hypo) value(?,?,?)", data.Name, data.Level, hid)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -177,7 +178,13 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 	}
 	// 如果这个职位被使用了，不允许被删除
 	var count int
-	err = bugconfig.Bug_Mysql.GetOne("select count(id) from user where jid=?", id).Scan(&count)
+	row, err := db.Mconn.GetOne("select count(id) from user where jid=?", id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&count)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -188,7 +195,13 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 是否被所属使用
-	err = bugconfig.Bug_Mysql.GetOne("select count(id) from jobs where hypo=?", id).Scan(&count)
+	row, err = db.Mconn.GetOne("select count(id) from jobs where hypo=?", id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&count)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -200,7 +213,7 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 	}
 	gsql := "delete from jobs where id=?"
 
-	_, err = bugconfig.Bug_Mysql.Update(gsql, id)
+	_, err = db.Mconn.Update(gsql, id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -279,7 +292,7 @@ func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	_, err = bugconfig.Bug_Mysql.Update("update jobs set name=?,level=?,hypo=? where id=?", data.Name, data.Level, hid, data.Id)
+	_, err = db.Mconn.Update("update jobs set name=?,level=?,hypo=? where id=?", data.Name, data.Level, hid, data.Id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -331,7 +344,7 @@ func GetHypos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rows, err := bugconfig.Bug_Mysql.GetRows("select name  from jobs where level=1")
+	rows, err := db.Mconn.GetRows("select name  from jobs where level=1")
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -371,7 +384,13 @@ func GetPositions(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		var name string
-		err = bugconfig.Bug_Mysql.GetOne("select name from jobs where hypo=?", bugconfig.CacheUidJid[bugconfig.CacheNickNameUid[nickname]]).Scan(&name)
+		row, err := db.Mconn.GetOne("select name from jobs where hypo=?", bugconfig.CacheUidJid[bugconfig.CacheNickNameUid[nickname]])
+		if err != nil {
+			golog.Error(err.Error())
+			w.Write(errorcode.ErrorE(err))
+			return
+		}
+		err = row.Scan(&name)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorE(err))

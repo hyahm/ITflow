@@ -9,6 +9,7 @@ import (
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
 	"itflow/bug/model"
+	"itflow/db"
 	"net/http"
 	"strconv"
 	"strings"
@@ -25,7 +26,7 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rows, err := bugconfig.Bug_Mysql.GetRows("select id,name,ownerid,auth,readuser,edituser,rid,eid from apiproject")
+	rows, err := db.Mconn.GetRows("select id,name,ownerid,auth,readuser,edituser,rid,eid from apiproject")
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -65,7 +66,13 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 			} else {
 				// 判断是都是可读的用户组
 				var ids string
-				err = bugconfig.Bug_Mysql.GetOne("select ids from usergroup where id=?", rid).Scan(&ids)
+				row, err := db.Mconn.GetOne("select ids from usergroup where id=?", rid)
+				if err != nil {
+					golog.Error(err.Error())
+					w.Write(errorcode.ErrorE(err))
+					return
+				}
+				err = row.Scan(&ids)
 				if err != nil {
 					golog.Error(err.Error())
 					w.Write(errorcode.ErrorE(err))
@@ -94,7 +101,13 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 			} else {
 				// 判断是都是可编辑的用户组
 				var ids string
-				err = bugconfig.Bug_Mysql.GetOne("select ids from usergroup where id=?", eid).Scan(&ids)
+				row, err := db.Mconn.GetOne("select ids from usergroup where id=?", eid)
+				if err != nil {
+					golog.Error(err.Error())
+					w.Write(errorcode.ErrorE(err))
+					return
+				}
+				err = row.Scan(&ids)
 				if err != nil {
 					golog.Error(err.Error())
 					w.Write(errorcode.ErrorE(err))
@@ -177,7 +190,7 @@ func RestUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	_, err = bugconfig.Bug_Mysql.Update("update apiproject set name=?,auth=?,readuser=?,edituser=?,rid=?,eid=? where id=?",
+	_, err = db.Mconn.Update("update apiproject set name=?,auth=?,readuser=?,edituser=?,rid=?,eid=? where id=?",
 		tl.Name,
 		tl.Auth,
 		tl.Readuser,
@@ -251,7 +264,7 @@ func RestAdd(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	restsql := "insert into apiproject(name,ownerid,auth,readuser,edituser,rid,eid) values(?,?,?,?,?,?,?)"
-	errorcode.Id, err = bugconfig.Bug_Mysql.Insert(restsql,
+	errorcode.Id, err = db.Mconn.Insert(restsql,
 		dr.Name, uid, dr.Auth, dr.Readuser, dr.Edituser, rid, eid)
 	if err != nil {
 		golog.Error(err.Error())
@@ -288,7 +301,7 @@ func RestDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 只有创建者才能删除
-	eff, err := bugconfig.Bug_Mysql.Update("delete from apiproject where id=? and ownerid=?", id, bugconfig.CacheNickNameUid[nickname])
+	eff, err := db.Mconn.Update("delete from apiproject where id=? and ownerid=?", id, bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -296,7 +309,7 @@ func RestDel(w http.ResponseWriter, r *http.Request) {
 	}
 	// 同时删除下面的所有接口
 	if eff > 0 {
-		_, err = bugconfig.Bug_Mysql.Update("delete from apilist where pid=? ", id)
+		_, err = db.Mconn.Update("delete from apilist where pid=? ", id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorE(err))
@@ -341,7 +354,7 @@ func ApiList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if hasperm {
-		rows, err := bugconfig.Bug_Mysql.GetRows("select id,name from apilist where pid=?", pid)
+		rows, err := db.Mconn.GetRows("select id,name from apilist where pid=?", pid)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorE(err))
@@ -370,8 +383,12 @@ func checkapiperm(pid string, uid int64) (bool, error) {
 	var oid int64
 	var rid int64
 	var eid int64
-	err := bugconfig.Bug_Mysql.GetOne("select ownerid,auth,readuser,edituser,rid,eid from apiproject where id=?", pid).Scan(
-		&oid, &auth, &readuser, &edituser, &rid, &eid)
+	row, err := db.Mconn.GetOne("select ownerid,auth,readuser,edituser,rid,eid from apiproject where id=?", pid)
+	if err != nil {
+		golog.Error(err.Error())
+		return false, err
+	}
+	err = row.Scan(	&oid, &auth, &readuser, &edituser, &rid, &eid)
 	if err != nil {
 		golog.Error(err.Error())
 		return false, err
@@ -390,7 +407,11 @@ func checkapiperm(pid string, uid int64) (bool, error) {
 		} else {
 			// 判断是都是可读的用户组
 			var ids string
-			err = bugconfig.Bug_Mysql.GetOne("select ids from usergroup where id=?", rid).Scan(&ids)
+			row, err = db.Mconn.GetOne("select ids from usergroup where id=?", rid)
+			if err != nil {
+				return false, err
+			}
+			err = row.Scan(&ids)
 			if err != nil {
 				return false, err
 			}
@@ -409,10 +430,13 @@ func checkapiperm(pid string, uid int64) (bool, error) {
 		} else {
 			// 判断是都是可编辑的用户组
 			var ids string
-			err = bugconfig.Bug_Mysql.GetOne("select ids from usergroup where id=?", eid).Scan(&ids)
+			row,err :=db.Mconn.GetOne("select ids from usergroup where id=?", eid)
 			if err != nil {
-
-				return false, nil
+				return false, err
+			}
+			err = row.Scan(&ids)
+			if err != nil {
+				return false, err
 			}
 
 			for _, v := range strings.Split(ids, ",") {
@@ -431,7 +455,12 @@ func checkeditperm(pid string, uid int64) (bool, error) {
 	var edituser bool
 	var oid int64
 	var eid int64
-	err := bugconfig.Bug_Mysql.GetOne("select ownerid,auth,edituser,eid from apiproject where id=?", pid).Scan(
+	row, err := db.Mconn.GetOne("select ownerid,auth,edituser,eid from apiproject where id=?", pid)
+	if err != nil {
+		golog.Error(err.Error())
+		return false, err
+	}
+	err = row.Scan(
 		&oid, &auth, &edituser, &eid)
 	if err != nil {
 		golog.Error(err.Error())
@@ -450,10 +479,14 @@ func checkeditperm(pid string, uid int64) (bool, error) {
 		} else {
 			// 判断是都是可编辑的用户组
 			var ids string
-			err = bugconfig.Bug_Mysql.GetOne("select ids from usergroup where id=?", eid).Scan(&ids)
+			row, err := db.Mconn.GetOne("select ids from usergroup where id=?", eid)
 			if err != nil {
+				return false, err
+			}
 
-				return false, nil
+			err = row.Scan(&ids)
+			if err != nil {
+				return false, err
 			}
 
 			for _, v := range strings.Split(ids, ",") {
@@ -492,7 +525,13 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 
 	//查出旧的
 	var oldopts string
-	err = bugconfig.Bug_Mysql.GetOne("select opts from apilist where id=?", tl.Id).Scan(&oldopts)
+	row, err := db.Mconn.GetOne("select opts from apilist where id=?", tl.Id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&oldopts)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -505,7 +544,7 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 			if v.Id > 0 {
 				// 修改
 				if tid, ok := bugconfig.CacheNameTid[v.Type]; ok {
-					_, err = bugconfig.Bug_Mysql.Update("update options set info=?,name=?,tid=?,df=?,need=? where id=?",
+					_, err = db.Mconn.Update("update options set info=?,name=?,tid=?,df=?,need=? where id=?",
 						v.Info, v.Name, tid, v.Default, v.Need, v.Id)
 					if err != nil {
 						golog.Error(err.Error())
@@ -524,7 +563,7 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 			} else {
 				// 添加
 				if tid, ok := bugconfig.CacheNameTid[v.Type]; ok {
-					tmpid, err := bugconfig.Bug_Mysql.Insert("insert into options(info,name,tid,df,need) values(?,?,?,?,?)",
+					tmpid, err := db.Mconn.Insert("insert into options(info,name,tid,df,need) values(?,?,?,?,?)",
 						v.Info, v.Name, tid, v.Default, v.Need)
 					if err != nil {
 						golog.Error(err.Error())
@@ -537,7 +576,7 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 
 		//删除多余的
-		_, err = bugconfig.Bug_Mysql.Update(fmt.Sprintf("delete from options where id in (%s)", oldopts))
+		_, err = db.Mconn.Update(fmt.Sprintf("delete from options where id in (%s)", oldopts))
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorE(err))
@@ -549,7 +588,7 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 			ms = append(ms, v)
 		}
 
-		_, err = bugconfig.Bug_Mysql.Update("update apilist set url=?,information=?,opts=?,methods=?,result=?,name=?,hid=?,calltype=?,resp=? where id=?",
+		_, err = db.Mconn.Update("update apilist set url=?,information=?,opts=?,methods=?,result=?,name=?,hid=?,calltype=?,resp=? where id=?",
 			tl.Url, html.EscapeString(tl.Information), oids, strings.Join(ms, ","), html.EscapeString(tl.Result), tl.Name, bugconfig.CacheHeaderHid[tl.Header], tl.CallType, html.EscapeString(tl.Resp), tl.Id)
 		if err != nil {
 			golog.Error(err.Error())
@@ -622,7 +661,7 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 	oid := ""
 	for i, v := range al.Opts {
 		if tid, ok := bugconfig.CacheNameTid[v.Type]; ok {
-			tmpid, err := bugconfig.Bug_Mysql.Insert("insert into options(info,name,tid,df,need) values(?,?,?,?,?)",
+			tmpid, err := db.Mconn.Insert("insert into options(info,name,tid,df,need) values(?,?,?,?,?)",
 				v.Info, v.Name, tid, v.Default, v.Need)
 			if err != nil {
 				golog.Error(err.Error())
@@ -656,7 +695,7 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	errorcode.Id, err = bugconfig.Bug_Mysql.Insert("insert into apilist(pid,url,information,opts,methods,result,name,uid,hid,calltype,resp) values(?,?,?,?,?,?,?,?,?,?,?)",
+	errorcode.Id, err = db.Mconn.Insert("insert into apilist(pid,url,information,opts,methods,result,name,uid,hid,calltype,resp) values(?,?,?,?,?,?,?,?,?,?,?)",
 		al.Pid, al.Url, html.EscapeString(al.Information), oid, ms,
 		html.EscapeString(al.Result), al.Name, bugconfig.CacheNickNameUid[nickname], hid, al.CallType, html.EscapeString(al.Resp))
 	if err != nil {
@@ -697,14 +736,26 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 	var oids string
 	var pid string
 	var uid int64
-	err = bugconfig.Bug_Mysql.GetOne("select pid,opts,uid from apilist where id=?", id).Scan(&pid, &oids, &uid)
+	row, err := db.Mconn.GetOne("select pid,opts,uid from apilist where id=?", id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&pid, &oids, &uid)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	var oid int64
-	err = bugconfig.Bug_Mysql.GetOne("select ownerid from apiproject where id=?", pid).Scan(&oid)
+	row, err = db.Mconn.GetOne("select ownerid from apiproject where id=?", pid)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&oid)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -717,7 +768,7 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 	ol := strings.Split(oids, ",")
 	if ol[0] != "" {
 		for _, v := range ol {
-			_, err = bugconfig.Bug_Mysql.Update("delete from options where id=?", v)
+			_, err = db.Mconn.Update("delete from options where id=?", v)
 			if err != nil {
 				golog.Error(err.Error())
 				w.Write(errorcode.ErrorE(err))
@@ -726,7 +777,7 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	_, err = bugconfig.Bug_Mysql.Update("delete from apilist where id=?", id)
+	_, err = db.Mconn.Update("delete from apilist where id=?", id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -771,8 +822,14 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 	var oids string
 	var ms string
 	var hid int64
-	err = bugconfig.Bug_Mysql.GetOne("select pid,url,information,opts,methods,result,name,hid,calltype,resp from apilist where id=?",
-		id).Scan(
+	row, err := db.Mconn.GetOne("select pid,url,information,opts,methods,result,name,hid,calltype,resp from apilist where id=?",
+		id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(
 		&sl.Pid,
 		&sl.Url,
 		&sl.Information,
@@ -782,23 +839,30 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 		&sl.Name,
 		&hid, &sl.CallType, &sl.Resp,
 	)
-	sl.Resp = html.UnescapeString(sl.Resp)
-	sl.Result = html.UnescapeString(sl.Result)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	sl.Resp = html.UnescapeString(sl.Resp)
+	sl.Result = html.UnescapeString(sl.Result)
+
 	// 遍历请求头
 	var ids string
 	if hid > 0 {
-		err = bugconfig.Bug_Mysql.GetOne("select hhids,remark from header where id=?", hid).Scan(&ids, &sl.Remark)
+		row, err := db.Mconn.GetOne("select hhids,remark from header where id=?", hid)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
-		hrows, err := bugconfig.Bug_Mysql.GetRows(fmt.Sprintf("select k,v from headerlist where id in (%v)", ids))
+		err = row.Scan(&ids, &sl.Remark)
+		if err != nil {
+			golog.Error(err.Error())
+			w.Write(errorcode.ErrorE(err))
+			return
+		}
+		hrows, err := db.Mconn.GetRows(fmt.Sprintf("select k,v from headerlist where id in (%v)", ids))
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorE(err))
@@ -824,7 +888,7 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 	// 遍历选项
 	if len(oids) != 0 {
 
-		orows, err := bugconfig.Bug_Mysql.GetRows(fmt.Sprintf("select id,info,name,tid,df,need from options where id in (%s)", oids))
+		orows, err := db.Mconn.GetRows(fmt.Sprintf("select id,info,name,tid,df,need from options where id in (%s)", oids))
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorE(err))
@@ -870,8 +934,14 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 	var oids string
 	var ms string
 	var hid int64
-	err = bugconfig.Bug_Mysql.GetOne("select pid,url,information,opts,methods,result,name,hid,calltype,resp from apilist where id=?",
-		id).Scan(
+	row, err := db.Mconn.GetOne("select pid,url,information,opts,methods,result,name,hid,calltype,resp from apilist where id=?",
+		id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(
 		&sl.Pid,
 		&sl.Url,
 		&sl.Information,
@@ -881,17 +951,24 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 		&sl.Name,
 		&hid, &sl.CallType, &sl.Resp,
 	)
-	sl.Resp = html.UnescapeString(sl.Resp)
-	sl.Result = html.UnescapeString(sl.Result)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	sl.Resp = html.UnescapeString(sl.Resp)
+	sl.Result = html.UnescapeString(sl.Result)
+
 	// 遍历请求头
 	var ids string
 	if hid > 0 {
-		err = bugconfig.Bug_Mysql.GetOne("select name,hhids,remark from header where id=?", hid).Scan(&sl.Header, &ids, &sl.Remark)
+		row, err := db.Mconn.GetOne("select name,hhids,remark from header where id=?", hid)
+		if err != nil {
+			golog.Error(err.Error())
+			w.Write(errorcode.ErrorE(err))
+			return
+		}
+		err = row.Scan(&sl.Header, &ids, &sl.Remark)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorE(err))
@@ -912,7 +989,7 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 	// 遍历选项
 	if len(oids) != 0 {
 
-		orows, err := bugconfig.Bug_Mysql.GetRows(fmt.Sprintf("select id,info,name,tid,df,need from options where id in (%s)", oids))
+		orows, err := db.Mconn.GetRows(fmt.Sprintf("select id,info,name,tid,df,need from options where id in (%s)", oids))
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorE(err))

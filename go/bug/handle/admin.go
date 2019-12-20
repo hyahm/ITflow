@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/hyahm/golog"
 	"itflow/bug/bugconfig"
+	"itflow/db"
 	"itflow/gaencrypt"
 	"net/http"
 	"strings"
@@ -19,7 +20,13 @@ func Reset(w http.ResponseWriter, r *http.Request) {
 	}
 	password := r.FormValue("password")
 	var count int
-	err := bugconfig.Bug_Mysql.GetOne("select count(id) from user where rid=0").Scan(&count)
+	row , err := db.Mconn.GetOne("select count(id) from user where rid=0")
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&count)
 	if err != nil {
 		if err == sql.ErrNoRows || count != 1 {
 			golog.Debug("有且只能有一个admin账户")
@@ -31,7 +38,7 @@ func Reset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	password = gaencrypt.PwdEncrypt(password, bugconfig.Salt)
-	_, err = bugconfig.Bug_Mysql.Update("update user set password=? where rid=0", password)
+	_, err = db.Mconn.Update("update user set password=? where rid=0", password)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))

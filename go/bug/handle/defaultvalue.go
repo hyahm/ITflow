@@ -5,6 +5,7 @@ import (
 	"github.com/hyahm/golog"
 	"io/ioutil"
 	"itflow/bug/bugconfig"
+	"itflow/db"
 	"net/http"
 )
 
@@ -75,7 +76,7 @@ func DefaultSave(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//修改字段
-	_, err = bugconfig.Bug_Mysql.Update("update defaultvalue set status=?, important=?,level=?", sid, iid, lid)
+	_, err = db.Mconn.Update("update defaultvalue set status=?, important=?,level=?", sid, iid, lid)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))

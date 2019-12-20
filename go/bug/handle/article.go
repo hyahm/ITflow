@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"itflow/bug/bugconfig"
+	"itflow/db"
 	"net/http"
 	"os"
 	"path"
@@ -178,7 +179,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	ul := &userList{}
 
 	getusersql := "select realname from user"
-	rows, err := bugconfig.Bug_Mysql.GetRows(getusersql)
+	rows, err := db.Mconn.GetRows(getusersql)
 
 	if err != nil {
 		golog.Error(err.Error())
@@ -354,7 +355,7 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 	url.Uploaded = 1
 	uploadimg := "update user set headimg = ? where nickname=?"
 
-	_, err = bugconfig.Bug_Mysql.Update(uploadimg, url.Url, nickname)
+	_, err = db.Mconn.Update(uploadimg, url.Url, nickname)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -379,7 +380,7 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 	}
 
 	getinfosql := "select uid,info,time from informations where bid=?"
-	rows, err := bugconfig.Bug_Mysql.GetRows(getinfosql, bid)
+	rows, err := db.Mconn.GetRows(getinfosql, bid)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -396,7 +397,13 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 	getlistsql := "select bugtitle,content,vid,sid,id from bugs where id=?"
 	var statusid int64
 	var vid int64
-	err = bugconfig.Bug_Mysql.GetOne(getlistsql, bid).Scan(&sl.Title, &sl.Content, &vid, &statusid, &sl.Id)
+	row, err := db.Mconn.GetOne(getlistsql, bid)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&sl.Title, &sl.Content, &vid, &statusid, &sl.Id)
 	if err != nil && err != sql.ErrNoRows {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))

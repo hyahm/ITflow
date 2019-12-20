@@ -7,6 +7,7 @@ import (
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
 	"itflow/bug/model"
+	"itflow/db"
 	"net/http"
 	"strconv"
 	"strings"
@@ -55,7 +56,18 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 	// 判断这个bug是不是自己的任务，只有自己的任务才可以转交
 	var splist string
 	var hasperm bool
-	err = bugconfig.Bug_Mysql.GetOne("select spusers from bugs where id=?", ub.Id).Scan(&splist)
+	row, err := db.Mconn.GetOne("select spusers from bugs where id=?", ub.Id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&splist)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
 	myuid := strconv.FormatInt(bugconfig.CacheNickNameUid[nickname], 10)
 	for _, v := range strings.Split(splist, ",") {
 		if myuid == v {
@@ -87,7 +99,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 	ul := strings.Join(idstr, ",")
 	//添加进information表, 应该要弄成事务,插入转交信息
 	remarksql := "insert into informations(uid,bid,info,time) values(?,?,?,?)"
-	_, err = bugconfig.Bug_Mysql.Insert(remarksql, bugconfig.CacheNickNameUid[nickname], ub.Id, ub.Remark, time.Now().Unix())
+	_, err = db.Mconn.Insert(remarksql, bugconfig.CacheNickNameUid[nickname], ub.Id, ub.Remark, time.Now().Unix())
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -95,7 +107,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 	}
 	//更改bug
 
-	_, err = bugconfig.Bug_Mysql.Update("update bugs set sid=?,spusers=? where id=?", sid, ul, ub.Id)
+	_, err = db.Mconn.Update("update bugs set sid=?,spusers=? where id=?", sid, ul, ub.Id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -189,7 +201,7 @@ func TaskList(w http.ResponseWriter, r *http.Request) {
 
 	getaritclesql := "select id,createtime,importent,status,bugtitle,uid,level,pid,spusers from bugs where id in (select bid from userandbug where uid=?)  order by id desc "
 
-	rows, err := bugconfig.Bug_Mysql.GetRows(getaritclesql, uid)
+	rows, err := db.Mconn.GetRows(getaritclesql, uid)
 
 	if err != nil {
 		golog.Error(err.Error())

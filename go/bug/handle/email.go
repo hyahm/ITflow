@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"itflow/bug/bugconfig"
 	"itflow/bug/mail"
+	"itflow/db"
 	"net/http"
 )
 
@@ -65,14 +66,14 @@ func SaveEmail(w http.ResponseWriter, r *http.Request) {
 
 	var id int64
 	if getemail.Id < 0 {
-		id, err = bugconfig.Bug_Mysql.Insert("insert into email(email,password,port,createuser,createbug,passbug) values(?,?,?,?,?,?)", getemail.EmailAddr, getemail.Password, getemail.Port, getemail.CreateUser, getemail.CreateBug, getemail.PassBug)
+		id, err = db.Mconn.Insert("insert into email(email,password,port,createuser,createbug,passbug) values(?,?,?,?,?,?)", getemail.EmailAddr, getemail.Password, getemail.Port, getemail.CreateUser, getemail.CreateBug, getemail.PassBug)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
 	} else {
-		_, err = bugconfig.Bug_Mysql.Update("update email set email=?,password=?,port=?,createuser=?,createbug=?,passbug=? where id=?", getemail.EmailAddr, getemail.Password, getemail.Port, getemail.CreateUser, getemail.CreateBug, getemail.PassBug, getemail.Id)
+		_, err = db.Mconn.Update("update email set email=?,password=?,port=?,createuser=?,createbug=?,passbug=? where id=?", getemail.EmailAddr, getemail.Password, getemail.Port, getemail.CreateUser, getemail.CreateBug, getemail.PassBug, getemail.Id)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorE(err))

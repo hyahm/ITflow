@@ -5,10 +5,9 @@ import (
 	"github.com/hyahm/golog"
 	"io"
 	"io/ioutil"
-	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
 	"itflow/bug/model"
-	"itflow/gadb"
+	"itflow/db"
 	"itflow/gaencrypt"
 	"net/http"
 	"os"
@@ -51,7 +50,7 @@ func ShareList(w http.ResponseWriter, r *http.Request) {
 	fd := &model.List_sharelist{}
 	uid := bugconfig.CacheNickNameUid[nickname]
 	path := r.FormValue("path")
-	grows, err := bugconfig.Bug_Mysql.GetRows("select id,ids from usergroup")
+	grows, err := db.Mconn.GetRows("select id,ids from usergroup")
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -75,7 +74,7 @@ func ShareList(w http.ResponseWriter, r *http.Request) {
 
 	// 如果是自己
 	sql := "select id,isfile,size,updatetime,name,ownerid,readuser,rid,wid,writeuser from sharefile where filepath=? "
-	rows, err := bugconfig.Bug_Mysql.GetRows(sql, filepath.Clean(path))
+	rows, err := db.Mconn.GetRows(sql, filepath.Clean(path))
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -259,8 +258,14 @@ func ShareUpload(w http.ResponseWriter, r *http.Request) {
 		//根目录
 		hasperm = true
 	} else {
-		err = bugconfig.Bug_Mysql.GetOne("select id,ownerid,writeuser,wid from sharefile where isfile=false and filepath=? and name=?",
-			filepath.Dir(dir), filepath.Base(dir)).Scan(&testid, &ownerid, &writeuser, &wid)
+		row, err := db.Mconn.GetOne("select id,ownerid,writeuser,wid from sharefile where isfile=false and filepath=? and name=?",
+			filepath.Dir(dir), filepath.Base(dir))
+		if err != nil {
+			golog.Error(err.Error())
+			w.Write(errorcode.ErrorE(err))
+			return
+		}
+		err= row.Scan(&testid, &ownerid, &writeuser, &wid)
 		if err != nil {
 			golog.Error(err.Error())
 			w.Write(errorcode.ErrorE(err))
@@ -281,7 +286,13 @@ func ShareUpload(w http.ResponseWriter, r *http.Request) {
 				}
 			} else {
 				var ids string
-				err = bugconfig.Bug_Mysql.GetOne("select ids from usergroup where id=?", wid).Scan(&ids)
+				row, err := db.Mconn.GetOne("select ids from usergroup where id=?", wid)
+				if err != nil {
+					golog.Error(err.Error())
+					w.Write(errorcode.ErrorE(err))
+					return
+				}
+				err = row.Scan(&ids)
 				if err != nil {
 					golog.Error(err.Error())
 					w.Write(errorcode.ErrorE(err))
@@ -307,7 +318,7 @@ func ShareUpload(w http.ResponseWriter, r *http.Request) {
 	// 插入数据
 	updatetime := time.Now().Unix()
 	ssql := "insert into sharefile(filepath,name,isfile,size,readuser,rid,ownerid,writeuser,wid,updatetime) values(?,?,?,?,?,?,?,?,?,?)"
-	errorcode.Id, err = bugconfig.Bug_Mysql.Insert(ssql, filepath.Clean(dir), header.Filename, true, header.Size, isuser,
+	errorcode.Id, err = db.Mconn.Insert(ssql, filepath.Clean(dir), header.Filename, true, header.Size, isuser,
 		rwid, bugconfig.CacheRealNameUid[nickname], isuser,
 		rwid,
 		updatetime,
@@ -406,7 +417,7 @@ func ShareRename(w http.ResponseWriter, r *http.Request) {
 	}
 
 	updatetime := time.Now().Unix()
-	_, err = bugconfig.Bug_Mysql.Update("update sharefile set readuser=?,rid=?,isfile=?,writeuser=?,wid=?,updatetime=?,name=? where id=? and filepath=?",
+	_, err = db.Mconn.Update("update sharefile set readuser=?,rid=?,isfile=?,writeuser=?,wid=?,updatetime=?,name=? where id=? and filepath=?",
 		ps.ReadUser, rid, ps.IsFile, ps.WriteUser, wid, updatetime, ps.Name, ps.Id, ps.FilePath)
 	if err != nil {
 		golog.Error(err.Error())
@@ -535,7 +546,7 @@ func ShareMkdir(w http.ResponseWriter, r *http.Request) {
 	}
 	updatetime := time.Now().Unix()
 	ssql := "insert into sharefile(filepath,name,isfile,size,readuser,rid,writeuser,wid,ownerid,updatetime) values(?,?,?,?,?,?,?,?,?,?)"
-	errorcode.Id, err = bugconfig.Bug_Mysql.Insert(ssql, filepath.Clean(ps.FilePath), ps.Name, ps.IsFile, ps.Size, ps.ReadUser, rid, ps.WriteUser, wid, bugconfig.CacheRealNameUid[nickname], updatetime)
+	errorcode.Id, err = db.Mconn.Insert(ssql, filepath.Clean(ps.FilePath), ps.Name, ps.IsFile, ps.Size, ps.ReadUser, rid, ps.WriteUser, wid, bugconfig.CacheRealNameUid[nickname], updatetime)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -563,7 +574,13 @@ func ShareRemove(w http.ResponseWriter, r *http.Request) {
 	// 检查文件夹权限
 	var fp string
 	var name string
-	err = bugconfig.Bug_Mysql.GetOne("select filepath,name from sharefile where id=? and ownerid=?", id, bugconfig.CacheNickNameUid[nickname]).Scan(&fp, &name)
+	row, err:= db.Mconn.GetOne("select filepath,name from sharefile where id=? and ownerid=?", id, bugconfig.CacheNickNameUid[nickname])
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&fp, &name)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -577,7 +594,7 @@ func ShareRemove(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	_, err = bugconfig.Bug_Mysql.Update("delete from sharefile where id=? ", id)
+	_, err = db.Mconn.Update("delete from sharefile where id=? ", id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -596,7 +613,7 @@ func ShareRemove(w http.ResponseWriter, r *http.Request) {
 }
 
 func getrow(fp string, name string) error {
-	dd, err := bugconfig.Bug_Mysql.GetRows("select id,filepath,name,isfile from sharefile where filepath=? ", filepath.Join(fp, name))
+	dd, err := db.Mconn.GetRows("select id,filepath,name,isfile from sharefile where filepath=? ", filepath.Join(fp, name))
 	if err != nil {
 		return err
 	}
@@ -610,7 +627,7 @@ func getrow(fp string, name string) error {
 			return err
 		}
 		// 删除数据库
-		_, err = bugconfig.Bug_Mysql.Update("delete from sharefile where id=? ", _id)
+		_, err = db.Mconn.Update("delete from sharefile where id=? ", _id)
 		if err != nil {
 			return err
 		}
@@ -633,12 +650,7 @@ func ShareShow(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("id")
 	token := r.FormValue("token")
-	conn, err := gadb.NewSqlConfig().ConnDB()
-	if err != nil {
-		golog.Error(err.Error())
-		w.WriteHeader(http.StatusBadGateway)
-		return
-	}
+
 	// 只是验证token
 	destoken, err := gaencrypt.RsaDecrypt(token, bugconfig.PrivateKey, true)
 	if err != nil {
@@ -646,7 +658,7 @@ func ShareShow(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-	nickname, err := asset.Getvalue(string(destoken))
+	nickname, err := db.RSconn.Get(string(destoken))
 	if err != nil {
 		golog.Error(err.Error())
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -660,7 +672,13 @@ func ShareShow(w http.ResponseWriter, r *http.Request) {
 	var readuser bool
 	var rid int64
 	var ownerid int64
-	err = conn.GetOne(getsql, id).Scan(&ownerid, &fp, &name, &readuser, &rid)
+	row, err := db.Mconn.GetOne(getsql, id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.WriteHeader(http.StatusBadGateway)
+		return
+	}
+	err = row.Scan(&ownerid, &fp, &name, &readuser, &rid)
 	if err != nil {
 		golog.Error(err.Error())
 		w.WriteHeader(http.StatusBadGateway)
@@ -676,7 +694,13 @@ func ShareShow(w http.ResponseWriter, r *http.Request) {
 		} else {
 			// 判断权限组是否有权限
 			var ids string
-			err = conn.GetOne("select ids from usergroup where id=?", rid).Scan(&ids)
+			row, err = db.Mconn.GetOne("select ids from usergroup where id=?", rid)
+			if err != nil {
+				golog.Error(err.Error())
+				w.WriteHeader(http.StatusBadGateway)
+				return
+			}
+			err = row.Scan(&ids)
 			if err != nil {
 				golog.Error(err.Error())
 				w.WriteHeader(http.StatusBadGateway)

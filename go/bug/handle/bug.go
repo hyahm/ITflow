@@ -11,6 +11,7 @@ import (
 	"itflow/bug/buglog"
 	"itflow/bug/model"
 	"itflow/bug/public"
+	"itflow/db"
 	"net/http"
 	"strconv"
 	"strings"
@@ -115,7 +116,13 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
 
 	sl := &userinfo{}
 
-	err = bugconfig.Bug_Mysql.GetOne("select email,realname from user where nickname=?", name).Scan(&sl.Email, &sl.Realname)
+	row, err := db.Mconn.GetOne("select email,realname from user where nickname=?", name)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&sl.Email, &sl.Realname)
 
 	if err != nil {
 		golog.Error(err.Error())
@@ -156,7 +163,7 @@ func UpdateInfo(w http.ResponseWriter, r *http.Request) {
 	}
 	uid := bugconfig.CacheNickNameUid[name]
 	// 修改用户信息
-	_, err = bugconfig.Bug_Mysql.Update("update user set email=?,realname=?,nickname=? where id=?", sl.Email, sl.Realname, sl.Nickname, uid)
+	_, err = db.Mconn.Update("update user set email=?,realname=?,nickname=? where id=?", sl.Email, sl.Realname, sl.Nickname, uid)
 
 	if err != nil {
 		golog.Error(err.Error())
@@ -229,7 +236,7 @@ func UpdateRoles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = bugconfig.Bug_Mysql.Update("update user set rid=? where id=?", rid, sl.Id)
+	_, err = db.Mconn.Update("update user set rid=? where id=?", rid, sl.Id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -290,7 +297,7 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	dsql := "select id,exectime,classify,content,ip from log order by id desc"
-	rows, err := bugconfig.Bug_Mysql.GetRows(dsql)
+	rows, err := db.Mconn.GetRows(dsql)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -379,7 +386,14 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 	}
 	//获取总行数
 
-	err = bugconfig.Bug_Mysql.GetOne("select count(id) from log " + endsql).Scan(&listlog.Count)
+	row, err := db.Mconn.GetOne("select count(id) from log " + endsql)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+
+	err = row.Scan(&listlog.Count)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -389,7 +403,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 	start, end := public.GetPagingLimitAndPage(listlog.Count, alllog.Page, alllog.Limit)
 	listlog.Page = start / alllog.Limit
 
-	rows, err := bugconfig.Bug_Mysql.GetRows(basesql+endsql+" limit ?,?", start, end)
+	rows, err :=db.Mconn.GetRows(basesql+endsql+" limit ?,?", start, end)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -478,7 +492,7 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 
 	basesql := "update bugs set sid=? where id=?"
 
-	_, err = bugconfig.Bug_Mysql.Update(basesql, sid, param.Id)
+	_, err = db.Mconn.Update(basesql, sid, param.Id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -538,7 +552,7 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 	//
 	basesql := "update user set showstatus=? where id=?"
 
-	_, err = bugconfig.Bug_Mysql.Update(basesql, showstatus, bugconfig.CacheNickNameUid[nickname])
+	_, err = db.Mconn.Update(basesql, showstatus, bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -582,7 +596,13 @@ func GetAllBugs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs").Scan(&al.Count)
+	row, err := db.Mconn.GetOne("select count(id) from bugs")
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&al.Count)
 	if err != nil {
 		golog.Error(err.Error())
 		al.Code = 5
@@ -593,7 +613,7 @@ func GetAllBugs(w http.ResponseWriter, r *http.Request) {
 	start, end := public.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
 
 	alsql := "select id,createtime,importent,status,bugtitle,uid,level,pid,env,spusers from bugs where dustbin=0 order by id desc limit ?,?"
-	rows, err := bugconfig.Bug_Mysql.GetRows(alsql, start, end)
+	rows, err := db.Mconn.GetRows(alsql, start, end)
 	if err != nil {
 		golog.Error(err.Error())
 		al.Code = 1
@@ -651,7 +671,13 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	uid := bugconfig.CacheNickNameUid[name]
-	err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs where uid=?", uid).Scan(&al.Count)
+	row, err := db.Mconn.GetOne("select count(id) from bugs where uid=?", uid)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err= row.Scan(&al.Count)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -660,7 +686,7 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 	start, end := public.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
 
 	alsql := "select id,createtime,importent,status,bugtitle,uid,level,pid,env,spusers from bugs where uid=? and dustbin=0 order by id desc limit ?,?"
-	rows, err := bugconfig.Bug_Mysql.GetRows(alsql, uid, start, end)
+	rows, err := db.Mconn.GetRows(alsql, uid, start, end)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -700,7 +726,13 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("id")
 	var uid int64
-	err = bugconfig.Bug_Mysql.GetOne("select uid from bugs where id=?", id).Scan(&uid)
+	row, err := db.Mconn.GetOne("select uid from bugs where id=?", id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&uid)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -711,7 +743,7 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("没有权限"))
 		return
 	}
-	_, err = bugconfig.Bug_Mysql.Update("update bugs set dustbin=true where id=?", id)
+	_, err = db.Mconn.Update("update bugs set dustbin=true where id=?", id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -765,7 +797,13 @@ func BugEdit(w http.ResponseWriter, r *http.Request) {
 	var lid int64
 	var vid int64
 	alsql := "select iid,bugtitle,lid,pid,eid,spusers,vid,content from bugs where id=?"
-	err = bugconfig.Bug_Mysql.GetOne(alsql, id).Scan(&iid, &al.Title, &lid, &pid, &eid, &uidlist, &vid, &al.Content)
+	row , err := db.Mconn.GetOne(alsql, id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&iid, &al.Title, &lid, &pid, &eid, &uidlist, &vid, &al.Content)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))

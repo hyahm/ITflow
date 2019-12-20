@@ -7,6 +7,7 @@ import (
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
+	"itflow/db"
 	"net/http"
 	"strconv"
 	"strings"
@@ -95,7 +96,7 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 
 	getaritclesql := "insert into environment(envname) values(?)"
 
-	errorcode.Id, err = bugconfig.Bug_Mysql.Insert(getaritclesql, envname)
+	errorcode.Id, err = db.Mconn.Insert(getaritclesql, envname)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -166,7 +167,7 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 
 	getaritclesql := "update environment set envname=? where id=?"
 
-	_, err = bugconfig.Bug_Mysql.Update(getaritclesql, er.EnvName, er.Id)
+	_, err = db.Mconn.Update(getaritclesql, er.EnvName, er.Id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -231,7 +232,13 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 	}
 	var count int
 
-	err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs where eid=?", id).Scan(&count)
+	row, err := db.Mconn.GetOne("select count(id) from bugs where eid=?", id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&count)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -243,7 +250,7 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 	}
 	getaritclesql := "delete from environment where id=?"
 
-	_, err = bugconfig.Bug_Mysql.Update(getaritclesql, id)
+	_, err = db.Mconn.Update(getaritclesql, id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))

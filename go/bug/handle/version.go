@@ -7,6 +7,7 @@ import (
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
+	"itflow/db"
 	"net/http"
 	"strconv"
 	"strings"
@@ -65,7 +66,7 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 	uid := bugconfig.CacheNickNameUid[nickname]
 	add_version_sql := "insert into version(name,urlone,urltwo,createtime,createuid) values(?,?,?,?,?)"
 
-	vid, err := bugconfig.Bug_Mysql.Insert(add_version_sql, version_add.Version, version_add.Iphoneurl, version_add.Notiphoneurl, time.Now().Unix(), uid)
+	vid, err := db.Mconn.Insert(add_version_sql, version_add.Version, version_add.Iphoneurl, version_add.Notiphoneurl, time.Now().Unix(), uid)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -156,7 +157,7 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 	}
 	get_version_sql := "select id,name,urlone,urltwo,createtime from version order by id desc"
 
-	rows, err := bugconfig.Bug_Mysql.GetRows(get_version_sql)
+	rows, err := db.Mconn.GetRows(get_version_sql)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -204,7 +205,13 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorNoPermission())
 		return
 	}
-	err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs where id=?", id).Scan(&bugcount)
+	row, err := db.Mconn.GetOne("select count(id) from bugs where id=?", id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&bugcount)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -216,7 +223,7 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	deletevl := "delete from version where id=?"
-	errorcode.Id, err = bugconfig.Bug_Mysql.Update(deletevl, id)
+	errorcode.Id, err = db.Mconn.Update(deletevl, id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -299,7 +306,7 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	uid := bugconfig.CacheNickNameUid[nickname]
 	versionsql := "update version set name=?,urlone=?,urltwo=?,createuid=? where id=?"
-	_, err = bugconfig.Bug_Mysql.Update(versionsql, data.Name, data.Iphone, data.NoIphone, uid, data.Id)
+	_, err = db.Mconn.Update(versionsql, data.Name, data.Iphone, data.NoIphone, uid, data.Id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))

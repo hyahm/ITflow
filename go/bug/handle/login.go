@@ -3,16 +3,17 @@ package handle
 import (
 	"database/sql"
 	"encoding/json"
+	"github.com/hyahm/goconfig"
 	"github.com/hyahm/golog"
 	"io/ioutil"
-	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
-	"itflow/gadb"
+	"itflow/db"
 	"itflow/gaencrypt"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type resLogin struct {
@@ -63,7 +64,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	getsql := "select nickname from user where email=? and password=? and disable=0"
 
-	err = bugconfig.Bug_Mysql.GetOne(getsql, login.Username, enpassword).Scan(&login.Username)
+	row, err := db.Mconn.GetOne(getsql, login.Username, enpassword)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&login.Username)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			golog.Error("username or password error")
@@ -75,7 +82,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = asset.Setkey(login.Token, login.Username)
+	_, err = db.RSconn.Set(login.Token, login.Username,
+		time.Duration(goconfig.ReadInt("expiration"))*time.Minute)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -102,22 +110,15 @@ func Login(w http.ResponseWriter, r *http.Request) {
 func Loginout(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &errorstruct{}
-	conn, err := gadb.NewSqlConfig().ConnDB()
-	if err != nil {
-		golog.Error(err.Error())
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	defer conn.Db.Close()
+
 
 	token := r.FormValue("token")
-	nickname, err := asset.Getvalue(token)
+	nickname, err := db.RSconn.Get(token)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	asset.Delkey(token)
 	il := buglog.AddLog{
 		Ip: strings.Split(r.RemoteAddr, ":")[0],
 	}
@@ -152,7 +153,13 @@ func UserInfo(w http.ResponseWriter, r *http.Request) {
 	sql := "select rid,level,headimg,nickname from user where nickname=?"
 	var rid string
 	var level int
-	err = bugconfig.Bug_Mysql.GetOne(sql, nickname).Scan(&rid, &level, &userinfo.Avatar, &userinfo.Name)
+	row, err := db.Mconn.GetOne(sql, nickname)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&rid, &level, &userinfo.Avatar, &userinfo.Name)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -164,7 +171,18 @@ func UserInfo(w http.ResponseWriter, r *http.Request) {
 	} else {
 		var rl string
 		getrole := "select rolelist from rolegroup where id=?"
-		bugconfig.Bug_Mysql.GetOne(getrole, rid).Scan(&rl)
+		row, err := db.Mconn.GetOne(getrole, rid)
+		if err != nil {
+			golog.Error(err.Error())
+			w.Write(errorcode.ErrorE(err))
+			return
+		}
+		err = row.Scan(&rl)
+		if err != nil {
+			golog.Error(err.Error())
+			w.Write(errorcode.ErrorE(err))
+			return
+		}
 		for _, v := range strings.Split(rl, ",") {
 			id, _ := strconv.Atoi(v)
 			userinfo.Roles = append(userinfo.Roles, bugconfig.CacheRidRole[int64(id)])

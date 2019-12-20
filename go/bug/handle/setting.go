@@ -8,6 +8,7 @@ import (
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
 	"itflow/bug/mail"
+	"itflow/db"
 	"itflow/gaencrypt"
 	"net/http"
 	"strconv"
@@ -106,7 +107,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var level int64
-	err = bugconfig.Bug_Mysql.GetOne("select level from jobs where id=?", jid).Scan(&level)
+	row , err := db.Mconn.GetOne("select level from jobs where id=?", jid)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&level)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -116,7 +123,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	showstatus := strings.Join(ids, ",")
 	enpassword := gaencrypt.PwdEncrypt(getuser.Password, bugconfig.Salt)
 	createusersql := "insert into user(nickname,password,email,headimg,createtime,createuid,realname,showstatus,disable,bugsid,level,rid,jid) values(?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	errorcode.Id, err = bugconfig.Bug_Mysql.Insert(createusersql,
+	errorcode.Id, err = db.Mconn.Insert(createusersql,
 		getuser.Nickname, enpassword, getuser.Email,
 		"", time.Now().Unix(), bugconfig.CacheNickNameUid[nickname],
 		getuser.RealName, showstatus, false,
@@ -180,7 +187,13 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 	}
 	// 判断是否有bug
 	var count int
-	err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs where uid=?", id).Scan(&count)
+	row, err := db.Mconn.GetOne("select count(id) from bugs where uid=?", id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&count)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -192,7 +205,7 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 查看用户组是否存在此用户
-	userrows, err := bugconfig.Bug_Mysql.GetRows("select ids from usergroup")
+	userrows, err := db.Mconn.GetRows("select ids from usergroup")
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -213,7 +226,7 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	_, err = bugconfig.Bug_Mysql.Update("delete from user where id=?", id)
+	_, err = db.Mconn.Update("delete from user where id=?", id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -258,13 +271,13 @@ func DisableUser(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("id")
 
-	_, err = bugconfig.Bug_Mysql.Update("update user set disable=ABS(disable-1) where id=?", id)
+	_, err = db.Mconn.Update("update user set disable=ABS(disable-1) where id=?", id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	_, err = bugconfig.Bug_Mysql.Update("update bugs set dustbin=ABS(dustbin-1) where uid=?", id)
+	_, err = db.Mconn.Update("update bugs set dustbin=ABS(dustbin-1) where uid=?", id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -327,7 +340,7 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 	//switch level {
 	//case 0:
 	getallsql := "select id,createtime,realname,nickname,email,disable,rid,bugsid,jid from user where level<>0"
-	adminrows, err := bugconfig.Bug_Mysql.GetRows(getallsql)
+	adminrows, err := db.Mconn.GetRows(getallsql)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -451,7 +464,7 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	getallsql := "update user set realname=?,nickname=?,email=?,rid=?,bugsid=?,jid=? where id=?"
-	_, err = bugconfig.Bug_Mysql.Update(getallsql,
+	_, err = db.Mconn.Update(getallsql,
 		uls.Realname, uls.Nickname, uls.Email, rid, bsid, bugconfig.CacheJobnameJid[uls.Position],
 		uls.Id,
 	)
@@ -523,7 +536,13 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	getaritclesql := "select count(id) from user where id=? and password=?"
 	oldpassword := gaencrypt.PwdEncrypt(getuser.Oldpassword, bugconfig.Salt)
 	var n int
-	err = bugconfig.Bug_Mysql.GetOne(getaritclesql, uid, oldpassword).Scan(&n)
+	row, err := db.Mconn.GetOne(getaritclesql, uid, oldpassword)
+	if err != nil || n != 1 {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorNoPermission())
+		return
+	}
+	err = row.Scan(&n)
 	if err != nil || n != 1 {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorNoPermission())
@@ -532,7 +551,7 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	newpassword := gaencrypt.PwdEncrypt(getuser.Newpassword, bugconfig.Salt)
 	chpwdsql := "update user set password=? where id=?"
 
-	_, err = bugconfig.Bug_Mysql.Update(chpwdsql, newpassword, uid)
+	_, err = db.Mconn.Update(chpwdsql, newpassword, uid)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -591,7 +610,13 @@ func GetThisRoles(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	var rolestring string
-	err = bugconfig.Bug_Mysql.GetOne("select rolestring from user where id=?", id).Scan(&rolestring)
+	row, err := db.Mconn.GetOne("select rolestring from user where id=?", id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&rolestring)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -659,7 +684,7 @@ func ResetPwd(w http.ResponseWriter, r *http.Request) {
 	newpassword := gaencrypt.PwdEncrypt(rp.Password, bugconfig.Salt)
 
 	updatepwdsql := "update user set password=? where id=?"
-	_, err = bugconfig.Bug_Mysql.Update(updatepwdsql, newpassword, rp.Id)
+	_, err = db.Mconn.Update(updatepwdsql, newpassword, rp.Id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))

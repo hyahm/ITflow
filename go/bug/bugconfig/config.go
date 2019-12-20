@@ -3,7 +3,6 @@ package bugconfig
 import (
 	"fmt"
 	"github.com/hyahm/goconfig"
-	"github.com/hyahm/gomysql"
 	"log"
 	"os"
 	"runtime"
@@ -13,14 +12,12 @@ import (
 //const SALT = "hjkkaksjdhfryuooweqzmbvc"
 
 var (
-	Bug_Mysql   *gomysql.Db
 	ImgDir      string
 	PrivateKey  string
 	ShowBaseUrl string
 	Salt        string
 	Expirontion int
 	ShareDir    string
-	Exclude     []string
 	CLASSIFY    = []string{"login", "user", "bug", "version", "project", "env", "statusgroup", "role", "status", "restfulproject", "api", "type", "usergroup", "header", "important", "level", "position"}
 )
 
@@ -88,16 +85,11 @@ func LoadConfig() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	Bug_Mysql, err = gomysql.GetDb("bug")
-	if err != nil {
-		log.Fatal(err)
-	}
 	PrivateKey = goconfig.ReadFile("privatekeyfile")
 	ShowBaseUrl = goconfig.ReadString("showbaseurl")
 	Salt = goconfig.ReadString("salt")
 	ShareDir = goconfig.ReadString("sharedir")
 	ShareDir = addXieGang(ShareDir)
-	Exclude = goconfig.ReadStringArray("exclude")
 	// 创建共享文件夹
 	err = os.MkdirAll(ShareDir, 0755)
 	if err != nil {

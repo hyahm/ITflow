@@ -8,6 +8,7 @@ import (
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
 	"itflow/bug/model"
+	"itflow/db"
 	"net/http"
 	"strconv"
 	"strings"
@@ -42,7 +43,7 @@ func RoleList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s := "select id,name,rolelist from rolegroup"
-	rows, err := bugconfig.Bug_Mysql.GetRows(s)
+	rows, err := db.Mconn.GetRows(s)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -99,7 +100,13 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 	}
 	ssql := "select count(id) from user where rid=?"
 	var count int
-	err = bugconfig.Bug_Mysql.GetOne(ssql, id).Scan(&count)
+	row, err := db.Mconn.GetOne(ssql, id)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&count)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -110,7 +117,7 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	isql := "delete from  rolegroup where id = ?"
-	_, err = bugconfig.Bug_Mysql.Update(isql, id)
+	_, err = db.Mconn.Update(isql, id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -181,7 +188,7 @@ func EditRole(w http.ResponseWriter, r *http.Request) {
 		rl = append(rl, strconv.FormatInt(bugconfig.CacheRoleRid[v], 10))
 	}
 	gsql := "update rolegroup set name=?,rolelist=?  where id=?"
-	_, err = bugconfig.Bug_Mysql.Update(gsql, data.Name, strings.Join(rl, ","), data.Id)
+	_, err = db.Mconn.Update(gsql, data.Name, strings.Join(rl, ","), data.Id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -258,7 +265,7 @@ func AddRole(w http.ResponseWriter, r *http.Request) {
 		ids = append(ids, strconv.FormatInt(bugconfig.CacheRoleRid[v], 10))
 	}
 	gsql := "insert rolegroup(name,rolelist) values(?,?)"
-	errorcode.Id, err = bugconfig.Bug_Mysql.Insert(gsql, data.Name, strings.Join(ids, ","))
+	errorcode.Id, err = db.Mconn.Insert(gsql, data.Name, strings.Join(ids, ","))
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))

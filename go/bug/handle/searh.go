@@ -9,6 +9,7 @@ import (
 	"itflow/bug/bugconfig"
 	"itflow/bug/model"
 	"itflow/bug/public"
+	"itflow/db"
 	"net/http"
 	"strconv"
 	"strings"
@@ -112,7 +113,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 	if showstatus != "" {
 		bugsql += fmt.Sprintf("and sid in (%s)", showstatus)
 	}
-	rows, err := bugconfig.Bug_Mysql.GetRows(bugsql)
+	rows, err := db.Mconn.GetRows(bugsql)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -205,7 +206,13 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 
 	basesql, args := managertotal("select count(id) from bugs", searchparam)
 
-	err = bugconfig.Bug_Mysql.GetOne(basesql, args...).Scan(&al.Count)
+	row, err := db.Mconn.GetOne(basesql, args...)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&al.Count)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -296,7 +303,7 @@ func managersearch(basesql string, count int, params *getBugManager) (*sql.Rows,
 	args = append(args, end)
 	searchsql = searchsql + " order by id desc limit ?,? "
 
-	return bugconfig.Bug_Mysql.GetRows(searchsql, args...)
+	return db.Mconn.GetRows(searchsql, args...)
 }
 
 func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool) (*model.AllArticleList, []byte) {
@@ -360,7 +367,12 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 		bugsql += fmt.Sprintf("and sid in (%s) ", showstatus)
 	}
 
-	err = bugconfig.Bug_Mysql.GetOne(countbasesql, bugconfig.CacheNickNameUid[nickname]).Scan(&al.Count)
+	row, err := db.Mconn.GetOne(countbasesql, bugconfig.CacheNickNameUid[nickname])
+	if err != nil {
+		golog.Error(err.Error())
+		return nil, errorcode.ErrorE(err)
+	}
+	err = row.Scan(&al.Count)
 	if err != nil {
 		golog.Error(err.Error())
 		return nil, errorcode.ErrorE(err)
@@ -368,7 +380,7 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 	// 获取查询的总个数
 	start, end := public.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
 
-	rows, err := bugconfig.Bug_Mysql.GetRows(bugsql+" limit ?,?", bugconfig.CacheNickNameUid[nickname], start, end)
+	rows, err := db.Mconn.GetRows(bugsql+" limit ?,?", bugconfig.CacheNickNameUid[nickname], start, end)
 	if err != nil {
 		golog.Error(err.Error())
 		return nil, errorcode.ErrorE(err)

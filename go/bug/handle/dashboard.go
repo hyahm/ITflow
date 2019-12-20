@@ -3,7 +3,7 @@ package handle
 import (
 	"encoding/json"
 	"github.com/hyahm/golog"
-	"itflow/bug/bugconfig"
+	"itflow/db"
 	"net/http"
 )
 
@@ -33,14 +33,27 @@ func UserCount(w http.ResponseWriter, r *http.Request) {
 
 	getusersql := "select count(id) from user"
 	getgroupsql := "select count(id) from rolegroup"
-	err = bugconfig.Bug_Mysql.GetOne(getusersql).Scan(&uc.CountUsers)
+	row ,err := db.Mconn.GetOne(getusersql)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
-	err = bugconfig.Bug_Mysql.GetOne(getgroupsql).Scan(&uc.CountGroups)
+	err = row.Scan(&uc.CountUsers)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+
+	row, err = db.Mconn.GetOne(getgroupsql)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&uc.CountGroups)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -72,7 +85,13 @@ func ProjectCount(w http.ResponseWriter, r *http.Request) {
 	pc := &projectCount{}
 
 	getbugs := "select count(id) from bugs"
-	err = bugconfig.Bug_Mysql.GetOne(getbugs).Scan(&pc.CountBugs)
+	row ,err := db.Mconn.GetOne(getbugs)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&pc.CountBugs)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))

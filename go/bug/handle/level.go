@@ -8,6 +8,7 @@ import (
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
 	"itflow/bug/model"
+	"itflow/db"
 	"net/http"
 	"strconv"
 	"strings"
@@ -95,7 +96,7 @@ func LevelAdd(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	errorcode.Id, err = bugconfig.Bug_Mysql.Insert("insert into level(name) value(?)", data.Name)
+	errorcode.Id, err = db.Mconn.Insert("insert into level(name) value(?)", data.Name)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -161,7 +162,13 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 
 	// 判断bug是否在使用
 	var count int
-	err = bugconfig.Bug_Mysql.GetOne("select count(id) from bugs where lid=?", id32).Scan(&count)
+	row, err := db.Mconn.GetOne("select count(id) from bugs where lid=?", id32)
+	if err != nil {
+		golog.Error(err.Error())
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = row.Scan(&count)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -177,7 +184,7 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	gsql := "delete from level where id=?"
-	_, err = bugconfig.Bug_Mysql.Update(gsql, id)
+	_, err = db.Mconn.Update(gsql, id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))
@@ -249,7 +256,7 @@ func LevelUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	gsql := "update level set name=? where id=?"
 
-	_, err = bugconfig.Bug_Mysql.Update(gsql, data.Name, data.Id)
+	_, err = db.Mconn.Update(gsql, data.Name, data.Id)
 	if err != nil {
 		golog.Error(err.Error())
 		w.Write(errorcode.ErrorE(err))

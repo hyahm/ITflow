@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
+	"itflow/db"
 	"net/http"
 	"strconv"
 	"strings"
@@ -123,7 +124,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 
 		insertsql := "insert into bugs(uid,bugtitle,sid,content,iid,createtime,lid,pid,eid,spusers,vid) values(?,?,?,?,?,?,?,?,?,?,?)"
 
-		bugid, err = bugconfig.Bug_Mysql.Insert(insertsql,
+		bugid, err = db.Mconn.Insert(insertsql,
 			uid, data.Title, bugconfig.CacheDefault["status"], html.EscapeString(data.Content),
 			iid, errorcode.UpdateTime, lid,
 			pid, eid, spusers, vid)
@@ -149,7 +150,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 		// 更新
 		insertsql := "update bugs set bugtitle=?,content=?,iid=?,updatetime=?,lid=?,pid=?,eid=?,spusers=?,vid=? where id=?"
 
-		_, err = bugconfig.Bug_Mysql.Update(insertsql, data.Title, html.EscapeString(data.Content), iid,
+		_, err = db.Mconn.Update(insertsql, data.Title, html.EscapeString(data.Content), iid,
 			time.Now().Unix(), lid, pid, eid, spusers, vid, data.Id)
 		if err != nil {
 			golog.Error(err.Error())
