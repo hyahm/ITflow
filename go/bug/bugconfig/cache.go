@@ -4,14 +4,13 @@ import (
 	"errors"
 	"github.com/hyahm/golog"
 	"itflow/db"
-	"log"
 )
 
 func initCache() {
 
 	statusrows, err := db.Mconn.GetRows("select id,name from status")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	for statusrows.Next() {
 		var id int64
@@ -23,7 +22,7 @@ func initCache() {
 
 	rolerows, err := db.Mconn.GetRows("select id,role from roles")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	for rolerows.Next() {
 		var id int64
@@ -35,7 +34,7 @@ func initCache() {
 
 	prows, err := db.Mconn.GetRows("select id,name from projectname")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	for prows.Next() {
 		var id int64
@@ -47,7 +46,7 @@ func initCache() {
 
 	jobrows, err := db.Mconn.GetRows("select id,name from jobs")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	for jobrows.Next() {
 		var id int64
@@ -59,7 +58,7 @@ func initCache() {
 
 	erows, err := db.Mconn.GetRows("select id,envname from environment")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	for erows.Next() {
 		var id int64
@@ -71,7 +70,7 @@ func initCache() {
 
 	headerrows, err := db.Mconn.GetRows("select id,name from header")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	for headerrows.Next() {
 		var id int64
@@ -83,7 +82,7 @@ func initCache() {
 
 	realrows, err := db.Mconn.GetRows("select id,realname,nickname,email,bugsid,level,showstatus,rid,jid from user")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	for realrows.Next() {
 		var id int64
@@ -113,7 +112,7 @@ func initCache() {
 
 	versionrows, err := db.Mconn.GetRows("select id,name from version")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	for versionrows.Next() {
 		var vid int64
@@ -126,7 +125,7 @@ func initCache() {
 
 	deprows, err := db.Mconn.GetRows("select id,name from statusgroup")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	for deprows.Next() {
 		var pid int64
@@ -136,7 +135,7 @@ func initCache() {
 	}
 	rgrows, err := db.Mconn.GetRows("select id,name from rolegroup")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	for rgrows.Next() {
 		var id int64
@@ -146,7 +145,7 @@ func initCache() {
 	}
 	grouprows, err := db.Mconn.GetRows("select id,name from usergroup")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	for grouprows.Next() {
@@ -158,7 +157,7 @@ func initCache() {
 
 	typerows, err := db.Mconn.GetRows("select id,name from types")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	for typerows.Next() {
@@ -174,18 +173,18 @@ func initCache() {
 	row, err  := db.Mconn.GetOne("select count(status) from defaultvalue")
 	if err != nil {
 		golog.Error(err.Error())
-		log.Fatal(err)
+		panic(err)
 	}
 	err = row.Scan(&checkdefaultcount)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	if checkdefaultcount != 1 {
-		log.Fatal(errors.New("defaultvalue表行数只能是1"))
+		panic(errors.New("defaultvalue表行数只能是1"))
 	}
 	importantrow, err := db.Mconn.GetRows("select id,name from importants")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	for importantrow.Next() {
@@ -198,7 +197,7 @@ func initCache() {
 
 	levelrow, err := db.Mconn.GetRows("select id,name from level")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	for levelrow.Next() {
@@ -215,11 +214,11 @@ func initCache() {
 	var level int64
 	row, err = db.Mconn.GetOne("select status,important,level from defaultvalue")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	err = row.Scan(&status, &important, &level)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	if _, ok := CacheSidStatus[status]; ok {
 		CacheDefault["status"] = status

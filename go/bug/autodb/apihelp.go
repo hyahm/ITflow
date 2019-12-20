@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/hyahm/goconfig"
 	"itflow/bug/bugconfig"
+	"itflow/db"
 	"log"
 	"strconv"
 	"strings"
@@ -13,21 +14,21 @@ import (
 func createapi() {
 	var pid int64
 	// 判断是否存在项目名
-	err := bugconfig.Bug_Mysql.GetOne("select id from apiproject where name=?", goconfig.ReadString("apiname")).Scan(&pid)
+	err := db.Mconn.GetOne("select id from apiproject where name=?", goconfig.ReadString("apiname")).Scan(&pid)
 	if err != nil && err != sql.ErrNoRows {
-		log.Fatal(err)
+		panic(err)
 	}
 	// 不存在就创建
 	if pid == 0 {
-		pid, err = bugconfig.Bug_Mysql.Insert("insert into apiproject(name,ownerid,auth) values(?,1,0)", goconfig.ReadString("apiname"))
+		pid, err = db.Mconn.Insert("insert into apiproject(name,ownerid,auth) values(?,1,0)", goconfig.ReadString("apiname"))
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
 	} else if goconfig.ReadBool("apicover") {
 
-		_, err = bugconfig.Bug_Mysql.Update("delete from apilist where pid=?", pid)
+		_, err = db.Mconn.Update("delete from apilist where pid=?", pid)
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
 	} else {
 		return
@@ -39,17 +40,17 @@ func createapi() {
 	for k, va := range apis {
 		oid := make([]string, 0)
 		for _, v := range opts[k] {
-			x, err := bugconfig.Bug_Mysql.Insert(fmt.Sprintf("insert into options(name,tid,need) values(%s)", v))
+			x, err := db.Mconn.Insert(fmt.Sprintf("insert into options(name,tid,need) values(%s)", v))
 			if err != nil {
-				log.Fatal(err)
+				panic(err)
 			}
 			oid = append(oid, strconv.FormatInt(x, 10))
 		}
-		_, err := bugconfig.Bug_Mysql.Insert(
+		_, err := db.Mconn.Insert(
 			fmt.Sprintf("insert into apilist(name,pid,url,opts,methods,uid,calltype,information,hid,resp,result) values(%s)", va),
 			pid, strings.Join(oid, ","))
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
 	}
 

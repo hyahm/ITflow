@@ -11,7 +11,7 @@ import (
 func main() {
 	conn, err := net.Dial("tcp", "127.0.0.1:7000")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	ch := make(chan bool)
 	go userRead(conn)

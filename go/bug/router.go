@@ -53,11 +53,11 @@ func RunHttp() {
 	if goconfig.ReadBool("ssl") {
 		if err := server.ListenAndServeTLS(goconfig.ReadString("certfile"), goconfig.ReadString("keyfile")); err != nil {
 			print("has ssl key?")
-			log.Fatal(err)
+			panic(err)
 		}
 	} else {
 		if err := server.ListenAndServe(); err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
 	}
 

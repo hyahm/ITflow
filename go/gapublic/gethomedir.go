@@ -15,7 +15,7 @@ import (
 func LocalPriKey() string {
 	homepath, err := Home()
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	path := filepath.Join(homepath, ".ssh/id_rsa")
 	return path

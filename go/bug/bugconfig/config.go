@@ -83,7 +83,7 @@ func LoadConfig() {
 	ImgDir = goconfig.ReadString("imgdir")
 	err := os.MkdirAll(ImgDir, 0755)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	PrivateKey = goconfig.ReadFile("privatekeyfile")
 	ShowBaseUrl = goconfig.ReadString("showbaseurl")
@@ -93,7 +93,7 @@ func LoadConfig() {
 	// 创建共享文件夹
 	err = os.MkdirAll(ShareDir, 0755)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	if runtime.GOOS == "windows" {
 		if ShareDir[len(ShareDir)-1:] == "\\" {

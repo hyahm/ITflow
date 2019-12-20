@@ -11,7 +11,7 @@ func PrintJsonStringPretty(b string) {
 	var out bytes.Buffer
 	err := json.Indent(&out, []byte(b), "", "\t")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	out.WriteTo(os.Stdout)

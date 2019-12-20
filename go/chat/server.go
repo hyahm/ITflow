@@ -37,7 +37,7 @@ func broadcaster() {
 func main() {
 	listener, err := net.Listen("tcp", ":7000")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	go broadcaster()
 	for {
