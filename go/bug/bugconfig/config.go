@@ -140,14 +140,12 @@ func LoadConfig() {
 	CacheNameTid = make(map[string]int64, 0)
 	CacheEmail = &Email{}
 
-	Expirontion = goconfig.ReadInt("redisexpiration")
+	Expirontion = goconfig.ReadInt("redis.expiration")
 	DEADLINE = time.Minute * time.Duration(Expirontion)
 	fmt.Println("cookie过期时间为：", Expirontion, "m")
 
 	initCache()
-
 	// 添加一个admin 用户的权限，默认全是1
-
 	cacheemail()
 
 	fmt.Println("connent redis successed")
