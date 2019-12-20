@@ -3,7 +3,6 @@ package bugconfig
 import (
 	"fmt"
 	"github.com/hyahm/goconfig"
-	"log"
 	"os"
 	"runtime"
 	"time"
