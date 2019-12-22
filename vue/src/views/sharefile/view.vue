@@ -209,7 +209,7 @@ export default {
     // 获取用户列表， 赋予权限
     getuserlist() {
       getUsers().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.users != null) {
             this.users = resp.data.users
           }
@@ -223,7 +223,7 @@ export default {
     // 获取用户列表， 赋予权限
     getgrouplist() {
       getGroup().then(resp => {
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           if (resp.data.grouplist != null) {
             this.groups = resp.data.grouplist
           }
@@ -254,9 +254,8 @@ export default {
     // 显示共享的文件
     sharelist() {
       shareList(this.pwd).then(resp => {
-        console.log(resp.data)
         this.realname = resp.data.realname
-        if (resp.data.statuscode === 0) {
+        if (resp.data.code === 0) {
           this.tableData = resp.data.sharelist
           if (this.tableData !== null) {
             this.tableData.unshift({
@@ -323,7 +322,7 @@ export default {
     // 上传文件
     handleSuccess(res, file) {
       console.log('上传文件成功')
-      if (res.statuscode === 0) {
+      if (res.code === 0) {
         this.tableData.push({
           id: res.id,
           name: res.filename,
@@ -345,7 +344,7 @@ export default {
       this.form.filepath = this.pwd
       if (this.form.id > 0) {
         renameFile(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             const l = this.tableData.length
             for (let i = 0; i < l; i++) {
               if (this.tableData[i].id === resp.data.id) {
@@ -357,7 +356,7 @@ export default {
       } else {
         // 创建文件夹
         mkDir(this.form).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             this.tableData.push({
               name: this.form.name,
               isowner: true,
@@ -412,7 +411,7 @@ export default {
         type: 'warning'
       }).then(() => {
         removeFile(id).then(resp => {
-          if (resp.data.statuscode === 0) {
+          if (resp.data.code === 0) {
             const l = this.tableData.length
             for (let i = 0; i < l; i++) {
               if (this.tableData[i].id === id) {
