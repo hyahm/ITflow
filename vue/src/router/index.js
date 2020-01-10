@@ -9,7 +9,7 @@ import Layout from '@/layout'
 /* Router Modules */
 import componentsRouter from './modules/components'
 // import chartsRouter from './modules/charts'
-// import tableRouter from './modules/table'
+import docRouter from './modules/doc'
 import system from './modules/system'
 import setting from './modules/setting'
 import userRoute from './modules/user'
@@ -84,6 +84,7 @@ export const asyncRouterMap = [
   // chartsRouter,
   // nestedRouter,
   // tableRouter,
+  docRouter,
   system,
   userRoute,
   bugRouter,
