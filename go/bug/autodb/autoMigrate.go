@@ -2,13 +2,12 @@ package autodb
 
 import (
 	"fmt"
+	"itflow/db"
+	"time"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/hyahm/goconfig"
 	"github.com/jinzhu/gorm"
-	"itflow/bug/bugconfig"
-	"itflow/db"
-	"log"
-	"time"
 )
 
 func InitDb() {
@@ -120,7 +119,7 @@ func InitDb() {
 			panic(err)
 		}
 	}
-	if goconfig.ReadBool("apihelp") {
-		createapi()
-	}
+	// if goconfig.ReadBool("apihelp") {
+	// 	createapi()
+	// }
 }

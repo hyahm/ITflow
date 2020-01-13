@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 
@@ -17,17 +16,11 @@ func main() {
 	fmt.Println(conf)
 	goconfig.InitWriteConf(conf)
 	goconfig.WriteBool("httpproxy", true, "是否使用了代码，为了获取ip，可能不起作用")
-	goconfig.WriteBool("initdb", true, "自动初始化数据库（为了减少启动时间，第一次初始化完成就关掉")
 	goconfig.WriteString("listenaddr", ":10001", "监听地址")
 	goconfig.WriteString("imgdir", "/data/bugimg/", "存放图片的目录")
 	goconfig.WriteString("showbaseurl", "http://127.0.0.1:10001/showimg", "图片显示的地址(用接口的地址)")
-	goconfig.WriteString("salt", "hjkkaksjdhfryuooweqzmbvc", "盐值，建议修改，然后用curl http://127.0.0.1:10001/admin/reset?password=123 来修改root密码")
+	goconfig.WriteString("salt", "hjkkaksjdhfryuooweqzmbvc", "盐值，建议修改，然后用curl http://127.0.0.1:10001/admin/reset?password=123 来修改admin密码")
 	goconfig.WriteString("sharedir", "/share/", "共享文件夹根目录")
-	ips := make([]string, 0)
-	exclude, _ := json.Marshal(ips)
-	goconfig.WriteBytes("exclude", exclude, "排除记录这些ip日志")
-	goconfig.WriteBool("apihelp", true, "是否初始化api帮助文档")
-	goconfig.WriteString("apiname", "help", "api项目名")
 
 	goconfig.WriteString("redis.pwd", "")
 	goconfig.WriteString("redis.host", "127.0.0.1:6379")

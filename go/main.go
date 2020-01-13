@@ -18,10 +18,6 @@ func main() {
 	db.InitRedis()
 	// 初始化缓存（后面会使用redis）
 	bugconfig.LoadConfig()
-	// 初始化数据表, 避免数据错误， 请用sql导入
-	//if goconfig.ReadBool("initdb") {
-	//	autodb.InitDb()
-	//}
 	// 初始化日志
 	golog.InitLogger(goconfig.ReadString("log.path"),
 		goconfig.ReadInt64("log.size"),
