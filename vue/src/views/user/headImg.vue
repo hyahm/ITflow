@@ -5,15 +5,16 @@
     </p>
     <el-button type="primary" @click="toggleShow">设置头像</el-button>
     <my-upload
+      v-model="show"
       :params="params"
       :headers="headers"
       :url="url"
-      v-model="show"
       field="upload"
       method="POST"
       @crop-success="cropSuccess"
       @crop-upload-success="cropUploadSuccess"
-      @crop-upload-fail="cropUploadFail"/>
+      @crop-upload-fail="cropUploadFail"
+    />
     <img :src="imgDataUrl">
   </div>
 </template>
@@ -57,6 +58,7 @@ export default {
     },
     cropSuccess(imgDataUrl, field) {
       this.imgDataUrl = imgDataUrl
+      console.log('cropSuccess')
     },
     /**
      * upload success
@@ -65,6 +67,7 @@ export default {
      * [param] field
      */
     cropUploadSuccess(jsonData, field) {
+      console.log('cropUploadSuccess')
       // this.$store.dispatch('ChangeHeadImg', jsonData.url).then(() => {
       //   this.loading = false
       //   // this.$router.push({ path: this.redirect || '/' })
