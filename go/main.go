@@ -1,20 +1,19 @@
 package main
 
 import (
-	"github.com/hyahm/goconfig"
-	"github.com/hyahm/golog"
 	"itflow/bug"
 	"itflow/bug/bugconfig"
 	"itflow/db"
+
+	"github.com/hyahm/goconfig"
+	"github.com/hyahm/golog"
 )
 
 func main() {
 	// 初始化配置文件
-	goconfig.InitConf("bug.conf")
-
+	goconfig.InitConf("bug.ini")
 	//初始化mysql
 	db.InitMysql()
-
 	// 初始化redis
 	db.InitRedis()
 	// 初始化缓存（后面会使用redis）
@@ -24,9 +23,9 @@ func main() {
 	//	autodb.InitDb()
 	//}
 	// 初始化日志
-	golog.InitLogger(goconfig.ReadString("logpath"),
-		goconfig.ReadInt64("logsize"),
-		goconfig.ReadBool("logeveryday"))
+	golog.InitLogger(goconfig.ReadString("log.path"),
+		goconfig.ReadInt64("log.size"),
+		goconfig.ReadBool("log.everyday"))
 
 	////
 	bug.RunHttp()
