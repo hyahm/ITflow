@@ -2,19 +2,21 @@ package handle
 
 import (
 	"errors"
-	"github.com/hyahm/golog"
 	"itflow/bug/bugconfig"
 	"itflow/db"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/hyahm/golog"
 )
 
 var NotFoundToken = errors.New("not found token")
 
 func logtokenmysql(r *http.Request) (string, error) {
 	a := r.Header.Get("X-Token")
+	golog.Info(a)
 	nickname, err := db.RSconn.Get(a)
 	if err != nil {
 		golog.Error(err.Error())

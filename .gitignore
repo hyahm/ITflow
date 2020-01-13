@@ -1,5 +1,5 @@
 go/bin
-go/bug.conf
+go/bug.ini
 go/pkg
 go/.idea
 vue/.DS_Store

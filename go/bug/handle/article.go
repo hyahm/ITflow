@@ -3,7 +3,6 @@ package handle
 import (
 	"database/sql"
 	"encoding/json"
-	"github.com/hyahm/golog"
 	"html"
 	"io"
 	"io/ioutil"
@@ -15,6 +14,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"github.com/hyahm/golog"
 )
 
 type ArticleList struct {
@@ -315,6 +316,7 @@ type uploadimage struct {
 func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 	url := &uploadimage{}
 	nickname, err := logtokenmysql(r)
+	golog.Info("uploading header image")
 	errorcode := &errorstruct{}
 	if err != nil {
 		golog.Error(err.Error())
