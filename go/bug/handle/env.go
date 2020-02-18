@@ -2,7 +2,6 @@ package handle
 
 import (
 	"encoding/json"
-	"github.com/hyahm/golog"
 	"io/ioutil"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
@@ -11,6 +10,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/hyahm/golog"
 )
 
 type envlist struct {
@@ -28,7 +29,7 @@ func EnvList(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -41,7 +42,7 @@ func EnvList(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("env", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -70,7 +71,7 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -82,7 +83,7 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("env", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -98,7 +99,7 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 
 	errorcode.Id, err = db.Mconn.Insert(getaritclesql, envname)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -110,7 +111,7 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 	err = il.Add(
 		nickname, errorcode.Id, envname)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -129,7 +130,7 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 	errorcode := &errorstruct{}
 
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -142,7 +143,7 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("env", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -154,13 +155,13 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 	}
 	bpr, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = json.Unmarshal(bpr, er)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -169,7 +170,7 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 
 	_, err = db.Mconn.Update(getaritclesql, er.EnvName, er.Id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -181,7 +182,7 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 	err = il.Update(
 		nickname, er.Id, er.EnvName)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -200,7 +201,7 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -212,7 +213,7 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("env", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -226,7 +227,7 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 	eid, err := strconv.Atoi(id)
 	if err != nil {
 
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -234,13 +235,13 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 
 	row, err := db.Mconn.GetOne("select count(id) from bugs where eid=?", id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = row.Scan(&count)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -252,7 +253,7 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 
 	_, err = db.Mconn.Update(getaritclesql, id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -264,7 +265,7 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 	err = il.Del(
 		nickname, id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}

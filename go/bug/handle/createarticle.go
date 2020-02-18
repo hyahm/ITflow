@@ -2,7 +2,6 @@ package handle
 
 import (
 	"encoding/json"
-	"github.com/hyahm/golog"
 	"html"
 	"io/ioutil"
 	"itflow/bug/bugconfig"
@@ -12,6 +11,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/hyahm/golog"
 	//"strings"
 )
 
@@ -25,7 +26,7 @@ func GetProject(w http.ResponseWriter, r *http.Request) {
 	_, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -46,7 +47,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -58,14 +59,14 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	content, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
 	err = json.Unmarshal(content, data)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -129,7 +130,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 			iid, errorcode.UpdateTime, lid,
 			pid, eid, spusers, vid)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -140,7 +141,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 		}
 		err = il.Add(nickname, bugid, data.Title)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -153,7 +154,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 		_, err = db.Mconn.Update(insertsql, data.Title, html.EscapeString(data.Content), iid,
 			time.Now().Unix(), lid, pid, eid, spusers, vid, data.Id)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -165,7 +166,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 		}
 		err = il.Update(nickname, bugid, nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}

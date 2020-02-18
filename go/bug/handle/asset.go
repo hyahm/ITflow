@@ -19,7 +19,7 @@ func logtokenmysql(r *http.Request) (string, error) {
 	golog.Info(a)
 	nickname, err := db.RSconn.Get(a)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		return "", NotFoundToken
 
 	}

@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/hyahm/golog"
 	"io/ioutil"
 	"itflow/bug/bugconfig"
 	"itflow/bug/model"
@@ -13,6 +12,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/hyahm/golog"
 )
 
 func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
@@ -55,21 +56,21 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
 	searchq, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	searchparam := &getBugSearchParam{} // 接收的参数
 	err = json.Unmarshal(searchq, searchparam)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -87,7 +88,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 			bugsql += fmt.Sprintf("and lid=%d ", lid)
 			countbasesql += fmt.Sprintf("and lid=%d ", lid)
 		} else {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.Error("没有搜索到什么"))
 			return
 		}
@@ -105,7 +106,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 			bugsql += fmt.Sprintf("and pid=%d ", pid)
 			countbasesql += fmt.Sprintf("and pid=%d ", pid)
 		} else {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.Error("没有搜索到什么"))
 			return
 		}
@@ -115,7 +116,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 	}
 	rows, err := db.Mconn.GetRows(bugsql)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -183,7 +184,7 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 	_, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -192,14 +193,14 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 
 	searchq, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	searchparam := &getBugManager{}
 	err = json.Unmarshal(searchq, searchparam)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -208,13 +209,13 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 
 	row, err := db.Mconn.GetOne(basesql, args...)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = row.Scan(&al.Count)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -227,7 +228,7 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := managersearch(alsql, al.Count, searchparam)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -310,19 +311,19 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		return nil, errorcode.ErrorE(err)
 	}
 
 	searchq, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		return nil, errorcode.ErrorE(err)
 	}
 	searchparam := &getBugSearchParam{} // 接收的参数
 	err = json.Unmarshal(searchq, searchparam)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		return nil, errorcode.ErrorE(err)
 	}
 	al := &model.AllArticleList{}
@@ -339,7 +340,7 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 			bugsql += fmt.Sprintf("and lid=%d ", lid)
 			countbasesql += fmt.Sprintf("and lid=%d ", lid)
 		} else {
-			golog.Error(err.Error())
+			golog.Error(err)
 			return nil, errorcode.Error("没有搜索到")
 		}
 	}
@@ -357,7 +358,7 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 			bugsql += fmt.Sprintf("and pid=%d ", pid)
 			countbasesql += fmt.Sprintf("and pid=%d ", pid)
 		} else {
-			golog.Error(err.Error())
+			golog.Error(err)
 			return nil, errorcode.Error("没有搜索到")
 		}
 	}
@@ -369,12 +370,12 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 
 	row, err := db.Mconn.GetOne(countbasesql, bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		return nil, errorcode.ErrorE(err)
 	}
 	err = row.Scan(&al.Count)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		return nil, errorcode.ErrorE(err)
 	}
 	// 获取查询的总个数
@@ -382,7 +383,7 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 
 	rows, err := db.Mconn.GetRows(bugsql+" limit ?,?", bugconfig.CacheNickNameUid[nickname], start, end)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		return nil, errorcode.ErrorE(err)
 	}
 

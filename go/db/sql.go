@@ -23,7 +23,7 @@ func InitMysql() {
 	}
 	Mconn, err = conf.NewDb()
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		panic(err)
 	}
 

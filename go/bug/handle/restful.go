@@ -3,7 +3,6 @@ package handle
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hyahm/golog"
 	"html"
 	"io/ioutil"
 	"itflow/bug/bugconfig"
@@ -13,6 +12,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/hyahm/golog"
 )
 
 func RestList(w http.ResponseWriter, r *http.Request) {
@@ -21,14 +22,14 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 	tl := &model.List_restful{}
 	nickname, err := logtokenmysql(r)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
 	rows, err := db.Mconn.GetRows("select id,name,ownerid,auth,readuser,edituser,rid,eid from apiproject")
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -68,13 +69,13 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 				var ids string
 				row, err := db.Mconn.GetOne("select ids from usergroup where id=?", rid)
 				if err != nil {
-					golog.Error(err.Error())
+					golog.Error(err)
 					w.Write(errorcode.ErrorE(err))
 					return
 				}
 				err = row.Scan(&ids)
 				if err != nil {
-					golog.Error(err.Error())
+					golog.Error(err)
 					w.Write(errorcode.ErrorE(err))
 					return
 				}
@@ -103,13 +104,13 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 				var ids string
 				row, err := db.Mconn.GetOne("select ids from usergroup where id=?", eid)
 				if err != nil {
-					golog.Error(err.Error())
+					golog.Error(err)
 					w.Write(errorcode.ErrorE(err))
 					return
 				}
 				err = row.Scan(&ids)
 				if err != nil {
-					golog.Error(err.Error())
+					golog.Error(err)
 					w.Write(errorcode.ErrorE(err))
 					return
 				}
@@ -140,19 +141,19 @@ func RestUpdate(w http.ResponseWriter, r *http.Request) {
 	tl := &model.Data_restful{}
 	nickname, err := logtokenmysql(r)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = json.Unmarshal(respbyte, tl)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -197,7 +198,7 @@ func RestUpdate(w http.ResponseWriter, r *http.Request) {
 		tl.Edituser,
 		rid, eid, tl.Id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -209,7 +210,7 @@ func RestUpdate(w http.ResponseWriter, r *http.Request) {
 	err = il.Update(
 		nickname, tl.Id, tl.Name)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -224,7 +225,7 @@ func RestAdd(w http.ResponseWriter, r *http.Request) {
 	errorcode := &errorstruct{}
 	nickname, err := logtokenmysql(r)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -233,13 +234,13 @@ func RestAdd(w http.ResponseWriter, r *http.Request) {
 	dr := &model.Data_restful{}
 	bytedata, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = json.Unmarshal(bytedata, dr)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -267,7 +268,7 @@ func RestAdd(w http.ResponseWriter, r *http.Request) {
 	errorcode.Id, err = db.Mconn.Insert(restsql,
 		dr.Name, uid, dr.Auth, dr.Readuser, dr.Edituser, rid, eid)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -279,7 +280,7 @@ func RestAdd(w http.ResponseWriter, r *http.Request) {
 	err = il.Add(
 		nickname, errorcode.Id, dr.Name)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -295,7 +296,7 @@ func RestDel(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 	nickname, err := logtokenmysql(r)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -303,7 +304,7 @@ func RestDel(w http.ResponseWriter, r *http.Request) {
 	// 只有创建者才能删除
 	eff, err := db.Mconn.Update("delete from apiproject where id=? and ownerid=?", id, bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -311,7 +312,7 @@ func RestDel(w http.ResponseWriter, r *http.Request) {
 	if eff > 0 {
 		_, err = db.Mconn.Update("delete from apilist where pid=? ", id)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -324,7 +325,7 @@ func RestDel(w http.ResponseWriter, r *http.Request) {
 	err = il.Del(
 		nickname, id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -341,7 +342,7 @@ func ApiList(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	pid := r.FormValue("pid")
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -349,14 +350,14 @@ func ApiList(w http.ResponseWriter, r *http.Request) {
 	//判断这个用户是否有权限访问
 	hasperm, err := checkapiperm(pid, bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	if hasperm {
 		rows, err := db.Mconn.GetRows("select id,name from apilist where pid=?", pid)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -385,12 +386,12 @@ func checkapiperm(pid string, uid int64) (bool, error) {
 	var eid int64
 	row, err := db.Mconn.GetOne("select ownerid,auth,readuser,edituser,rid,eid from apiproject where id=?", pid)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		return false, err
 	}
-	err = row.Scan(	&oid, &auth, &readuser, &edituser, &rid, &eid)
+	err = row.Scan(&oid, &auth, &readuser, &edituser, &rid, &eid)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		return false, err
 	}
 	if uid == oid {
@@ -430,7 +431,7 @@ func checkapiperm(pid string, uid int64) (bool, error) {
 		} else {
 			// 判断是都是可编辑的用户组
 			var ids string
-			row,err :=db.Mconn.GetOne("select ids from usergroup where id=?", eid)
+			row, err := db.Mconn.GetOne("select ids from usergroup where id=?", eid)
 			if err != nil {
 				return false, err
 			}
@@ -457,13 +458,13 @@ func checkeditperm(pid string, uid int64) (bool, error) {
 	var eid int64
 	row, err := db.Mconn.GetOne("select ownerid,auth,edituser,eid from apiproject where id=?", pid)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		return false, err
 	}
 	err = row.Scan(
 		&oid, &auth, &edituser, &eid)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		return false, err
 	}
 	if uid == oid {
@@ -506,19 +507,19 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 	tl := &model.Get_apilist{}
 	nickname, err := logtokenmysql(r)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = json.Unmarshal(respbyte, tl)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -527,13 +528,13 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 	var oldopts string
 	row, err := db.Mconn.GetOne("select opts from apilist where id=?", tl.Id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = row.Scan(&oldopts)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -547,7 +548,7 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 					_, err = db.Mconn.Update("update options set info=?,name=?,tid=?,df=?,need=? where id=?",
 						v.Info, v.Name, tid, v.Default, v.Need, v.Id)
 					if err != nil {
-						golog.Error(err.Error())
+						golog.Error(err)
 						w.Write(errorcode.ErrorE(err))
 						return
 					}
@@ -566,7 +567,7 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 					tmpid, err := db.Mconn.Insert("insert into options(info,name,tid,df,need) values(?,?,?,?,?)",
 						v.Info, v.Name, tid, v.Default, v.Need)
 					if err != nil {
-						golog.Error(err.Error())
+						golog.Error(err)
 						w.Write(errorcode.ErrorE(err))
 						return
 					}
@@ -578,7 +579,7 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 		//删除多余的
 		_, err = db.Mconn.Update(fmt.Sprintf("delete from options where id in (%s)", oldopts))
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -591,7 +592,7 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 		_, err = db.Mconn.Update("update apilist set url=?,information=?,opts=?,methods=?,result=?,name=?,hid=?,calltype=?,resp=? where id=?",
 			tl.Url, html.EscapeString(tl.Information), oids, strings.Join(ms, ","), html.EscapeString(tl.Result), tl.Name, bugconfig.CacheHeaderHid[tl.Header], tl.CallType, html.EscapeString(tl.Resp), tl.Id)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -608,7 +609,7 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 	err = il.Update(
 		nickname, tl.Id, tl.Name)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -623,7 +624,7 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 	errorcode := &errorstruct{}
 	nickname, err := logtokenmysql(r)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -631,13 +632,13 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 	al := &model.Get_apilist{}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = json.Unmarshal(respbyte, al)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -664,7 +665,7 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 			tmpid, err := db.Mconn.Insert("insert into options(info,name,tid,df,need) values(?,?,?,?,?)",
 				v.Info, v.Name, tid, v.Default, v.Need)
 			if err != nil {
-				golog.Error(err.Error())
+				golog.Error(err)
 				w.Write(errorcode.ErrorE(err))
 				return
 			}
@@ -699,7 +700,7 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 		al.Pid, al.Url, html.EscapeString(al.Information), oid, ms,
 		html.EscapeString(al.Result), al.Name, bugconfig.CacheNickNameUid[nickname], hid, al.CallType, html.EscapeString(al.Resp))
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -712,7 +713,7 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 	err = il.Add(
 		nickname, errorcode.Id, al.Name)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -728,7 +729,7 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 	nickname, err := logtokenmysql(r)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -738,26 +739,26 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 	var uid int64
 	row, err := db.Mconn.GetOne("select pid,opts,uid from apilist where id=?", id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = row.Scan(&pid, &oids, &uid)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	var oid int64
 	row, err = db.Mconn.GetOne("select ownerid from apiproject where id=?", pid)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = row.Scan(&oid)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -770,7 +771,7 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 		for _, v := range ol {
 			_, err = db.Mconn.Update("delete from options where id=?", v)
 			if err != nil {
-				golog.Error(err.Error())
+				golog.Error(err)
 				w.Write(errorcode.ErrorE(err))
 				return
 			}
@@ -779,7 +780,7 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 
 	_, err = db.Mconn.Update("delete from apilist where id=?", id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -791,7 +792,7 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 	err = il.Del(
 		nickname, id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -809,7 +810,7 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -825,7 +826,7 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 	row, err := db.Mconn.GetOne("select pid,url,information,opts,methods,result,name,hid,calltype,resp from apilist where id=?",
 		id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -840,7 +841,7 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 		&hid, &sl.CallType, &sl.Resp,
 	)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -852,19 +853,19 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 	if hid > 0 {
 		row, err := db.Mconn.GetOne("select hhids,remark from header where id=?", hid)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
 		err = row.Scan(&ids, &sl.Remark)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
 		hrows, err := db.Mconn.GetRows(fmt.Sprintf("select k,v from headerlist where id in (%v)", ids))
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -877,7 +878,7 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 	// 判断权限
 	hasperm, err := checkapiperm(strconv.Itoa(sl.Pid), bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -890,7 +891,7 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 
 		orows, err := db.Mconn.GetRows(fmt.Sprintf("select id,info,name,tid,df,need from options where id in (%s)", oids))
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -921,7 +922,7 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -937,7 +938,7 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 	row, err := db.Mconn.GetOne("select pid,url,information,opts,methods,result,name,hid,calltype,resp from apilist where id=?",
 		id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -952,7 +953,7 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 		&hid, &sl.CallType, &sl.Resp,
 	)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -964,13 +965,13 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 	if hid > 0 {
 		row, err := db.Mconn.GetOne("select name,hhids,remark from header where id=?", hid)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
 		err = row.Scan(&sl.Header, &ids, &sl.Remark)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -978,7 +979,7 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 	// 判断权限
 	hasperm, err := checkapiperm(strconv.Itoa(sl.Pid), bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -991,7 +992,7 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 
 		orows, err := db.Mconn.GetRows(fmt.Sprintf("select id,info,name,tid,df,need from options where id in (%s)", oids))
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -1032,13 +1033,13 @@ func ApiResp(w http.ResponseWriter, r *http.Request) {
 	bb := &resp{}
 	bytedata, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = json.Unmarshal(bytedata, bb)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -1054,21 +1055,21 @@ func ApiResp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write([]byte("请求失败, 请确认添加了url或者参数错误"))
 		return
 	}
 	//处理返回结果
 	response, err := client.Do(reqest)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write([]byte("请求失败, 请确认添加了url或者参数错误"))
 		return
 	}
 	defer response.Body.Close()
 	send, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write([]byte("获取数据失败"))
 	}
 	//fmt.Println(string(xx))

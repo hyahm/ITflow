@@ -2,9 +2,10 @@ package gamail
 
 import (
 	"crypto/tls"
-	"github.com/hyahm/golog"
 	"strings"
 	"time"
+
+	"github.com/hyahm/golog"
 )
 
 func doc(subject string, content string, user []string) {
@@ -50,13 +51,13 @@ func (mc *mailConfig) SetContent(content string) {
 func (mc *mailConfig) SendMail() {
 
 	if mc.Username == "" {
-		golog.Email("username is empty")
+		golog.Error("username is empty")
 		return
 	}
 	if mc.Host == "" {
 		hl := strings.Split(mc.Username, "@")
 		if len(hl) < 2 {
-			golog.Email("username %s is not vaild", mc.Username)
+			golog.Errorf("username %s is not vaild", mc.Username)
 			return
 		}
 		mc.Host = "smtp." + hl[1]
@@ -66,7 +67,7 @@ func (mc *mailConfig) SendMail() {
 		mc.Port = 25
 	}
 	if len(mc.Tolist) < 1 {
-		golog.Email("sender is empty")
+		golog.Error("sender is empty")
 		return
 	}
 	d := NewDialer(mc.Host, mc.Port, mc.Username, mc.Password)
@@ -86,7 +87,7 @@ func (mc *mailConfig) SendMail() {
 	msg.SetHeader("Subject", mc.Subject)
 
 	if err := d.DialAndSend(msg); err != nil {
-		golog.Email("time:%s,error:%v", time.Now().Unix(), err)
+		golog.Errorf("time:%s,error:%v", time.Now().Unix(), err)
 		return
 	}
 	tousers := ""
@@ -97,6 +98,6 @@ func (mc *mailConfig) SendMail() {
 			tousers = tousers + "," + v
 		}
 	}
-	golog.Email("time:%s,to: %v,send mail successed", time.Now().Unix(), tousers)
+	golog.Errorf("time:%s,to: %v,send mail successed", time.Now().Unix(), tousers)
 
 }

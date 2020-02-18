@@ -2,7 +2,6 @@ package handle
 
 import (
 	"encoding/json"
-	"github.com/hyahm/golog"
 	"io/ioutil"
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
@@ -13,6 +12,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/hyahm/golog"
 )
 
 type passBug struct {
@@ -31,7 +32,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -41,14 +42,14 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 	// 获取参数
 	ss, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
 	err = json.Unmarshal(ss, ub)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -58,13 +59,13 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 	var hasperm bool
 	row, err := db.Mconn.GetOne("select spusers from bugs where id=?", ub.Id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = row.Scan(&splist)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -101,7 +102,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 	remarksql := "insert into informations(uid,bid,info,time) values(?,?,?,?)"
 	_, err = db.Mconn.Insert(remarksql, bugconfig.CacheNickNameUid[nickname], ub.Id, ub.Remark, time.Now().Unix())
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -109,7 +110,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 
 	_, err = db.Mconn.Update("update bugs set sid=?,spusers=? where id=?", sid, ul, ub.Id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -119,7 +120,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 	}
 	err = il.Add(ub.Id, nickname, ub.SelectUsers)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -190,7 +191,7 @@ func TaskList(w http.ResponseWriter, r *http.Request) {
 	name, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -204,7 +205,7 @@ func TaskList(w http.ResponseWriter, r *http.Request) {
 	rows, err := db.Mconn.GetRows(getaritclesql, uid)
 
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}

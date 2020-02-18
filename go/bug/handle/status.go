@@ -2,7 +2,6 @@ package handle
 
 import (
 	"encoding/json"
-	"github.com/hyahm/golog"
 	"io/ioutil"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
@@ -12,6 +11,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/hyahm/golog"
 )
 
 type status struct {
@@ -29,7 +30,7 @@ func StatusList(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -41,7 +42,7 @@ func StatusList(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("status", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -69,7 +70,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -81,7 +82,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("status", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -93,7 +94,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 	}
 	ss, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -102,7 +103,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode.Id, err = db.Mconn.Insert("insert into status(name) values(?)", s.Name)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -115,7 +116,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 	err = il.Add(
 		nickname, errorcode.Id, s.Name)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -135,7 +136,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -143,7 +144,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 	sid, err := strconv.Atoi(id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -154,7 +155,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("status", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -168,18 +169,18 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 	var bcount int
 	row, err := db.Mconn.GetOne("select count(id) from bugs where sid=?", sid)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = row.Scan(&bcount)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	if bcount > 0 {
-		golog.Error("sid:%d 删除失败", sid)
+		golog.Errorf("sid:%d 删除失败", sid)
 		w.Write(errorcode.Error("还有bug"))
 		return
 	}
@@ -201,7 +202,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 
 	_, err = db.Mconn.Update("delete from  status where id=?", sid)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -211,7 +212,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 		bugconfig.CacheDefault["status"] = 0
 		_, err = db.Mconn.Update("update defaultvalue set status=0 ")
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -224,7 +225,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 	err = il.Del(
 		nickname, sid)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -245,7 +246,7 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -257,7 +258,7 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("status", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -269,21 +270,21 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	ss, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	s := &status{}
 	err = json.Unmarshal(ss, s)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
 	_, err = db.Mconn.Update("update status set name=? where id=?", s.Name, s.Id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -296,7 +297,7 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 	err = il.Update(
 		nickname, s.Id, s.Name)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -318,7 +319,7 @@ func StatusGroupName(w http.ResponseWriter, r *http.Request) {
 	_, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}

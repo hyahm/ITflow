@@ -1,10 +1,11 @@
 package asset
 
 import (
-	"github.com/hyahm/golog"
 	"itflow/bug/bugconfig"
 	"itflow/db"
 	"strings"
+
+	"github.com/hyahm/golog"
 )
 
 func CheckPerm(role string, nickname string) (bool, error) {
@@ -12,12 +13,12 @@ func CheckPerm(role string, nickname string) (bool, error) {
 	var rolestring string
 	row, err := db.Mconn.GetOne("select rolelist from rolegroup where id=?", rid)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		return false, err
 	}
 	err = row.Scan(&rolestring)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		return false, err
 	}
 	for _, v := range strings.Split(rolestring, ",") {

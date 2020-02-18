@@ -2,7 +2,6 @@ package handle
 
 import (
 	"encoding/json"
-	"github.com/hyahm/golog"
 	"io/ioutil"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
@@ -12,6 +11,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/hyahm/golog"
 )
 
 type addVersion struct {
@@ -28,7 +29,7 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -36,13 +37,13 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 	version_add := &addVersion{}
 	s, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = json.Unmarshal(s, version_add)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -53,7 +54,7 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("version", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -68,7 +69,7 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 
 	vid, err := db.Mconn.Insert(add_version_sql, version_add.Version, version_add.Iphoneurl, version_add.Notiphoneurl, time.Now().Unix(), uid)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -80,7 +81,7 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 	err = il.Add(
 		nickname, vid, version_add.Version)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -118,7 +119,7 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -127,14 +128,14 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 
 	m, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	pl := &pageLimit{}
 	err = json.Unmarshal(m, pl)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -145,7 +146,7 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("version", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -159,7 +160,7 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := db.Mconn.GetRows(get_version_sql)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -181,7 +182,7 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -195,7 +196,7 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("version", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -207,25 +208,25 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 	}
 	row, err := db.Mconn.GetOne("select count(id) from bugs where id=?", id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = row.Scan(&bugcount)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	if bugcount != 0 {
-		golog.Error("vid:%s has bugs", id)
+		golog.Errorf("vid:%s has bugs", id)
 		w.Write(errorcode.Errorf("vid:%s has bugs", id))
 		return
 	}
 	deletevl := "delete from version where id=?"
 	errorcode.Id, err = db.Mconn.Update(deletevl, id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -243,7 +244,7 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 	err = il.Del(
 		nickname, id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -269,7 +270,7 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -282,7 +283,7 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("version", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -294,13 +295,13 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	getdata, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = json.Unmarshal(getdata, data)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -308,7 +309,7 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 	versionsql := "update version set name=?,urlone=?,urltwo=?,createuid=? where id=?"
 	_, err = db.Mconn.Update(versionsql, data.Name, data.Iphone, data.NoIphone, uid, data.Id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -321,7 +322,7 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 	err = il.Update(
 		nickname, data.Id, data.Name)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}

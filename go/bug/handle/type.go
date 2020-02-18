@@ -3,7 +3,6 @@ package handle
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hyahm/golog"
 	"io/ioutil"
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
@@ -12,6 +11,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/hyahm/golog"
 )
 
 func TypeList(w http.ResponseWriter, r *http.Request) {
@@ -20,14 +21,14 @@ func TypeList(w http.ResponseWriter, r *http.Request) {
 	tl := &model.List_types{}
 	_, err := logtokenmysql(r)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
 	rows, err := db.Mconn.GetRows("select id,name,type,opts,tid from types")
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -43,7 +44,7 @@ func TypeList(w http.ResponseWriter, r *http.Request) {
 
 			optrows, err := db.Mconn.GetRows(fmt.Sprintf("select id,name,info,tid,df,need  from options where id in (%s)", opts))
 			if err != nil {
-				golog.Error(err.Error())
+				golog.Error(err)
 				w.Write(errorcode.ErrorE(err))
 				return
 			}
@@ -73,7 +74,7 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 	errorcode := &errorstruct{}
 	nickname, err := logtokenmysql(r)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -81,13 +82,13 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 	send := &model.Send_types{}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = json.Unmarshal(respbyte, data)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -119,12 +120,12 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 			}
 			_, err = db.Mconn.Update("update types set name=?,type=?,tid=? where id=?", data.Name, data.Types, tid, data.Id)
 			if err != nil {
-				golog.Error(err.Error())
+				golog.Error(err)
 				w.Write(errorcode.ErrorE(err))
 				return
 			}
 		} else {
-			golog.Error("params error, type:%d", data.Types)
+			golog.Errorf("params error, type:%d", data.Types)
 			errorcode.Errorf("params error, type:%d", data.Types)
 			return
 		}
@@ -143,7 +144,7 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 					_, err = db.Mconn.Update("update options set name=?,info=?,tid=?,df=?,need=? where id=?",
 						v.Name, v.Info, tid, v.Default, v.Need, v.Id)
 					if err != nil {
-						golog.Error(err.Error())
+						golog.Error(err)
 						w.Write(errorcode.ErrorE(err))
 						return
 					}
@@ -156,7 +157,7 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 					v.Id, err = db.Mconn.Insert("insert into options(name,info,tid,df,need) values(?,?,?,?,?)",
 						v.Name, v.Info, tid, v.Default, v.Need)
 					if err != nil {
-						golog.Error(err.Error())
+						golog.Error(err)
 						w.Write(errorcode.ErrorE(err))
 						return
 					}
@@ -167,7 +168,7 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 				}
 
 			} else {
-				golog.Error("params error, type:%d", data.Types)
+				golog.Errorf("params error, type:%d", data.Types)
 				w.Write(errorcode.Errorf("params error, type:%d", data.Types))
 				return
 			}
@@ -181,13 +182,13 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 		opts := strings.Join(optids, ",")
 		_, err = db.Mconn.Update("update types set name=?,type=?,opts=? where id=?", data.Name, data.Types, opts, data.Id)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
 
 	default:
-		golog.Error("params error, type:%d", data.Types)
+		golog.Errorf("params error, type:%d", data.Types)
 		w.Write(errorcode.Errorf("params error, type:%d", data.Types))
 		return
 
@@ -200,7 +201,7 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 	err = il.Update(
 		nickname, data.Id, data.Name)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -218,7 +219,7 @@ func TypeAdd(w http.ResponseWriter, r *http.Request) {
 	errorcode := &errorstruct{}
 	_, err := logtokenmysql(r)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -227,13 +228,13 @@ func TypeAdd(w http.ResponseWriter, r *http.Request) {
 	send := &model.Send_types{}
 	bytedata, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = json.Unmarshal(bytedata, data)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -243,12 +244,12 @@ func TypeAdd(w http.ResponseWriter, r *http.Request) {
 		if tid, ok := bugconfig.CacheNameTid[data.Listtype]; ok {
 			send.Id, err = db.Mconn.Insert("insert into types(name,type,tid) value(?,?,?)", data.Name, data.Types, tid)
 			if err != nil {
-				golog.Error(err.Error())
+				golog.Error(err)
 				w.Write(errorcode.ErrorE(err))
 				return
 			}
 		} else {
-			golog.Error("params error, type:%d", data.Types)
+			golog.Errorf("params error, type:%d", data.Types)
 			errorcode.Errorf("params error, type:%d", data.Types)
 			return
 		}
@@ -265,7 +266,7 @@ func TypeAdd(w http.ResponseWriter, r *http.Request) {
 				v.Id, err = db.Mconn.Insert("insert into options(name,info,tid,df,need) values(?,?,?,?,?)",
 					v.Name, v.Info, tid, v.Default, v.Need)
 				if err != nil {
-					golog.Error(err.Error())
+					golog.Error(err)
 					w.Write(errorcode.ErrorE(err))
 					return
 				}
@@ -273,7 +274,7 @@ func TypeAdd(w http.ResponseWriter, r *http.Request) {
 				optids = append(optids, strconv.FormatInt(v.Id, 10))
 				send.Opts = append(send.Opts, v)
 			} else {
-				golog.Error("params error, type:%d", data.Types)
+				golog.Errorf("params error, type:%d", data.Types)
 				w.Write(errorcode.Errorf("params error, type:%d", data.Types))
 				return
 			}
@@ -287,13 +288,13 @@ func TypeAdd(w http.ResponseWriter, r *http.Request) {
 		opts := strings.Join(optids, ",")
 		send.Id, err = db.Mconn.Insert("insert into types(name,type,opts) values(?,?,?)", data.Name, data.Types, opts)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
 
 	default:
-		golog.Error("params error, type:%d", data.Types)
+		golog.Errorf("params error, type:%d", data.Types)
 		w.Write(errorcode.Errorf("params error, type:%d", data.Types))
 		return
 
@@ -305,7 +306,7 @@ func TypeAdd(w http.ResponseWriter, r *http.Request) {
 	//return
 	//errorcode.Id, err = conn.Insert("insert into types(name) values(?)", name)
 	//if err != nil {
-	//	golog.Error(err.Error())
+	//	golog.Error(err)
 	//	w.Write(errorcode.ErrorConnentMysql())
 	//	return
 	//}
@@ -318,7 +319,7 @@ func TypeAdd(w http.ResponseWriter, r *http.Request) {
 	//err = il.Add(
 	//	nickname, errorcode.Id, name)
 	//if err != nil {
-	//	golog.Error(err.Error())
+	//	golog.Error(err)
 	//	w.Write(errorcode.ErrorConnentMysql())
 	//	return
 	//}
@@ -334,13 +335,13 @@ func TypeDel(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 	id32, err := strconv.Atoi(id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	nickname, err := logtokenmysql(r)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -360,7 +361,7 @@ func TypeDel(w http.ResponseWriter, r *http.Request) {
 	}
 	_, err = db.Mconn.Update("delete from types where id=?", id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -372,7 +373,7 @@ func TypeDel(w http.ResponseWriter, r *http.Request) {
 	err = il.Del(
 		nickname, id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -389,7 +390,7 @@ func GetType(w http.ResponseWriter, r *http.Request) {
 	errorcode := &errorstruct{}
 	_, err := logtokenmysql(r)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -397,7 +398,7 @@ func GetType(w http.ResponseWriter, r *http.Request) {
 	types := &model.Send_Types{}
 	rows, err := db.Mconn.GetRows("select name from types")
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}

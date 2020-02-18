@@ -54,7 +54,7 @@ type articledetail struct {
 //
 //		uid, err := asset.NicknameGetUid(name, conn)
 //		if err != nil {
-//			logger.ErrorLog(err.Error())
+//			logger.ErrorLog(err)
 //			conn.Db.Close()
 //			w.WriteHeader(http.StatusNotFound)
 //			return
@@ -135,7 +135,7 @@ func GetEnv(w http.ResponseWriter, r *http.Request) {
 	errorcode := &errorstruct{}
 	_, err := logtokenmysql(r)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -172,7 +172,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	_, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -183,7 +183,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	rows, err := db.Mconn.GetRows(getusersql)
 
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -209,7 +209,7 @@ func GetVersion(w http.ResponseWriter, r *http.Request) {
 	_, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -250,7 +250,7 @@ func UploadImgs(w http.ResponseWriter, r *http.Request) {
 	errorcode := &errorstruct{}
 	file, h, err := r.FormFile("file")
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -259,7 +259,7 @@ func UploadImgs(w http.ResponseWriter, r *http.Request) {
 
 	cfile, err := os.OpenFile(path.Join(bugconfig.ImgDir, filename), os.O_CREATE|os.O_RDWR, 0755)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -267,7 +267,7 @@ func UploadImgs(w http.ResponseWriter, r *http.Request) {
 
 	_, err = io.Copy(cfile, file)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -319,21 +319,21 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 	golog.Info("uploading header image")
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
 	image, header, err := r.FormFile("upload")
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	imgcode := make([]byte, header.Size)
 	_, err = image.Read(imgcode)
 	if err != nil {
-		golog.Error("parse uploadImage struct fail,%v", err)
+		golog.Errorf("parse uploadImage struct fail,%v", err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -342,7 +342,7 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 	filename := prefix + ".png"
 	err = ioutil.WriteFile(path.Join(bugconfig.ImgDir, filename), imgcode, 0655) //buffer输出到jpg文件中（不做处理，直接写到文件）
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -359,7 +359,7 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 
 	_, err = db.Mconn.Update(uploadimg, url.Url, nickname)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -376,7 +376,7 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 	errorcode := &errorstruct{}
 	_, err := logtokenmysql(r)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -384,7 +384,7 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 	getinfosql := "select uid,info,time from informations where bid=?"
 	rows, err := db.Mconn.GetRows(getinfosql, bid)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -401,13 +401,13 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 	var vid int64
 	row, err := db.Mconn.GetOne(getlistsql, bid)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = row.Scan(&sl.Title, &sl.Content, &vid, &statusid, &sl.Id)
 	if err != nil && err != sql.ErrNoRows {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}

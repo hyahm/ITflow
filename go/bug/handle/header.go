@@ -3,7 +3,6 @@ package handle
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hyahm/golog"
 	"io/ioutil"
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
@@ -12,6 +11,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/hyahm/golog"
 )
 
 func HeaderList(w http.ResponseWriter, r *http.Request) {
@@ -19,7 +20,7 @@ func HeaderList(w http.ResponseWriter, r *http.Request) {
 	_, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -29,7 +30,7 @@ func HeaderList(w http.ResponseWriter, r *http.Request) {
 	gsql := "select id,name,hhids,remark from header"
 	rows, err := db.Mconn.GetRows(gsql)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -41,7 +42,7 @@ func HeaderList(w http.ResponseWriter, r *http.Request) {
 		if hs != "" {
 			hrow, err := db.Mconn.GetRows(fmt.Sprintf("select id,k,v from headerlist where id in (%v)", hs))
 			if err != nil {
-				golog.Error(err.Error())
+				golog.Error(err)
 				w.Write(errorcode.ErrorE(err))
 				return
 			}
@@ -65,7 +66,7 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -78,14 +79,14 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 	data := &model.Data_header{}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
 	err = json.Unmarshal(respbyte, data)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -94,7 +95,7 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 	for _, v := range data.Hhids {
 		id, err := db.Mconn.Insert("insert into headerlist(k,v) values(?,?)", v.Key, v.Value)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -104,7 +105,7 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 	gsql := "insert into header(name,hhids,remark) values(?,?,?)"
 	errorcode.Id, err = db.Mconn.Insert(gsql, data.Name, ids, data.Remark)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -116,7 +117,7 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 	err = il.Add(
 		nickname, errorcode.Id, data.Name)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -134,7 +135,7 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 
 		w.Write(errorcode.ErrorE(err))
 		return
@@ -155,13 +156,13 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 	var count int
 	row, err := db.Mconn.GetOne(" select count(id) from apilist where hid=?", id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err= row.Scan(&count)
+	err = row.Scan(&count)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -174,13 +175,13 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 	var hids string
 	row, err = db.Mconn.GetOne("select hhids from header where id=?", id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = row.Scan(&hids)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -188,7 +189,7 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 	if hids != "" {
 		_, err = db.Mconn.Update(fmt.Sprintf("delete from headerlist where id in (%v)", hids))
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -196,7 +197,7 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 	// 删除header
 	_, err = db.Mconn.Update("delete from header where id=?", id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -209,7 +210,7 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 	err = il.Del(
 		nickname, id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -228,7 +229,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -241,14 +242,14 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
 	err = json.Unmarshal(respbyte, data)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -256,13 +257,13 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 	var oldheadids string
 	row, err := db.Mconn.GetOne("select hhids from header where id=?", data.Id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = row.Scan(&oldheadids)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -275,7 +276,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 		if v.Id > 0 {
 			_, err = db.Mconn.Update("update headerlist set k=?,v=? where id=?", v.Key, v.Value, v.Id)
 			if err != nil {
-				golog.Error(err.Error())
+				golog.Error(err)
 				w.Write(errorcode.ErrorE(err))
 				return
 			}
@@ -298,7 +299,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 			//否则就添加,id也要返回
 			hl.Id, err = db.Mconn.Insert("insert into headerlist(k,v) values(?,?)", v.Key, v.Value)
 			if err != nil {
-				golog.Error(err.Error())
+				golog.Error(err)
 				w.Write(errorcode.ErrorE(err))
 				return
 			}
@@ -312,7 +313,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 	if len(delhhids) > 0 {
 		_, err = db.Mconn.Update(fmt.Sprintf("delete from headerlist where id in (%s)", strings.Join(delhhids, ",")))
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -322,7 +323,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 	hids := strings.Join(idstr, ",")
 	_, err = db.Mconn.Update("update header set name=?,hhids=?,remark=? where id=?", data.Name, hids, data.Remark, data.Id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -334,7 +335,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 	err = il.Update(
 		nickname, data.Id, data.Name)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -358,7 +359,7 @@ func HeaderGet(w http.ResponseWriter, r *http.Request) {
 	_, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}

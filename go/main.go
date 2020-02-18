@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"itflow/bug"
 	"itflow/bug/bugconfig"
 	"itflow/db"
@@ -10,6 +11,7 @@ import (
 )
 
 func main() {
+	fmt.Println("-------------")
 	// 初始化配置文件
 	goconfig.InitConf("bug.ini")
 	//初始化mysql

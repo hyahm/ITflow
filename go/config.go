@@ -24,7 +24,7 @@ func main() {
 
 	goconfig.WriteString("redis.pwd", "")
 	goconfig.WriteString("redis.host", "127.0.0.1:6379")
-	goconfig.WriteInt("redis.db", 0, "token 过期时间")
+	goconfig.WriteInt("redis.db", 0)
 	goconfig.WriteInt64("redis.expiration", 120, "token 过期时间")
 
 	goconfig.WriteNotesForModule("ssl", "ssl, 使用ssl")

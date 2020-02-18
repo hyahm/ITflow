@@ -2,7 +2,6 @@ package handle
 
 import (
 	"encoding/json"
-	"github.com/hyahm/golog"
 	"io/ioutil"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
@@ -12,6 +11,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/hyahm/golog"
 )
 
 func RoleList(w http.ResponseWriter, r *http.Request) {
@@ -19,7 +20,7 @@ func RoleList(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -32,7 +33,7 @@ func RoleList(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("rolegroup", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -45,7 +46,7 @@ func RoleList(w http.ResponseWriter, r *http.Request) {
 	s := "select id,name,rolelist from rolegroup"
 	rows, err := db.Mconn.GetRows(s)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -70,7 +71,7 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -88,7 +89,7 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("rolegroup", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -102,13 +103,13 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 	var count int
 	row, err := db.Mconn.GetOne(ssql, id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = row.Scan(&count)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -119,7 +120,7 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 	isql := "delete from  rolegroup where id = ?"
 	_, err = db.Mconn.Update(isql, id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -131,7 +132,7 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 	err = il.Del(
 		nickname, id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -148,7 +149,7 @@ func EditRole(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -161,7 +162,7 @@ func EditRole(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("rolegroup", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -173,13 +174,13 @@ func EditRole(w http.ResponseWriter, r *http.Request) {
 	}
 	bytedata, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = json.Unmarshal(bytedata, data)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -190,7 +191,7 @@ func EditRole(w http.ResponseWriter, r *http.Request) {
 	gsql := "update rolegroup set name=?,rolelist=?  where id=?"
 	_, err = db.Mconn.Update(gsql, data.Name, strings.Join(rl, ","), data.Id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -202,7 +203,7 @@ func EditRole(w http.ResponseWriter, r *http.Request) {
 	err = il.Update(
 		nickname, data.Id, data.Name)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -219,7 +220,7 @@ func AddRole(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 
 		w.Write(errorcode.ErrorE(err))
 		return
@@ -233,7 +234,7 @@ func AddRole(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("rolegroup", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -245,13 +246,13 @@ func AddRole(w http.ResponseWriter, r *http.Request) {
 	}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = json.Unmarshal(respbyte, data)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -267,7 +268,7 @@ func AddRole(w http.ResponseWriter, r *http.Request) {
 	gsql := "insert rolegroup(name,rolelist) values(?,?)"
 	errorcode.Id, err = db.Mconn.Insert(gsql, data.Name, strings.Join(ids, ","))
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -280,7 +281,7 @@ func AddRole(w http.ResponseWriter, r *http.Request) {
 	err = il.Add(
 		nickname, errorcode.Id, data.Name)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -296,7 +297,7 @@ func RoleGroupName(w http.ResponseWriter, r *http.Request) {
 	_, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}

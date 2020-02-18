@@ -3,7 +3,6 @@ package handle
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hyahm/golog"
 	"io/ioutil"
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
@@ -14,6 +13,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/hyahm/golog"
 )
 
 type getAddUser struct {
@@ -32,7 +33,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -41,13 +42,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	gu, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = json.Unmarshal(gu, getuser)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -107,15 +108,15 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var level int64
-	row , err := db.Mconn.GetOne("select level from jobs where id=?", jid)
+	row, err := db.Mconn.GetOne("select level from jobs where id=?", jid)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = row.Scan(&level)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -131,7 +132,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -159,7 +160,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	err = il.Add(
 		getuser.RealName, getuser.Nickname, getuser.Email)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -174,7 +175,7 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -189,13 +190,13 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 	var count int
 	row, err := db.Mconn.GetOne("select count(id) from bugs where uid=?", id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = row.Scan(&count)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -207,7 +208,7 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 	// 查看用户组是否存在此用户
 	userrows, err := db.Mconn.GetRows("select ids from usergroup")
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -228,7 +229,7 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 	}
 	_, err = db.Mconn.Update("delete from user where id=?", id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -240,7 +241,7 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 	err = il.Del(
 		nickname, id, bugconfig.CacheUidRealName[int64(id32)])
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -264,7 +265,7 @@ func DisableUser(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -273,13 +274,13 @@ func DisableUser(w http.ResponseWriter, r *http.Request) {
 
 	_, err = db.Mconn.Update("update user set disable=ABS(disable-1) where id=?", id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	_, err = db.Mconn.Update("update bugs set dustbin=ABS(dustbin-1) where uid=?", id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -291,7 +292,7 @@ func DisableUser(w http.ResponseWriter, r *http.Request) {
 	err = il.Del(
 		nickname, id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -324,7 +325,7 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -342,7 +343,7 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 	getallsql := "select id,createtime,realname,nickname,email,disable,rid,bugsid,jid from user where level<>0"
 	adminrows, err := db.Mconn.GetRows(getallsql)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -361,7 +362,7 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 	//	getusersql := "select id,createtime,realname,nickname,rolestring,email,disable,rid,bugsid from user where level=1 and nickname<>?"
 	//	adminrows, err := conn.GetRows(getusersql, nickname)
 	//	if err != nil {
-	//		golog.Error(err.Error())
+	//		golog.Error(err)
 	//		w.Write(errorcode.ErrorConnentMysql())
 	//		return
 	//	}
@@ -380,7 +381,7 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 	//	getusersql := "select id,createtime,realname,nickname,rolestring,email,disable from user where level=2 and nickname=?"
 	//	err := conn.GetOne(getusersql, nickname).Scan(&ul.Id, &ul.Createtime, &ul.Realname, &ul.Nickname, &rid, &ul.Email, &ul.Disable)
 	//	if err != nil {
-	//		golog.Error(err.Error())
+	//		golog.Error(err)
 	//		w.Write(errorcode.ErrorConnentMysql())
 	//		return
 	//	}
@@ -399,7 +400,7 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -412,14 +413,14 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 	uls := &userlist{}
 	bytedata, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
 	err = json.Unmarshal(bytedata, uls)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -469,7 +470,7 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 		uls.Id,
 	)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -481,7 +482,7 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 	err = il.Update("updateuser : changeuser:%s, operator: %s  ",
 		uls.Realname, nickname)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -512,7 +513,7 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	errorcode := &errorstruct{}
 	name, err := logtokenmysql(r)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -520,7 +521,7 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	getuser := &pwd{}
 	gu, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -529,7 +530,7 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 
 	err = json.Unmarshal(gu, getuser)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -538,13 +539,13 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	var n int
 	row, err := db.Mconn.GetOne(getaritclesql, uid, oldpassword)
 	if err != nil || n != 1 {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorNoPermission())
 		return
 	}
 	err = row.Scan(&n)
 	if err != nil || n != 1 {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorNoPermission())
 		return
 	}
@@ -553,13 +554,13 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 
 	_, err = db.Mconn.Update(chpwdsql, newpassword, uid)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = insertlog("resetpassword", "用户"+name+"修改了密码", r)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -580,7 +581,7 @@ func GetRoles(w http.ResponseWriter, r *http.Request) {
 	_, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -600,7 +601,7 @@ func GetThisRoles(w http.ResponseWriter, r *http.Request) {
 	_, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -612,13 +613,13 @@ func GetThisRoles(w http.ResponseWriter, r *http.Request) {
 	var rolestring string
 	row, err := db.Mconn.GetOne("select rolestring from user where id=?", id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = row.Scan(&rolestring)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -639,7 +640,7 @@ func GetGroup(w http.ResponseWriter, r *http.Request) {
 	_, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -662,7 +663,7 @@ func ResetPwd(w http.ResponseWriter, r *http.Request) {
 	_, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -671,13 +672,13 @@ func ResetPwd(w http.ResponseWriter, r *http.Request) {
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = json.Unmarshal(body, rp)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -686,7 +687,7 @@ func ResetPwd(w http.ResponseWriter, r *http.Request) {
 	updatepwdsql := "update user set password=? where id=?"
 	_, err = db.Mconn.Update(updatepwdsql, newpassword, rp.Id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}

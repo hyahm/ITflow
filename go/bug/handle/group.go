@@ -3,7 +3,6 @@ package handle
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hyahm/golog"
 	"io/ioutil"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
@@ -14,6 +13,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/hyahm/golog"
 )
 
 type getDepartment struct {
@@ -26,7 +27,7 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -39,7 +40,7 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("statusgroup", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -51,13 +52,13 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 	}
 	list, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = json.Unmarshal(list, data)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -72,7 +73,7 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 	isql := "insert into statusgroup(name,sids) values(?,?)"
 	errorcode.Id, err = db.Mconn.Insert(isql, data.Department, ss)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -85,7 +86,7 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 	err = il.Add(
 		nickname, errorcode.Id, data.Department)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -102,7 +103,7 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -115,7 +116,7 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("statusgroup", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -127,13 +128,13 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 	}
 	list, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = json.Unmarshal(list, data)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -152,7 +153,7 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 	isql := "update statusgroup set name =?,sids=? where id = ?"
 	_, err = db.Mconn.Update(isql, data.Department, ss, data.Id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -165,7 +166,7 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 	err = il.Update(
 		nickname, data.Id, data.Department)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -192,7 +193,7 @@ func BugGroupList(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -204,7 +205,7 @@ func BugGroupList(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("statusgroup", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -218,7 +219,7 @@ func BugGroupList(w http.ResponseWriter, r *http.Request) {
 	s := "select id,name,sids from statusgroup"
 	rows, err := db.Mconn.GetRows(s)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -249,7 +250,7 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -267,7 +268,7 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("statusgroup", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -279,15 +280,15 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 	}
 	ssql := "select count(id) from user where bugsid=?"
 	var count int
-	row,err := db.Mconn.GetOne(ssql, id)
+	row, err := db.Mconn.GetOne(ssql, id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = row.Scan(&count)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -298,7 +299,7 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 	isql := "delete from  statusgroup where id = ?"
 	_, err = db.Mconn.Update(isql, id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -310,7 +311,7 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 	err = il.Del(
 		nickname, id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -327,7 +328,7 @@ func GroupGet(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -340,7 +341,7 @@ func GroupGet(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("usergroup", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -353,7 +354,7 @@ func GroupGet(w http.ResponseWriter, r *http.Request) {
 	gsql := "select id,name,ids from usergroup"
 	rows, err := db.Mconn.GetRows(gsql)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -378,7 +379,7 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -390,7 +391,7 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("usergroup", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -403,13 +404,13 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 	data := &model.Get_groups{}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = json.Unmarshal(respbyte, data)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -426,7 +427,7 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 	gsql := "insert usergroup(name,ids,cuid) values(?,?,?)"
 	errorcode.Id, err = db.Mconn.Insert(gsql, data.Name, strings.Join(ids, ","), bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -439,7 +440,7 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 	err = il.Add(
 		nickname, errorcode.Id, data.Name)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -455,7 +456,7 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -467,7 +468,7 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("usergroup", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -480,7 +481,7 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 	id32, err := strconv.Atoi(id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -490,7 +491,7 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 	var hasshare bool
 	sharerows, err := db.Mconn.GetRows("select readuser,rid,wid,writeuser from  sharefile")
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -522,7 +523,7 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 	var hasrest bool
 	restrows, err := db.Mconn.GetRows("select readuser,edituser,rid,eid from  apiproject")
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -552,7 +553,7 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 	gsql := "delete from usergroup where id=? and cuid=?"
 	_, err = db.Mconn.Update(gsql, id, bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -564,7 +565,7 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 	err = il.Del(
 		nickname, id)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -581,7 +582,7 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -594,7 +595,7 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 	} else {
 		permssion, err = asset.CheckPerm("usergroup", nickname)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
@@ -606,13 +607,13 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = json.Unmarshal(respbyte, data)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -627,7 +628,7 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	_, err = db.Mconn.Update(gsql, data.Name, ids, data.Id, bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -640,7 +641,7 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 	err = il.Update(
 		nickname, data.Id, data.Name)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}

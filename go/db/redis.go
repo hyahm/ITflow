@@ -21,10 +21,10 @@ import (
 var RSconn *xredis.TypeString
 
 func InitRedis() {
-	rconn , err := xredis.Conn(&redis.Options{
-		Addr:               goconfig.ReadString("redis.host"),
-		Password:           goconfig.ReadString("redis.password"),
-		DB:                 goconfig.ReadInt("redis.db"),
+	rconn, err := xredis.Conn(&redis.Options{
+		Addr:     goconfig.ReadString("redis.host"),
+		Password: goconfig.ReadString("redis.pwd"),
+		DB:       goconfig.ReadInt("redis.db"),
 	})
 	if err != nil {
 		panic(err)
@@ -32,6 +32,7 @@ func InitRedis() {
 	RSconn = rconn.NewStr()
 
 }
+
 //
 //func NewRedis() (*redis.Client, error) {
 //	conf := &redis.Options{
@@ -45,7 +46,6 @@ func InitRedis() {
 //	}
 //	return client, nil
 //}
-
 
 //func (rd *Rconfig) Connect() (*redis.Client, error) {
 //

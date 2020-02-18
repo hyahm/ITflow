@@ -2,8 +2,9 @@ package bugconfig
 
 import (
 	"errors"
-	"github.com/hyahm/golog"
 	"itflow/db"
+
+	"github.com/hyahm/golog"
 )
 
 func initCache() {
@@ -170,9 +171,9 @@ func initCache() {
 
 	//检查默认值是否只有一行
 	var checkdefaultcount int
-	row, err  := db.Mconn.GetOne("select count(status) from defaultvalue")
+	row, err := db.Mconn.GetOne("select count(status) from defaultvalue")
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		panic(err)
 	}
 	err = row.Scan(&checkdefaultcount)

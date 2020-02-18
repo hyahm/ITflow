@@ -2,9 +2,10 @@ package handle
 
 import (
 	"encoding/json"
-	"github.com/hyahm/golog"
 	"itflow/db"
 	"net/http"
+
+	"github.com/hyahm/golog"
 )
 
 //type totalProject struct {
@@ -24,7 +25,7 @@ func UserCount(w http.ResponseWriter, r *http.Request) {
 	errorcode := &errorstruct{}
 
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -33,29 +34,29 @@ func UserCount(w http.ResponseWriter, r *http.Request) {
 
 	getusersql := "select count(id) from user"
 	getgroupsql := "select count(id) from rolegroup"
-	row ,err := db.Mconn.GetOne(getusersql)
+	row, err := db.Mconn.GetOne(getusersql)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
 	err = row.Scan(&uc.CountUsers)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
 	row, err = db.Mconn.GetOne(getgroupsql)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = row.Scan(&uc.CountGroups)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -77,7 +78,7 @@ func ProjectCount(w http.ResponseWriter, r *http.Request) {
 	_, err := logtokenmysql(r)
 	errorcode := &errorstruct{}
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -85,15 +86,15 @@ func ProjectCount(w http.ResponseWriter, r *http.Request) {
 	pc := &projectCount{}
 
 	getbugs := "select count(id) from bugs"
-	row ,err := db.Mconn.GetOne(getbugs)
+	row, err := db.Mconn.GetOne(getbugs)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = row.Scan(&pc.CountBugs)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}

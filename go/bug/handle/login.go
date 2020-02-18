@@ -3,8 +3,6 @@ package handle
 import (
 	"database/sql"
 	"encoding/json"
-	"github.com/hyahm/goconfig"
-	"github.com/hyahm/golog"
 	"io/ioutil"
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
@@ -14,6 +12,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/hyahm/goconfig"
+	"github.com/hyahm/golog"
 )
 
 type resLogin struct {
@@ -29,7 +30,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	errorcode := &errorstruct{}
 	s, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -37,7 +38,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	err = json.Unmarshal(s, login)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -45,7 +46,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// 解密
 	//username, err := gaencrypt.RsaDecrypt(login.Username, bugconfig.PrivateKey, true)
 	//if err != nil {
-	//	golog.Error(err.Error())
+	//	golog.Error(err)
 	//	w.Write(errorcode.ErrorRsa())
 	//	return
 	//}
@@ -53,7 +54,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	//tmp, err := gaencrypt.RsaDecrypt(login.Password, bugconfig.PrivateKey, true)
 	//if err != nil {
 	//
-	//	golog.Error(err.Error())
+	//	golog.Error(err)
 	//	w.Write(errorcode.ErrorRsa())
 	//	return
 	//}
@@ -66,7 +67,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	row, err := db.Mconn.GetOne(getsql, login.Username, enpassword)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -77,7 +78,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.Error("username or password error"))
 			return
 		}
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -85,7 +86,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	_, err = db.RSconn.Set(login.Token, login.Username,
 		time.Duration(goconfig.ReadInt("expiration"))*time.Minute)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -96,7 +97,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 	err = il.Login("nickname: %s has login", login.Username)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -111,11 +112,10 @@ func Loginout(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &errorstruct{}
 
-
 	token := r.FormValue("token")
 	nickname, err := db.RSconn.Get(token)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -124,7 +124,7 @@ func Loginout(w http.ResponseWriter, r *http.Request) {
 	}
 	err = il.Login("nickname: %s has logout", nickname)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -143,7 +143,7 @@ func UserInfo(w http.ResponseWriter, r *http.Request) {
 	errorcode := &errorstruct{}
 	nickname, err := logtokenmysql(r)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -155,13 +155,13 @@ func UserInfo(w http.ResponseWriter, r *http.Request) {
 	var level int
 	row, err := db.Mconn.GetOne(sql, nickname)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	err = row.Scan(&rid, &level, &userinfo.Avatar, &userinfo.Name)
 	if err != nil {
-		golog.Error(err.Error())
+		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
@@ -173,13 +173,13 @@ func UserInfo(w http.ResponseWriter, r *http.Request) {
 		getrole := "select rolelist from rolegroup where id=?"
 		row, err := db.Mconn.GetOne(getrole, rid)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
 		err = row.Scan(&rl)
 		if err != nil {
-			golog.Error(err.Error())
+			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
