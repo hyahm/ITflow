@@ -1,0 +1,1 @@
+2020-03-05 11:18:39 - [ERROR] - DESKTOP-IFSG3I9 - e:/ITflow/go/db/sql.go:26 - dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.

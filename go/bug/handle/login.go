@@ -84,7 +84,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = db.RSconn.Set(login.Token, login.Username,
-		time.Duration(goconfig.ReadInt("expiration"))*time.Minute)
+		time.Duration(goconfig.ReadInt("expiration", 120))*time.Minute)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

@@ -39,7 +39,7 @@ func RunHttp() {
 	router.Pattern("/upload/headimg").Post(handle.UploadHeadImg)
 	router.Pattern("/showimg/{imgname}").Get(handle.ShowImg)
 	//
-	listenaddr := goconfig.ReadString("listenaddr")
+	listenaddr := goconfig.ReadString("listenaddr", ":10001")
 
 	fmt.Println("listen on " + listenaddr)
 	server := http.Server{
@@ -49,8 +49,8 @@ func RunHttp() {
 		WriteTimeout: 5 * time.Second,
 	}
 
-	if goconfig.ReadBool("ssl") {
-		if err := server.ListenAndServeTLS(goconfig.ReadString("certfile"), goconfig.ReadString("keyfile")); err != nil {
+	if goconfig.ReadBool("ssl", false) {
+		if err := server.ListenAndServeTLS(goconfig.ReadString("certfile", "ssl.cert"), goconfig.ReadString("keyfile", "ssl.key")); err != nil {
 			print("has ssl key?")
 			panic(err)
 		}

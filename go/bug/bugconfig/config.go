@@ -2,10 +2,12 @@ package bugconfig
 
 import (
 	"fmt"
-	"github.com/hyahm/goconfig"
 	"os"
 	"runtime"
 	"time"
+
+	"github.com/hyahm/goconfig"
+	"github.com/prometheus/common/log"
 )
 
 //const SALT = "hjkkaksjdhfryuooweqzmbvc"
@@ -79,17 +81,14 @@ var (
 
 func LoadConfig() {
 
-	ImgDir = goconfig.ReadString("imgdir")
+	ImgDir = goconfig.ReadString("imgdir", "/data/bugimg/")
 	err := os.MkdirAll(ImgDir, 0755)
-	fmt.Println("------------------------", ImgDir)
 	if err != nil {
 		panic(err)
 	}
-	PrivateKey = goconfig.ReadFile("privatekeyfile")
-	ShowBaseUrl = goconfig.ReadString("showbaseurl")
-	Salt = goconfig.ReadString("salt")
-	ShareDir = goconfig.ReadString("sharedir")
-	ShareDir = addXieGang(ShareDir)
+	ShowBaseUrl = goconfig.ReadString("showbaseurl", " http://127.0.0.1:10001/showimg")
+	Salt = goconfig.ReadString("salt", "hjkkaksjdhfryuooweqzmbvc")
+	ShareDir = goconfig.ReadUrl("sharedir", "/share/")
 	// 创建共享文件夹
 	err = os.MkdirAll(ShareDir, 0755)
 	if err != nil {
@@ -140,9 +139,9 @@ func LoadConfig() {
 	CacheNameTid = make(map[string]int64, 0)
 	CacheEmail = &Email{}
 
-	Expirontion = goconfig.ReadInt("redis.expiration")
+	Expirontion = goconfig.ReadInt("redis.expiration", 120)
 	DEADLINE = time.Minute * time.Duration(Expirontion)
-	fmt.Println("cookie过期时间为：", Expirontion, "m")
+	log.Infof("cookie过期时间为：", DEADLINE)
 
 	initCache()
 	// 添加一个admin 用户的权限，默认全是1

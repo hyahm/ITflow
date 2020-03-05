@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"itflow/bug"
 	"itflow/bug/bugconfig"
 	"itflow/db"
@@ -11,7 +10,7 @@ import (
 )
 
 func main() {
-	fmt.Println("-------------")
+
 	// 初始化配置文件
 	goconfig.InitConf("bug.ini")
 	//初始化mysql
@@ -21,9 +20,9 @@ func main() {
 	// 初始化缓存（后面会使用redis）
 	bugconfig.LoadConfig()
 	// 初始化日志
-	golog.InitLogger(goconfig.ReadString("log.path"),
-		goconfig.ReadInt64("log.size"),
-		goconfig.ReadBool("log.everyday"))
+	golog.InitLogger(goconfig.ReadString("log.path", ""),
+		goconfig.ReadInt64("log.size", 0),
+		goconfig.ReadBool("log.everyday", false))
 
 	////
 	bug.RunHttp()

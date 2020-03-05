@@ -3,12 +3,11 @@ package autodb
 import (
 	"database/sql"
 	"fmt"
-	"github.com/hyahm/goconfig"
-	"itflow/bug/bugconfig"
 	"itflow/db"
-	"log"
 	"strconv"
 	"strings"
+
+	"github.com/hyahm/goconfig"
 )
 
 func createapi() {
@@ -24,7 +23,7 @@ func createapi() {
 		if err != nil {
 			panic(err)
 		}
-	} else if goconfig.ReadBool("apicover") {
+	} else if goconfig.ReadBool("apicover", false) {
 
 		_, err = db.Mconn.Update("delete from apilist where pid=?", pid)
 		if err != nil {

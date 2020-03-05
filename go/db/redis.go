@@ -22,9 +22,9 @@ var RSconn *xredis.TypeString
 
 func InitRedis() {
 	rconn, err := xredis.Conn(&redis.Options{
-		Addr:     goconfig.ReadString("redis.host"),
-		Password: goconfig.ReadString("redis.pwd"),
-		DB:       goconfig.ReadInt("redis.db"),
+		Addr:     goconfig.ReadString("redis.host", "127.0.0.1:6379"),
+		Password: goconfig.ReadString("redis.pwd", ""),
+		DB:       goconfig.ReadInt("redis.db", 0),
 	})
 	if err != nil {
 		panic(err)

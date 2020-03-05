@@ -12,11 +12,11 @@ import (
 
 func InitDb() {
 	connstring := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4",
-		goconfig.ReadString("mysql.user"),
-		goconfig.ReadString("mysql.pwd"),
-		goconfig.ReadString("mysql.host"),
-		goconfig.ReadInt("mysql.port"),
-		goconfig.ReadString("mysql.db"),
+		goconfig.ReadString("mysql.user", "root"),
+		goconfig.ReadString("mysql.pwd", "123456"),
+		goconfig.ReadString("mysql.host", "127.0.0.1"),
+		goconfig.ReadInt("mysql.port", 3306),
+		goconfig.ReadString("mysql.db", "project"),
 	)
 	orm, err := gorm.Open("mysql", connstring)
 	if err != nil {
