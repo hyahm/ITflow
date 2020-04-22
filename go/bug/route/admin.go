@@ -1,14 +1,15 @@
 package route
 
 import (
-	"github.com/hyahm/xmux"
 	"itflow/bug/handle"
+
+	"github.com/hyahm/xmux"
 )
 
 var Admin *xmux.GroupRoute
 
-func init()  {
-	Admin = xmux.NewGroupRoute()
+func init() {
+	Admin = xmux.NewGroupRoute("admin")
 	Admin.Pattern("/dashboard/usercount").Post(handle.UserCount)
 	Admin.Pattern("/dashboard/projectcount").Post(handle.ProjectCount)
 	Admin.Pattern("/search/log").Post(handle.SearchLog)

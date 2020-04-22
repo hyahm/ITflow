@@ -1,14 +1,15 @@
 package route
 
 import (
-	"github.com/hyahm/xmux"
 	"itflow/bug/handle"
+
+	"github.com/hyahm/xmux"
 )
 
 var Api *xmux.GroupRoute
 
 func init() {
-	Api = xmux.NewGroupRoute()
+	Api = xmux.NewGroupRoute("api")
 	Api.Pattern("/rest/list").Post(handle.RestList)
 	Api.Pattern("/rest/update").Post(handle.RestUpdate)
 	Api.Pattern("/rest/add").Post(handle.RestAdd)
@@ -50,7 +51,6 @@ func init() {
 	Api.Pattern("/level/del").Get(handle.LevelDel)
 	Api.Pattern("/level/update").Post(handle.LevelUpdate)
 	Api.Pattern("/get/levels").Post(handle.GetLevels)
-
 
 	//---------------------------------------------------------
 	Api.Pattern("/default/status").Post(handle.DefaultStatus)

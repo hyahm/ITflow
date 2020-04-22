@@ -1,14 +1,15 @@
 package route
 
 import (
-	"github.com/hyahm/xmux"
 	"itflow/bug/handle"
+
+	"github.com/hyahm/xmux"
 )
 
 var Env *xmux.GroupRoute
 
 func init() {
-	Env = xmux.NewGroupRoute()
+	Env = xmux.NewGroupRoute("env")
 	Env.Pattern("/env/list").Post(handle.EnvList)
 	Env.Pattern("/env/add").Get(handle.AddEnv)
 	Env.Pattern("/env/update").Post(handle.UpdateEnv)

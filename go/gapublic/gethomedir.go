@@ -3,7 +3,6 @@ package gapublic
 import (
 	"bytes"
 	"errors"
-	"log"
 	"os"
 	"os/exec"
 	"os/user"

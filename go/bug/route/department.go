@@ -1,14 +1,15 @@
 package route
 
 import (
-	"github.com/hyahm/xmux"
 	"itflow/bug/handle"
+
+	"github.com/hyahm/xmux"
 )
 
 var Department *xmux.GroupRoute
 
 func init() {
-	Department = xmux.NewGroupRoute()
+	Department = xmux.NewGroupRoute("department")
 	Department.Pattern("/department/add").Post(handle.AddBugGroup)
 	Department.Pattern("/department/edit").Post(handle.EditBugGroup)
 	Department.Pattern("/department/list").Post(handle.BugGroupList)

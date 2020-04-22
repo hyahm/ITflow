@@ -1,14 +1,15 @@
 package route
 
 import (
-	"github.com/hyahm/xmux"
 	"itflow/bug/handle"
+
+	"github.com/hyahm/xmux"
 )
+
 var User *xmux.GroupRoute
 
-
 func init() {
-	User = xmux.NewGroupRoute()
+	User = xmux.NewGroupRoute("user")
 	User.Pattern("/user/login").Post(handle.Login)
 	User.Pattern("/user/logout").Post(handle.Loginout)
 	User.Pattern("/user/info").Get(handle.UserInfo)

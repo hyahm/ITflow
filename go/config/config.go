@@ -9,7 +9,7 @@ import (
 
 // 初始化配置文件, 会清空原有文件内容
 func main() {
-	conf := "bug.ini"
+	conf := "../bug.ini"
 	if len(os.Args) > 1 {
 		conf = os.Args[1]
 	}

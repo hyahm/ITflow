@@ -3,7 +3,6 @@ package gapublic
 import (
 	"bytes"
 	"encoding/json"
-	"log"
 	"os"
 )
 

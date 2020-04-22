@@ -1,14 +1,15 @@
 package route
 
 import (
-	"github.com/hyahm/xmux"
 	"itflow/bug/handle"
+
+	"github.com/hyahm/xmux"
 )
 
 var Share *xmux.GroupRoute
 
 func init() {
-	Share = xmux.NewGroupRoute()
+	Share = xmux.NewGroupRoute("share")
 	Share.Pattern("/share/list").Get(handle.ShareList)
 	Share.Pattern("/share/upload").Post(handle.ShareUpload)
 	Share.Pattern("/share/mkdir").Post(handle.ShareMkdir)
