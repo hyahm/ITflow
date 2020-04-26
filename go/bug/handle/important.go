@@ -8,6 +8,7 @@ import (
 	"itflow/bug/buglog"
 	"itflow/bug/model"
 	"itflow/db"
+	"itflow/model/response"
 	"net/http"
 	"strconv"
 	"strings"
@@ -18,7 +19,7 @@ import (
 func ImportantGet(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -59,7 +60,7 @@ func ImportantGet(w http.ResponseWriter, r *http.Request) {
 func ImportantAdd(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -128,7 +129,7 @@ func ImportantAdd(w http.ResponseWriter, r *http.Request) {
 func ImportantDel(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -215,7 +216,7 @@ func ImportantDel(w http.ResponseWriter, r *http.Request) {
 func ImportantUpdate(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -293,7 +294,7 @@ type importantslist struct {
 func GetImportants(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

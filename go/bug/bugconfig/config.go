@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/hyahm/goconfig"
-	"github.com/prometheus/common/log"
+	"github.com/hyahm/golog"
 )
 
 //const SALT = "hjkkaksjdhfryuooweqzmbvc"
@@ -139,9 +139,7 @@ func LoadConfig() {
 	CacheNameTid = make(map[string]int64, 0)
 	CacheEmail = &Email{}
 
-	Expirontion = goconfig.ReadInt("redis.expiration", 120)
-	DEADLINE = time.Minute * time.Duration(Expirontion)
-	log.Infof("cookie过期时间为：", DEADLINE)
+	golog.Info("cookie过期时间为：", goconfig.ReadDuration("redis.expiration", 120*time.Minute))
 
 	initCache()
 	// 添加一个admin 用户的权限，默认全是1

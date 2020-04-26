@@ -9,6 +9,7 @@ import (
 	"itflow/bug/buglog"
 	"itflow/bug/model"
 	"itflow/db"
+	"itflow/model/response"
 	"net/http"
 	"strconv"
 	"strings"
@@ -18,7 +19,7 @@ import (
 
 func RestList(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	tl := &model.List_restful{}
 	nickname, err := logtokenmysql(r)
 	if err != nil {
@@ -137,7 +138,7 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 
 func RestUpdate(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	tl := &model.Data_restful{}
 	nickname, err := logtokenmysql(r)
 	if err != nil {
@@ -222,7 +223,7 @@ func RestUpdate(w http.ResponseWriter, r *http.Request) {
 
 func RestAdd(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	nickname, err := logtokenmysql(r)
 	if err != nil {
 		golog.Error(err)
@@ -292,7 +293,7 @@ func RestAdd(w http.ResponseWriter, r *http.Request) {
 
 func RestDel(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	id := r.FormValue("id")
 	nickname, err := logtokenmysql(r)
 	if err != nil {
@@ -337,7 +338,7 @@ func RestDel(w http.ResponseWriter, r *http.Request) {
 
 func ApiList(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	tl := &model.List_restful{}
 	nickname, err := logtokenmysql(r)
 	pid := r.FormValue("pid")
@@ -503,7 +504,7 @@ func checkeditperm(pid string, uid int64) (bool, error) {
 
 func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	tl := &model.Get_apilist{}
 	nickname, err := logtokenmysql(r)
 	if err != nil {
@@ -621,7 +622,7 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 
 func ApiAdd(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	nickname, err := logtokenmysql(r)
 	if err != nil {
 		golog.Error(err)
@@ -725,7 +726,7 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 
 func ApiDel(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	id := r.FormValue("id")
 	nickname, err := logtokenmysql(r)
 	if err != nil {
@@ -804,7 +805,7 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 
 func ApiOne(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	sl := &model.Show_apilist{}
 	id := r.FormValue("id")
 
@@ -916,7 +917,7 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 
 func EditOne(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	sl := &model.One_apilist{}
 	id := r.FormValue("id")
 
@@ -1029,7 +1030,7 @@ type resp struct {
 
 func ApiResp(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	bb := &resp{}
 	bytedata, err := ioutil.ReadAll(r.Body)
 	if err != nil {

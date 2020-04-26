@@ -8,6 +8,7 @@ import (
 	"itflow/bug/buglog"
 	"itflow/bug/model"
 	"itflow/db"
+	"itflow/model/response"
 	"net/http"
 	"strconv"
 	"strings"
@@ -18,7 +19,7 @@ import (
 func HeaderList(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -64,7 +65,7 @@ func HeaderList(w http.ResponseWriter, r *http.Request) {
 func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -133,7 +134,7 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 func HeaderDel(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 
@@ -227,7 +228,7 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -357,7 +358,7 @@ type headerstruct struct {
 func HeaderGet(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

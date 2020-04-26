@@ -7,6 +7,7 @@ import (
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
 	"itflow/db"
+	"itflow/model/response"
 	"net/http"
 	"strconv"
 	"strings"
@@ -27,7 +28,7 @@ type projectrow struct {
 func ProjectList(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -69,7 +70,7 @@ func ProjectList(w http.ResponseWriter, r *http.Request) {
 func AddProject(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -128,7 +129,7 @@ func AddProject(w http.ResponseWriter, r *http.Request) {
 func UpdateProject(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 
 	if err != nil {
 		golog.Error(err)
@@ -199,7 +200,7 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 func DeleteProject(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

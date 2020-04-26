@@ -6,6 +6,7 @@ import (
 	"itflow/bug/bugconfig"
 	"itflow/bug/mail"
 	"itflow/db"
+	"itflow/model/response"
 	"net/http"
 
 	"github.com/hyahm/golog"
@@ -14,7 +15,7 @@ import (
 func TestEmail(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -44,7 +45,7 @@ func TestEmail(w http.ResponseWriter, r *http.Request) {
 func SaveEmail(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -95,7 +96,7 @@ func SaveEmail(w http.ResponseWriter, r *http.Request) {
 func GetEmail(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

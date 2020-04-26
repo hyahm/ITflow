@@ -15,9 +15,9 @@ import (
 func RunHttp() {
 
 	router := xmux.NewRouter()
-	router.SetHeader("Access-Control-Allow-Origin", "*")
-	router.SetHeader("Content-Type", "application/x-www-form-urlencoded,application/json; charset=UTF-8")
-	router.SetHeader("Access-Control-Allow-Headers", "Content-Type,Access-Token,X-Token,smail")
+	router.AddHeader("Access-Control-Allow-Origin", "*")
+	router.AddHeader("Content-Type", "application/x-www-form-urlencoded,application/json; charset=UTF-8")
+	router.AddHeader("Access-Control-Allow-Headers", "Content-Type,Access-Token,X-Token,smail")
 	router.AddGroup(route.User)
 	router.AddGroup(route.Bug)
 
@@ -39,6 +39,7 @@ func RunHttp() {
 	router.Pattern("/upload/headimg").Post(handle.UploadHeadImg)
 	router.Pattern("/showimg/{imgname}").Get(handle.ShowImg)
 	//
+	router.ShowApi("/docs")
 	listenaddr := goconfig.ReadString("listenaddr", ":10001")
 
 	fmt.Println("listen on " + listenaddr)

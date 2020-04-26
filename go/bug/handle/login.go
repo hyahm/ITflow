@@ -3,11 +3,12 @@ package handle
 import (
 	"database/sql"
 	"encoding/json"
-	"io/ioutil"
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
 	"itflow/db"
 	"itflow/gaencrypt"
+	"itflow/model/response"
+	"itflow/model/user"
 	"net/http"
 	"strconv"
 	"strings"
@@ -15,52 +16,15 @@ import (
 
 	"github.com/hyahm/goconfig"
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
-
-type resLogin struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Token    string `json:"token"`
-	Code     int    `json:"code"`
-	Avatar   string `json:"avatar"`
-}
 
 func Login(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
-	s, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	login := &resLogin{}
-
-	err = json.Unmarshal(s, login)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	// 解密
-	//username, err := gaencrypt.RsaDecrypt(login.Username, bugconfig.PrivateKey, true)
-	//if err != nil {
-	//	golog.Error(err)
-	//	w.Write(errorcode.ErrorRsa())
-	//	return
-	//}
-	//
-	//tmp, err := gaencrypt.RsaDecrypt(login.Password, bugconfig.PrivateKey, true)
-	//if err != nil {
-	//
-	//	golog.Error(err)
-	//	w.Write(errorcode.ErrorRsa())
-	//	return
-	//}
+	errorcode := &response.Response{}
+	login := xmux.GetData(r).Data.(*user.Login)
 	login.Username = strings.Trim(login.Username, " ")
 
-	login.Token = gaencrypt.Token(login.Username, bugconfig.Salt)
 	enpassword := gaencrypt.PwdEncrypt(login.Password, bugconfig.Salt)
 
 	getsql := "select nickname from user where email=? and password=? and disable=0"
@@ -82,8 +46,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	resp := user.RespLogin{}
 
-	_, err = db.RSconn.Set(login.Token, login.Username,
+	resp.Token = gaencrypt.Token(login.Username, bugconfig.Salt)
+	_, err = db.RSconn.Set(resp.Token, login.Username,
 		time.Duration(goconfig.ReadInt("expiration", 120))*time.Minute)
 	if err != nil {
 		golog.Error(err)
@@ -102,15 +68,17 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, _ := json.Marshal(login)
-	w.Write(resp)
+	resp.UserName = login.Username
+
+	send, _ := json.Marshal(resp)
+	w.Write(send)
 	return
 
 }
 
 func Loginout(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 
 	token := r.FormValue("token")
 	nickname, err := db.RSconn.Get(token)
@@ -140,7 +108,7 @@ type userInfo struct {
 
 func UserInfo(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	nickname, err := logtokenmysql(r)
 	if err != nil {
 		golog.Error(err)

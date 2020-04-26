@@ -11,6 +11,7 @@ import (
 	"itflow/bug/model"
 	"itflow/bug/public"
 	"itflow/db"
+	"itflow/model/response"
 	"net/http"
 	"strconv"
 	"strings"
@@ -26,7 +27,7 @@ type statusList struct {
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 
 	if err != nil {
 		golog.Error(err)
@@ -53,7 +54,7 @@ type mystatus struct {
 func ShowStatus(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -77,7 +78,7 @@ func ShowStatus(w http.ResponseWriter, r *http.Request) {
 func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 
@@ -108,7 +109,7 @@ type userinfo struct {
 func GetInfo(w http.ResponseWriter, r *http.Request) {
 
 	name, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -140,7 +141,7 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
 func UpdateInfo(w http.ResponseWriter, r *http.Request) {
 
 	name, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 
 	if err != nil {
 		golog.Error(err)
@@ -201,7 +202,7 @@ func UpdateInfo(w http.ResponseWriter, r *http.Request) {
 func UpdateRoles(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -271,7 +272,7 @@ type loglist struct {
 func LogList(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -318,7 +319,7 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 func SearchLog(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -461,7 +462,7 @@ type getChangeStatus struct {
 func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -520,7 +521,7 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 
 func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -570,7 +571,7 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 func GetAllBugs(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -649,7 +650,7 @@ func GetAllBugs(w http.ResponseWriter, r *http.Request) {
 func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 
 	name, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -718,7 +719,7 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 func CloseBug(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -781,7 +782,7 @@ type editList struct {
 func BugEdit(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

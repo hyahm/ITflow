@@ -8,6 +8,7 @@ import (
 	"itflow/bug/buglog"
 	"itflow/bug/model"
 	"itflow/db"
+	"itflow/model/response"
 	"net/http"
 	"strconv"
 	"strings"
@@ -18,7 +19,7 @@ import (
 func PositionGet(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -66,7 +67,7 @@ func PositionGet(w http.ResponseWriter, r *http.Request) {
 func PositionAdd(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -147,7 +148,7 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 func PositionDel(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -245,7 +246,7 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -331,7 +332,7 @@ type hypos struct {
 func GetHypos(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -370,7 +371,7 @@ type positions struct {
 func GetPositions(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

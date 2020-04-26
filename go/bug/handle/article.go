@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"itflow/bug/bugconfig"
 	"itflow/db"
+	"itflow/model/response"
 	"net/http"
 	"os"
 	"path"
@@ -132,7 +133,7 @@ type envList struct {
 
 func GetEnv(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	_, err := logtokenmysql(r)
 	if err != nil {
 		golog.Error(err)
@@ -170,7 +171,7 @@ type userList struct {
 func GetUser(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -207,7 +208,7 @@ type versionList struct {
 func GetVersion(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -247,7 +248,7 @@ type uploadImage struct {
 }
 
 func UploadImgs(w http.ResponseWriter, r *http.Request) {
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	file, h, err := r.FormFile("file")
 	if err != nil {
 		golog.Error(err)
@@ -317,7 +318,7 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 	url := &uploadimage{}
 	nickname, err := logtokenmysql(r)
 	golog.Info("uploading header image")
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -373,7 +374,7 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 func BugShow(w http.ResponseWriter, r *http.Request) {
 	bid := r.FormValue("id")
 	sl := &showArticle{}
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	_, err := logtokenmysql(r)
 	if err != nil {
 		golog.Error(err)

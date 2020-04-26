@@ -3,6 +3,7 @@ package handle
 import (
 	"encoding/json"
 	"itflow/db"
+	"itflow/model/response"
 	"net/http"
 
 	"github.com/hyahm/golog"
@@ -22,7 +23,7 @@ type userCount struct {
 func UserCount(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 
 	if err != nil {
 		golog.Error(err)
@@ -76,7 +77,7 @@ type projectCount struct {
 func ProjectCount(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

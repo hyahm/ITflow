@@ -8,6 +8,7 @@ import (
 	"itflow/bug/buglog"
 	"itflow/bug/model"
 	"itflow/db"
+	"itflow/model/response"
 	"net/http"
 	"strconv"
 	"strings"
@@ -17,7 +18,7 @@ import (
 
 func TypeList(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	tl := &model.List_types{}
 	_, err := logtokenmysql(r)
 	if err != nil {
@@ -71,7 +72,7 @@ func TypeList(w http.ResponseWriter, r *http.Request) {
 
 func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	nickname, err := logtokenmysql(r)
 	if err != nil {
 		golog.Error(err)
@@ -216,7 +217,7 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 
 func TypeAdd(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	_, err := logtokenmysql(r)
 	if err != nil {
 		golog.Error(err)
@@ -331,7 +332,7 @@ func TypeAdd(w http.ResponseWriter, r *http.Request) {
 
 func TypeDel(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	id := r.FormValue("id")
 	id32, err := strconv.Atoi(id)
 	if err != nil {
@@ -387,7 +388,7 @@ func TypeDel(w http.ResponseWriter, r *http.Request) {
 
 func GetType(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	_, err := logtokenmysql(r)
 	if err != nil {
 		golog.Error(err)

@@ -2,6 +2,8 @@ package route
 
 import (
 	"itflow/bug/handle"
+	"itflow/midware"
+	"itflow/model/user"
 
 	"github.com/hyahm/xmux"
 )
@@ -10,7 +12,12 @@ var User *xmux.GroupRoute
 
 func init() {
 	User = xmux.NewGroupRoute("user")
-	User.Pattern("/user/login").Post(handle.Login)
+	User.Pattern("/user/login").Post(handle.Login).
+		ApiDescribe("用户登录接口").
+		ApiReqStruct(user.Login{}).
+		Bind(&user.Login{}).AddMidware(midware.JsonToStruct).ApiResStruct(user.RespLogin{}).
+		ApiRequestTemplate(`{"username":"admin", "password": "123456"}`).
+		ApiResponseTemplate(`{"username":"admin","token":"sdfhdffffsdfgasdfasdf", "code": 0}`)
 	User.Pattern("/user/logout").Post(handle.Loginout)
 	User.Pattern("/user/info").Get(handle.UserInfo)
 	User.Pattern("/user/list").Post(handle.UserList)

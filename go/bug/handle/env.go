@@ -7,6 +7,7 @@ import (
 	"itflow/bug/bugconfig"
 	"itflow/bug/buglog"
 	"itflow/db"
+	"itflow/model/response"
 	"net/http"
 	"strconv"
 	"strings"
@@ -27,7 +28,7 @@ type envrow struct {
 func EnvList(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -69,7 +70,7 @@ func EnvList(w http.ResponseWriter, r *http.Request) {
 func AddEnv(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -127,7 +128,7 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 
 	if err != nil {
 		golog.Error(err)
@@ -199,7 +200,7 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

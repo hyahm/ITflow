@@ -5,6 +5,7 @@ import (
 	"itflow/bug/bugconfig"
 	"itflow/db"
 	"itflow/gaencrypt"
+	"itflow/model/response"
 	"net/http"
 	"strings"
 
@@ -12,7 +13,7 @@ import (
 )
 
 func Reset(w http.ResponseWriter, r *http.Request) {
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	addr := strings.Split(r.RemoteAddr, ":")
 	if addr[0] != "127.0.0.1" {
 		golog.Debug("only 127.0.0.1 cat request")

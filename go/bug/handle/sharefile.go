@@ -8,6 +8,7 @@ import (
 	"itflow/bug/model"
 	"itflow/db"
 	"itflow/gaencrypt"
+	"itflow/model/response"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -18,20 +19,6 @@ import (
 	"github.com/hyahm/golog"
 )
 
-type onefd struct {
-	Id       int    `json:"id"`
-	Name     string `json:"name"`
-	Size     int64  `json:"size"`
-	ModDate  int64  `json:"date"`
-	IsFile   bool   `json:"isfile"`
-	IsOwner  bool   `json:"isowner"`
-	HasWrite bool   `json:"haswrite"`
-	Ru       bool   `json:"readuser"`
-	Rname    string `json:"readname"`
-	Wu       bool   `json:"writeuser"`
-	Wname    string `json:"writename"`
-}
-
 type getpath struct {
 	Path string `json:"path"` // 需要创建的目录
 	Now  string `json:"now"`  // 前端当前所在路径
@@ -40,7 +27,7 @@ type getpath struct {
 func ShareList(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 
 	if err != nil {
 		golog.Error(err)
@@ -225,7 +212,7 @@ func ShareUpload(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseMultipartForm(1 << 30)
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -363,7 +350,7 @@ func ShareRename(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseMultipartForm(1 << 30)
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -487,7 +474,7 @@ func ShareMkdir(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseMultipartForm(1 << 30)
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -564,7 +551,7 @@ func ShareMkdir(w http.ResponseWriter, r *http.Request) {
 func ShareRemove(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

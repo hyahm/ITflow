@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"itflow/bug/bugconfig"
 	"itflow/db"
+	"itflow/model/response"
 	"net/http"
 
 	"github.com/hyahm/golog"
@@ -20,7 +21,7 @@ type DefaultValue struct {
 func DefaultStatus(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -39,7 +40,7 @@ func DefaultStatus(w http.ResponseWriter, r *http.Request) {
 func DefaultSave(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -101,7 +102,7 @@ type defaultImportant struct {
 func DefaultImportant(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -124,7 +125,7 @@ type defaultLevel struct {
 func DefaultLevel(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

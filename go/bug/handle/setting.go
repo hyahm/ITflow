@@ -9,6 +9,7 @@ import (
 	"itflow/bug/mail"
 	"itflow/db"
 	"itflow/gaencrypt"
+	"itflow/model/response"
 	"net/http"
 	"strconv"
 	"strings"
@@ -31,7 +32,7 @@ type getAddUser struct {
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -173,7 +174,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 func RemoveUser(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -263,7 +264,7 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 func DisableUser(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -323,7 +324,7 @@ type sendUserList struct {
 func UserList(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -398,7 +399,7 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 func UserUpdate(w http.ResponseWriter, r *http.Request) {
 
 	nickname, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -510,7 +511,7 @@ type pwd struct {
 }
 
 func ChangePassword(w http.ResponseWriter, r *http.Request) {
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	name, err := logtokenmysql(r)
 	if err != nil {
 		golog.Error(err)
@@ -579,7 +580,7 @@ type getroles struct {
 func GetRoles(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -599,7 +600,7 @@ func GetRoles(w http.ResponseWriter, r *http.Request) {
 func GetThisRoles(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -638,7 +639,7 @@ type sendGroup struct {
 func GetGroup(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -661,7 +662,7 @@ type resetPassword struct {
 func ResetPwd(w http.ResponseWriter, r *http.Request) {
 
 	_, err := logtokenmysql(r)
-	errorcode := &errorstruct{}
+	errorcode := &response.Response{}
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
