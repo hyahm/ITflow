@@ -88,7 +88,7 @@ func LoadConfig() {
 	}
 	ShowBaseUrl = goconfig.ReadString("showbaseurl", " http://127.0.0.1:10001/showimg")
 	Salt = goconfig.ReadString("salt", "hjkkaksjdhfryuooweqzmbvc")
-	ShareDir = goconfig.ReadUrl("sharedir", "/share/")
+	ShareDir = goconfig.ReadString("sharedir", "/share/")
 	// 创建共享文件夹
 	err = os.MkdirAll(ShareDir, 0755)
 	if err != nil {

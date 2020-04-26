@@ -12,7 +12,7 @@ import (
 func main() {
 
 	// 初始化配置文件
-	goconfig.InitConf("bug.ini")
+	goconfig.InitConf("bug.ini", goconfig.INI)
 	//初始化mysql
 	db.InitMysql()
 	// 初始化redis
