@@ -90,6 +90,8 @@ github.com/hyahm/xmux v0.0.0-20200426085001-77275c0acd3f h1:IwRUEG5tQiLEtRqW5URZ
 github.com/hyahm/xmux v0.0.0-20200426085001-77275c0acd3f/go.mod h1:/ZhusK9oYnq0N1ja9BtuyJzYKhT8yTrZnOBLWzWzfiY=
 github.com/hyahm/xmux v0.0.0-20200426095812-88cb31fa1370 h1:tLHthDT6lr0gL3Qb2zXrbK3gObasSsswnhbnTYx4O+I=
 github.com/hyahm/xmux v0.0.0-20200426095812-88cb31fa1370/go.mod h1:/ZhusK9oYnq0N1ja9BtuyJzYKhT8yTrZnOBLWzWzfiY=
+github.com/hyahm/xmux v0.0.0-20200426133650-975556a1b10c h1:5OcTTwHghDNXfH6Z2cG1YcPQwTAqNblO/tcR+guBYA0=
+github.com/hyahm/xmux v0.0.0-20200426133650-975556a1b10c/go.mod h1:/ZhusK9oYnq0N1ja9BtuyJzYKhT8yTrZnOBLWzWzfiY=
 github.com/hyahm/xredis v0.0.1 h1:Kl/jS7OzdtWtJlKjtFphXeD4sefAQMxVqxb9OpIdEaM=
 github.com/hyahm/xredis v0.0.1/go.mod h1:mzCsmuwnQEXsq6z3wnWNCJ+v9Qn9VImTu38GdxGOah4=
 github.com/jinzhu/gorm v1.9.10 h1:HvrsqdhCW78xpJF67g1hMxS6eCToo9PZH4LDB8WKPac=
