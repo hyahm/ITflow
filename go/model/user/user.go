@@ -49,6 +49,7 @@ func (login *Login) Check(resp *RespLogin) error {
 		golog.Error(err)
 		return err
 	}
+	golog.Infof("login seccuss, user: %s, token: ", login.Username, resp.Token)
 	resp.UserName = login.Username
 	return nil
 }
