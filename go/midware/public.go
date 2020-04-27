@@ -39,6 +39,7 @@ func CheckToken(w http.ResponseWriter, r *http.Request) bool {
 		if err == redis.Nil {
 			// token 没找到或过期
 			errorcode.Code = 10
+			golog.Info("ffff")
 			w.Write(errorcode.ErrorE(err))
 			return true
 		}
