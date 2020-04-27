@@ -8,26 +8,13 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/hyahm/golog"
 )
 
 var NotFoundToken = errors.New("not found token")
 
 func logtokenmysql(r *http.Request) (string, error) {
 	a := r.Header.Get("X-Token")
-	golog.Info(a)
-	nickname, err := db.RSconn.Get(a)
-	if err != nil {
-		golog.Error(err)
-		return "", NotFoundToken
-
-	}
-	// todo: session
-	//err = asset.Settimeout(a)
-	//if err != nil {
-	//	return "", err
-	//}
+	nickname, _ := db.RSconn.Get(a)
 	return string(nickname), nil
 }
 

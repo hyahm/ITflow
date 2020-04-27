@@ -13,7 +13,7 @@ var User *xmux.GroupRoute
 
 func init() {
 	User = xmux.NewGroupRoute("user")
-	User.Pattern("/user/login").Post(handle.Login).
+	User.Pattern("/user/login").Post(handle.Login).DelMidware(midware.CheckToken).
 		ApiDescribe("用户登录接口").
 		ApiReqStruct(user.Login{}).
 		Bind(&user.Login{}).AddMidware(midware.JsonToStruct).ApiResStruct(user.RespLogin{}).

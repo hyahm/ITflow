@@ -3,9 +3,11 @@ package midware
 import (
 	"encoding/json"
 	"io/ioutil"
+	"itflow/db"
 	"itflow/model/response"
 	"net/http"
 
+	"github.com/go-redis/redis/v7"
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
@@ -24,6 +26,26 @@ func JsonToStruct(w http.ResponseWriter, r *http.Request) bool {
 		golog.Error(err)
 		w.Write(resp.ErrorE(err))
 		return true
+	}
+	return false
+}
+
+func CheckToken(w http.ResponseWriter, r *http.Request) bool {
+	errorcode := &response.Response{}
+	a := r.Header.Get("X-Token")
+	golog.Info(a)
+	_, err := db.RSconn.Get(a)
+	if err != nil {
+		if err == redis.Nil {
+			// token 没找到或过期
+			errorcode.Code = 10
+			w.Write(errorcode.ErrorE(err))
+			return true
+		}
+		errorcode.Code = 11
+		w.Write(errorcode.ErrorE(err))
+		return true
+
 	}
 	return false
 }

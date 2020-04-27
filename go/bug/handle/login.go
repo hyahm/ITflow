@@ -45,6 +45,7 @@ func LoginOut(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("X-Token")
 	nickname, err := db.RSconn.Get(token)
 	if err != nil {
+
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
