@@ -60,12 +60,12 @@ func LoginOut(w http.ResponseWriter, r *http.Request) {
 
 func UserInfo(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
 	userinfo := &user.UserInfo{}
 	nickname, err := logtokenmysql(r)
 	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		userinfo.Msg = err.Error()
+		userinfo.Code = 1
+		w.Write(userinfo.Json())
 		return
 	}
 	userinfo.Name = nickname
@@ -73,10 +73,11 @@ func UserInfo(w http.ResponseWriter, r *http.Request) {
 	err = userinfo.GetUserInfo()
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		userinfo.Msg = err.Error()
+		userinfo.Code = 2
+		w.Write(userinfo.Json())
 		return
 	}
-	send, _ := json.Marshal(userinfo)
-	w.Write(send)
+	w.Write(userinfo.Json())
 
 }

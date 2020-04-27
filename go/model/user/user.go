@@ -2,6 +2,7 @@ package user
 
 import (
 	"database/sql"
+	"encoding/json"
 	"itflow/bug/bugconfig"
 	"itflow/db"
 	"itflow/gaencrypt"
@@ -53,10 +54,11 @@ func (login *Login) Check(resp *RespLogin) error {
 }
 
 type UserInfo struct {
-	Roles  []string `json:"roles" type:"array" need:"是" default:"" information:"角色组"`
-	Code   int      `json:"code" type:"string" need:"是" default:"" information:"状态码"`
-	Avatar string   `json:"avatar" type:"string" need:"是" default:"" information:"个人头像地址"`
-	Name   string   `json:"nickname" type:"string" need:"是" default:"" information:"用户昵称"`
+	Roles  []string `json:"roles" type:"array" need:"否" default:"" information:"角色组"`
+	Code   int      `json:"code" type:"string" need:"是" default:"" information:"状态码， 0为成功"`
+	Avatar string   `json:"avatar" type:"string" need:"否" default:"" information:"个人头像地址"`
+	Name   string   `json:"nickname" type:"string" need:"否" default:"" information:"用户昵称"`
+	Msg    string   `json:"msg, omitempty" type:"string" need:"否" default:"" information:"错误信息"`
 }
 
 func (ui *UserInfo) GetUserInfo() error {
@@ -94,4 +96,9 @@ func (ui *UserInfo) GetUserInfo() error {
 		}
 	}
 	return nil
+}
+
+func (ui *UserInfo) Json() []byte {
+	send, _ := json.Marshal(ui)
+	return send
 }
