@@ -15,9 +15,9 @@ import (
 func RunHttp() {
 
 	router := xmux.NewRouter()
-	router.AddHeader("Access-Control-Allow-Origin", "*")
-	router.AddHeader("Content-Type", "application/x-www-form-urlencoded,application/json; charset=UTF-8")
-	router.AddHeader("Access-Control-Allow-Headers", "Content-Type,Access-Token,X-Token,smail")
+	router.SetHeader("Access-Control-Allow-Origin", "*")
+	router.SetHeader("Content-Type", "application/x-www-form-urlencoded,application/json; charset=UTF-8")
+	router.SetHeader("Access-Control-Allow-Headers", "Content-Type,Access-Token,X-Token,smail")
 	router.AddGroup(route.User)
 	router.AddGroup(route.Bug)
 
