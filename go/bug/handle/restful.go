@@ -6,15 +6,16 @@ import (
 	"html"
 	"io/ioutil"
 	"itflow/bug/bugconfig"
-	"itflow/bug/buglog"
 	"itflow/bug/model"
 	"itflow/db"
+	"itflow/model/datalog"
 	"itflow/model/response"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 func RestList(w http.ResponseWriter, r *http.Request) {
@@ -204,17 +205,13 @@ func RestUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
-		Classify: "restproject",
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
+		Classify: "rest",
+		Action:   "update",
 	}
-	err = il.Update(
-		nickname, tl.Id, tl.Name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -274,17 +271,13 @@ func RestAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
-		Classify: "restproject",
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
+		Classify: "rest",
+		Action:   "add",
 	}
-	err = il.Add(
-		nickname, errorcode.Id, dr.Name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -319,17 +312,13 @@ func RestDel(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
-		Classify: "restproject",
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
+		Classify: "rest",
+		Action:   "delete",
 	}
-	err = il.Del(
-		nickname, id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -603,17 +592,13 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "api",
+		Action:   "update",
 	}
-	err = il.Update(
-		nickname, tl.Id, tl.Name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -707,17 +692,13 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "api",
+		Action:   "add",
 	}
-	err = il.Add(
-		nickname, errorcode.Id, al.Name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -786,17 +767,13 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "api",
+		Action:   "delete",
 	}
-	err = il.Del(
-		nickname, id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return

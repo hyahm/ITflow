@@ -5,15 +5,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"itflow/bug/bugconfig"
-	"itflow/bug/buglog"
 	"itflow/bug/model"
 	"itflow/db"
+	"itflow/model/datalog"
 	"itflow/model/response"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 func TypeList(w http.ResponseWriter, r *http.Request) {
@@ -195,17 +196,13 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "type",
+		Action:   "update",
 	}
-	err = il.Update(
-		nickname, data.Id, data.Name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	delete(bugconfig.CacheNameTid, bugconfig.CacheTidName[data.Id])
 	bugconfig.CacheTidName[data.Id] = data.Name
 	bugconfig.CacheNameTid[data.Name] = data.Id
@@ -218,7 +215,7 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 func TypeAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	_, err := logtokenmysql(r)
+	nickname, err := logtokenmysql(r)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -301,29 +298,16 @@ func TypeAdd(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	//fmt.Printf("%+v \n", data)
 	bugconfig.CacheTidName[send.Id] = data.Name
 	bugconfig.CacheNameTid[data.Name] = send.Id
-	//return
-	//errorcode.Id, err = conn.Insert("insert into types(name) values(?)", name)
-	//if err != nil {
-	//	golog.Error(err)
-	//	w.Write(errorcode.ErrorConnentMysql())
-	//	return
-	//}
-	// 增加日志
-	//il := buglog.AddLog{
-	//	Conn:     conn,
-	//	Ip:       strings.Split(r.RemoteAddr, ":")[0],
-	//	Classify: "type",
-	//}
-	//err = il.Add(
-	//	nickname, errorcode.Id, name)
-	//if err != nil {
-	//	golog.Error(err)
-	//	w.Write(errorcode.ErrorConnentMysql())
-	//	return
-	//}
+
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
+		Classify: "type",
+		Action:   "delete",
+		Msg:      fmt.Sprintf("delete type: %s", data.Types),
+	}
 	s, _ := json.Marshal(send)
 	w.Write(s)
 	return
@@ -367,17 +351,14 @@ func TypeDel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "type",
+		Action:   "delete",
+		Msg:      fmt.Sprintf("delete type id: %s", id),
 	}
-	err = il.Del(
-		nickname, id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	delete(bugconfig.CacheNameTid, bugconfig.CacheTidName[int64(id32)])
 	delete(bugconfig.CacheTidName, int64(id32))
 	send, _ := json.Marshal(errorcode)

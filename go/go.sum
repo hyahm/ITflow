@@ -25,6 +25,8 @@ github.com/hyahm/xmux v0.0.0-20200426162658-82b1ac588e13 h1:zmA3d3TEzVVLjFmBdHcU
 github.com/hyahm/xmux v0.0.0-20200426162658-82b1ac588e13/go.mod h1:/ZhusK9oYnq0N1ja9BtuyJzYKhT8yTrZnOBLWzWzfiY=
 github.com/hyahm/xmux v0.0.0-20200427015113-dba1b5774745 h1:wSSxu+iz4erQoUMLguBGe4lSO5l1GqCXa6iGrtbniLQ=
 github.com/hyahm/xmux v0.0.0-20200427015113-dba1b5774745/go.mod h1:xS4JxpGPUa2Z+41B+Db5KoElTWgFwl+CNG6uajE9f+I=
+github.com/hyahm/xmux v0.0.0-20200427035555-f1b73246f1e0 h1:Mm10DPOGHbup2dpMOWulad1SFUv3gZPVmpdzGLjro0o=
+github.com/hyahm/xmux v0.0.0-20200427035555-f1b73246f1e0/go.mod h1:/qrMqjHV8UBp1LqYau128V3KlVhOHTg9UF3at2f0lZQ=
 github.com/hyahm/xredis v0.0.1 h1:Kl/jS7OzdtWtJlKjtFphXeD4sefAQMxVqxb9OpIdEaM=
 github.com/hyahm/xredis v0.0.1/go.mod h1:mzCsmuwnQEXsq6z3wnWNCJ+v9Qn9VImTu38GdxGOah4=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=

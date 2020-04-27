@@ -5,15 +5,16 @@ import (
 	"io/ioutil"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
-	"itflow/bug/buglog"
 	"itflow/bug/model"
 	"itflow/db"
+	"itflow/model/datalog"
 	"itflow/model/response"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 type status struct {
@@ -110,16 +111,11 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "status",
-	}
-	err = il.Add(
-		nickname, errorcode.Id, s.Name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
+		Action:   "add",
 	}
 
 	// 更新缓存
@@ -219,17 +215,13 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "status",
+		Action:   "delete",
 	}
-	err = il.Del(
-		nickname, sid)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	// 更新缓存
 	// 获取status的索引
 
@@ -291,17 +283,13 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "status",
+		Action:   "update",
 	}
-	err = il.Update(
-		nickname, s.Id, s.Name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	// 更新缓存
 
 	delete(bugconfig.CacheStatusSid, bugconfig.CacheSidStatus[s.Id])
@@ -311,8 +299,6 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
-	return
-
 }
 
 func StatusGroupName(w http.ResponseWriter, r *http.Request) {

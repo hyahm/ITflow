@@ -7,16 +7,17 @@ import (
 	"io/ioutil"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
-	"itflow/bug/buglog"
 	"itflow/bug/model"
 	"itflow/bug/public"
 	"itflow/db"
+	"itflow/model/datalog"
 	"itflow/model/response"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 	//"strconv"
 )
 
@@ -500,17 +501,11 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "status",
-	}
-	err = il.Update(
-		param.Id, nickname, param.Status)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
+		Action:   "change",
 	}
 
 	send, _ := json.Marshal(param)
@@ -751,16 +746,13 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "bug",
+		Action:   "close",
 	}
-	err = il.Del(id, nickname)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return

@@ -2,6 +2,7 @@ package route
 
 import (
 	"itflow/bug/handle"
+	"itflow/midware"
 
 	"github.com/hyahm/xmux"
 )
@@ -15,7 +16,6 @@ func init() {
 	Admin.Pattern("/search/log").Post(handle.SearchLog)
 	Admin.Pattern("/log/classify").Post(handle.LogClassify)
 	Admin.Pattern("/admin/reset").Get(handle.Reset)
-	Admin.Pattern("/info/update").Post(handle.UpdateInfo)
-	//router.HandleFunc("/role/update", handle.UpdateRoles)
+	Admin.Pattern("/info/update").Post(handle.UpdateInfo).End(midware.EndLog)
 	Admin.Pattern("/log/list").Post(handle.LogList)
 }

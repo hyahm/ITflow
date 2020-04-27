@@ -365,6 +365,8 @@ CREATE TABLE `log` (
   `classify` varchar(30) NOT NULL DEFAULT '',
   `content` text,
   `ip` varchar(40) DEFAULT '',
+  `username` varchar(50) DEFAULT '',
+  `action` varchar(50) DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=601 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

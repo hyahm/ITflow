@@ -2,18 +2,19 @@ package handle
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
-	"itflow/bug/buglog"
 	"itflow/db"
+	"itflow/model/datalog"
 	"itflow/model/response"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 type addVersion struct {
@@ -75,17 +76,14 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "version",
+		Action:   "add",
+		Msg:      fmt.Sprintf("add version id: %s", version_add.Version),
 	}
-	err = il.Add(
-		nickname, vid, version_add.Version)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	// 增加缓存
 	bugconfig.CacheVidName[vid] = version_add.Version
 	bugconfig.CacheVersionNameVid[version_add.Version] = vid
@@ -238,16 +236,12 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "version",
-	}
-	err = il.Del(
-		nickname, id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
+		Action:   "delete",
+		Msg:      fmt.Sprintf("delete version id: %s", id),
 	}
 
 	delete(bugconfig.CacheVersionNameVid, bugconfig.CacheEidName[int64(vid)])
@@ -316,17 +310,14 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "version",
+		Action:   "update",
+		Msg:      fmt.Sprintf("update version id %v to %v", data.Id, data.Name),
 	}
-	err = il.Update(
-		nickname, data.Id, data.Name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	delete(bugconfig.CacheVersionNameVid, data.Name)
 	bugconfig.CacheVidName[int64(data.Id)] = data.Name
 	bugconfig.CacheVersionNameVid[data.Name] = int64(data.Id)

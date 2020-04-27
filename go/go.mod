@@ -9,9 +9,8 @@ require (
 	github.com/hyahm/goconfig v0.0.0-20200411075020-85401a1b9350
 	github.com/hyahm/golog v0.0.0-20200319122124-04b0a58a15ff
 	github.com/hyahm/gomysql v0.0.5-0.20191228040128-27a4e3456547
-	github.com/hyahm/xmux v0.0.0-20200427015113-dba1b5774745
+	github.com/hyahm/xmux v0.0.0-20200427035555-f1b73246f1e0
 	github.com/hyahm/xredis v0.0.1
-	golang.org/x/net v0.0.0-20200425230154-ff2c4b7c35a0 // indirect
 	golang.org/x/text v0.3.2 // indirect
 	honnef.co/go/tools v0.0.1-2020.1.3 // indirect
 )

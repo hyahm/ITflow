@@ -5,15 +5,15 @@ import (
 	"io/ioutil"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
-	"itflow/bug/buglog"
 	"itflow/bug/model"
 	"itflow/db"
+	"itflow/model/datalog"
 	"itflow/model/response"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 func ImportantGet(w http.ResponseWriter, r *http.Request) {
@@ -105,16 +105,11 @@ func ImportantAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "important",
-	}
-	err = il.Add(
-		nickname, errorcode.Id, data.Name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
+		Action:   "add",
 	}
 
 	//更新缓存
@@ -193,17 +188,13 @@ func ImportantDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "important",
+		Action:   "delete",
 	}
-	err = il.Del(
-		nickname, id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	// 删除缓存
 	delete(bugconfig.CacheImportantIid, bugconfig.CacheIidImportant[int64(id32)])
 	delete(bugconfig.CacheIidImportant, int64(id32))
@@ -265,17 +256,13 @@ func ImportantUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "important",
+		Action:   "update",
 	}
-	err = il.Update(
-		nickname, data.Id, data.Name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	// 删除strings key
 	delete(bugconfig.CacheImportantIid, bugconfig.CacheIidImportant[data.Id])
 	bugconfig.CacheIidImportant[data.Id] = data.Name

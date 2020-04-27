@@ -5,14 +5,14 @@ import (
 	"io/ioutil"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
-	"itflow/bug/buglog"
 	"itflow/db"
+	"itflow/model/datalog"
 	"itflow/model/response"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 type envlist struct {
@@ -105,17 +105,13 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "env",
+		Action:   "add",
 	}
-	err = il.Add(
-		nickname, errorcode.Id, envname)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	// 添加缓存
 	bugconfig.CacheEidName[errorcode.Id] = envname
 	bugconfig.CacheEnvNameEid[envname] = errorcode.Id
@@ -176,17 +172,13 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
-		Classify: "env",
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
+		Classify: "bug",
+		Action:   "update",
 	}
-	err = il.Update(
-		nickname, er.Id, er.EnvName)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	// 更新缓存
 	delete(bugconfig.CacheEnvNameEid, bugconfig.CacheEidName[int64(er.Id)])
 	bugconfig.CacheEidName[int64(er.Id)] = er.EnvName
@@ -259,17 +251,13 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "env",
+		Action:   "delete",
 	}
-	err = il.Del(
-		nickname, id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	delete(bugconfig.CacheEnvNameEid, bugconfig.CacheEidName[int64(eid)])
 	delete(bugconfig.CacheEidName, int64(eid))
 	send, _ := json.Marshal(errorcode)

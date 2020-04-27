@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"itflow/bug/bugconfig"
-	"itflow/bug/buglog"
 	"itflow/bug/mail"
 	"itflow/db"
 	"itflow/gaencrypt"
+	"itflow/model/datalog"
 	"itflow/model/response"
 	"net/http"
 	"strconv"
@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 type getAddUser struct {
@@ -154,17 +155,15 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		content := fmt.Sprintf("你的用户名: %v;<br> 密码: %v", getuser.Email, getuser.Password)
 		mail.SendMail("创建用户成功", content, []string{getuser.Email})
 	}
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
-		Classify: "user",
+
+	// 更新日志
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
+		Classify: "setting",
+		Action:   "createuser",
 	}
-	err = il.Add(
-		getuser.RealName, getuser.Nickname, getuser.Email)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -234,18 +233,13 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
+		Classify: "setting",
+		Action:   "deluser",
+	}
 
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
-		Classify: "user",
-	}
-	err = il.Del(
-		nickname, id, bugconfig.CacheUidRealName[int64(id32)])
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	delete(bugconfig.CacheNickNameUid, bugconfig.CacheUidNickName[int64(id32)])
 	delete(bugconfig.CacheRealNameUid, bugconfig.CacheUidRealName[int64(id32)])
 	delete(bugconfig.CacheUidEmail, int64(id32))
@@ -286,17 +280,13 @@ func DisableUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
-		Classify: "user",
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
+		Classify: "setting",
+		Action:   "disableuser",
 	}
-	err = il.Del(
-		nickname, id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -359,36 +349,6 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 		ul.Position = bugconfig.CacheJidJobname[jid]
 		uls.Userlist = append(uls.Userlist, ul)
 	}
-	//case 1:
-	//	getusersql := "select id,createtime,realname,nickname,rolestring,email,disable,rid,bugsid from user where level=1 and nickname<>?"
-	//	adminrows, err := conn.GetRows(getusersql, nickname)
-	//	if err != nil {
-	//		golog.Error(err)
-	//		w.Write(errorcode.ErrorConnentMysql())
-	//		return
-	//	}
-	//	for adminrows.Next() {
-	//		ul := &userlist{}
-	//		var rid int64
-	//		var bugsid int64
-	//		adminrows.Scan(&ul.Id, &ul.Createtime, &ul.Realname, &ul.Nickname, &ul.Role, &ul.Email, &ul.Disable, &rid, &bugsid)
-	//		ul.Role = bugconfig.CacheRidRole[rid]
-	//		ul.BugStatusGroup = bugconfig.CacheSgidGroup[bugsid]
-	//		uls.Userlist = append(uls.Userlist, ul)
-	//	}
-	//default:
-	//	ul := &userlist{}
-	//	var rid int64
-	//	getusersql := "select id,createtime,realname,nickname,rolestring,email,disable from user where level=2 and nickname=?"
-	//	err := conn.GetOne(getusersql, nickname).Scan(&ul.Id, &ul.Createtime, &ul.Realname, &ul.Nickname, &rid, &ul.Email, &ul.Disable)
-	//	if err != nil {
-	//		golog.Error(err)
-	//		w.Write(errorcode.ErrorConnentMysql())
-	//		return
-	//	}
-	//	ul.Role = bugconfig.CacheRidRole[rid]
-	//	uls.Userlist = append(uls.Userlist, ul)
-	//}
 
 	send, _ := json.Marshal(uls)
 	w.Write(send)
@@ -476,17 +436,13 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
-		Classify: "user",
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
+		Classify: "setting",
+		Action:   "updateuser",
 	}
-	err = il.Update("updateuser : changeuser:%s, operator: %s  ",
-		uls.Realname, nickname)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	//更新缓存
 	delete(bugconfig.CacheNickNameUid, bugconfig.CacheUidNickName[int64(uls.Id)])
 	delete(bugconfig.CacheRealNameUid, bugconfig.CacheUidNickName[int64(uls.Id)])

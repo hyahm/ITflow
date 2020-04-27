@@ -5,15 +5,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"itflow/bug/bugconfig"
-	"itflow/bug/buglog"
 	"itflow/bug/model"
 	"itflow/db"
+	"itflow/model/datalog"
 	"itflow/model/response"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 func HeaderList(w http.ResponseWriter, r *http.Request) {
@@ -111,17 +112,13 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "header",
+		Action:   "add",
 	}
-	err = il.Add(
-		nickname, errorcode.Id, data.Name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	// 添加缓存
 	bugconfig.CacheHidHeader[errorcode.Id] = data.Name
 	bugconfig.CacheHeaderHid[data.Name] = errorcode.Id
@@ -204,16 +201,11 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "header",
-	}
-	err = il.Del(
-		nickname, id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
+		Action:   "delete",
 	}
 
 	// 删除缓存
@@ -329,16 +321,11 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "header",
-	}
-	err = il.Update(
-		nickname, data.Id, data.Name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
+		Action:   "update",
 	}
 
 	delete(bugconfig.CacheHeaderHid, bugconfig.CacheHidHeader[data.Id])

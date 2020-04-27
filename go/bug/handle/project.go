@@ -5,14 +5,14 @@ import (
 	"io/ioutil"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
-	"itflow/bug/buglog"
 	"itflow/db"
+	"itflow/model/datalog"
 	"itflow/model/response"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 type projectlist struct {
@@ -106,17 +106,13 @@ func AddProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "project",
+		Action:   "add",
 	}
-	err = il.Add(
-		nickname, errorcode.Id, name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	// 更新缓存
 	bugconfig.CacheProjectPid[name] = errorcode.Id
 	bugconfig.CachePidName[errorcode.Id] = name
@@ -175,17 +171,13 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "project",
+		Action:   "update",
 	}
-	err = il.Update(
-		nickname, pr.Id, pr.ProjectName)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	// 更新缓存
 	delete(bugconfig.CacheProjectPid, bugconfig.CachePidName[int64(pr.Id)])
 	bugconfig.CachePidName[int64(pr.Id)] = pr.ProjectName
@@ -259,17 +251,13 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "project",
+		Action:   "delete",
 	}
-	err = il.Del(
-		nickname, id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	// 更新缓存
 	delete(bugconfig.CacheProjectPid, bugconfig.CachePidName[int64(pid)])
 	delete(bugconfig.CachePidName, int64(pid))

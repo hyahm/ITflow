@@ -5,15 +5,16 @@ import (
 	"io/ioutil"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
-	"itflow/bug/buglog"
 	"itflow/bug/model"
 	"itflow/db"
+	"itflow/model/datalog"
 	"itflow/model/response"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 func RoleList(w http.ResponseWriter, r *http.Request) {
@@ -126,17 +127,13 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
-		Classify: "rolegroup",
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
+		Classify: "role",
+		Action:   "roledelete",
 	}
-	err = il.Del(
-		nickname, id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	// 删除缓存
 	delete(bugconfig.CacheRidGroup, int64(id32))
 	send, _ := json.Marshal(errorcode)
@@ -197,16 +194,11 @@ func EditRole(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
-		Classify: "rolegroup",
-	}
-	err = il.Update(
-		nickname, data.Id, data.Name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
+		Classify: "role",
+		Action:   "update",
 	}
 
 	bugconfig.CacheRidGroup[data.Id] = data.Name
@@ -275,17 +267,13 @@ func AddRole(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
-		Classify: "rolegroup",
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
+		Classify: "role",
+		Action:   "add",
 	}
-	err = il.Add(
-		nickname, errorcode.Id, data.Name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	bugconfig.CacheRidGroup[errorcode.Id] = data.Name
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)

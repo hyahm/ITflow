@@ -5,15 +5,15 @@ import (
 	"io/ioutil"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
-	"itflow/bug/buglog"
 	"itflow/bug/model"
 	"itflow/db"
+	"itflow/model/datalog"
 	"itflow/model/response"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 func PositionGet(w http.ResponseWriter, r *http.Request) {
@@ -124,16 +124,11 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
-		Classify: "position",
-	}
-	err = il.Add(
-		nickname, errorcode.Id, data.Name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
+		Classify: "positioin",
+		Action:   "add",
 	}
 
 	//更新缓存
@@ -223,17 +218,13 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
-		Classify: "position",
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
+		Classify: "positioin",
+		Action:   "delete",
 	}
-	err = il.Del(
-		nickname, id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	// 删除缓存
 	delete(bugconfig.CacheJobnameJid, bugconfig.CacheJidJobname[int64(id32)])
 	delete(bugconfig.CacheJidJobname, int64(id32))
@@ -302,17 +293,13 @@ func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "position",
+		Action:   "update",
 	}
-	err = il.Update(
-		nickname, data.Id, data.Name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	// 更新缓存
 	delete(bugconfig.CacheJobnameJid, bugconfig.CacheJidJobname[data.Id])
 	bugconfig.CacheJidJobname[data.Id] = data.Name

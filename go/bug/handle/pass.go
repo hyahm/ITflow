@@ -2,11 +2,12 @@ package handle
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"itflow/bug/bugconfig"
-	"itflow/bug/buglog"
 	"itflow/bug/model"
 	"itflow/db"
+	"itflow/model/datalog"
 	"itflow/model/response"
 	"net/http"
 	"strconv"
@@ -15,6 +16,7 @@ import (
 	"time"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 type passBug struct {
@@ -115,77 +117,20 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "bug",
+		Action:   "pass",
+		Msg:      fmt.Sprintf("bug id: %v", ub.Id),
 	}
-	err = il.Add(ub.Id, nickname, ub.SelectUsers)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	send, _ := json.Marshal(ub)
 	w.Write(send)
 	return
 
 }
-
-//func GetThisTask(w http.ResponseWriter, r *http.Request) {
-//	headers(w, r)
-//	if r.Method == http.MethodOptions {
-//		w.WriteHeader(http.StatusOK)
-//		return
-//	}
-//
-//	if r.Method == http.MethodPost {
-//		logger, conn, _, err := logtokenmysql(r)
-//		defer conn.Db.Close()
-//		gid, err := ioutil.ReadAll(r.Body)
-//
-//		if err != nil {
-//			logger.ErrorLog("file:table.go,line:134,%v", err)
-//			w.Write([]byte("fail"))
-//			return
-//
-//		}
-//		id, err := strconv.Atoi(string(gid))
-//		if err != nil {
-//			logger.ErrorLog("file:table.go,line:151,%v", err)
-//			w.Write([]byte("fail"))
-//			return
-//		}
-//		getaritclesql := "select status,spusers from bugs where id=?"
-//
-//		data, _, err := conn.SelectSlice_Slice(getaritclesql, id)
-//
-//		if err != nil {
-//			logger.ErrorLog("file:table.go,line:210,%v", err)
-//			w.Write([]byte("fail"))
-//			return
-//		}
-//		senddata := &passtask{}
-//		statusname, err := asset.StatusidGetName(data[0][0], conn)
-//		if err != nil {
-//			logger.ErrorLog("file:table.go,line:210,%v", err)
-//			w.Write([]byte("fail"))
-//			return
-//		}
-//		senddata.Status = statusname
-//		senddata.Id = id
-//		senddata.SelectUsers = strings.Split(data[0][0], ",")
-//		senddata.Remark = ""
-//		send, err := json.Marshal(senddata)
-//		if err != nil {
-//			logger.ErrorLog("file:table.go,line:73,%v", err)
-//			w.Write([]byte("fail"))
-//			return
-//		}
-//		w.Write(send)
-//		return
-//	}
-//	w.WriteHeader(http.StatusNotFound)
-//}
 
 func TaskList(w http.ResponseWriter, r *http.Request) {
 

@@ -5,8 +5,8 @@ import (
 	"html"
 	"io/ioutil"
 	"itflow/bug/bugconfig"
-	"itflow/bug/buglog"
 	"itflow/db"
+	"itflow/model/datalog"
 	"itflow/model/response"
 	"net/http"
 	"strconv"
@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 	//"strings"
 )
 
@@ -118,7 +119,6 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 	//spusers, nicknamelist, args := formatUserlistToData(data.Selectusers, data.Id)
 	errorcode.UpdateTime = time.Now().Unix()
 	// add
-	var bugid int64
 
 	//
 	if data.Id == -1 {
@@ -126,7 +126,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 
 		insertsql := "insert into bugs(uid,bugtitle,sid,content,iid,createtime,lid,pid,eid,spusers,vid) values(?,?,?,?,?,?,?,?,?,?,?)"
 
-		bugid, err = db.Mconn.Insert(insertsql,
+		_, err = db.Mconn.Insert(insertsql,
 			uid, data.Title, bugconfig.CacheDefault["status"], html.EscapeString(data.Content),
 			iid, errorcode.UpdateTime, lid,
 			pid, eid, spusers, vid)
@@ -135,16 +135,11 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
-
-		il := buglog.AddLog{
-			Ip:       strings.Split(r.RemoteAddr, ":")[0],
+		xmux.GetData(r).End = &datalog.AddLog{
+			Ip:       r.RemoteAddr,
+			Username: nickname,
 			Classify: "bug",
-		}
-		err = il.Add(nickname, bugid, data.Title)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
+			Action:   "create",
 		}
 
 	} else {
@@ -161,16 +156,13 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 		}
 
 		//// 插入日志
-		il := buglog.AddLog{
-			Ip:       strings.Split(r.RemoteAddr, ":")[0],
+		xmux.GetData(r).End = &datalog.AddLog{
+			Ip:       r.RemoteAddr,
+			Username: nickname,
 			Classify: "bug",
+			Action:   "update",
 		}
-		err = il.Update(nickname, bugid, nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
+
 	}
 
 	w.Write(errorcode.Success())

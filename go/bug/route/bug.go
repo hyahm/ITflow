@@ -2,6 +2,7 @@ package route
 
 import (
 	"itflow/bug/handle"
+	"itflow/midware"
 
 	"github.com/hyahm/xmux"
 )
@@ -11,12 +12,12 @@ var Bug *xmux.GroupRoute
 func init() {
 	Bug = xmux.NewGroupRoute("bug")
 
-	Bug.Pattern("/bug/pass").Post(handle.PassBug)
-	Bug.Pattern("/bug/create").Post(handle.BugCreate)
-	Bug.Pattern("/bug/edit").Get(handle.BugEdit)
-	Bug.Pattern("/bug/mybugs").Post(handle.GetMyBugs)
-	Bug.Pattern("/bug/close").Get(handle.CloseBug)
-	Bug.Pattern("/bug/changestatus").Post(handle.ChangeBugStatus)
+	Bug.Pattern("/bug/pass").Post(handle.PassBug).End(midware.EndLog).End(midware.EndLog)
+	Bug.Pattern("/bug/create").Post(handle.BugCreate).End(midware.EndLog).End(midware.EndLog)
+	Bug.Pattern("/bug/edit").Get(handle.BugEdit).End(midware.EndLog).End(midware.EndLog)
+	Bug.Pattern("/bug/mybugs").Post(handle.GetMyBugs).End(midware.EndLog)
+	Bug.Pattern("/bug/close").Get(handle.CloseBug).End(midware.EndLog).End(midware.EndLog)
+	Bug.Pattern("/bug/changestatus").Post(handle.ChangeBugStatus).End(midware.EndLog).End(midware.EndLog)
 	Bug.Pattern("/status/filter").Post(handle.ChangeFilterStatus)
 	Bug.Pattern("/status/show").Post(handle.ShowStatus)
 	Bug.Pattern("/bug/show").Get(handle.BugShow)

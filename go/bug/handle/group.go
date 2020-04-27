@@ -6,9 +6,9 @@ import (
 	"io/ioutil"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
-	"itflow/bug/buglog"
 	"itflow/bug/model"
 	"itflow/db"
+	"itflow/model/datalog"
 	"itflow/model/response"
 	"log"
 	"net/http"
@@ -16,6 +16,7 @@ import (
 	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 type getDepartment struct {
@@ -80,17 +81,12 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip: r.RemoteAddr,
+
 		Classify: "statusgroup",
 	}
-	err = il.Add(
-		nickname, errorcode.Id, data.Department)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	// 添加缓存
 	bugconfig.CacheSgidGroup[errorcode.Id] = data.Department
 	send, _ := json.Marshal(errorcode)
@@ -160,17 +156,13 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
-		Classify: "statusgroup",
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
+		Classify: "buggroup",
+		Action:   "update",
 	}
-	err = il.Update(
-		nickname, data.Id, data.Department)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	bugconfig.CacheSgidGroup[data.Id] = data.Department
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
@@ -305,17 +297,13 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
-		Classify: "statusgroup",
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
+		Classify: "buggroup",
+		Action:   "delete",
 	}
-	err = il.Del(
-		nickname, id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	//更新缓存
 	delete(bugconfig.CacheSgidGroup, int64(id32))
 	send, _ := json.Marshal(errorcode)
@@ -434,17 +422,13 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "usergroup",
+		Action:   "add",
 	}
-	err = il.Add(
-		nickname, errorcode.Id, data.Name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	bugconfig.CacheGidGroup[errorcode.Id] = data.Name
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
@@ -559,16 +543,11 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "usergroup",
-	}
-	err = il.Del(
-		nickname, id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
+		Action:   "delete",
 	}
 
 	delete(bugconfig.CacheGidGroup, int64(id32))
@@ -635,17 +614,13 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	il := buglog.AddLog{
-		Ip:       strings.Split(r.RemoteAddr, ":")[0],
+	xmux.GetData(r).End = &datalog.AddLog{
+		Ip:       r.RemoteAddr,
+		Username: nickname,
 		Classify: "usergroup",
+		Action:   "update",
 	}
-	err = il.Update(
-		nickname, data.Id, data.Name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	bugconfig.CacheGidGroup[data.Id] = data.Name
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)

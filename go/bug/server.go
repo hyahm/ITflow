@@ -30,6 +30,8 @@ func RunHttp() {
 	router.AddGroup(route.Department)
 	router.AddGroup(route.Position)
 	router.AddGroup(route.Status)
+	router.AddGroup(route.Type)
+	router.AddGroup(route.Level)
 
 	router.AddGroup(route.Email)
 	router.AddGroup(route.Share)
@@ -52,7 +54,6 @@ func RunHttp() {
 
 	if goconfig.ReadBool("ssl", false) {
 		if err := server.ListenAndServeTLS(goconfig.ReadString("certfile", "ssl.cert"), goconfig.ReadString("keyfile", "ssl.key")); err != nil {
-			print("has ssl key?")
 			panic(err)
 		}
 	} else {
