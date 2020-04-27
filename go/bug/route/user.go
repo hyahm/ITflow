@@ -25,7 +25,7 @@ func init() {
 		ApiSupplement("返回码是大部分公用的").ApiReqHeader(map[string]string{"X-Token": "asdfasdfasdfasdfsdf"})
 
 	User.Pattern("/user/info").Get(handle.UserInfo).ApiDescribe("获取用户信息").
-		ApiResStruct(user.UserInfo{}).
+		ApiResStruct(user.UserInfo{}).ApiReqHeader(map[string]string{"X-Token": "asdfasdfasdfasdfsdf"}).
 		ApiResponseTemplate(`{"roles": ["admin"], "code": 0, "avatar":"http://xxxx/aaaa.png", "nickname": "admin"}`)
 	User.Pattern("/user/list").Post(handle.UserList)
 	User.Pattern("/user/update").Post(handle.UserUpdate).End(midware.EndLog)
