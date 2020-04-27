@@ -3,6 +3,7 @@
   前段是短板， 欢迎前端一起开发
 
 文档地址： http://itflow.doc.hyahm.com  
+接口文档地址： http://hyahm.com:10001/docs
 
 更改项目路由为：  https://github.com/hyahm/xmux
 
