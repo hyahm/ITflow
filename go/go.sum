@@ -45,6 +45,8 @@ github.com/hyahm/xmux v0.0.0-20200427123209-c87d760a6472 h1:BRzJMebwDFho89H/JcK8
 github.com/hyahm/xmux v0.0.0-20200427123209-c87d760a6472/go.mod h1:/qrMqjHV8UBp1LqYau128V3KlVhOHTg9UF3at2f0lZQ=
 github.com/hyahm/xmux v0.0.0-20200427124028-acc9da6a77c0 h1:7wdh9sbizM3ReXDWUA1hRzASfYRczFY01ZtzIaVW4qE=
 github.com/hyahm/xmux v0.0.0-20200427124028-acc9da6a77c0/go.mod h1:/qrMqjHV8UBp1LqYau128V3KlVhOHTg9UF3at2f0lZQ=
+github.com/hyahm/xmux v0.0.0-20200428084731-d1cfc4569fcc h1:PQChapZ5MBCZb6B4Jt1U0JX/joSe+j2WdHlRqHKjxo8=
+github.com/hyahm/xmux v0.0.0-20200428084731-d1cfc4569fcc/go.mod h1:/qrMqjHV8UBp1LqYau128V3KlVhOHTg9UF3at2f0lZQ=
 github.com/hyahm/xredis v0.0.1 h1:Kl/jS7OzdtWtJlKjtFphXeD4sefAQMxVqxb9OpIdEaM=
 github.com/hyahm/xredis v0.0.1/go.mod h1:mzCsmuwnQEXsq6z3wnWNCJ+v9Qn9VImTu38GdxGOah4=
 github.com/hyahm/xredis v0.0.2-0.20200427134550-98c201be9a34 h1:ovhzWGNbThulaodVDxfnueYes3bOnrtRGOojVIuJ2sQ=

@@ -43,7 +43,7 @@ func RunHttp() {
 	router.Pattern("/upload/headimg").Post(handle.UploadHeadImg)
 	router.Pattern("/showimg/{imgname}").Get(handle.ShowImg)
 	//
-	router.ShowApi("/docs").DelMidware(midware.CheckToken)
+	router.ShowApi("doc", "/docs").DelMidware(midware.CheckToken)
 	listenaddr := goconfig.ReadString("listenaddr", ":10001")
 
 	fmt.Println("listen on " + listenaddr)
