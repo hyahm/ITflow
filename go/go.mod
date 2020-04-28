@@ -10,7 +10,6 @@ require (
 	github.com/hyahm/goconfig v0.0.0-20200411075020-85401a1b9350
 	github.com/hyahm/golog v0.0.0-20200319122124-04b0a58a15ff
 	github.com/hyahm/gomysql v0.0.5-0.20191228040128-27a4e3456547
-	github.com/hyahm/xmux v0.0.0-20200428084731-d1cfc4569fcc
+	github.com/hyahm/xmux v0.0.0-20200428091804-f2927fff609b
 	github.com/hyahm/xredis v0.0.2-0.20200427134550-98c201be9a34
-	honnef.co/go/tools v0.0.1-2020.1.3 // indirect
 )
