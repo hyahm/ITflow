@@ -12,7 +12,7 @@ import (
 var User *xmux.GroupRoute
 
 func init() {
-	User = xmux.NewGroupRoute("user")
+	User = xmux.NewGroupRoute("user").ApiCreateGroup("user", "用户相关的", "user")
 	User.Pattern("/user/login").Post(handle.Login).
 		DelMidware(midware.CheckToken).
 		ApiDescribe("用户登录接口").

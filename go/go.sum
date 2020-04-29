@@ -32,6 +32,8 @@ github.com/hyahm/gomysql v0.0.5-0.20191228040128-27a4e3456547 h1:eZfR53H2SSYIq2x
 github.com/hyahm/gomysql v0.0.5-0.20191228040128-27a4e3456547/go.mod h1:uBxi9E3IcGhdoxM68XudGTyy+gIB8+1LFlAsN6KOHTE=
 github.com/hyahm/xmux v0.0.0-20200428101221-f801fc4d424c h1:E0EF/ovKZOsxLlvNFfNZOiTF20wY6R9r6ynY89/YYzk=
 github.com/hyahm/xmux v0.0.0-20200428101221-f801fc4d424c/go.mod h1:/qrMqjHV8UBp1LqYau128V3KlVhOHTg9UF3at2f0lZQ=
+github.com/hyahm/xmux v0.0.0-20200429102905-1e930d14b168 h1:uQLbLu6OajZs8kEb6w0Dlzp8Ub0jtG6WBfXk3+nBZyM=
+github.com/hyahm/xmux v0.0.0-20200429102905-1e930d14b168/go.mod h1:/qrMqjHV8UBp1LqYau128V3KlVhOHTg9UF3at2f0lZQ=
 github.com/hyahm/xredis v0.0.2-0.20200427134550-98c201be9a34 h1:ovhzWGNbThulaodVDxfnueYes3bOnrtRGOojVIuJ2sQ=
 github.com/hyahm/xredis v0.0.2-0.20200427134550-98c201be9a34/go.mod h1:v6H5mFJjoxCM490BS61Nuj/A6wOhJxWHrOl38Vycx2E=
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=
