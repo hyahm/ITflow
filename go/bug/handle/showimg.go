@@ -13,7 +13,7 @@ import (
 
 func ShowImg(w http.ResponseWriter, r *http.Request) {
 
-	name := xmux.GetData(r).Var["imgname"]
+	name := xmux.Var(r)["imgname"]
 	golog.Infof("image name %s", name)
 	file, err := os.Open(path.Join(bugconfig.ImgDir, name))
 	if err != nil {

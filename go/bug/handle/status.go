@@ -2,6 +2,7 @@ package handle
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"itflow/bug/asset"
 	"itflow/bug/bugconfig"
@@ -13,18 +14,15 @@ import (
 	"strconv"
 	"strings"
 
+	"itflow/model/bug"
+
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
 
-type status struct {
-	Id   int64  `json:"id"`
-	Name string `json:"name"`
-}
-
 type listStatus struct {
-	StatusList []*status `json:"statuslist"`
-	Code       int       `json:"code"`
+	StatusList []*bug.Status `json:"statuslist"`
+	Code       int           `json:"code"`
 }
 
 func StatusList(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +54,7 @@ func StatusList(w http.ResponseWriter, r *http.Request) {
 	}
 	ls := &listStatus{}
 	for k, v := range bugconfig.CacheSidStatus {
-		one := &status{}
+		one := &bug.Status{}
 		one.Id = k
 		one.Name = v
 		ls.StatusList = append(ls.StatusList, one)
@@ -100,7 +98,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	s := &status{}
+	s := &bug.Status{}
 	err = json.Unmarshal(ss, s)
 
 	errorcode.Id, err = db.Mconn.Insert("insert into status(name) values(?)", s.Name)
@@ -267,7 +265,8 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	s := &status{}
+	s := &bug.Status{}
+	fmt.Println(string(ss))
 	err = json.Unmarshal(ss, s)
 	if err != nil {
 		golog.Error(err)
