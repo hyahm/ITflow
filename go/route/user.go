@@ -17,7 +17,7 @@ func init() {
 		ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf")
 
 	User.Pattern("/user/login").Post(handle.Login).Bind(&user.Login{}).
-		DelMidware(midware.CheckToken).End(midware.EndLog).AddMidware(midware.JsonToStruct).
+		DelMidware(midware.CheckToken).AddMidware(midware.JsonToStruct).End(midware.EndLog).
 		ApiDescribe("用户登录接口").
 		ApiDelReqHeader("X-Token").
 		ApiReqStruct(user.Login{}).
