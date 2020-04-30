@@ -1,12 +1,12 @@
 ### 简介
   一个开源的bug管理系统，IT人员开发全过程，文件存储，接口文档, 单接口测试功能  
-  前段是短板， 欢迎前端一起开发
+ 
 
 文档地址： http://itflow.doc.hyahm.com  
-接口文档地址： http://hyahm.com:10001/docs
+路由接口文档地址： http://hyahm.com:10001/docs （配合新前端不断更新中）
 
 更改项目路由为：  https://github.com/hyahm/xmux
-新前端地址：  https://github.com/jiandanzhiyun/vue-elementAdmin （开发完成后会替换掉老的前端）
+新前端地址：  https://github.com/jiandanzhiyun/vue-elementAdmin （开发完成后会替换掉老的前端）  
 
 ### 功能
 - [x] 增加bug，改变bug状态，转交bug 
