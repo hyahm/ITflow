@@ -3,7 +3,7 @@ package response
 import (
 	"encoding/json"
 	"fmt"
-	"itflow/bug/model"
+	"itflow/app/model"
 )
 
 type Onefd struct {
@@ -59,6 +59,35 @@ func (es *Response) Success() []byte {
 
 func (es *Response) ErrorNoPermission() []byte {
 	es.Msg = "没有权限"
+	send, _ := json.Marshal(es)
+	return send
+}
+
+func (es *Response) TokenNotFound() []byte {
+	es.Code = 10
+	es.Msg = "token过期"
+	send, _ := json.Marshal(es)
+	return send
+}
+
+func (es *Response) ConnectRedisFail() []byte {
+	es.Code = 11
+	es.Msg = "系统错误"
+	send, _ := json.Marshal(es)
+	return send
+}
+
+func (es *Response) ConnectMysqlFail() []byte {
+	// 连接mysql失败
+	es.Code = 1
+	es.Msg = "系统错误"
+	send, _ := json.Marshal(es)
+	return send
+}
+
+func (es *Response) LoginFailed() []byte {
+	es.Code = 2
+	es.Msg = "用户或密码错误"
 	send, _ := json.Marshal(es)
 	return send
 }

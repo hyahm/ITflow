@@ -30,9 +30,8 @@ github.com/hyahm/golog v0.0.0-20200319122124-04b0a58a15ff h1:IbGT9W1zsOFUtLE9d9B
 github.com/hyahm/golog v0.0.0-20200319122124-04b0a58a15ff/go.mod h1:zKiO0JeV7UoTS6Gx7jZaGr+GblF6B57e04Q+/+ChEZA=
 github.com/hyahm/gomysql v0.0.5-0.20191228040128-27a4e3456547 h1:eZfR53H2SSYIq2xuZCK9AIqzxi607qpsn58arkZiwYk=
 github.com/hyahm/gomysql v0.0.5-0.20191228040128-27a4e3456547/go.mod h1:uBxi9E3IcGhdoxM68XudGTyy+gIB8+1LFlAsN6KOHTE=
-github.com/hyahm/itflow v0.0.0-20200430025027-a16bbaaf37a1 h1:QJAJNSLTHiooFPW1+VGBlxAUGeOmyKu14gxHD5RLOfc=
-github.com/hyahm/xmux v0.0.0-20200430090507-e8c439b17c21 h1:SptlHKjDqxC4IYqxgSdfbi+19eSRzeg2qEejMjAqhlk=
-github.com/hyahm/xmux v0.0.0-20200430090507-e8c439b17c21/go.mod h1:/qrMqjHV8UBp1LqYau128V3KlVhOHTg9UF3at2f0lZQ=
+github.com/hyahm/xmux v0.0.0-20200430100510-af4fe835d6ef h1:pH+p47CG0/LR6NORFsfS2seCZSBhwEJYDKVLtH1Zans=
+github.com/hyahm/xmux v0.0.0-20200430100510-af4fe835d6ef/go.mod h1:/qrMqjHV8UBp1LqYau128V3KlVhOHTg9UF3at2f0lZQ=
 github.com/hyahm/xredis v0.0.2-0.20200427134550-98c201be9a34 h1:ovhzWGNbThulaodVDxfnueYes3bOnrtRGOojVIuJ2sQ=
 github.com/hyahm/xredis v0.0.2-0.20200427134550-98c201be9a34/go.mod h1:v6H5mFJjoxCM490BS61Nuj/A6wOhJxWHrOl38Vycx2E=
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=

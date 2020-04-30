@@ -1,8 +1,8 @@
 package main
 
 import (
-	"itflow/bug"
-	"itflow/bug/bugconfig"
+	bug "itflow/app"
+	"itflow/app/bugconfig"
 	"itflow/db"
 
 	"github.com/hyahm/goconfig"

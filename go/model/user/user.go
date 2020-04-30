@@ -3,9 +3,10 @@ package user
 import (
 	"database/sql"
 	"encoding/json"
-	"itflow/bug/bugconfig"
+	"itflow/app/bugconfig"
 	"itflow/db"
 	"itflow/gaencrypt"
+	"itflow/model/response"
 	"strconv"
 	"strings"
 	"time"
@@ -21,25 +22,24 @@ type Login struct {
 	Password string `json:"password"  type:"string" need:"是" default:"" information:"密码"`
 }
 
-func (login *Login) Check(resp *RespLogin) error {
+func (login *Login) Check(resp *RespLogin) []byte {
 	login.Username = strings.Trim(login.Username, " ")
-
+	errorcode := &response.Response{}
 	enpassword := gaencrypt.PwdEncrypt(login.Password, bugconfig.Salt)
 	getsql := "select nickname from user where email=? and password=? and disable=0"
 
 	row, err := db.Mconn.GetOne(getsql, login.Username, enpassword)
 	if err != nil {
 		golog.Error(err)
-		return err
+		return errorcode.ConnectMysqlFail()
 	}
 	err = row.Scan(&login.Username)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			golog.Error("username or password error")
-			return err
+			return errorcode.LoginFailed()
 		}
 		golog.Error(err)
-		return err
+		return errorcode.ConnectMysqlFail()
 	}
 
 	resp.Token = gaencrypt.Token(login.Username, bugconfig.Salt)
@@ -47,7 +47,7 @@ func (login *Login) Check(resp *RespLogin) error {
 		time.Duration(goconfig.ReadInt("expiration", 120))*time.Minute)
 	if err != nil {
 		golog.Error(err)
-		return err
+		return errorcode.ConnectRedisFail()
 	}
 	golog.Infof("login seccuss, user: %s, token: %s", login.Username, resp.Token)
 	resp.UserName = login.Username
