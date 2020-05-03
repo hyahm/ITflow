@@ -10,7 +10,7 @@ require (
 	github.com/hyahm/goconfig v0.0.0-20200411075020-85401a1b9350
 	github.com/hyahm/golog v0.0.0-20200319122124-04b0a58a15ff
 	github.com/hyahm/gomysql v0.0.5-0.20191228040128-27a4e3456547
-	github.com/hyahm/xmux v0.0.0-20200503153411-4e0228f554d7
+	github.com/hyahm/xmux v0.0.0-20200503163638-25d65295eba9
 	github.com/hyahm/xredis v0.0.2-0.20200427134550-98c201be9a34
 	golang.org/x/net v0.0.0-20200501053045-e0ff5e5a1de5 // indirect
 )

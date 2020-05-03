@@ -2,7 +2,6 @@ package midware
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"itflow/db"
 	"itflow/model/response"
@@ -14,8 +13,7 @@ import (
 )
 
 func JsonToStruct(w http.ResponseWriter, r *http.Request) bool {
-	fmt.Println(r.URL)
-	golog.Info(*r)
+	golog.Info("aaaasdgsdf")
 	resp := &response.Response{}
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {

@@ -329,6 +329,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	alllog := &model.Search_log{}
+	golog.Info(*alllog)
 	listlog := &model.List_log{}
 	bytedata, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -336,7 +337,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-
+	golog.Info(string(bytedata))
 	err = json.Unmarshal(bytedata, alllog)
 	if err != nil {
 		golog.Error(err)

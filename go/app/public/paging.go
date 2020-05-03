@@ -1,8 +1,12 @@
 package public
 
+import "github.com/hyahm/golog"
+
 // 返回正确的起始值,和末尾数
 func GetPagingLimitAndPage(count int, page int, limit int) (int, int) {
 	// 都小于1了
+	golog.Info(count)
+	golog.Info(limit)
 	if page < 1 {
 		return 1, count % limit
 	}

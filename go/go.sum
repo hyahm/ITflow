@@ -44,12 +44,8 @@ github.com/hyahm/golog v0.0.0-20200319122124-04b0a58a15ff h1:IbGT9W1zsOFUtLE9d9B
 github.com/hyahm/golog v0.0.0-20200319122124-04b0a58a15ff/go.mod h1:zKiO0JeV7UoTS6Gx7jZaGr+GblF6B57e04Q+/+ChEZA=
 github.com/hyahm/gomysql v0.0.5-0.20191228040128-27a4e3456547 h1:eZfR53H2SSYIq2xuZCK9AIqzxi607qpsn58arkZiwYk=
 github.com/hyahm/gomysql v0.0.5-0.20191228040128-27a4e3456547/go.mod h1:uBxi9E3IcGhdoxM68XudGTyy+gIB8+1LFlAsN6KOHTE=
-github.com/hyahm/xmux v0.0.0-20200430104535-adbddd9d537f h1:QbPrVcQNMm7pkWNleL7Z88JHU0jjnSuYaYovjZbu6C4=
-github.com/hyahm/xmux v0.0.0-20200430104535-adbddd9d537f/go.mod h1:/qrMqjHV8UBp1LqYau128V3KlVhOHTg9UF3at2f0lZQ=
-github.com/hyahm/xmux v0.0.0-20200503123019-c2f28fde5199 h1:OOpQaTwB66TMcYpbqvXkQmLwESW0rAx/d659ozdL0Gc=
-github.com/hyahm/xmux v0.0.0-20200503123019-c2f28fde5199/go.mod h1:r4uLa3YcAxzxjF40bomgw6CJVDEXDYgv/A+6/debBuo=
-github.com/hyahm/xmux v0.0.0-20200503153411-4e0228f554d7 h1:1JCCFadwxjeHftDA0oxfMRXkCx/UbnrJpb7oRYNPWh4=
-github.com/hyahm/xmux v0.0.0-20200503153411-4e0228f554d7/go.mod h1:r4uLa3YcAxzxjF40bomgw6CJVDEXDYgv/A+6/debBuo=
+github.com/hyahm/xmux v0.0.0-20200503163638-25d65295eba9 h1:rHXukurWcn42Qqgi8hOlnbb58y2alHdC6M0wAhPYq8s=
+github.com/hyahm/xmux v0.0.0-20200503163638-25d65295eba9/go.mod h1:r4uLa3YcAxzxjF40bomgw6CJVDEXDYgv/A+6/debBuo=
 github.com/hyahm/xredis v0.0.2-0.20200427134550-98c201be9a34 h1:ovhzWGNbThulaodVDxfnueYes3bOnrtRGOojVIuJ2sQ=
 github.com/hyahm/xredis v0.0.2-0.20200427134550-98c201be9a34/go.mod h1:v6H5mFJjoxCM490BS61Nuj/A6wOhJxWHrOl38Vycx2E=
 github.com/json-iterator/go v1.1.6/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=

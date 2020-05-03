@@ -52,7 +52,7 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 }
 
 func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
-
+	golog.Info("000000000")
 	countbasesql := "select count(id) from bugs where dustbin=0 "
 	bugsql := "select id,createtime,iid,sid,bugtitle,lid,pid,eid,spusers from bugs where dustbin=0 "
 	errorcode := &response.Response{}
@@ -148,7 +148,10 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 	}
 	// 获取查询的开始位置
 	start, end := public.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
-	al.Al = al.Al[start:end]
+	if len(al.Al) > end {
+		al.Al = al.Al[start:end]
+	}
+
 	send, _ := json.Marshal(al)
 	w.Write(send)
 	return

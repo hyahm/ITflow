@@ -10,6 +10,7 @@ import (
 	"net/http"
 
 	"github.com/hyahm/goconfig"
+	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
 
@@ -39,7 +40,7 @@ func RunHttp() {
 	router.AddGroup(route.Email)
 	router.AddGroup(route.Share)
 	router.AddGroup(route.Api)
-
+	golog.Info("1111")
 	router.Pattern("/uploadimg").Post(handle.UploadImgs)
 	router.Pattern("/upload/headimg").Post(handle.UploadHeadImg)
 	router.Pattern("/showimg/{imgname}").Get(handle.ShowImg)
