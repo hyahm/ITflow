@@ -10,7 +10,7 @@ import (
 var Admin *xmux.GroupRoute
 
 func init() {
-	Admin = xmux.NewGroupRoute("admin")
+	Admin = xmux.NewGroupRoute()
 	Admin.Pattern("/dashboard/usercount").Post(handle.UserCount)
 	Admin.Pattern("/dashboard/projectcount").Post(handle.ProjectCount)
 	Admin.Pattern("/search/log").Post(handle.SearchLog)

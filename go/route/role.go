@@ -10,7 +10,7 @@ import (
 var Role *xmux.GroupRoute
 
 func init() {
-	Role = xmux.NewGroupRoute("role")
+	Role = xmux.NewGroupRoute()
 	Role.Pattern("/role/add").Post(handle.AddRole).End(midware.EndLog)
 	Role.Pattern("/role/edit").Post(handle.EditRole).End(midware.EndLog)
 	Role.Pattern("/role/list").Post(handle.RoleList)

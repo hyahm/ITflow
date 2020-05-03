@@ -10,7 +10,7 @@ import (
 var Project *xmux.GroupRoute
 
 func init() {
-	Project = xmux.NewGroupRoute("project")
+	Project = xmux.NewGroupRoute()
 	Project.Pattern("/project/list").Post(handle.ProjectList)
 	Project.Pattern("/project/add").Post(handle.AddProject).End(midware.EndLog)
 	Project.Pattern("/project/update").Post(handle.UpdateProject).End(midware.EndLog)

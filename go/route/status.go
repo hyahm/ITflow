@@ -11,7 +11,7 @@ import (
 var Status *xmux.GroupRoute
 
 func init() {
-	Status = xmux.NewGroupRoute("status").
+	Status = xmux.NewGroupRoute().
 		ApiCreateGroup("bugstatus", "bug 状态管理", "bug status").
 		ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf")
 

@@ -10,7 +10,7 @@ import (
 var Env *xmux.GroupRoute
 
 func init() {
-	Env = xmux.NewGroupRoute("env")
+	Env = xmux.NewGroupRoute()
 	Env.Pattern("/env/list").Post(handle.EnvList)
 	Env.Pattern("/env/add").Get(handle.AddEnv).End(midware.EndLog)
 	Env.Pattern("/env/update").Post(handle.UpdateEnv).End(midware.EndLog)

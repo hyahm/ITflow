@@ -10,7 +10,7 @@ import (
 var Position *xmux.GroupRoute
 
 func init() {
-	Position = xmux.NewGroupRoute("posistion")
+	Position = xmux.NewGroupRoute()
 	Position.Pattern("/position/list").Post(handle.PositionGet)
 	Position.Pattern("/position/add").Post(handle.PositionAdd).End(midware.EndLog)
 	Position.Pattern("/position/del").Get(handle.PositionDel).End(midware.EndLog)

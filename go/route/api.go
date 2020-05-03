@@ -10,7 +10,7 @@ import (
 var Api *xmux.GroupRoute
 
 func init() {
-	Api = xmux.NewGroupRoute("api")
+	Api = xmux.NewGroupRoute()
 	Api.Pattern("/rest/list").Post(handle.RestList)
 	Api.Pattern("/rest/update").Post(handle.RestUpdate).End(midware.EndLog)
 	Api.Pattern("/rest/add").Post(handle.RestAdd).End(midware.EndLog)

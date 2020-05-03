@@ -10,7 +10,7 @@ import (
 var Bug *xmux.GroupRoute
 
 func init() {
-	Bug = xmux.NewGroupRoute("bug")
+	Bug = xmux.NewGroupRoute()
 
 	Bug.Pattern("/bug/pass").Post(handle.PassBug).End(midware.EndLog).End(midware.EndLog)
 	Bug.Pattern("/bug/create").Post(handle.BugCreate).End(midware.EndLog).End(midware.EndLog)

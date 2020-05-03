@@ -12,7 +12,7 @@ import (
 var User *xmux.GroupRoute
 
 func init() {
-	User = xmux.NewGroupRoute("user").
+	User = xmux.NewGroupRoute().
 		ApiCreateGroup("user", "用户相关的", "user").
 		ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf")
 

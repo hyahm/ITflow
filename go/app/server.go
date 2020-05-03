@@ -43,7 +43,7 @@ func RunHttp() {
 	router.Pattern("/upload/headimg").Post(handle.UploadHeadImg)
 	router.Pattern("/showimg/{imgname}").Get(handle.ShowImg)
 	//
-	doc := xmux.ShowApi("doc", "/docs", router).DelMidware(midware.CheckToken)
+	doc := xmux.ShowApi("/docs", router).DelMidware(midware.CheckToken)
 	router.AddGroup(doc)
 	listenaddr := goconfig.ReadString("listenaddr", ":10001")
 

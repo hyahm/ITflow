@@ -10,7 +10,7 @@ import (
 var Share *xmux.GroupRoute
 
 func init() {
-	Share = xmux.NewGroupRoute("share")
+	Share = xmux.NewGroupRoute()
 	Share.Pattern("/share/list").Get(handle.ShareList)
 	Share.Pattern("/share/upload").Post(handle.ShareUpload)
 	Share.Pattern("/share/mkdir").Post(handle.ShareMkdir)
