@@ -48,6 +48,8 @@ github.com/hyahm/xmux v0.0.0-20200430104535-adbddd9d537f h1:QbPrVcQNMm7pkWNleL7Z
 github.com/hyahm/xmux v0.0.0-20200430104535-adbddd9d537f/go.mod h1:/qrMqjHV8UBp1LqYau128V3KlVhOHTg9UF3at2f0lZQ=
 github.com/hyahm/xmux v0.0.0-20200503123019-c2f28fde5199 h1:OOpQaTwB66TMcYpbqvXkQmLwESW0rAx/d659ozdL0Gc=
 github.com/hyahm/xmux v0.0.0-20200503123019-c2f28fde5199/go.mod h1:r4uLa3YcAxzxjF40bomgw6CJVDEXDYgv/A+6/debBuo=
+github.com/hyahm/xmux v0.0.0-20200503153411-4e0228f554d7 h1:1JCCFadwxjeHftDA0oxfMRXkCx/UbnrJpb7oRYNPWh4=
+github.com/hyahm/xmux v0.0.0-20200503153411-4e0228f554d7/go.mod h1:r4uLa3YcAxzxjF40bomgw6CJVDEXDYgv/A+6/debBuo=
 github.com/hyahm/xredis v0.0.2-0.20200427134550-98c201be9a34 h1:ovhzWGNbThulaodVDxfnueYes3bOnrtRGOojVIuJ2sQ=
 github.com/hyahm/xredis v0.0.2-0.20200427134550-98c201be9a34/go.mod h1:v6H5mFJjoxCM490BS61Nuj/A6wOhJxWHrOl38Vycx2E=
 github.com/json-iterator/go v1.1.6/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=

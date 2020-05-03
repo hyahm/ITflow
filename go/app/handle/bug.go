@@ -10,6 +10,7 @@ import (
 	"itflow/app/model"
 	"itflow/app/public"
 	"itflow/db"
+	"itflow/model/bug"
 	"itflow/model/datalog"
 	"itflow/model/response"
 	"net/http"
@@ -434,15 +435,6 @@ func LogClassify(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type getBugSearchParam struct {
-	Page    int      `json:"page"`
-	Limit   int      `json:"limit"`
-	Level   string   `json:"level"`
-	Project string   `json:"project"`
-	Title   string   `json:"title"`
-	Status  []string `json:"status"`
-}
-
 type getAllBugSearchParam struct {
 	Page    int      `json:"page"`
 	Limit   int      `json:"limit"`
@@ -563,111 +555,92 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func GetAllBugs(w http.ResponseWriter, r *http.Request) {
+// func GetAllBugs(w http.ResponseWriter, r *http.Request) {
 
-	_, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+// 	_, err := logtokenmysql(r)
+// 	errorcode := &response.Response{}
+// 	if err != nil {
+// 		golog.Error(err)
+// 		w.Write(errorcode.ErrorE(err))
+// 		return
+// 	}
 
-	al := &model.AllArticleList{}
+// 	al := &model.AllArticleList{}
 
-	searchq, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		al.Code = 7
-		send, _ := json.Marshal(al)
-		w.Write(send)
-		return
-	}
-	searchparam := &getBugSearchParam{}
-	err = json.Unmarshal(searchq, searchparam)
-	if err != nil {
-		golog.Error(err)
-		al.Code = 5
-		send, _ := json.Marshal(al)
-		w.Write(send)
-		return
-	}
+// 	searchq, err := ioutil.ReadAll(r.Body)
+// 	if err != nil {
+// 		golog.Error(err)
+// 		al.Code = 7
+// 		send, _ := json.Marshal(al)
+// 		w.Write(send)
+// 		return
+// 	}
+// 	searchparam := &getBugSearchParam{}
+// 	err = json.Unmarshal(searchq, searchparam)
+// 	if err != nil {
+// 		golog.Error(err)
+// 		al.Code = 5
+// 		send, _ := json.Marshal(al)
+// 		w.Write(send)
+// 		return
+// 	}
 
-	row, err := db.Mconn.GetOne("select count(id) from bugs")
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = row.Scan(&al.Count)
-	if err != nil {
-		golog.Error(err)
-		al.Code = 5
-		send, _ := json.Marshal(al)
-		w.Write(send)
-		return
-	}
-	start, end := public.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
+// 	row, err := db.Mconn.GetOne("select count(id) from bugs")
+// 	if err != nil {
+// 		golog.Error(err)
+// 		w.Write(errorcode.ErrorE(err))
+// 		return
+// 	}
+// 	err = row.Scan(&al.Count)
+// 	if err != nil {
+// 		golog.Error(err)
+// 		al.Code = 5
+// 		send, _ := json.Marshal(al)
+// 		w.Write(send)
+// 		return
+// 	}
+// 	start, end := public.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
 
-	alsql := "select id,createtime,importent,status,bugtitle,uid,level,pid,env,spusers from bugs where dustbin=0 order by id desc limit ?,?"
-	rows, err := db.Mconn.GetRows(alsql, start, end)
-	if err != nil {
-		golog.Error(err)
-		al.Code = 1
-		send, _ := json.Marshal(al)
-		w.Write(send)
-		return
-	}
-	for rows.Next() {
-		bl := &model.ArticleList{}
-		var statusid int64
-		var uid int64
-		var pid int64
-		var eid int64
-		var spusers string
-		rows.Scan(&bl.ID, &bl.Date, &bl.Importance, &statusid, &bl.Title, &uid, &bl.Level, &pid, &eid, &spusers)
+// 	alsql := "select id,createtime,importent,status,bugtitle,uid,level,pid,env,spusers from bugs where dustbin=0 order by id desc limit ?,?"
+// 	rows, err := db.Mconn.GetRows(alsql, start, end)
+// 	if err != nil {
+// 		golog.Error(err)
+// 		al.Code = 1
+// 		send, _ := json.Marshal(al)
+// 		w.Write(send)
+// 		return
+// 	}
+// 	for rows.Next() {
+// 		bl := &model.ArticleList{}
+// 		var statusid int64
+// 		var uid int64
+// 		var pid int64
+// 		var eid int64
+// 		var spusers string
+// 		rows.Scan(&bl.ID, &bl.Date, &bl.Importance, &statusid, &bl.Title, &uid, &bl.Level, &pid, &eid, &spusers)
 
-		bl.Handle = formatUserlistToRealname(spusers)
-		bl.Status = bugconfig.CacheSidStatus[statusid]
-		bl.Author = bugconfig.CacheUidRealName[uid]
-		bl.Projectname = bugconfig.CachePidName[pid]
-		bl.Env = bugconfig.CacheEidName[eid]
+// 		bl.Handle = formatUserlistToRealname(spusers)
+// 		bl.Status = bugconfig.CacheSidStatus[statusid]
+// 		bl.Author = bugconfig.CacheUidRealName[uid]
+// 		bl.Projectname = bugconfig.CachePidName[pid]
+// 		bl.Env = bugconfig.CacheEidName[eid]
 
-		al.Al = append(al.Al, bl)
+// 		al.Al = append(al.Al, bl)
 
-	}
-	send, _ := json.Marshal(al)
-	w.Write(send)
-	return
+// 	}
+// 	send, _ := json.Marshal(al)
+// 	w.Write(send)
+// 	return
 
-}
+// }
 
 func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 
-	name, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	al := &model.AllArticleList{}
-
-	searchq, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	searchparam := &getBugSearchParam{}
-	err = json.Unmarshal(searchq, searchparam)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	uid := bugconfig.CacheNickNameUid[name]
+	nickname := xmux.GetData(r).Get("nickname").(string)
+	uid := bugconfig.CacheNickNameUid[nickname]
 	row, err := db.Mconn.GetOne("select count(id) from bugs where uid=?", uid)
 	if err != nil {
 		golog.Error(err)
@@ -680,6 +653,8 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+
+	searchparam := xmux.GetData(r).Data.(*bug.SearchParam)
 	start, end := public.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
 
 	alsql := "select id,createtime,importent,status,bugtitle,uid,level,pid,env,spusers from bugs where uid=? and dustbin=0 order by id desc limit ?,?"

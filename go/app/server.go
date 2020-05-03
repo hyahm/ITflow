@@ -20,6 +20,7 @@ func RunHttp() {
 	router.SetHeader("Content-Type", "application/x-www-form-urlencoded,application/json; charset=UTF-8")
 	router.SetHeader("Access-Control-Allow-Headers", "Content-Type,Access-Token,X-Token,smail")
 	router.AddMidware(midware.CheckToken) // 所有的请求头优先检查token是否有效， 登录除外
+
 	router.AddGroup(route.User)
 	router.AddGroup(route.Bug)
 

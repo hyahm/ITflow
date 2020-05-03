@@ -9,12 +9,14 @@ import (
 	"itflow/app/model"
 	"itflow/app/public"
 	"itflow/db"
+	"itflow/model/bug"
 	"itflow/model/response"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
@@ -53,35 +55,17 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 
 	countbasesql := "select count(id) from bugs where dustbin=0 "
 	bugsql := "select id,createtime,iid,sid,bugtitle,lid,pid,eid,spusers from bugs where dustbin=0 "
-
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	searchq, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	searchparam := &getBugSearchParam{} // 接收的参数
-	err = json.Unmarshal(searchq, searchparam)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	al := &model.AllArticleList{}
 	// 获取状态
+
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	showstatus := bugconfig.CacheUidFilter[bugconfig.CacheNickNameUid[nickname]]
 
 	//更新缓存
 	bugconfig.CacheUidFilter[bugconfig.CacheNickNameUid[nickname]] = showstatus
 
+	searchparam := xmux.GetData(r).Data.(*bug.SearchParam)
 	// 第二步， 检查level
 	if searchparam.Level != "" {
 		// 判断这个值是否存在
@@ -89,7 +73,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 			bugsql += fmt.Sprintf("and lid=%d ", lid)
 			countbasesql += fmt.Sprintf("and lid=%d ", lid)
 		} else {
-			golog.Error(err)
+			golog.Error("没有搜索到什么")
 			w.Write(errorcode.Error("没有搜索到什么"))
 			return
 		}
@@ -107,7 +91,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 			bugsql += fmt.Sprintf("and pid=%d ", pid)
 			countbasesql += fmt.Sprintf("and pid=%d ", pid)
 		} else {
-			golog.Error(err)
+			golog.Error("没有搜索到什么")
 			w.Write(errorcode.Error("没有搜索到什么"))
 			return
 		}
@@ -162,7 +146,6 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
-	fmt.Println("-----")
 	// 获取查询的开始位置
 	start, end := public.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
 	al.Al = al.Al[start:end]
@@ -256,7 +239,7 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 }
 
 // 返回搜索的字符串 和 参数
-func searchParamsSql(params *getBugSearchParam) (string, []interface{}) {
+func searchParamsSql(params *bug.SearchParam) (string, []interface{}) {
 	basesql := ""
 	args := make([]interface{}, 0)
 	if params.Title != "" {
@@ -321,7 +304,7 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 		golog.Error(err)
 		return nil, errorcode.ErrorE(err)
 	}
-	searchparam := &getBugSearchParam{} // 接收的参数
+	searchparam := &bug.SearchParam{} // 接收的参数
 	err = json.Unmarshal(searchq, searchparam)
 	if err != nil {
 		golog.Error(err)

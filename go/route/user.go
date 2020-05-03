@@ -12,9 +12,9 @@ import (
 var User *xmux.GroupRoute
 
 func init() {
-	User = xmux.NewGroupRoute().
-		ApiCreateGroup("user", "用户相关的", "user").
-		ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf")
+	User = xmux.NewGroupRoute()
+	User.ApiCreateGroup("user", "用户相关的", "user")
+	User.ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf")
 
 	User.Pattern("/user/login").Post(handle.Login).Bind(&user.Login{}).
 		DelMidware(midware.CheckToken).AddMidware(midware.JsonToStruct).End(midware.EndLog).
