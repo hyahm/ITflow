@@ -42,7 +42,10 @@ func init() {
 		ApiCodeMsg("0", "成功")
 
 	Status.Pattern("/status/add").Post(handle.StatusAdd).Bind(&bug.Status{}).
-		AddMidware(midware.CheckPermssion).End(midware.EndLog).AddMidware(midware.JsonToStruct)
+		AddMidware(midware.CheckPermssion).End(midware.EndLog).AddMidware(midware.JsonToStruct).
+		ApiDescribe("添加bug 状态").
+		ApiReqStruct(&bug.Status{}).ApiRequestTemplate(`{"id": 0, "name": "普通"}`).
+		ApiResStruct(&bug.ResponeStatus{}).ApiResponseTemplate(`{"id": 8,"code": 0}`)
 
 	Status.Pattern("/status/remove").Get(handle.StatusRemove).
 		End(midware.EndLog)

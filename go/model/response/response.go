@@ -39,6 +39,20 @@ func (es *Response) ErrorE(err error) []byte {
 	return send
 }
 
+func (es *Response) GetDataErr() []byte {
+	es.Msg = "获取请求数据失败"
+	es.Code = 4
+	send, _ := json.Marshal(es)
+	return send
+}
+
+func (es *Response) NotJsonFormat() []byte {
+	es.Msg = "数据无法被解析"
+	es.Code = 5
+	send, _ := json.Marshal(es)
+	return send
+}
+
 func (es *Response) Errorf(format string, args ...interface{}) []byte {
 	es.Msg = fmt.Sprintf(format, args...)
 	send, _ := json.Marshal(es)

@@ -44,7 +44,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 	errorcode.Id, err = db.Mconn.Insert("insert into status(name) values(?)", s.Name)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		w.Write(errorcode.ConnectMysqlFail())
 		return
 	}
 
@@ -60,8 +60,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 	bugconfig.CacheSidStatus[errorcode.Id] = s.Name
 	bugconfig.CacheStatusSid[s.Name] = errorcode.Id
 
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
+	w.Write(errorcode.Success())
 	return
 
 }
