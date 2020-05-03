@@ -20,39 +20,9 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-type listStatus struct {
-	StatusList []*bug.Status `json:"statuslist"`
-	Code       int           `json:"code"`
-}
-
 func StatusList(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("status", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
-
-	if !permssion {
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
-	ls := &listStatus{}
+	ls := &bug.ListStatus{}
 	for k, v := range bugconfig.CacheSidStatus {
 		one := &bug.Status{}
 		one.Id = k
@@ -67,40 +37,10 @@ func StatusList(w http.ResponseWriter, r *http.Request) {
 }
 
 func StatusAdd(w http.ResponseWriter, r *http.Request) {
-	nickname, err := logtokenmysql(r)
+
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("status", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
-
-	if !permssion {
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
-	ss, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	s := &bug.Status{}
-	err = json.Unmarshal(ss, s)
-
+	var err error
+	s := xmux.GetData(r).Data.(*bug.Status)
 	errorcode.Id, err = db.Mconn.Insert("insert into status(name) values(?)", s.Name)
 	if err != nil {
 		golog.Error(err)
@@ -111,7 +51,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 	// 增加日志
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
-		Username: nickname,
+		Username: xmux.GetData(r).Get("nickname").(string),
 		Classify: "status",
 		Action:   "add",
 	}

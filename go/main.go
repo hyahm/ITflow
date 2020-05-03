@@ -1,7 +1,7 @@
 package main
 
 import (
-	bug "itflow/app"
+	"itflow/app"
 	"itflow/app/bugconfig"
 	"itflow/db"
 
@@ -25,5 +25,5 @@ func main() {
 		goconfig.ReadBool("log.everyday", false))
 
 	////
-	bug.RunHttp()
+	app.RunHttp()
 }

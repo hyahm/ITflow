@@ -59,6 +59,7 @@ func (es *Response) Success() []byte {
 
 func (es *Response) ErrorNoPermission() []byte {
 	es.Msg = "没有权限"
+	es.Code = 3
 	send, _ := json.Marshal(es)
 	return send
 }

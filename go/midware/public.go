@@ -36,7 +36,7 @@ func CheckToken(w http.ResponseWriter, r *http.Request) bool {
 	errorcode := &response.Response{}
 	a := r.Header.Get("X-Token")
 	golog.Info(a)
-	_, err := db.RSconn.Get(a)
+	nickname, err := db.RSconn.Get(a)
 	if err != nil {
 		if err == redis.Nil {
 			// token 没找到或过期
@@ -50,5 +50,6 @@ func CheckToken(w http.ResponseWriter, r *http.Request) bool {
 		return true
 
 	}
+	xmux.GetData(r).Set("nickname", nickname)
 	return false
 }

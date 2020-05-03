@@ -1,4 +1,4 @@
-package bug
+package app
 
 import (
 	"fmt"
