@@ -21,7 +21,6 @@ func main() {
 	goconfig.WriteString("showbaseurl", "http://127.0.0.1:10001/showimg", "图片显示的地址(用接口的地址)")
 	goconfig.WriteString("salt", "hjkkaksjdhfryuooweqzmbvc", "盐值，建议修改，然后用curl http://127.0.0.1:10001/admin/reset?password=123 来修改admin密码")
 	goconfig.WriteString("sharedir", "/share/", "共享文件夹根目录")
-	goconfig.WriteString("adminuser", "admin", "管理员用户名")
 
 	goconfig.WriteString("redis.pwd", "")
 	goconfig.WriteString("redis.host", "127.0.0.1:6379")

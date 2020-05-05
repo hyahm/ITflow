@@ -27,17 +27,13 @@ type envrow struct {
 
 func EnvList(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	env := &envlist{}
 	var permssion bool
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	// 管理员
+	var err error
 	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 		permssion = true
 	} else {

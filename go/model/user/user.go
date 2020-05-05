@@ -77,7 +77,7 @@ func (ui *UserInfo) GetUserInfo() error {
 	}
 	// 管理员
 	if bugconfig.CacheNickNameUid[ui.Name] == bugconfig.SUPERID {
-		ui.Roles = append(ui.Roles, goconfig.ReadString("adminuser", "admin"))
+		ui.Roles = append(ui.Roles, ui.Name)
 	} else {
 		var rl string
 		getrole := "select rolelist from rolegroup where id=?"

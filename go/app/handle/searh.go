@@ -52,7 +52,6 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 }
 
 func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
-	golog.Info("000000000")
 	countbasesql := "select count(id) from bugs where dustbin=0 "
 	bugsql := "select id,createtime,iid,sid,bugtitle,lid,pid,eid,spusers from bugs where dustbin=0 "
 	errorcode := &response.Response{}

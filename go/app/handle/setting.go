@@ -524,8 +524,6 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
-	return
-
 }
 
 type getroles struct {
