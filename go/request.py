@@ -22,7 +22,7 @@ else:
 
 
 headers = {
-	"X-Token": token
+	"X-Token": "token"
 }
 
 

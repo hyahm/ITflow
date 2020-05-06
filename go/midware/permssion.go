@@ -11,9 +11,109 @@ import (
 )
 
 func CheckStatusPermssion(w http.ResponseWriter, r *http.Request) bool {
+
+	nickname := xmux.GetData(r).Get("nickname").(string)
+	resp, ok := checkPermssion(nickname, "status")
+	if ok {
+		w.Write(resp)
+		return ok
+	}
+	return false
+}
+
+func CheckRoleGroupPermssion(w http.ResponseWriter, r *http.Request) bool {
+	nickname := xmux.GetData(r).Get("nickname").(string)
+	resp, ok := checkPermssion(nickname, "rolegroup")
+	if ok {
+		w.Write(resp)
+		return ok
+	}
+	return false
+}
+
+func CheckProjectPermssion(w http.ResponseWriter, r *http.Request) bool {
+	nickname := xmux.GetData(r).Get("nickname").(string)
+	resp, ok := checkPermssion(nickname, "project")
+	if ok {
+		w.Write(resp)
+		return ok
+	}
+	return false
+}
+
+func CheckLevelPermssion(w http.ResponseWriter, r *http.Request) bool {
+	nickname := xmux.GetData(r).Get("nickname").(string)
+	resp, ok := checkPermssion(nickname, "level")
+	if ok {
+		w.Write(resp)
+		return ok
+	}
+	return false
+}
+
+func CheckEnvPermssion(w http.ResponseWriter, r *http.Request) bool {
+	nickname := xmux.GetData(r).Get("nickname").(string)
+	resp, ok := checkPermssion(nickname, "env")
+	if ok {
+		w.Write(resp)
+		return ok
+	}
+	return false
+}
+
+func CheckLogPermssion(w http.ResponseWriter, r *http.Request) bool {
+	nickname := xmux.GetData(r).Get("nickname").(string)
+	resp, ok := checkPermssion(nickname, "log")
+	if ok {
+		w.Write(resp)
+		return ok
+	}
+	return false
+}
+
+func CheckImportantPermssion(w http.ResponseWriter, r *http.Request) bool {
+	nickname := xmux.GetData(r).Get("nickname").(string)
+	resp, ok := checkPermssion(nickname, "important")
+	if ok {
+		w.Write(resp)
+		return ok
+	}
+	return false
+}
+
+func CheckUserGroupPermssion(w http.ResponseWriter, r *http.Request) bool {
+	nickname := xmux.GetData(r).Get("nickname").(string)
+	resp, ok := checkPermssion(nickname, "usergroup")
+	if ok {
+		w.Write(resp)
+		return ok
+	}
+	return false
+}
+
+func CheckVersionPermssion(w http.ResponseWriter, r *http.Request) bool {
+	nickname := xmux.GetData(r).Get("nickname").(string)
+	resp, ok := checkPermssion(nickname, "version")
+	if ok {
+		w.Write(resp)
+		return ok
+	}
+	return false
+}
+
+func CheckPositionPermssion(w http.ResponseWriter, r *http.Request) bool {
+	nickname := xmux.GetData(r).Get("nickname").(string)
+	resp, ok := checkPermssion(nickname, "position")
+	if ok {
+		w.Write(resp)
+		return ok
+	}
+	return false
+}
+
+func checkPermssion(nickname, pagename string) ([]byte, bool) {
 	var permssion bool
 	errorcode := &response.Response{}
-	nickname := xmux.GetData(r).Get("nickname").(string)
 
 	// 管理员
 	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
@@ -22,8 +122,8 @@ func CheckStatusPermssion(w http.ResponseWriter, r *http.Request) bool {
 		rg, err := model.NewRoleGroup(nickname)
 		if err != nil {
 			golog.Error(err)
-			w.Write(errorcode.ConnectMysqlFail())
-			return true
+
+			return errorcode.ConnectMysqlFail(), true
 		}
 		permssion = rg.CheckPagePerm("status")
 
@@ -31,8 +131,7 @@ func CheckStatusPermssion(w http.ResponseWriter, r *http.Request) bool {
 
 	if !permssion {
 		golog.Error(string(errorcode.ErrorNoPermission()))
-		w.Write(errorcode.ErrorNoPermission())
-		return true
+		return errorcode.ErrorNoPermission(), true
 	}
-	return false
+	return nil, false
 }

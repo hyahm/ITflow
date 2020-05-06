@@ -22,13 +22,7 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	tl := &network.List_restful{}
-	nickname, err := logtokenmysql(r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	rows, err := db.Mconn.GetRows("select id,name,ownerid,auth,readuser,edituser,rid,eid from apiproject")
 	if err != nil {
 		golog.Error(err)
@@ -138,15 +132,10 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 }
 
 func RestUpdate(w http.ResponseWriter, r *http.Request) {
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	errorcode := &response.Response{}
 	tl := &network.Data_restful{}
-	nickname, err := logtokenmysql(r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -221,12 +210,7 @@ func RestUpdate(w http.ResponseWriter, r *http.Request) {
 func RestAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	nickname, err := logtokenmysql(r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	uid := bugconfig.CacheNickNameUid[nickname]
 
 	dr := &network.Data_restful{}
@@ -288,13 +272,7 @@ func RestDel(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	id := r.FormValue("id")
-	nickname, err := logtokenmysql(r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	// 只有创建者才能删除
 	eff, err := db.Mconn.Update("delete from apiproject where id=? and ownerid=?", id, bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
@@ -329,14 +307,10 @@ func ApiList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	tl := &network.List_restful{}
-	nickname, err := logtokenmysql(r)
-	pid := r.FormValue("pid")
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
+	pid := r.FormValue("pid")
+
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	//判断这个用户是否有权限访问
 	hasperm, err := checkapiperm(pid, bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
@@ -495,12 +469,7 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	tl := &network.Get_apilist{}
-	nickname, err := logtokenmysql(r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -608,13 +577,7 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 func ApiAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	nickname, err := logtokenmysql(r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	al := &network.Get_apilist{}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -692,6 +655,7 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
+
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -709,12 +673,6 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	id := r.FormValue("id")
-	nickname, err := logtokenmysql(r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	var oids string
 	var pid string
@@ -744,6 +702,7 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	if uid != bugconfig.CacheNickNameUid[nickname] && oid != bugconfig.CacheNickNameUid[nickname] {
 		w.Write(errorcode.ErrorNoPermission())
 		return
@@ -767,6 +726,7 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
+
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -785,14 +745,8 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 	sl := &network.Show_apilist{}
 	id := r.FormValue("id")
-
-	nickname, err := logtokenmysql(r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
+	var err error
 	sl.Id, err = strconv.Atoi(id)
 	if err != nil {
 		w.Write(errorcode.ErrorE(err))
@@ -897,14 +851,7 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 	sl := &network.One_apilist{}
 	id := r.FormValue("id")
-
-	nickname, err := logtokenmysql(r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
+	var err error
 	sl.Id, err = strconv.Atoi(id)
 	if err != nil {
 		w.Write(errorcode.ErrorE(err))
@@ -955,6 +902,7 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	// 判断权限
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	hasperm, err := checkapiperm(strconv.Itoa(sl.Pid), bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
 		golog.Error(err)

@@ -2,9 +2,7 @@ package handle
 
 import (
 	"encoding/json"
-	"itflow/db"
 	"itflow/network/datalog"
-	"itflow/network/response"
 	"itflow/network/user"
 	"net/http"
 
@@ -38,17 +36,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 func LoginOut(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
 	// 检查token 是否存在
-	token := r.Header.Get("X-Token")
-	nickname, err := db.RSconn.Get(token)
-	if err != nil {
-
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -60,16 +49,9 @@ func LoginOut(w http.ResponseWriter, r *http.Request) {
 func UserInfo(w http.ResponseWriter, r *http.Request) {
 
 	userinfo := &user.UserInfo{}
-	nickname, err := logtokenmysql(r)
-	if err != nil {
-		userinfo.Msg = err.Error()
-		userinfo.Code = 1
-		w.Write(userinfo.Json())
-		return
-	}
-	userinfo.Name = nickname
+	userinfo.NickName = xmux.GetData(r).Get("nickname").(string)
 
-	err = userinfo.GetUserInfo()
+	err := userinfo.GetUserInfo()
 	if err != nil {
 		golog.Error(err)
 		userinfo.Msg = err.Error()

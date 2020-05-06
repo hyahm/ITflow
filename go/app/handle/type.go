@@ -21,12 +21,6 @@ func TypeList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	tl := &network.List_types{}
-	_, err := logtokenmysql(r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	rows, err := db.Mconn.GetRows("select id,name,type,opts,tid from types")
 	if err != nil {
@@ -74,12 +68,7 @@ func TypeList(w http.ResponseWriter, r *http.Request) {
 func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	nickname, err := logtokenmysql(r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	data := &network.Data_types{}
 	send := &network.Send_types{}
 	respbyte, err := ioutil.ReadAll(r.Body)
@@ -195,6 +184,7 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 
 	}
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	// 增加日志
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
@@ -215,12 +205,6 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 func TypeAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	nickname, err := logtokenmysql(r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	data := &network.Data_types{}
 	send := &network.Send_types{}
@@ -300,7 +284,7 @@ func TypeAdd(w http.ResponseWriter, r *http.Request) {
 
 	bugconfig.CacheTidName[send.Id] = data.Name
 	bugconfig.CacheNameTid[data.Name] = send.Id
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -324,13 +308,7 @@ func TypeDel(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	nickname, err := logtokenmysql(r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	var t int
 	row, err := db.Mconn.GetOne("select type from types where id=?", id)
 	if t == 0 {
@@ -370,12 +348,6 @@ func TypeDel(w http.ResponseWriter, r *http.Request) {
 func GetType(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	_, err := logtokenmysql(r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	types := &network.Send_Types{}
 	rows, err := db.Mconn.GetRows("select name from types")

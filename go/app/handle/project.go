@@ -3,7 +3,6 @@ package handle
 import (
 	"encoding/json"
 	"io/ioutil"
-	"itflow/app/asset"
 	"itflow/app/bugconfig"
 	"itflow/db"
 	"itflow/network/datalog"
@@ -27,32 +26,8 @@ type projectrow struct {
 
 func ProjectList(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
 	projects := &projectlist{}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("project", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
 	for k, v := range bugconfig.CachePidName {
 		pr := &projectrow{
 			Id:          k,
@@ -69,36 +44,12 @@ func ProjectList(w http.ResponseWriter, r *http.Request) {
 
 func AddProject(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
 
-	}
-
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("project", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
-
-	if !permssion {
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
 	name := r.FormValue("name")
 
 	getaritclesql := "insert into projectname(name) values(?)"
-
+	var err error
 	errorcode.Id, err = db.Mconn.Insert(getaritclesql, name)
 	if err != nil {
 		golog.Error(err)
@@ -106,6 +57,7 @@ func AddProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -124,33 +76,10 @@ func AddProject(w http.ResponseWriter, r *http.Request) {
 
 func UpdateProject(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
 
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
 	pr := &projectrow{}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("project", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
 	bpr, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -171,6 +100,7 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -191,31 +121,8 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 
 func DeleteProject(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("project", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
-
-	if !permssion {
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
 	id := r.FormValue("id")
 	pid, err := strconv.Atoi(id)
 	if err != nil {
@@ -251,6 +158,7 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,

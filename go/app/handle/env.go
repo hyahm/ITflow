@@ -3,7 +3,6 @@ package handle
 import (
 	"encoding/json"
 	"io/ioutil"
-	"itflow/app/asset"
 	"itflow/app/bugconfig"
 	"itflow/db"
 	"itflow/network/datalog"
@@ -27,28 +26,10 @@ type envrow struct {
 
 func EnvList(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
-
 	env := &envlist{}
-	var permssion bool
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	// 管理员
-	var err error
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("env", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
+	// 管理员
+
 	for k, v := range bugconfig.CacheEidName {
 		pr := &envrow{
 			Id:      k,
@@ -65,41 +46,19 @@ func EnvList(w http.ResponseWriter, r *http.Request) {
 
 func AddEnv(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("env", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
-
-	if !permssion {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
 	envname := r.FormValue("name")
 
 	getaritclesql := "insert into environment(envname) values(?)"
-
+	var err error
 	errorcode.Id, err = db.Mconn.Insert(getaritclesql, envname)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	// 增加日志
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
@@ -119,33 +78,10 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 
 func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
 
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
 	er := &envrow{}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("env", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
 	bpr, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -168,6 +104,7 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -187,31 +124,8 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 
 func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("env", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
-
-	if !permssion {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
 	id := r.FormValue("id")
 	eid, err := strconv.Atoi(id)
 	if err != nil {
@@ -247,6 +161,7 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,

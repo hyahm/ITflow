@@ -20,14 +20,6 @@ type DefaultValue struct {
 
 func DefaultStatus(w http.ResponseWriter, r *http.Request) {
 
-	_, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
 	sl := &DefaultValue{}
 	//如果是管理员的话,所有的都可以
 	sl.DefaultStatus = bugconfig.CacheSidStatus[bugconfig.CacheDefault["status"]]
@@ -39,13 +31,7 @@ func DefaultStatus(w http.ResponseWriter, r *http.Request) {
 
 func DefaultSave(w http.ResponseWriter, r *http.Request) {
 
-	_, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	sl := &DefaultValue{}
 	bytedata, err := ioutil.ReadAll(r.Body)
@@ -101,14 +87,6 @@ type defaultImportant struct {
 
 func DefaultImportant(w http.ResponseWriter, r *http.Request) {
 
-	_, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
 	data := &defaultImportant{}
 	data.DefaultImportant = bugconfig.CacheIidImportant[bugconfig.CacheDefault["important"]]
 	send, _ := json.Marshal(data)
@@ -123,14 +101,6 @@ type defaultLevel struct {
 }
 
 func DefaultLevel(w http.ResponseWriter, r *http.Request) {
-
-	_, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	data := &defaultLevel{}
 	data.DefaultLevel = bugconfig.CacheLidLevel[bugconfig.CacheDefault["level"]]

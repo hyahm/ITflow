@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"itflow/app/asset"
 	"itflow/app/bugconfig"
 	"itflow/db"
-	network "itflow/model"
+	"itflow/model"
 	"itflow/network/datalog"
 	"itflow/network/response"
 	"log"
@@ -26,32 +25,11 @@ type getDepartment struct {
 }
 
 func AddBugGroup(w http.ResponseWriter, r *http.Request) {
-	nickname, err := logtokenmysql(r)
+
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	data := &getDepartment{}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("statusgroup", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
 	list, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -97,32 +75,10 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 
 func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	data := &getDepartment{}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("statusgroup", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
 	list, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -154,7 +110,7 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	// 增加日志
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
@@ -183,31 +139,8 @@ type departmentList struct {
 
 func BugGroupList(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("statusgroup", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
-
-	if !permssion {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
 	data := &departmentList{}
 	s := "select id,name,sids from statusgroup"
 	rows, err := db.Mconn.GetRows(s)
@@ -240,13 +173,7 @@ func BugGroupList(w http.ResponseWriter, r *http.Request) {
 
 func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	id := r.FormValue("id")
 	id32, err := strconv.Atoi(id)
@@ -254,23 +181,7 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("statusgroup", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
 	ssql := "select count(id) from user where bugsid=?"
 	var count int
 	row, err := db.Mconn.GetOne(ssql, id)
@@ -296,6 +207,7 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	// 增加日志
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
@@ -314,32 +226,10 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 
 func GroupGet(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
-	data := &network.Send_groups{}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("usergroup", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
+	data := &model.Send_groups{}
 
-	if !permssion {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
 	gsql := "select id,name,ids from usergroup"
 	rows, err := db.Mconn.GetRows(gsql)
 	if err != nil {
@@ -348,7 +238,7 @@ func GroupGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for rows.Next() {
-		onegroup := &network.Get_groups{}
+		onegroup := &model.Get_groups{}
 		var users string
 		rows.Scan(&onegroup.Id, &onegroup.Name, &users)
 		for _, v := range strings.Split(users, ",") {
@@ -365,32 +255,9 @@ func GroupGet(w http.ResponseWriter, r *http.Request) {
 
 func GroupAdd(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("usergroup", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
-
-	if !permssion {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
-	data := &network.Get_groups{}
+	nickname := xmux.GetData(r).Get("nickname").(string)
+	data := &model.Get_groups{}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -438,31 +305,8 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 
 func GroupDel(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("usergroup", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
-
-	if !permssion {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	id := r.FormValue("id")
 	id32, err := strconv.Atoi(id)
 	if err != nil {
@@ -559,32 +403,10 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 
 func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
-	data := &network.Get_groups{}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("usergroup", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
-
-	if !permssion {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
+	data := &model.Get_groups{}
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)

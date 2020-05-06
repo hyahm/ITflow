@@ -3,7 +3,6 @@ package handle
 import (
 	"encoding/json"
 	"io/ioutil"
-	"itflow/app/asset"
 	"itflow/app/bugconfig"
 	"itflow/db"
 	network "itflow/model"
@@ -18,32 +17,10 @@ import (
 
 func PositionGet(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	data := &network.List_jobs{}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("position", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
 	rows, err := db.Mconn.GetRows("select id,name,level,hypo from jobs")
 	if err != nil {
 		golog.Error(err)
@@ -66,32 +43,10 @@ func PositionGet(w http.ResponseWriter, r *http.Request) {
 
 func PositionAdd(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	data := &network.Data_jobs{}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("position", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -124,6 +79,7 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -142,13 +98,7 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 
 func PositionDel(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	id := r.FormValue("id")
 	id32, err := strconv.Atoi(id)
@@ -156,23 +106,7 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("position", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
 	// 如果这个职位被使用了，不允许被删除
 	var count int
 	row, err := db.Mconn.GetOne("select count(id) from user where jid=?", id)
@@ -218,6 +152,7 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -236,32 +171,10 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 
 func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	data := &network.Update_jobs{}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("position", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -293,6 +206,7 @@ func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -318,14 +232,8 @@ type hypos struct {
 
 func GetHypos(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	data := &hypos{}
 	// 管理员
 	if bugconfig.CacheNickNameUid[nickname] != bugconfig.SUPERID {
@@ -357,16 +265,10 @@ type positions struct {
 
 func GetPositions(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	data := &positions{}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
 		for _, v := range bugconfig.CacheJidJobname {
 			data.Positions = append(data.Positions, v)

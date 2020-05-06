@@ -12,12 +12,6 @@ import (
 
 var NotFoundToken = errors.New("not found token")
 
-func logtokenmysql(r *http.Request) (string, error) {
-	a := r.Header.Get("X-Token")
-	nickname, _ := db.RSconn.Get(a)
-	return string(nickname), nil
-}
-
 func sortpermlist(permlist []string) []string {
 	l := len(bugconfig.CacheSidStatus)
 

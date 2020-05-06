@@ -19,13 +19,7 @@ import (
 
 func HeaderList(w http.ResponseWriter, r *http.Request) {
 
-	_, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	data := &network.List_headers{}
 
@@ -65,14 +59,8 @@ func HeaderList(w http.ResponseWriter, r *http.Request) {
 
 func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	// 管理员
 	if bugconfig.CacheNickNameUid[nickname] != bugconfig.SUPERID {
 		w.Write(errorcode.Error("没有权限"))
@@ -130,15 +118,8 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 
 func HeaderDel(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	id := r.FormValue("id")
 	id32, err := strconv.Atoi(id)
 	if err != nil {
@@ -219,14 +200,8 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 
 func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	data := &network.Data_header{}
 	// 管理员
 	if bugconfig.CacheNickNameUid[nickname] != bugconfig.SUPERID {
@@ -321,6 +296,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
+
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -344,13 +320,6 @@ type headerstruct struct {
 
 func HeaderGet(w http.ResponseWriter, r *http.Request) {
 
-	_, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	data := &headerstruct{}
 
 	for _, v := range bugconfig.CacheHidHeader {

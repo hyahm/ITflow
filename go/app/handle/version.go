@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"itflow/app/asset"
 	"itflow/app/bugconfig"
 	"itflow/db"
 	"itflow/network/datalog"
@@ -28,13 +27,7 @@ type addVersion struct {
 
 func AddVersion(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	version_add := &addVersion{}
 	s, err := ioutil.ReadAll(r.Body)
@@ -49,23 +42,7 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("version", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
-
-	if !permssion {
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	uid := bugconfig.CacheNickNameUid[nickname]
 	add_version_sql := "insert into version(name,urlone,urltwo,createtime,createuid) values(?,?,?,?,?)"
 
@@ -115,13 +92,7 @@ type pageLimit struct {
 
 func VersionList(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	al := &versionInfoList{}
 
@@ -138,23 +109,7 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("version", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
 	get_version_sql := "select id,name,urlone,urltwo,createtime from version order by id desc"
 
 	rows, err := db.Mconn.GetRows(get_version_sql)
@@ -178,33 +133,11 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 
 func VersionRemove(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	id := r.FormValue("id")
 	var bugcount int
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("version", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
 	row, err := db.Mconn.GetOne("select count(id) from bugs where id=?", id)
 	if err != nil {
 		golog.Error(err)
@@ -236,6 +169,7 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -262,32 +196,10 @@ type updateversion struct {
 
 func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	data := &updateversion{}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("version", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
 	getdata, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -300,6 +212,7 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	uid := bugconfig.CacheNickNameUid[nickname]
 	versionsql := "update version set name=?,urlone=?,urltwo=?,createuid=? where id=?"
 	_, err = db.Mconn.Update(versionsql, data.Name, data.Iphone, data.NoIphone, uid, data.Id)

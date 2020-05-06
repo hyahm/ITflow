@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 type getpath struct {
@@ -26,15 +27,8 @@ type getpath struct {
 
 func ShareList(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	fd := &network.List_sharelist{}
 	uid := bugconfig.CacheNickNameUid[nickname]
 	path := r.FormValue("path")
@@ -211,13 +205,8 @@ func ShareList(w http.ResponseWriter, r *http.Request) {
 func ShareUpload(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseMultipartForm(1 << 30)
-	nickname, err := logtokenmysql(r)
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	dir := r.FormValue("dir")
 
@@ -349,13 +338,8 @@ type rename struct {
 func ShareRename(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseMultipartForm(1 << 30)
-	_, err := logtokenmysql(r)
+
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	ps := &network.Data_sharefile{}
 
@@ -431,12 +415,6 @@ func ShareRename(w http.ResponseWriter, r *http.Request) {
 func ShareDownload(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseMultipartForm(1 << 30)
-	_, err := logtokenmysql(r)
-	if err != nil {
-		golog.Error(err)
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
 
 	// 检查权限
 
@@ -473,14 +451,9 @@ func ShareDownload(w http.ResponseWriter, r *http.Request) {
 func ShareMkdir(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseMultipartForm(1 << 30)
-	nickname, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
+	errorcode := &response.Response{}
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	ps := &network.Data_sharefile{}
 	pb, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -550,14 +523,8 @@ func ShareMkdir(w http.ResponseWriter, r *http.Request) {
 
 func ShareRemove(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	id := r.FormValue("id")
 	// 检查文件夹权限
 	var fp string

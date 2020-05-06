@@ -3,7 +3,6 @@ package handle
 import (
 	"encoding/json"
 	"io/ioutil"
-	"itflow/app/asset"
 	"itflow/app/bugconfig"
 	"itflow/db"
 	network "itflow/model"
@@ -18,32 +17,8 @@ import (
 
 func ImportantGet(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
 	data := &network.List_importants{}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("important", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
 	for k, v := range bugconfig.CacheIidImportant {
 		one := &network.Table_importants{}
 		one.Id = k
@@ -59,32 +34,10 @@ func ImportantGet(w http.ResponseWriter, r *http.Request) {
 
 func ImportantAdd(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	data := &network.Data_importants{}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("important", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -105,6 +58,7 @@ func ImportantAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -123,13 +77,7 @@ func ImportantAdd(w http.ResponseWriter, r *http.Request) {
 
 func ImportantDel(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	id := r.FormValue("id")
 	id32, err := strconv.Atoi(id)
@@ -138,23 +86,7 @@ func ImportantDel(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("important", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
 	// 判断是否有bug在使用
 	var count int
 	row, err := db.Mconn.GetOne("select count(id) from bugs where iid=?", id32)
@@ -188,6 +120,7 @@ func ImportantDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -206,32 +139,10 @@ func ImportantDel(w http.ResponseWriter, r *http.Request) {
 
 func ImportantUpdate(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	data := &network.Update_importants{}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("important", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -256,6 +167,7 @@ func ImportantUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -279,14 +191,6 @@ type importantslist struct {
 }
 
 func GetImportants(w http.ResponseWriter, r *http.Request) {
-
-	_, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	data := &importantslist{}
 	for _, v := range bugconfig.CacheIidImportant {

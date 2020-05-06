@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 type ArticleList struct {
@@ -41,105 +42,12 @@ type articledetail struct {
 	Projectname string `json:"projectname"`
 }
 
-//func Detail(w http.ResponseWriter, r *http.Request) {
-//	headers(w, r)
-//	if r.Method == http.MethodOptions {
-//		w.WriteHeader(http.StatusOK)
-//		return
-//	}
-//
-//	if r.Method == http.MethodGet {
-//		bid := r.FormValue("id")
-//		id, err := strconv.Atoi(bid)
-//		logger, conn, name, err := logtokenmysql(r)
-//
-//		uid, err := asset.NicknameGetUid(name, conn)
-//		if err != nil {
-//			logger.ErrorLog(err)
-//			conn.Db.Close()
-//			w.WriteHeader(http.StatusNotFound)
-//			return
-//		}
-//		getlistsql := "select bugtitle,status,content,importent,selectclass,appversion,selectoses,spusers,level,pid from bugs where id=? and uid=?"
-//		rows, err := conn.GetRows(getlistsql, bid, uid)
-//		if err != nil {
-//			logger.ErrorLog("file:article.go,line:70,%v", err)
-//			conn.Db.Close()
-//			w.Write([]byte("fail"))
-//			return
-//		}
-//		for rows.Next() {
-//			rows.Scan()
-//		}
-//		pname, err := asset.PidGetProject(data[0][9], conn)
-//
-//		ad := &articledetail{}
-//
-//		ad.ID = id
-//		statusid, err := asset.StatusidGetName(data[0][1], conn)
-//		if err != nil {
-//			logger.ErrorLog("file:article.go,line:111,%v", err)
-//			conn.Db.Close()
-//			w.WriteHeader(http.StatusNotFound)
-//			return
-//		}
-//
-//		userlist := strings.Split(data[0][7], ",")
-//		ul := ""
-//
-//		for _, v := range userlist {
-//			user, err := asset.UidGetNicknameAndRealname(v, conn)
-//			if err != nil {
-//				logger.ErrorLog("file:article.go,line:122,%v", err)
-//				conn.Db.Close()
-//				w.WriteHeader(http.StatusNotFound)
-//				return
-//			}
-//			if ul == "" {
-//				ul = user
-//			} else {
-//				ul = ul + "," + user
-//			}
-//		}
-//
-//		ad.Status = statusid
-//		ad.Title = data[0][0]
-//		ad.Content = data[0][2]
-//		ad.Projectname = pname
-//		ad.Importance = data[0][3]
-//		ad.SelectClass = data[0][4]
-//		ad.AppVersion = data[0][5]
-//		ad.Selectoses = data[0][6]
-//		ad.Spusers = ul
-//		ad.Level = data[0][8]
-//		send, err := json.Marshal(ad)
-//		if err != nil {
-//			logger.ErrorLog("file:article.go,line:118,%v", err)
-//			conn.Db.Close()
-//			w.Write([]byte("fail"))
-//			return
-//		}
-//		conn.Db.Close()
-//		w.Write(send)
-//		return
-//	}
-//	w.WriteHeader(http.StatusNotFound)
-//}
-
 type envList struct {
 	EnvList []string `json:"envlist"`
 	Code    int      `json:"code"`
 }
 
 func GetEnv(w http.ResponseWriter, r *http.Request) {
-
-	errorcode := &response.Response{}
-	_, err := logtokenmysql(r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	el := &envList{}
 
@@ -170,13 +78,7 @@ type userList struct {
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
 
-	_, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	ul := &userList{}
 
@@ -206,14 +108,6 @@ type versionList struct {
 }
 
 func GetVersion(w http.ResponseWriter, r *http.Request) {
-
-	_, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	vl := &versionList{}
 
@@ -316,14 +210,8 @@ type uploadimage struct {
 
 func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 	url := &uploadimage{}
-	nickname, err := logtokenmysql(r)
 	golog.Info("uploading header image")
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	image, header, err := r.FormFile("upload")
 	if err != nil {
@@ -357,7 +245,7 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 	url.FileName = filename
 	url.Uploaded = 1
 	uploadimg := "update user set headimg = ? where nickname=?"
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	_, err = db.Mconn.Update(uploadimg, url.Url, nickname)
 	if err != nil {
 		golog.Error(err)
@@ -375,12 +263,6 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 	bid := r.FormValue("id")
 	sl := &showArticle{}
 	errorcode := &response.Response{}
-	_, err := logtokenmysql(r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	getinfosql := "select uid,info,time from informations where bid=?"
 	rows, err := db.Mconn.GetRows(getinfosql, bid)

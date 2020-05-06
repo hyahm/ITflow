@@ -24,22 +24,11 @@ func init() {
 	Api.Pattern("/edit/one").Get(handle.EditOne)
 	Api.Pattern("/api/resp").Post(handle.ApiResp)
 
-	Api.Pattern("/group/get").Post(handle.GroupGet)
-	Api.Pattern("/group/add").Post(handle.GroupAdd).End(midware.EndLog)
-	Api.Pattern("/group/del").Get(handle.GroupDel).End(midware.EndLog)
-	Api.Pattern("/group/update").Post(handle.GroupUpdate).End(midware.EndLog)
-
 	Api.Pattern("/header/list").Post(handle.HeaderList)
 	Api.Pattern("/header/add").Post(handle.HeaderAdd).End(midware.EndLog)
 	Api.Pattern("/header/del").Get(handle.HeaderDel).End(midware.EndLog)
 	Api.Pattern("/header/update").Post(handle.HeaderUpdate).End(midware.EndLog)
 	Api.Pattern("/header/get").Post(handle.HeaderGet)
-
-	Api.Pattern("/important/get").Post(handle.ImportantGet)
-	Api.Pattern("/important/add").Post(handle.ImportantAdd).End(midware.EndLog)
-	Api.Pattern("/important/del").Get(handle.ImportantDel).End(midware.EndLog)
-	Api.Pattern("/important/update").Post(handle.ImportantUpdate).End(midware.EndLog)
-	Api.Pattern("/get/importants").Post(handle.GetImportants)
 
 	//---------------------------------------------------------
 	Api.Pattern("/default/status").Post(handle.DefaultStatus)

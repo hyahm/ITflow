@@ -3,6 +3,7 @@ package route
 import (
 	"itflow/app/handle"
 	"itflow/midware"
+	"itflow/network/user"
 
 	"github.com/hyahm/xmux"
 )
@@ -13,9 +14,10 @@ func init() {
 	Admin = xmux.NewGroupRoute()
 	Admin.Pattern("/dashboard/usercount").Post(handle.UserCount)
 	Admin.Pattern("/dashboard/projectcount").Post(handle.ProjectCount)
-	Admin.Pattern("/search/log").Post(handle.SearchLog)
-	Admin.Pattern("/log/classify").Post(handle.LogClassify)
+
 	Admin.Pattern("/admin/reset").Get(handle.Reset)
-	Admin.Pattern("/info/update").Post(handle.UpdateInfo).End(midware.EndLog)
-	Admin.Pattern("/log/list").Post(handle.LogList)
+
+	Admin.Pattern("/info/update").Post(handle.UpdateInfo).Bind(&user.UserInfo{}).
+		AddMidware(midware.JsonToStruct).End(midware.EndLog)
+
 }

@@ -3,7 +3,6 @@ package handle
 import (
 	"encoding/json"
 	"io/ioutil"
-	"itflow/app/asset"
 	"itflow/app/bugconfig"
 	"itflow/db"
 	network "itflow/model"
@@ -18,32 +17,8 @@ import (
 
 func LevelGet(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
 	data := &network.List_levels{}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("level", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
 	for k, v := range bugconfig.CacheLidLevel {
 		one := &network.Table_level{}
 		one.Id = k
@@ -59,32 +34,10 @@ func LevelGet(w http.ResponseWriter, r *http.Request) {
 
 func LevelAdd(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	data := &network.Data_level{}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("level", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -106,6 +59,7 @@ func LevelAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -124,36 +78,13 @@ func LevelAdd(w http.ResponseWriter, r *http.Request) {
 
 func LevelDel(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	id := r.FormValue("id")
 	id32, err := strconv.Atoi(id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("level", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
-
-	if !permssion {
-		w.Write(errorcode.ErrorNoPermission())
 		return
 	}
 
@@ -189,6 +120,7 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -207,32 +139,10 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 
 func LevelUpdate(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	data := &network.Update_level{}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("level", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -255,6 +165,7 @@ func LevelUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -279,15 +190,6 @@ type levelslist struct {
 }
 
 func GetLevels(w http.ResponseWriter, r *http.Request) {
-
-	_, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	data := &levelslist{}
 	for _, v := range bugconfig.CacheLidLevel {

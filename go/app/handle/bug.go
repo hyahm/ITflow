@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"html"
 	"io/ioutil"
-	"itflow/app/asset"
 	"itflow/app/bugconfig"
 	"itflow/app/public"
 	"itflow/db"
@@ -13,6 +12,7 @@ import (
 	"itflow/network/bug"
 	"itflow/network/datalog"
 	"itflow/network/response"
+	"itflow/network/user"
 	"net/http"
 	"strconv"
 	"strings"
@@ -28,14 +28,6 @@ type statusList struct {
 }
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
-	_, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	sl := &statusList{}
 	for _, v := range bugconfig.CacheSidStatus {
@@ -55,15 +47,9 @@ type mystatus struct {
 
 func ShowStatus(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
 	sl := &mystatus{}
+
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	// 遍历出每一个status id
 	for _, v := range strings.Split(bugconfig.CacheUidFilter[bugconfig.CacheNickNameUid[nickname]], ",") {
 		sid, _ := strconv.Atoi(v)
@@ -79,14 +65,7 @@ func ShowStatus(w http.ResponseWriter, r *http.Request) {
 
 func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	nickname := xmux.GetData(r).Get("nickname").(string)
 
 	sl := &statusList{}
 	//如果是管理员的话,所有的都可以
@@ -101,26 +80,13 @@ func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type userinfo struct {
-	Code     int    `json:"code"`
-	Nickname string `json:"nickname"`
-	Realname string `json:"realname"`
-	Email    string `json:"email"`
-}
-
 func GetInfo(w http.ResponseWriter, r *http.Request) {
 
-	name, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
-	sl := &userinfo{}
-
-	row, err := db.Mconn.GetOne("select email,realname from user where nickname=?", name)
+	sl := &user.UserInfo{}
+	sl.NickName = xmux.GetData(r).Get("nickname").(string)
+	row, err := db.Mconn.GetOne("select email,realname from user where nickname=?", sl.NickName)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -133,7 +99,7 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	sl.Nickname = name
+
 	send, _ := json.Marshal(sl)
 	w.Write(send)
 	return
@@ -142,32 +108,14 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
 
 func UpdateInfo(w http.ResponseWriter, r *http.Request) {
 
-	name, err := logtokenmysql(r)
 	errorcode := &response.Response{}
 
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	sl := xmux.GetData(r).Data.(*user.UserInfo)
+	nickname := xmux.GetData(r).Get("nickname").(string)
 
-	sl := &userinfo{}
-
-	ss, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(ss, sl)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	uid := bugconfig.CacheNickNameUid[name]
+	uid := bugconfig.CacheNickNameUid[nickname]
 	// 修改用户信息
-	_, err = db.Mconn.Update("update user set email=?,realname=?,nickname=? where id=?", sl.Email, sl.Realname, sl.Nickname, uid)
+	_, err := db.Mconn.Update("update user set email=?,realname=?,nickname=? where id=?", sl.Email, sl.Realname, sl.NickName, uid)
 
 	if err != nil {
 		golog.Error(err)
@@ -180,15 +128,15 @@ func UpdateInfo(w http.ResponseWriter, r *http.Request) {
 	delete(bugconfig.CacheNickNameUid, oldnickname)
 	delete(bugconfig.CacheRealNameUid, oldrealname)
 	delete(bugconfig.CacheUidEmail, uid)
-	bugconfig.CacheNickNameUid[sl.Nickname] = int64(uid)
+	bugconfig.CacheNickNameUid[sl.NickName] = int64(uid)
 	bugconfig.CacheRealNameUid[sl.Realname] = int64(uid)
 	bugconfig.CacheUidEmail[uid] = sl.Email
 
 	bugconfig.CacheUidRealName[int64(uid)] = sl.Realname
 
-	bugconfig.CacheUidNickName[int64(uid)] = sl.Nickname
+	bugconfig.CacheUidNickName[int64(uid)] = sl.NickName
 
-	err = insertlog("updateinfo", name+"修改了用户信息", r)
+	err = insertlog("updateinfo", nickname+"修改了用户信息", r)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -203,13 +151,7 @@ func UpdateInfo(w http.ResponseWriter, r *http.Request) {
 
 func UpdateRoles(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	sl := &model.Table_roles{}
 
@@ -246,7 +188,7 @@ func UpdateRoles(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	err = insertlog("updaterole", nickname+"修改了角色权限", r)
 	if err != nil {
 		golog.Error(err)
@@ -273,33 +215,10 @@ type loglist struct {
 
 func LogList(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	alllog := &loglist{}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("log", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		golog.Debug("没有权限")
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
 	dsql := "select id,exectime,classify,content,ip from log order by id desc"
 	rows, err := db.Mconn.GetRows(dsql)
 	if err != nil {
@@ -320,16 +239,10 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 
 func SearchLog(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	alllog := &model.Search_log{}
-	golog.Info(*alllog)
+
 	listlog := &model.List_log{}
 	bytedata, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -344,24 +257,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	var permssion bool
-	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
-		permssion = true
-	} else {
-		permssion, err = asset.CheckPerm("log", nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 
-	if !permssion {
-		golog.Error("没有权限")
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
 	basesql := "select id,exectime,classify,content,ip from log "
 	endsql := ""
 	// 如果搜索了类别
@@ -455,13 +351,7 @@ type getChangeStatus struct {
 
 func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	param := &getChangeStatus{}
 
@@ -494,6 +384,7 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -508,13 +399,8 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 }
 
 func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
-	nickname, err := logtokenmysql(r)
+
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	param := &mystatus{}
 
@@ -541,7 +427,7 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 	showstatus := strings.Join(ids, ",")
 	//
 	basesql := "update user set showstatus=? where id=?"
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	_, err = db.Mconn.Update(basesql, showstatus, bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
 		golog.Error(err)
@@ -555,85 +441,6 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 	w.Write(send)
 	return
 }
-
-// func GetAllBugs(w http.ResponseWriter, r *http.Request) {
-
-// 	_, err := logtokenmysql(r)
-// 	errorcode := &response.Response{}
-// 	if err != nil {
-// 		golog.Error(err)
-// 		w.Write(errorcode.ErrorE(err))
-// 		return
-// 	}
-
-// 	al := &network.AllArticleList{}
-
-// 	searchq, err := ioutil.ReadAll(r.Body)
-// 	if err != nil {
-// 		golog.Error(err)
-// 		al.Code = 7
-// 		send, _ := json.Marshal(al)
-// 		w.Write(send)
-// 		return
-// 	}
-// 	searchparam := &getBugSearchParam{}
-// 	err = json.Unmarshal(searchq, searchparam)
-// 	if err != nil {
-// 		golog.Error(err)
-// 		al.Code = 5
-// 		send, _ := json.Marshal(al)
-// 		w.Write(send)
-// 		return
-// 	}
-
-// 	row, err := db.Mconn.GetOne("select count(id) from bugs")
-// 	if err != nil {
-// 		golog.Error(err)
-// 		w.Write(errorcode.ErrorE(err))
-// 		return
-// 	}
-// 	err = row.Scan(&al.Count)
-// 	if err != nil {
-// 		golog.Error(err)
-// 		al.Code = 5
-// 		send, _ := json.Marshal(al)
-// 		w.Write(send)
-// 		return
-// 	}
-// 	start, end := public.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
-
-// 	alsql := "select id,createtime,importent,status,bugtitle,uid,level,pid,env,spusers from bugs where dustbin=0 order by id desc limit ?,?"
-// 	rows, err := db.Mconn.GetRows(alsql, start, end)
-// 	if err != nil {
-// 		golog.Error(err)
-// 		al.Code = 1
-// 		send, _ := json.Marshal(al)
-// 		w.Write(send)
-// 		return
-// 	}
-// 	for rows.Next() {
-// 		bl := &network.ArticleList{}
-// 		var statusid int64
-// 		var uid int64
-// 		var pid int64
-// 		var eid int64
-// 		var spusers string
-// 		rows.Scan(&bl.ID, &bl.Date, &bl.Importance, &statusid, &bl.Title, &uid, &bl.Level, &pid, &eid, &spusers)
-
-// 		bl.Handle = formatUserlistToRealname(spusers)
-// 		bl.Status = bugconfig.CacheSidStatus[statusid]
-// 		bl.Author = bugconfig.CacheUidRealName[uid]
-// 		bl.Projectname = bugconfig.CachePidName[pid]
-// 		bl.Env = bugconfig.CacheEidName[eid]
-
-// 		al.Al = append(al.Al, bl)
-
-// 	}
-// 	send, _ := json.Marshal(al)
-// 	w.Write(send)
-// 	return
-
-// }
 
 func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 
@@ -689,13 +496,7 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 
 func CloseBug(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	id := r.FormValue("id")
 	var uid int64
@@ -711,6 +512,7 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	if uid != bugconfig.CacheNickNameUid[nickname] && uid != bugconfig.SUPERID {
 		golog.Debug("没有权限")
 		w.Write(errorcode.Error("没有权限"))
@@ -749,13 +551,7 @@ type editList struct {
 
 func BugEdit(w http.ResponseWriter, r *http.Request) {
 
-	_, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	al := &editList{}
 

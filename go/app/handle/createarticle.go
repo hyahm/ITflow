@@ -25,14 +25,6 @@ type projectList struct {
 
 func GetProject(w http.ResponseWriter, r *http.Request) {
 
-	_, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
 	pl := &projectList{}
 
 	for _, v := range bugconfig.CachePidName {
@@ -46,17 +38,11 @@ func GetProject(w http.ResponseWriter, r *http.Request) {
 
 func BugCreate(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	data := &getArticle{}
 	if bugconfig.CacheDefault["status"] <= 0 {
-		w.Write(errorcode.ErrorE(err))
+		w.Write(errorcode.Error("status not set default value"))
 		return
 	}
 	content, err := ioutil.ReadAll(r.Body)

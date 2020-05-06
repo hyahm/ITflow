@@ -13,12 +13,12 @@ var Status *xmux.GroupRoute
 func init() {
 	Status = xmux.NewGroupRoute().AddMidware(midware.CheckStatusPermssion).
 		ApiCreateGroup("bugstatus", "bug 状态管理", "bug status").
-		ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf")
+		ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf").
+		ApiCodeMsg("0", "成功").ApiCodeMsg("3", "没有权限").ApiCodeMsg("10", "token 过期")
 
 	Status.Pattern("/status/list").Post(handle.StatusList).
 		ApiResStruct(&bug.ListStatus{}).ApiDescribe("获取bugstatus状态列表").
-		ApiCodeMsg("3", "没有权限").
-		ApiCodeMsg("10", "token 过期").ApiResponseTemplate(`{
+		ApiResponseTemplate(`{
 			"statuslist": [
 				{
 					"id": 3,
@@ -38,8 +38,7 @@ func init() {
 				}
 			],
 			"code": 0
-		}`).
-		ApiCodeMsg("0", "成功")
+		}`)
 
 	Status.Pattern("/status/add").Post(handle.StatusAdd).Bind(&bug.Status{}).
 		End(midware.EndLog).AddMidware(midware.JsonToStruct).
@@ -48,10 +47,12 @@ func init() {
 		ApiResStruct(&bug.ResponeStatus{}).ApiResponseTemplate(`{"id": 8,"code": 0}`)
 
 	Status.Pattern("/status/remove").Get(handle.StatusRemove).
-		End(midware.EndLog)
+		End(midware.EndLog).
+		ApiDescribe("删除bug 状态").ApiSupplement("当此状态有bug在使用时， 无法删除")
 
 	Status.Pattern("/status/update").Post(handle.StatusUpdate).Bind(&bug.Status{}).AddMidware(midware.JsonToStruct).
-		End(midware.EndLog)
-
-	Status.Pattern("/status/groupname").Post(handle.StatusGroupName)
+		End(midware.EndLog).
+		ApiDescribe("修改状态").
+		ApiReqStruct(&bug.Status{}).ApiRequestTemplate(`{"id": 0, "name": "普通"}`).
+		ApiResStruct(&bug.ResponeStatus{}).ApiResponseTemplate(`{"code": 0}`)
 }

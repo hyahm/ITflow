@@ -6,6 +6,9 @@ import (
 )
 
 func EndLog(data interface{}) {
+	if data == nil {
+		return
+	}
 	dl := data.(*datalog.AddLog)
 
 	if dl == nil {

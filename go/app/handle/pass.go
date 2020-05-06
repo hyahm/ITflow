@@ -32,16 +32,10 @@ type passBug struct {
 
 func PassBug(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	ub := &passBug{}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	// 获取参数
 	ss, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -134,17 +128,11 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 
 func TaskList(w http.ResponseWriter, r *http.Request) {
 
-	name, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	al := &model.AllArticleList{}
-
-	uid := bugconfig.CacheNickNameUid[name]
+	nickname := xmux.GetData(r).Get("nickname").(string)
+	uid := bugconfig.CacheNickNameUid[nickname]
 
 	getaritclesql := "select id,createtime,importent,status,bugtitle,uid,level,pid,spusers from bugs where id in (select bid from userandbug where uid=?)  order by id desc "
 

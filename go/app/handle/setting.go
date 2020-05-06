@@ -32,14 +32,8 @@ type getAddUser struct {
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	getuser := &getAddUser{}
 
 	gu, err := ioutil.ReadAll(r.Body)
@@ -172,13 +166,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 func RemoveUser(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	id := r.FormValue("id")
 	id32, err := strconv.Atoi(id)
@@ -233,6 +221,7 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -257,16 +246,11 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 
 func DisableUser(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	nickname := xmux.GetData(r).Get("nickname").(string)
 
 	id := r.FormValue("id")
-
+	var err error
 	_, err = db.Mconn.Update("update user set disable=ABS(disable-1) where id=?", id)
 	if err != nil {
 		golog.Error(err)
@@ -313,14 +297,8 @@ type sendUserList struct {
 // 显示自己能管理的权限，不显示自己的
 func UserList(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	if bugconfig.SUPERID != bugconfig.CacheNickNameUid[nickname] {
 		w.Write(errorcode.ErrorNoPermission())
 		return
@@ -358,14 +336,8 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 
 func UserUpdate(w http.ResponseWriter, r *http.Request) {
 
-	nickname, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	if bugconfig.SUPERID != bugconfig.CacheNickNameUid[nickname] {
 		w.Write(errorcode.ErrorNoPermission())
 		return
@@ -468,12 +440,6 @@ type pwd struct {
 
 func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
-	name, err := logtokenmysql(r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	getuser := &pwd{}
 	gu, err := ioutil.ReadAll(r.Body)
@@ -482,8 +448,9 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	fmt.Println(string(gu))
-	uid := bugconfig.CacheNickNameUid[name]
+
+	nickname := xmux.GetData(r).Get("nickname").(string)
+	uid := bugconfig.CacheNickNameUid[nickname]
 
 	err = json.Unmarshal(gu, getuser)
 	if err != nil {
@@ -515,7 +482,7 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = insertlog("resetpassword", "用户"+name+"修改了密码", r)
+	err = insertlog("resetpassword", "用户"+nickname+"修改了密码", r)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -533,14 +500,6 @@ type getroles struct {
 
 func GetRoles(w http.ResponseWriter, r *http.Request) {
 
-	_, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
 	rl := &getroles{}
 	for _, v := range bugconfig.CacheRidRole {
 		rl.Rolelist = append(rl.Rolelist, v)
@@ -553,13 +512,7 @@ func GetRoles(w http.ResponseWriter, r *http.Request) {
 
 func GetThisRoles(w http.ResponseWriter, r *http.Request) {
 
-	_, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	rl := &getroles{}
 
@@ -592,14 +545,6 @@ type sendGroup struct {
 
 func GetGroup(w http.ResponseWriter, r *http.Request) {
 
-	_, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
 	sg := &sendGroup{}
 
 	send, _ := json.Marshal(sg)
@@ -615,13 +560,7 @@ type resetPassword struct {
 
 func ResetPwd(w http.ResponseWriter, r *http.Request) {
 
-	_, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	rp := &resetPassword{}
 

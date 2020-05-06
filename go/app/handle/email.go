@@ -14,13 +14,7 @@ import (
 
 func TestEmail(w http.ResponseWriter, r *http.Request) {
 
-	_, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	getemail := &bugconfig.Email{}
 	b, err := ioutil.ReadAll(r.Body)
@@ -44,13 +38,7 @@ func TestEmail(w http.ResponseWriter, r *http.Request) {
 
 func SaveEmail(w http.ResponseWriter, r *http.Request) {
 
-	_, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	getemail := &bugconfig.Email{}
 	b, err := ioutil.ReadAll(r.Body)
@@ -94,14 +82,6 @@ func SaveEmail(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetEmail(w http.ResponseWriter, r *http.Request) {
-
-	_, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	email := &bugconfig.Email{}
 

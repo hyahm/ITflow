@@ -167,13 +167,7 @@ type getBugManager struct {
 
 func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 
-	_, err := logtokenmysql(r)
 	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	al := &model.AllArticleList{}
 
@@ -294,13 +288,9 @@ func managersearch(basesql string, count int, params *getBugManager) (*sql.Rows,
 }
 
 func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool) (*model.AllArticleList, []byte) {
-	nickname, err := logtokenmysql(r)
-	errorcode := &response.Response{}
-	if err != nil {
-		golog.Error(err)
-		return nil, errorcode.ErrorE(err)
-	}
 
+	errorcode := &response.Response{}
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	searchq, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
