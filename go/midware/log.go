@@ -6,6 +6,7 @@ import (
 )
 
 func EndLog(data interface{}) {
+
 	if data == nil {
 		return
 	}
@@ -15,5 +16,5 @@ func EndLog(data interface{}) {
 		return
 	}
 	dl.Ip = strings.Split(dl.Ip, ":")[0]
-	dl.Insert("nickname: %s has login", dl.Username)
+	dl.Insert()
 }

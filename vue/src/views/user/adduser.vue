@@ -59,17 +59,17 @@
           />
         </el-form-item>
 
-        <el-form-item style="margin-bottom: 40px;" prop="title" label="状态:">
+        <el-form-item style="margin-bottom: 40px;" prop="title" label="状态组:">
           <el-select v-model="postForm.statusgroup" class="filter-item" style="width: 130px">
             <el-option v-for="(status, index) in statusgroups" :key="index" :label="status" :value="status" />
           </el-select>
         </el-form-item>
-        <el-form-item style="margin-bottom: 40px;" prop="title" label="角色:">
+        <el-form-item style="margin-bottom: 40px;" prop="title" label="角色组:">
           <el-select v-model="postForm.rolegroup" class="filter-item" style="width: 130px">
             <el-option v-for="(role, index) in rolegroups" :key="index" :label="role" :value="role" />
           </el-select>
         </el-form-item>
-        <el-form-item style="margin-bottom: 40px;" prop="title" label="职位:">
+        <el-form-item style="margin-bottom: 40px;" prop="title" label="职位名:">
           <el-select v-model="postForm.position" placeholder="Select">
             <el-option
               v-for="(position, index) in positions"
@@ -91,8 +91,8 @@
 
 <script>
 import { createUser } from '@/api/user'
-import { getStatusName } from '@/api/status'
-import { roleGroupName } from '@/api/role'
+import { getStatusGroupName } from '@/api/statusgroup'
+import { getRoleGroup } from '@/api/rolegroup'
 import { getPositions } from '@/api/position'
 export default {
   name: 'Adduser',
@@ -139,10 +139,12 @@ export default {
       })
     },
     getstatusgroups() {
-      getStatusName().then(resp => {
+      getStatusGroupName().then(resp => {
         if (resp.data.code === 0) {
-          if (resp.data.statuslist !== null) {
-            this.statusgroups = resp.data.statuslist
+          console.log(resp.data)
+          if (resp.data.names.length > 0) {
+            this.statusgroups = resp.data.names
+            console.log(1111)
           }
         } else {
           this.$message.error(resp.data.msg)
@@ -150,10 +152,11 @@ export default {
       })
     },
     getrolegroups() {
-      roleGroupName().then(resp => {
+      getRoleGroup().then(resp => {
+        console.log(resp.data)
         if (resp.data.code === 0) {
-          if (resp.data.roles !== null) {
-            this.rolegroups = resp.data.roles
+          if (resp.data.rolelist !== null) {
+            this.rolegroups = resp.data.rolelist
           }
         } else {
           this.$message.error(resp.data.msg)

@@ -55,7 +55,7 @@ const system = {
       component: () => import('@/views/system/bugGroup'),
       name: 'buggroup',
       meta: {
-        title: 'bug组',
+        title: 'bug状态组',
         icon: 'user',
         roles: ['admin', 'statusgroup']
       }

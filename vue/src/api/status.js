@@ -52,3 +52,4 @@ export function getStatusName() {
     method: 'post'
   })
 }
+

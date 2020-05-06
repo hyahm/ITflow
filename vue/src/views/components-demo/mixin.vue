@@ -37,7 +37,7 @@
           <div style="height:100px;">
             <el-form :model="demo" :rules="demoRules">
               <el-form-item prop="title">
-                <md-input icon="search" name="title" placeholder="输入标题" v-model="demo.title">标题</md-input>
+                <md-input v-model="demo.title" icon="search" name="title" placeholder="输入标题">标题</md-input>
               </el-form-item>
             </el-form>
           </div>
@@ -74,7 +74,7 @@
             <span>hover text</span>
           </div>
           <div class="component-item">
-            <mallki className="mallki-text" text="vue-element-admin"></mallki>
+            <mallki class-name="mallki-text" text="vue-element-admin" />
           </div>
         </el-card>
       </el-col>
@@ -87,7 +87,7 @@
             <span>Share</span>
           </div>
           <div class="component-item" style="height:420px;">
-            <dropdown-menu style="margin:0 auto;" title='系列文章' :items='articleList'></dropdown-menu>
+            <dropdown-menu style="margin:0 auto;" title="系列文章" :items="articleList" />
           </div>
         </el-card>
       </el-col>
@@ -104,7 +104,7 @@ import DropdownMenu from '@/components/Share/dropdownMenu'
 import waves from '@/directive/waves/index.js' // 水波纹指令
 
 export default {
-  name: 'componentMixin-demo',
+  name: 'ComponentMixinDemo',
   components: {
     PanThumb,
     MdInput,

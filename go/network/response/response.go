@@ -35,6 +35,7 @@ type Response struct {
 
 func (es *Response) ErrorE(err error) []byte {
 	es.Msg = err.Error()
+	es.Code = 100
 	send, _ := json.Marshal(es)
 	return send
 }
@@ -61,6 +62,7 @@ func (es *Response) Errorf(format string, args ...interface{}) []byte {
 
 func (es *Response) Error(msg string) []byte {
 	es.Msg = msg
+	es.Code = 20
 	send, _ := json.Marshal(es)
 	return send
 }

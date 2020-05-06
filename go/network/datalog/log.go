@@ -15,9 +15,9 @@ type AddLog struct {
 	Action   string
 }
 
-func (al *AddLog) Insert(classify string, content string) {
+func (al *AddLog) Insert() {
 	_, err := db.Mconn.Insert("insert into log(exectime,classify,content,ip, username,action) values(?,?,?,?,?,?)",
-		time.Now().Unix(), classify, content, al.Ip, al.Username, al.Action,
+		time.Now().Unix(), al.Classify, "", al.Ip, al.Username, al.Action,
 	)
 	if err != nil {
 		golog.Error(err)

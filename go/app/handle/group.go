@@ -9,6 +9,7 @@ import (
 	"itflow/model"
 	"itflow/network/datalog"
 	"itflow/network/response"
+	"itflow/network/status"
 	"log"
 	"net/http"
 	"strconv"
@@ -18,17 +19,11 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-type getDepartment struct {
-	Id         int64    `json:"id"`
-	StatusList []string `json:"checklist"`
-	Department string   `json:"departmentname"`
-}
-
 func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := &getDepartment{}
+	data := &status.StatusGroup{}
 
 	list, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -51,7 +46,7 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 	ss := strings.Join(ids, ",")
 
 	isql := "insert into statusgroup(name,sids) values(?,?)"
-	errorcode.Id, err = db.Mconn.Insert(isql, data.Department, ss)
+	errorcode.Id, err = db.Mconn.Insert(isql, data.Name, ss)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -66,7 +61,7 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 添加缓存
-	bugconfig.CacheSgidGroup[errorcode.Id] = data.Department
+	bugconfig.CacheSgidGroup[errorcode.Id] = data.Name
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -77,7 +72,7 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := &getDepartment{}
+	data := &status.StatusGroup{}
 
 	list, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -103,13 +98,16 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 		ssids = append(ssids, strconv.FormatInt(sid, 10))
 	}
 	ss := strings.Join(ssids, ",")
+	db.Mconn.OpenDebug()
+	defer db.Mconn.CloseDebug()
 	isql := "update statusgroup set name =?,sids=? where id = ?"
-	_, err = db.Mconn.Update(isql, data.Department, ss, data.Id)
+	_, err = db.Mconn.Update(isql, data.Name, ss, data.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	golog.Info(db.Mconn.GetSql())
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	// 增加日志
 	xmux.GetData(r).End = &datalog.AddLog{
@@ -119,7 +117,7 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 		Action:   "update",
 	}
 
-	bugconfig.CacheSgidGroup[data.Id] = data.Department
+	bugconfig.CacheSgidGroup[data.Id] = data.Name
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return

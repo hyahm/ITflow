@@ -4,19 +4,20 @@
       可以改变bug的所有信息
     </p>
     <div class="filter-container">
-      <el-input placeholder="id" v-model="listQuery.id" type="number" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-input placeholder="标题" v-model="listQuery.title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-input placeholder="作者" v-model="listQuery.author" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.id" placeholder="id" type="number" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.title" placeholder="标题" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.author" placeholder="作者" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
     </div>
     <el-table
-      v-loading="listLoading"
       ref="multipleTable"
+      v-loading="listLoading"
       :data="list"
       border
       fit
       highlight-current-row
-      style="width: 100%">
+      style="width: 100%"
+    >
 
       <el-table-column label="id" align="center" width="50">
         <template slot-scope="scope">
@@ -82,7 +83,7 @@
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <router-link :to="'/bug/edit/'+scope.row.id">
-            <el-button type="primary" size="mini" >编辑</el-button>
+            <el-button type="primary" size="mini">编辑</el-button>
           </router-link>
           <el-button type="success" size="mini" @click="handleClose(scope.row)">关闭</el-button>
           <!--<el-button type="danger" size="mini" @click="handleRemove(scope.row)">{{ $t('list.remove') }}</el-button>-->

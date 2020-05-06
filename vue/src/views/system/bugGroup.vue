@@ -42,7 +42,7 @@
       <el-form ref="postForm" class="form-container">
         <el-form-item prop="title" label="状态组名:">
           <el-input
-            v-model="form.departmentname"
+            v-model="form.name"
             :maxlength="100"
             placeholder="请输入状态组名"
             clearable
@@ -65,8 +65,7 @@
 
 <script>
 import { getStatus } from '@/api/get'
-import { addDepartment, editDepartment, removeDepartment } from '@/api/department'
-import { departmentList } from '@/api/department'
+import { statusGroupList, addStatusGroup, editStatusGroup, removeStatusGroup } from '@/api/statusgroup'
 export default {
   name: 'BugGroup',
   data() {
@@ -78,7 +77,7 @@ export default {
       list: [],
       form: {
         id: -1,
-        departmentname: '',
+        name: '',
         checklist: []
       }
 
@@ -91,7 +90,7 @@ export default {
   methods: {
     handleEdit(row) {
       this.form.id = row.id
-      this.form.departmentname = row.name
+      this.form.name = row.name
       if (row.bugstatuslist === null) {
         this.form.checklist = []
       } else {
@@ -101,7 +100,7 @@ export default {
       this.dialogVisible = true
     },
     getlist() {
-      departmentList().then(resp => {
+      statusGroupList().then(resp => {
         if (resp.data.code === 0) {
           if (resp.data.departmentlist !== null) {
             this.list = resp.data.departmentlist
@@ -114,7 +113,7 @@ export default {
     handleAdd() {
       this.form = {
         id: -1,
-        departmentname: '',
+        name: '',
         checklist: []
       }
       this.dialogVisible = true
@@ -122,7 +121,7 @@ export default {
     handleRemove(id) {
       this.$confirm('确认关闭？')
         .then(_ => {
-          removeDepartment(id).then(resp => {
+          removeStatusGroup(id).then(resp => {
             if (resp.data.code === 23) {
               this.$message.warning('删除失败，此状态组有用户在使用')
               return
@@ -153,27 +152,33 @@ export default {
       this.dialogVisible = false
     },
     HandlerAddGroup() {
+      if (this.form.name === '') {
+        this.$message.error('名称不能为空')
+        return
+      }
       if (this.form.id > 0) {
-        editDepartment(this.form).then(resp => {
+        console.log(this.form)
+        editStatusGroup(this.form).then(resp => {
           if (resp.data.code === 0) {
             const l = this.list.length
             for (let i = 0; i < l; i++) {
               if (this.list[i].id === this.form.id) {
-                this.list[i].name = this.form.departmentname
+                this.list[i].name = this.form.name
                 this.list[i].bugstatuslist = this.form.checklist
               }
             }
+            console.log(resp.data)
             this.$message.success('修改成功')
           } else {
             this.$message.error(resp.data.msg)
           }
         })
       } else {
-        addDepartment(this.form).then(resp => {
+        addStatusGroup(this.form).then(resp => {
           if (resp.data.code === 0) {
             this.list.push({
               id: resp.data.id,
-              name: this.form.departmentname,
+              name: this.form.name,
               bugstatuslist: this.form.checklist
             })
             this.$message.success('添加成功')

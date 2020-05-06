@@ -11,9 +11,9 @@
     </el-button>
 
     <image-cropper
+      v-show="imagecropperShow"
       :key="imagecropperKey"
       :width="300"
-      v-show="imagecropperShow"
       :height="300"
       url="https://httpbin.org/post"
       lang-type="en"
