@@ -29,16 +29,13 @@ func RunHttp() {
 	router.AddGroup(route.Project)
 	router.AddGroup(route.Env)
 
-	router.AddGroup(route.Role)
-	router.AddGroup(route.Department)
-	router.AddGroup(route.Position)
-	router.AddGroup(route.Status)
-	router.AddGroup(route.Type)
-	router.AddGroup(route.Level)
+	router.AddGroup(route.Role).AddGroup(route.Department).AddGroup(route.Position).AddGroup(route.Status)
 
-	router.AddGroup(route.Email)
-	router.AddGroup(route.Share)
-	router.AddGroup(route.Api)
+	router.AddGroup(route.Type)
+	router.AddGroup(route.Level).AddGroup(route.Important).AddGroup(route.Log).AddGroup(route.UserGroup)
+
+	router.AddGroup(route.Email).AddGroup(route.Share).AddGroup(route.Api)
+
 	router.Pattern("/uploadimg").Post(handle.UploadImgs)
 	router.Pattern("/upload/headimg").Post(handle.UploadHeadImg)
 	router.Pattern("/showimg/{imgname}").Get(handle.ShowImg)
