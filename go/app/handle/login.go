@@ -3,9 +3,9 @@ package handle
 import (
 	"encoding/json"
 	"itflow/db"
-	"itflow/model/datalog"
-	"itflow/model/response"
-	"itflow/model/user"
+	"itflow/network/datalog"
+	"itflow/network/response"
+	"itflow/network/user"
 	"net/http"
 
 	"github.com/hyahm/golog"

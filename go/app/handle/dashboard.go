@@ -3,7 +3,7 @@ package handle
 import (
 	"encoding/json"
 	"itflow/db"
-	"itflow/model/response"
+	"itflow/network/response"
 	"net/http"
 
 	"github.com/hyahm/golog"

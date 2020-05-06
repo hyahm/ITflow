@@ -6,8 +6,8 @@ import (
 	"itflow/app/asset"
 	"itflow/app/bugconfig"
 	"itflow/db"
-	"itflow/model/datalog"
-	"itflow/model/response"
+	"itflow/network/datalog"
+	"itflow/network/response"
 	"net/http"
 	"strconv"
 

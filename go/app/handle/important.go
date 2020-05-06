@@ -5,10 +5,10 @@ import (
 	"io/ioutil"
 	"itflow/app/asset"
 	"itflow/app/bugconfig"
-	"itflow/app/model"
 	"itflow/db"
-	"itflow/model/datalog"
-	"itflow/model/response"
+	network "itflow/model"
+	"itflow/network/datalog"
+	"itflow/network/response"
 	"net/http"
 	"strconv"
 
@@ -26,7 +26,7 @@ func ImportantGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &model.List_importants{}
+	data := &network.List_importants{}
 	var permssion bool
 	// 管理员
 	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
@@ -45,7 +45,7 @@ func ImportantGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for k, v := range bugconfig.CacheIidImportant {
-		one := &model.Table_importants{}
+		one := &network.Table_importants{}
 		one.Id = k
 		one.Name = v
 		data.ImportantList = append(data.ImportantList, one)
@@ -67,7 +67,7 @@ func ImportantAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &model.Data_importants{}
+	data := &network.Data_importants{}
 	var permssion bool
 	// 管理员
 	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
@@ -214,7 +214,7 @@ func ImportantUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &model.Update_importants{}
+	data := &network.Update_importants{}
 	var permssion bool
 	// 管理员
 	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {

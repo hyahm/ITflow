@@ -5,10 +5,10 @@ import (
 	"io"
 	"io/ioutil"
 	"itflow/app/bugconfig"
-	"itflow/app/model"
 	"itflow/db"
 	"itflow/gaencrypt"
-	"itflow/model/response"
+	network "itflow/model"
+	"itflow/network/response"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -35,7 +35,7 @@ func ShareList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fd := &model.List_sharelist{}
+	fd := &network.List_sharelist{}
 	uid := bugconfig.CacheNickNameUid[nickname]
 	path := r.FormValue("path")
 	grows, err := db.Mconn.GetRows("select id,ids from usergroup")
@@ -69,7 +69,7 @@ func ShareList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for rows.Next() {
-		od := &model.Data_sharefile{}
+		od := &network.Data_sharefile{}
 		var oid int64
 		var rid int64
 		var wid int64
@@ -357,7 +357,7 @@ func ShareRename(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ps := &model.Data_sharefile{}
+	ps := &network.Data_sharefile{}
 
 	pb, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -481,7 +481,7 @@ func ShareMkdir(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ps := &model.Data_sharefile{}
+	ps := &network.Data_sharefile{}
 	pb, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)

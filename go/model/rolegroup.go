@@ -1,8 +1,9 @@
-package datasource
+package model
 
 import (
 	"itflow/app/bugconfig"
 	"itflow/db"
+	"strconv"
 	"strings"
 
 	"github.com/hyahm/golog"
@@ -17,12 +18,14 @@ type RoleGroup struct {
 }
 
 //
-func (rg *RoleGroup) Split() {
+func (rg *RoleGroup) split() {
 	rg.RoleArray = strings.Split(rg.RoleList, ",")
+
 }
 
 func (rg *RoleGroup) Join() {
 	rg.RoleList = strings.Join(rg.RoleArray, ",")
+
 }
 
 func NewRoleGroup(nickname string) (*RoleGroup, error) {
@@ -40,10 +43,17 @@ func NewRoleGroup(nickname string) (*RoleGroup, error) {
 		golog.Error(err)
 		return nil, err
 	}
+	rg.split()
 	return rg, nil
 }
 
-// 检查打开页面的权限
-func (rg *RoleGroup) CheckEnvPagePerm() {
+func (rg *RoleGroup) CheckPagePerm(name string) bool {
 	rg.RoleArray = strings.Split(rg.RoleList, ",")
+	for _, v := range rg.RoleArray {
+		id, _ := strconv.ParseInt(v, 10, 64)
+		if bugconfig.CacheRidRole[id] == name {
+			return true
+		}
+	}
+	return false
 }

@@ -6,10 +6,10 @@ import (
 	"io/ioutil"
 	"itflow/app/asset"
 	"itflow/app/bugconfig"
-	"itflow/app/model"
 	"itflow/db"
-	"itflow/model/datalog"
-	"itflow/model/response"
+	network "itflow/model"
+	"itflow/network/datalog"
+	"itflow/network/response"
 	"log"
 	"net/http"
 	"strconv"
@@ -322,7 +322,7 @@ func GroupGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &model.Send_groups{}
+	data := &network.Send_groups{}
 	var permssion bool
 	// 管理员
 	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
@@ -348,7 +348,7 @@ func GroupGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for rows.Next() {
-		onegroup := &model.Get_groups{}
+		onegroup := &network.Get_groups{}
 		var users string
 		rows.Scan(&onegroup.Id, &onegroup.Name, &users)
 		for _, v := range strings.Split(users, ",") {
@@ -390,7 +390,7 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("没有权限"))
 		return
 	}
-	data := &model.Get_groups{}
+	data := &network.Get_groups{}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -567,7 +567,7 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &model.Get_groups{}
+	data := &network.Get_groups{}
 	var permssion bool
 	// 管理员
 	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {

@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"itflow/app/bugconfig"
-	"itflow/app/model"
 	"itflow/db"
-	"itflow/model/datalog"
-	"itflow/model/response"
+	network "itflow/model"
+	"itflow/network/datalog"
+	"itflow/network/response"
 	"net/http"
 	"strconv"
 	"strings"
@@ -20,7 +20,7 @@ import (
 func TypeList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	tl := &model.List_types{}
+	tl := &network.List_types{}
 	_, err := logtokenmysql(r)
 	if err != nil {
 		golog.Error(err)
@@ -37,7 +37,7 @@ func TypeList(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		var opts string
-		tr := &model.Data_types{}
+		tr := &network.Data_types{}
 		var tid int64
 		rows.Scan(&tr.Id, &tr.Name, &tr.Types, &opts, &tid)
 		tr.Listtype = bugconfig.CacheTidName[tid]
@@ -52,7 +52,7 @@ func TypeList(w http.ResponseWriter, r *http.Request) {
 			}
 
 			for optrows.Next() {
-				one := &model.Options{}
+				one := &network.Options{}
 				var ts int64
 				optrows.Scan(&one.Id, &one.Name, &one.Info, &ts, &one.Default, &one.Need)
 
@@ -80,8 +80,8 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	data := &model.Data_types{}
-	send := &model.Send_types{}
+	data := &network.Data_types{}
+	send := &network.Send_types{}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -222,8 +222,8 @@ func TypeAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &model.Data_types{}
-	send := &model.Send_types{}
+	data := &network.Data_types{}
+	send := &network.Send_types{}
 	bytedata, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -377,7 +377,7 @@ func GetType(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	types := &model.Send_Types{}
+	types := &network.Send_Types{}
 	rows, err := db.Mconn.GetRows("select name from types")
 	if err != nil {
 		golog.Error(err)

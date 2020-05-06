@@ -7,12 +7,12 @@ import (
 	"io/ioutil"
 	"itflow/app/asset"
 	"itflow/app/bugconfig"
-	"itflow/app/model"
 	"itflow/app/public"
 	"itflow/db"
-	"itflow/model/bug"
-	"itflow/model/datalog"
-	"itflow/model/response"
+	"itflow/model"
+	"itflow/network/bug"
+	"itflow/network/datalog"
+	"itflow/network/response"
 	"net/http"
 	"strconv"
 	"strings"
@@ -566,7 +566,7 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 // 		return
 // 	}
 
-// 	al := &model.AllArticleList{}
+// 	al := &network.AllArticleList{}
 
 // 	searchq, err := ioutil.ReadAll(r.Body)
 // 	if err != nil {
@@ -612,7 +612,7 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 // 		return
 // 	}
 // 	for rows.Next() {
-// 		bl := &model.ArticleList{}
+// 		bl := &network.ArticleList{}
 // 		var statusid int64
 // 		var uid int64
 // 		var pid int64

@@ -5,7 +5,7 @@ import (
 	"itflow/app/bugconfig"
 	"itflow/db"
 	"itflow/gaencrypt"
-	"itflow/model/response"
+	"itflow/network/response"
 	"net/http"
 	"strings"
 

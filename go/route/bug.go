@@ -3,7 +3,7 @@ package route
 import (
 	"itflow/app/handle"
 	"itflow/midware"
-	"itflow/model/bug"
+	"itflow/network/bug"
 
 	"github.com/hyahm/xmux"
 )

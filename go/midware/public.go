@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"itflow/db"
-	"itflow/model/response"
+	"itflow/network/response"
 	"net/http"
 
 	"github.com/go-redis/redis/v7"

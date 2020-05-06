@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"itflow/app/bugconfig"
-	"itflow/app/model"
 	"itflow/db"
-	"itflow/model/datalog"
-	"itflow/model/response"
+	network "itflow/model"
+	"itflow/network/datalog"
+	"itflow/network/response"
 	"net/http"
 	"strconv"
 	"strings"
@@ -27,7 +27,7 @@ func HeaderList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &model.List_headers{}
+	data := &network.List_headers{}
 
 	gsql := "select id,name,hhids,remark from header"
 	rows, err := db.Mconn.GetRows(gsql)
@@ -38,7 +38,7 @@ func HeaderList(w http.ResponseWriter, r *http.Request) {
 	}
 	for rows.Next() {
 		// 查询
-		one := &model.Data_header{}
+		one := &network.Data_header{}
 		var hs string
 		rows.Scan(&one.Id, &one.Name, &hs, &one.Remark)
 		if hs != "" {
@@ -49,7 +49,7 @@ func HeaderList(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			for hrow.Next() {
-				hone := &model.Table_headerlist{}
+				hone := &network.Table_headerlist{}
 				hrow.Scan(&hone.Id, &hone.Key, &hone.Value)
 				one.Hhids = append(one.Hhids, hone)
 			}
@@ -78,7 +78,7 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("没有权限"))
 		return
 	}
-	data := &model.Data_header{}
+	data := &network.Data_header{}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -227,7 +227,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &model.Data_header{}
+	data := &network.Data_header{}
 	// 管理员
 	if bugconfig.CacheNickNameUid[nickname] != bugconfig.SUPERID {
 		w.Write(errorcode.Error("没有权限"))
@@ -285,7 +285,7 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 			idstr = append(idstr, fmt.Sprintf("%d", v.Id))
 			errorcode.HeaderList = append(errorcode.HeaderList, v)
 		} else {
-			hl := &model.Table_headerlist{
+			hl := &network.Table_headerlist{
 				Key:   v.Key,
 				Value: v.Value,
 			}

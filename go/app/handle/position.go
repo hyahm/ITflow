@@ -5,10 +5,10 @@ import (
 	"io/ioutil"
 	"itflow/app/asset"
 	"itflow/app/bugconfig"
-	"itflow/app/model"
 	"itflow/db"
-	"itflow/model/datalog"
-	"itflow/model/response"
+	network "itflow/model"
+	"itflow/network/datalog"
+	"itflow/network/response"
 	"net/http"
 	"strconv"
 
@@ -26,7 +26,7 @@ func PositionGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &model.List_jobs{}
+	data := &network.List_jobs{}
 	var permssion bool
 	// 管理员
 	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
@@ -52,7 +52,7 @@ func PositionGet(w http.ResponseWriter, r *http.Request) {
 	}
 	for rows.Next() {
 		var jid int64
-		one := &model.Table_jobs{}
+		one := &network.Table_jobs{}
 		rows.Scan(&one.Id, &one.Name, &one.Level, &jid)
 		one.Hypo = bugconfig.CacheJidJobname[jid]
 		data.Positions = append(data.Positions, one)
@@ -74,7 +74,7 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &model.Data_jobs{}
+	data := &network.Data_jobs{}
 	var permssion bool
 	// 管理员
 	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
@@ -244,7 +244,7 @@ func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &model.Update_jobs{}
+	data := &network.Update_jobs{}
 	var permssion bool
 	// 管理员
 	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {

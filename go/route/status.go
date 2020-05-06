@@ -3,7 +3,7 @@ package route
 import (
 	"itflow/app/handle"
 	"itflow/midware"
-	"itflow/model/bug"
+	"itflow/network/bug"
 
 	"github.com/hyahm/xmux"
 )
@@ -11,7 +11,7 @@ import (
 var Status *xmux.GroupRoute
 
 func init() {
-	Status = xmux.NewGroupRoute().
+	Status = xmux.NewGroupRoute().AddMidware(midware.CheckStatusPermssion).
 		ApiCreateGroup("bugstatus", "bug 状态管理", "bug status").
 		ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf")
 
@@ -42,7 +42,7 @@ func init() {
 		ApiCodeMsg("0", "成功")
 
 	Status.Pattern("/status/add").Post(handle.StatusAdd).Bind(&bug.Status{}).
-		AddMidware(midware.CheckPermssion).End(midware.EndLog).AddMidware(midware.JsonToStruct).
+		End(midware.EndLog).AddMidware(midware.JsonToStruct).
 		ApiDescribe("添加bug 状态").
 		ApiReqStruct(&bug.Status{}).ApiRequestTemplate(`{"id": 0, "name": "普通"}`).
 		ApiResStruct(&bug.ResponeStatus{}).ApiResponseTemplate(`{"id": 8,"code": 0}`)
@@ -50,7 +50,7 @@ func init() {
 	Status.Pattern("/status/remove").Get(handle.StatusRemove).
 		End(midware.EndLog)
 
-	Status.Pattern("/status/update").Post(handle.StatusUpdate).
+	Status.Pattern("/status/update").Post(handle.StatusUpdate).Bind(&bug.Status{}).AddMidware(midware.JsonToStruct).
 		End(midware.EndLog)
 
 	Status.Pattern("/status/groupname").Post(handle.StatusGroupName)

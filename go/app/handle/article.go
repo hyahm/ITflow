@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/db"
-	"itflow/model/response"
+	"itflow/network/response"
 	"net/http"
 	"os"
 	"path"

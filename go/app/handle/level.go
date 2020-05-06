@@ -5,10 +5,10 @@ import (
 	"io/ioutil"
 	"itflow/app/asset"
 	"itflow/app/bugconfig"
-	"itflow/app/model"
 	"itflow/db"
-	"itflow/model/datalog"
-	"itflow/model/response"
+	network "itflow/model"
+	"itflow/network/datalog"
+	"itflow/network/response"
 	"net/http"
 	"strconv"
 
@@ -26,7 +26,7 @@ func LevelGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &model.List_levels{}
+	data := &network.List_levels{}
 	var permssion bool
 	// 管理员
 	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
@@ -45,7 +45,7 @@ func LevelGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for k, v := range bugconfig.CacheLidLevel {
-		one := &model.Table_level{}
+		one := &network.Table_level{}
 		one.Id = k
 		one.Name = v
 		data.Levels = append(data.Levels, one)
@@ -67,7 +67,7 @@ func LevelAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &model.Data_level{}
+	data := &network.Data_level{}
 	var permssion bool
 	// 管理员
 	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
@@ -215,7 +215,7 @@ func LevelUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &model.Update_level{}
+	data := &network.Update_level{}
 	var permssion bool
 	// 管理员
 	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {

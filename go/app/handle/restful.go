@@ -6,10 +6,10 @@ import (
 	"html"
 	"io/ioutil"
 	"itflow/app/bugconfig"
-	"itflow/app/model"
 	"itflow/db"
-	"itflow/model/datalog"
-	"itflow/model/response"
+	network "itflow/model"
+	"itflow/network/datalog"
+	"itflow/network/response"
 	"net/http"
 	"strconv"
 	"strings"
@@ -21,7 +21,7 @@ import (
 func RestList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	tl := &model.List_restful{}
+	tl := &network.List_restful{}
 	nickname, err := logtokenmysql(r)
 	if err != nil {
 		golog.Error(err)
@@ -39,7 +39,7 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 		var oid int64
 		var rid int64
 		var eid int64
-		tr := &model.Data_restful{}
+		tr := &network.Data_restful{}
 		rows.Scan(&tr.Id, &tr.Name, &oid, &tr.Auth, &tr.Readuser, &tr.Edituser, &rid, &eid)
 		tr.Owner = bugconfig.CacheUidRealName[oid]
 		if tr.Readuser {
@@ -140,7 +140,7 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 func RestUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	tl := &model.Data_restful{}
+	tl := &network.Data_restful{}
 	nickname, err := logtokenmysql(r)
 	if err != nil {
 		golog.Error(err)
@@ -229,7 +229,7 @@ func RestAdd(w http.ResponseWriter, r *http.Request) {
 	}
 	uid := bugconfig.CacheNickNameUid[nickname]
 
-	dr := &model.Data_restful{}
+	dr := &network.Data_restful{}
 	bytedata, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -328,7 +328,7 @@ func RestDel(w http.ResponseWriter, r *http.Request) {
 func ApiList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	tl := &model.List_restful{}
+	tl := &network.List_restful{}
 	nickname, err := logtokenmysql(r)
 	pid := r.FormValue("pid")
 	if err != nil {
@@ -352,7 +352,7 @@ func ApiList(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for rows.Next() {
-			tr := &model.Data_restful{}
+			tr := &network.Data_restful{}
 			rows.Scan(&tr.Id, &tr.Name)
 			tl.List = append(tl.List, tr)
 		}
@@ -494,7 +494,7 @@ func checkeditperm(pid string, uid int64) (bool, error) {
 func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	tl := &model.Get_apilist{}
+	tl := &network.Get_apilist{}
 	nickname, err := logtokenmysql(r)
 	if err != nil {
 		golog.Error(err)
@@ -615,7 +615,7 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	al := &model.Get_apilist{}
+	al := &network.Get_apilist{}
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
@@ -783,7 +783,7 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 func ApiOne(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	sl := &model.Show_apilist{}
+	sl := &network.Show_apilist{}
 	id := r.FormValue("id")
 
 	nickname, err := logtokenmysql(r)
@@ -848,7 +848,7 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for hrows.Next() {
-			two := &model.Table_headerlist{}
+			two := &network.Table_headerlist{}
 			hrows.Scan(&two.Key, &two.Value)
 			sl.Header = append(sl.Header, two)
 		}
@@ -874,7 +874,7 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for orows.Next() {
-			o := &model.Table_opts{}
+			o := &network.Table_opts{}
 			var tid int64
 			orows.Scan(&o.Id, &o.Info, &o.Name, &tid, &o.Default, &o.Need)
 			o.Type = bugconfig.CacheTidName[tid]
@@ -895,7 +895,7 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 func EditOne(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	sl := &model.One_apilist{}
+	sl := &network.One_apilist{}
 	id := r.FormValue("id")
 
 	nickname, err := logtokenmysql(r)
@@ -975,7 +975,7 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for orows.Next() {
-			o := &model.Table_opts{}
+			o := &network.Table_opts{}
 			var tid int64
 			orows.Scan(&o.Id, &o.Info, &o.Name, &tid, &o.Default, &o.Need)
 			o.Type = bugconfig.CacheTidName[tid]
