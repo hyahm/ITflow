@@ -16,7 +16,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-func RoleList(w http.ResponseWriter, r *http.Request) {
+func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 

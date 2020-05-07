@@ -17,7 +17,7 @@ func init() {
 	Role.Pattern("/role/edit").Post(handle.EditRole).
 		End(midware.EndLog)
 
-	Role.Pattern("/role/list").Post(handle.RoleList)
+	Role.Pattern("/role/list").Post(handle.RoleGroupList)
 
 	Role.Pattern("/role/remove").Get(handle.RoleDel).End(midware.EndLog)
 
