@@ -5,7 +5,7 @@ import (
 	"itflow/app/bugconfig"
 	"net/http"
 	"os"
-	"path"
+	"path/filepath"
 
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
@@ -14,8 +14,9 @@ import (
 func ShowImg(w http.ResponseWriter, r *http.Request) {
 
 	name := xmux.Var(r)["imgname"]
-	golog.Infof("image name %s", name)
-	file, err := os.Open(path.Join(bugconfig.ImgDir, name))
+	golog.Info(name)
+	golog.Infof("image name %s", filepath.Join(bugconfig.ImgDir, name))
+	file, err := os.Open(filepath.Join(bugconfig.ImgDir, name))
 	if err != nil {
 		golog.Error(err)
 		return
