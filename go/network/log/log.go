@@ -12,6 +12,7 @@ type Search_log struct {
 type Loglist struct {
 	LogList []*LogRow `json:"loglist" type:"int" need:"否" default:"[]" information:"列表"`
 	Code    int       `json:"code" type:"int" need:"是" default:"0" information:"状态码"`
+	Count   int       `json:"count" type:"int" need:"是" default:"0" information:"总个数"`
 	Msg     string    `json:"msg" type:"string" need:"否" default:"" information:"错误信息"`
 }
 

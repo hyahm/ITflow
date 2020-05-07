@@ -96,3 +96,47 @@ func LogClassify(w http.ResponseWriter, r *http.Request) {
 	return
 
 }
+
+func LogList(w http.ResponseWriter, r *http.Request) {
+
+	errorcode := &response.Response{}
+
+	pager := xmux.GetData(r).Data.(*log.Search_log)
+
+	var count int
+	countsql := "select count(id) from log"
+
+	countrow, err := db.Mconn.GetOne(countsql)
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	err = countrow.Scan(&count)
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	start, end := public.GetPagingLimitAndPage(count, pager.Page, pager.Limit)
+	alllog := &log.Loglist{
+		Count: count,
+	}
+
+	dsql := "select id,exectime,classify,action,ip from log order by id desc limit ?,?"
+	rows, err := db.Mconn.GetRows(dsql, start, end)
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	for rows.Next() {
+		log := &log.LogRow{}
+		rows.Scan(&log.Id, &log.Exectime, &log.Classify, &log.Action, &log.Ip)
+		alllog.LogList = append(alllog.LogList, log)
+	}
+	send, _ := json.Marshal(alllog)
+	w.Write(send)
+	return
+
+}
