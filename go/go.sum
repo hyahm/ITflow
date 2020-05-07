@@ -29,6 +29,8 @@ github.com/hyahm/gomysql v0.0.5-0.20191228040128-27a4e3456547 h1:eZfR53H2SSYIq2x
 github.com/hyahm/gomysql v0.0.5-0.20191228040128-27a4e3456547/go.mod h1:uBxi9E3IcGhdoxM68XudGTyy+gIB8+1LFlAsN6KOHTE=
 github.com/hyahm/xmux v0.0.0-20200506101006-8a7450e6f54b h1:3B3DW+chy6zAo+rAIkb7KkQoXgnVd/mzGbGjwm4Vi2E=
 github.com/hyahm/xmux v0.0.0-20200506101006-8a7450e6f54b/go.mod h1:UoEQtjCaA8OzZJPtmiflvZ+cFMlmZo7o7WSQ/VdkDmE=
+github.com/hyahm/xmux v0.0.0-20200507081207-3d3155cf21a5 h1:XhRPWPse8X61L01muno4OEQ1bziqOkLTaKKz2qgrI6c=
+github.com/hyahm/xmux v0.0.0-20200507081207-3d3155cf21a5/go.mod h1:UoEQtjCaA8OzZJPtmiflvZ+cFMlmZo7o7WSQ/VdkDmE=
 github.com/json-iterator/go v1.1.6/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
 github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7VTCxuUUipMqKk8s4w=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=

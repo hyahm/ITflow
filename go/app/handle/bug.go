@@ -200,20 +200,6 @@ func UpdateRoles(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type logstruct struct {
-	Id       int    `json:"id"`
-	Exectime int64  `json:"exectime"`
-	Classify string `json:"classify"`
-	Action   string `json:"action"`
-	Ip       string `json:"ip"`
-	UserName string `json:"username"`
-}
-
-type loglist struct {
-	LogList []*logstruct `json:"loglist"`
-	Code    int          `json:"code"`
-}
-
 func LogList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
@@ -236,7 +222,7 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	start, end := public.GetPagingLimitAndPage(count, pager.Page, pager.Limit)
-	alllog := &loglist{}
+	alllog := &log.Loglist{}
 
 	dsql := "select id,exectime,classify,action,ip from log order by id desc limit ?,?"
 	rows, err := db.Mconn.GetRows(dsql, start, end)
@@ -246,8 +232,8 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for rows.Next() {
-		log := &logstruct{}
-		rows.Scan(&log.Id, &log.Exectime, &log.Classify, &log.Content, &log.Ip)
+		log := &log.LogRow{}
+		rows.Scan(&log.Id, &log.Exectime, &log.Classify, &log.Action, &log.Ip)
 		alllog.LogList = append(alllog.LogList, log)
 	}
 	send, _ := json.Marshal(alllog)
