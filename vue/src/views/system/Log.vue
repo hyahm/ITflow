@@ -38,6 +38,7 @@
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
+
       <el-table-column label="日期" width="150px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.exectime | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
@@ -54,7 +55,11 @@
           <span>{{ scope.row.ip }}</span>
         </template>
       </el-table-column>
-
+      <el-table-column label="操作者" width="150" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.username }}</span>
+        </template>
+      </el-table-column>
       <!--<el-table-column min-width="150px" align="center" :label="$t('table.title')">-->
       <!--<template slot-scope="scope">-->
       <!--<router-link class="link-type" :to="'/components/back-to-top/'+scope.row.id">-->
@@ -65,7 +70,7 @@
       <!--</el-table-column>-->
       <el-table-column label="操作" width="400" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.content }}</span>
+          <span>{{ scope.row.action }}</span>
         </template>
       </el-table-column>
       <!--<el-table-column width="110px" v-if='showReviewer' align="center" :label="$t('table.reviewer')">-->
@@ -138,7 +143,7 @@ export default {
     },
     getlog() {
       this.listLoading = true
-      getLog().then(resp => {
+      getLog(this.listQuery).then(resp => {
         if (resp.data.code === 0) {
           this.list = resp.data.loglist
         } else {

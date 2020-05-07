@@ -38,3 +38,11 @@ export function userList(data) {
     data
   })
 }
+
+export function createUser(data) {
+  return request({
+    url: '/user/create',
+    method: 'post',
+    data
+  })
+}

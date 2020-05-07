@@ -1,9 +1,10 @@
 import request from '@/utils/request'
 
-export function getLog() {
+export function getLog(data) {
   return request({
     url: '/log/list',
-    method: 'post'
+    method: 'post',
+    data: data
   })
 }
 

@@ -162,8 +162,8 @@
 
 <script>
 import { userList, resetPwd, updateUser, userRemove, userDisable } from '@/api/user'
-import { roleGroupName } from '@/api/role'
-import { getStatusName } from '@/api/status'
+import { getRoleGroup } from '@/api/rolegroup'
+import { getStatusGroupName } from '@/api/statusgroup'
 import { getPositions } from '@/api/position'
 import waves from '@/directive/waves' // 水波纹指令
 
@@ -214,14 +214,14 @@ export default {
   },
   methods: {
     getgrouplist() {
-      roleGroupName().then(resp => {
+      getRoleGroup().then(resp => {
         if (resp.data.code === 0) {
           this.rolegrouplist = resp.data.roles
         } else {
           this.$message.error(resp.data.msg)
         }
       })
-      getStatusName().then(resp => {
+      getStatusGroupName().then(resp => {
         if (resp.data.code === 0) {
           this.statusgrouplist = resp.data.statuslist
         } else {
@@ -237,7 +237,7 @@ export default {
       })
     },
     getroles() {
-      roleGroupName().then(resp => {
+      getRoleGroup().then(resp => {
         if (resp.data.code === 0) {
           this.rolelist = resp.data.roles
         } else {
