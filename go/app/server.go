@@ -35,7 +35,8 @@ func RunHttp() {
 	router.AddGroup(route.Role).AddGroup(route.Department).AddGroup(route.Position).AddGroup(route.Status)
 
 	router.AddGroup(route.Type)
-	router.AddGroup(route.Level).AddGroup(route.Important).AddGroup(route.Log).AddGroup(route.UserGroup)
+	router.AddGroup(route.Level).AddGroup(route.Important)
+	router.AddGroup(route.Log).AddGroup(route.UserGroup)
 
 	router.AddGroup(route.Email).AddGroup(route.Share).AddGroup(route.Api)
 
