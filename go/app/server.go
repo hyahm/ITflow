@@ -42,6 +42,8 @@ func RunHttp() {
 	router.Pattern("/uploadimg").Post(handle.UploadImgs)
 	router.Pattern("/upload/headimg").Post(handle.UploadHeadImg)
 	router.Pattern("/showimg/{imgname}").Get(handle.ShowImg).SetHeader("Content-Type", "image/png").DelMidware(midware.CheckToken)
+
+	router.Pattern("/get/expire/{token}").Get(handle.GetExpire).DelMidware(midware.CheckToken)
 	//
 	doc := xmux.ShowApi("/docs", router).DelMidware(midware.CheckToken)
 	router.AddGroup(doc)

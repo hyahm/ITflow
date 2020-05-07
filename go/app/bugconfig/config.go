@@ -1,7 +1,6 @@
 package bugconfig
 
 import (
-	"fmt"
 	"os"
 	"runtime"
 	"time"
@@ -139,13 +138,12 @@ func LoadConfig() {
 	CacheNameTid = make(map[string]int64, 0)
 	CacheEmail = &Email{}
 
-	golog.Info("cookie过期时间为：", goconfig.ReadDuration("redis.expiration", 120*time.Minute))
+	golog.Info("cookie过期时间为：", goconfig.ReadDuration("expiration", 120*time.Minute))
 
 	initCache()
 	// 添加一个admin 用户的权限，默认全是1
 	cacheemail()
 
-	fmt.Println("connent redis successed")
 }
 
 func addXieGang(path string) string {

@@ -7,13 +7,11 @@ import (
 	"itflow/network/response"
 	"net/http"
 
-	"github.com/go-redis/redis"
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
 
 func JsonToStruct(w http.ResponseWriter, r *http.Request) bool {
-	golog.Info("aaaasdgsdf")
 	resp := &response.Response{}
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil || len(b) == 0 {
@@ -35,22 +33,18 @@ func CheckToken(w http.ResponseWriter, r *http.Request) bool {
 	a := r.Header.Get("X-Token")
 	if a == "" {
 		errorcode.Code = 10
-		w.Write(errorcode.ErrorE(redis.Nil))
+		w.Write(errorcode.Error("token未找到"))
 		return true
 	}
-	nickname, err := db.RSconn.Get(a)
-	if err != nil {
-		if err == redis.Nil {
-			// token 没找到或过期
-			errorcode.Code = 10
-			w.Write(errorcode.ErrorE(err))
-			return true
-		}
+	if filter, err := db.CT.Filter("Token", a); err != nil {
 		errorcode.Code = 11
-		w.Write(errorcode.ErrorE(err))
+		w.Write(errorcode.Error("没有找到"))
 		return true
-
+	} else {
+		var nickname string
+		filter.Get("NickName").Scan(&nickname)
+		xmux.GetData(r).Set("nickname", nickname)
 	}
-	xmux.GetData(r).Set("nickname", nickname)
+
 	return false
 }

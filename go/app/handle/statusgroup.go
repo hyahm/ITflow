@@ -3,7 +3,6 @@ package handle
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/db"
 	"itflow/network/datalog"
@@ -22,20 +21,8 @@ func AddStatusGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := &status.StatusGroup{}
+	data := xmux.GetData(r).Data.(*status.StatusGroup)
 
-	list, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(list, data)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	if data.Name == "" {
 		w.Write(errorcode.Error("名称不能为空"))
 		return
@@ -47,7 +34,7 @@ func AddStatusGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ss := strings.Join(ids, ",")
-
+	var err error
 	isql := "insert into statusgroup(name,sids) values(?,?)"
 	errorcode.Id, err = db.Mconn.Insert(isql, data.Name, ss)
 	if err != nil {

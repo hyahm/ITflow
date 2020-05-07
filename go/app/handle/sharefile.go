@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/db"
-	"itflow/gaencrypt"
 	network "itflow/model"
 	"itflow/network/response"
 	"net/http"
@@ -604,21 +603,10 @@ func ShareShow(w http.ResponseWriter, r *http.Request) {
 	//name := m["name"]
 
 	id := r.FormValue("id")
-	token := r.FormValue("token")
+	// token := r.FormValue("token")
 
-	// 只是验证token
-	destoken, err := gaencrypt.RsaDecrypt(token, bugconfig.PrivateKey, true)
-	if err != nil {
-		golog.Error(err)
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-	nickname, err := db.RSconn.Get(string(destoken))
-	if err != nil {
-		golog.Error(err)
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
+	nickname := xmux.GetData(r).Get("nickname").(string)
+
 	uid := bugconfig.CacheNickNameUid[nickname]
 	var haspermision bool
 	getsql := "select ownerid,filepath,name,readuser,rid from sharefile where id=? "

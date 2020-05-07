@@ -7,8 +7,6 @@ import (
 	"github.com/hyahm/gomysql"
 )
 
-const SESSION = "session"
-
 var Mconn *gomysql.Db
 
 func InitMysql() {

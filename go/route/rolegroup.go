@@ -22,5 +22,5 @@ func init() {
 	RoleGroup.Pattern("/rolegroup/remove").Get(handle.RoleDel).End(midware.EndLog)
 
 	RoleGroup.Pattern("/rolegroup/get").Get(handle.GetRoleGroup)
-
+	RoleGroup.Pattern("/rolegroup/name").Get(handle.GetRoleGroup)
 }

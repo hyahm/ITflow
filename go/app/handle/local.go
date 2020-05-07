@@ -1,0 +1,22 @@
+package handle
+
+import (
+	"itflow/db"
+	"net/http"
+
+	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
+)
+
+func GetExpire(w http.ResponseWriter, r *http.Request) {
+	token := xmux.Var(r)["token"]
+	golog.Info(token)
+	filter, err := db.CT.Filter("Token", token)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		return
+	}
+	time := filter.TTL()
+
+	w.Write([]byte(time.String()))
+}

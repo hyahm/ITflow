@@ -43,11 +43,15 @@ func (login *Login) Check(resp *RespLogin) []byte {
 	}
 
 	resp.Token = gaencrypt.Token(login.Username, bugconfig.Salt)
-	_, err = db.RSconn.Set(resp.Token, login.Username,
-		time.Duration(goconfig.ReadInt("expiration", 120))*time.Minute)
+	token := &db.Token{
+		Token:    resp.Token,
+		NickName: login.Username,
+	}
+
+	err = db.CT.Add(token, time.Duration(goconfig.ReadInt("expiration", 120))*time.Minute)
 	if err != nil {
 		golog.Error(err)
-		return errorcode.ConnectRedisFail()
+		return []byte(err.Error())
 	}
 	golog.Infof("login seccuss, user: %s, token: %s", login.Username, resp.Token)
 	resp.UserName = login.Username

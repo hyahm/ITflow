@@ -22,10 +22,10 @@ func main() {
 	goconfig.WriteString("salt", "hjkkaksjdhfryuooweqzmbvc", "盐值，建议修改，然后用curl http://127.0.0.1:10001/admin/reset?password=123 来修改admin密码")
 	goconfig.WriteString("sharedir", "/share/", "共享文件夹根目录")
 
-	goconfig.WriteString("redis.pwd", "")
-	goconfig.WriteString("redis.host", "127.0.0.1:6379")
-	goconfig.WriteInt("redis.db", 0)
-	goconfig.WriteString("redis.expiration", "120m", "token 过期时间")
+	// goconfig.WriteString("redis.pwd", "")
+	// goconfig.WriteString("redis.host", "127.0.0.1:6379")
+	// goconfig.WriteInt("redis.db", 0)
+	goconfig.WriteString("expiration", "120m", "token 过期时间")
 
 	goconfig.WriteNotesForModule("ssl", "ssl, 使用ssl")
 	goconfig.WriteBool("ssl.on", false)
