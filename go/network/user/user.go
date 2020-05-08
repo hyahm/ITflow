@@ -90,6 +90,7 @@ func (ui *UserInfo) GetUserInfo() error {
 			ui.Roles = append(ui.Roles, bugconfig.CacheRidRole[int64(id)])
 		}
 	}
+
 	return nil
 }
 
