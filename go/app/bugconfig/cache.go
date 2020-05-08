@@ -171,15 +171,12 @@ func initCache() {
 
 	//检查默认值是否只有一行
 	var checkdefaultcount int
-	row, err := db.Mconn.GetOne("select count(status) from defaultvalue")
+	err = db.Mconn.GetOne("select count(status) from defaultvalue").Scan(&checkdefaultcount)
 	if err != nil {
 		golog.Error(err)
 		panic(err)
 	}
-	err = row.Scan(&checkdefaultcount)
-	if err != nil {
-		panic(err)
-	}
+
 	if checkdefaultcount != 1 {
 		panic(errors.New("defaultvalue表行数只能是1"))
 	}
@@ -213,14 +210,11 @@ func initCache() {
 	var status int64
 	var important int64
 	var level int64
-	row, err = db.Mconn.GetOne("select status,important,level from defaultvalue")
+	err = db.Mconn.GetOne("select status,important,level from defaultvalue").Scan(&status, &important, &level)
 	if err != nil {
 		panic(err)
 	}
-	err = row.Scan(&status, &important, &level)
-	if err != nil {
-		panic(err)
-	}
+
 	if _, ok := CacheSidStatus[status]; ok {
 		CacheDefault["status"] = status
 	}

@@ -52,14 +52,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 	}
 	//获取总行数
 
-	row, err := db.Mconn.GetOne("select count(id) from log " + endsql)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	err = row.Scan(&listlog.Count)
+	err := db.Mconn.GetOne("select count(id) from log " + endsql).Scan(&listlog.Count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -106,18 +99,13 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 	var count int
 	countsql := "select count(id) from log"
 
-	countrow, err := db.Mconn.GetOne(countsql)
+	err := db.Mconn.GetOne(countsql).Scan(&count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = countrow.Scan(&count)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	start, end := public.GetPagingLimitAndPage(count, pager.Page, pager.Limit)
 	alllog := &log.Loglist{
 		Count: count,

@@ -33,16 +33,12 @@ func NewRoleGroup(nickname string) (*RoleGroup, error) {
 	uid := bugconfig.CacheNickNameUid[nickname]
 	rid := bugconfig.CacheUidRid[uid]
 	rg := &RoleGroup{}
-	row, err := db.Mconn.GetOne("select name, rolelist from rolegroup where id=?", rid)
+	err := db.Mconn.GetOne("select name, rolelist from rolegroup where id=?", rid).Scan(&rg.Name, &rg.RoleList)
 	if err != nil {
 		golog.Error(err)
 		return nil, err
 	}
-	err = row.Scan(&rg.Name, &rg.RoleList)
-	if err != nil {
-		golog.Error(err)
-		return nil, err
-	}
+
 	rg.split()
 	return rg, nil
 }

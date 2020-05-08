@@ -89,18 +89,13 @@ func ImportantDel(w http.ResponseWriter, r *http.Request) {
 
 	// 判断是否有bug在使用
 	var count int
-	row, err := db.Mconn.GetOne("select count(id) from bugs where iid=?", id32)
+	err = db.Mconn.GetOne("select count(id) from bugs where iid=?", id32).Scan(&count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&count)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	if count > 0 {
 		w.Write(errorcode.Error("不存在bug"))
 		return

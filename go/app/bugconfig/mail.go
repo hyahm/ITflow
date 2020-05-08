@@ -6,11 +6,9 @@ import (
 )
 
 func cacheemail() {
-	row, err := db.Mconn.GetOne("select id,email,password,port,createuser,createbug,passbug from email")
-	if err != nil {
-		panic(err)
-	}
-	err = row.Scan(&CacheEmail.Id, &CacheEmail.EmailAddr, &CacheEmail.Password, &CacheEmail.Port, &CacheEmail.CreateUser, &CacheEmail.CreateBug, &CacheEmail.PassBug)
+	err := db.Mconn.GetOne("select id,email,password,port,createuser,createbug,passbug from email").
+		Scan(&CacheEmail.Id, &CacheEmail.EmailAddr, &CacheEmail.Password, &CacheEmail.Port, &CacheEmail.CreateUser, &CacheEmail.CreateBug, &CacheEmail.PassBug)
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return

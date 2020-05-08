@@ -149,18 +149,13 @@ func DeleteStatusGroup(w http.ResponseWriter, r *http.Request) {
 
 	ssql := "select count(id) from user where bugsid=?"
 	var count int
-	row, err := db.Mconn.GetOne(ssql, id)
+	err = db.Mconn.GetOne(ssql, id).Scan(&count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&count)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	if count > 0 {
 		w.Write(errorcode.Error("有人再使用"))
 		return

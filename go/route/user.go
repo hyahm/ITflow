@@ -41,11 +41,19 @@ func init() {
 		ApiResponseTemplate(`{"roles": ["admin"], "code": 0, "avatar":"http://xxxx/aaaa.png", "nickname": "admin"}`)
 
 	User.Pattern("/user/list").Post(handle.UserList)
+
 	User.Pattern("/user/update").Post(handle.UserUpdate).End(midware.EndLog)
-	User.Pattern("/user/create").Post(handle.CreateUser).End(midware.EndLog)
+
+	User.Pattern("/user/create").Post(handle.CreateUser).Bind(&user.GetAddUser{}).
+		AddMidware(midware.JsonToStruct).End(midware.EndLog)
+
 	User.Pattern("/user/remove").Get(handle.RemoveUser).End(midware.EndLog)
+
 	User.Pattern("/user/disable").Get(handle.DisableUser).End(midware.EndLog)
-	User.Pattern("/password/update").Post(handle.ChangePassword)
+
+	User.Pattern("/password/update").Post(handle.ChangePassword).Bind(&user.ChangePasswod{}).
+		AddMidware(midware.JsonToStruct)
+
 	User.Pattern("/password/reset").Post(handle.ResetPwd)
 
 }

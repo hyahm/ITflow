@@ -136,18 +136,13 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 	}
 	var count int
 
-	row, err := db.Mconn.GetOne("select count(id) from bugs where eid=?", id)
+	err = db.Mconn.GetOne("select count(id) from bugs where eid=?", id).Scan(&count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&count)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	if count > 0 {
 		w.Write(errorcode.Error("存在此env"))
 		return

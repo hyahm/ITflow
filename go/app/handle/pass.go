@@ -54,18 +54,13 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 	// 判断这个bug是不是自己的任务，只有自己的任务才可以转交
 	var splist string
 	var hasperm bool
-	row, err := db.Mconn.GetOne("select spusers from bugs where id=?", ub.Id)
+	err = db.Mconn.GetOne("select spusers from bugs where id=?", ub.Id).Scan(&splist)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&splist)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	myuid := strconv.FormatInt(bugconfig.CacheNickNameUid[nickname], 10)
 	for _, v := range strings.Split(splist, ",") {
 		if myuid == v {

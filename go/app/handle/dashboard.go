@@ -28,27 +28,14 @@ func UserCount(w http.ResponseWriter, r *http.Request) {
 
 	getusersql := "select count(id) from user"
 	getgroupsql := "select count(id) from rolegroup"
-	row, err := db.Mconn.GetOne(getusersql)
+	err := db.Mconn.GetOne(getusersql).Scan(&uc.CountUsers)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
-	err = row.Scan(&uc.CountUsers)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	row, err = db.Mconn.GetOne(getgroupsql)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = row.Scan(&uc.CountGroups)
+	err = db.Mconn.GetOne(getgroupsql).Scan(&uc.CountGroups)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -74,13 +61,7 @@ func ProjectCount(w http.ResponseWriter, r *http.Request) {
 	pc := &projectCount{}
 
 	getbugs := "select count(id) from bugs"
-	row, err := db.Mconn.GetOne(getbugs)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = row.Scan(&pc.CountBugs)
+	err := db.Mconn.GetOne(getbugs).Scan(&pc.CountBugs)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

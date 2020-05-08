@@ -90,18 +90,13 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 
 	// 判断bug是否在使用
 	var count int
-	row, err := db.Mconn.GetOne("select count(id) from bugs where lid=?", id32)
+	err = db.Mconn.GetOne("select count(id) from bugs where lid=?", id32).Scan(&count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&count)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	if count > 0 {
 		w.Write(errorcode.Error("没有bug"))
 		return

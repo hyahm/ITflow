@@ -234,19 +234,14 @@ func ShareUpload(w http.ResponseWriter, r *http.Request) {
 		//根目录
 		hasperm = true
 	} else {
-		row, err := db.Mconn.GetOne("select id,ownerid,writeuser,wid from sharefile where isfile=false and filepath=? and name=?",
-			filepath.Dir(dir), filepath.Base(dir))
+		err := db.Mconn.GetOne("select id,ownerid,writeuser,wid from sharefile where isfile=false and filepath=? and name=?",
+			filepath.Dir(dir), filepath.Base(dir)).Scan(&testid, &ownerid, &writeuser, &wid)
 		if err != nil {
 			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
-		err = row.Scan(&testid, &ownerid, &writeuser, &wid)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
+
 		//判断是否有权限
 
 		if ownerid == bugconfig.CacheNickNameUid[nickname] {
@@ -262,18 +257,13 @@ func ShareUpload(w http.ResponseWriter, r *http.Request) {
 				}
 			} else {
 				var ids string
-				row, err := db.Mconn.GetOne("select ids from usergroup where id=?", wid)
+				err := db.Mconn.GetOne("select ids from usergroup where id=?", wid).Scan(&ids)
 				if err != nil {
 					golog.Error(err)
 					w.Write(errorcode.ErrorE(err))
 					return
 				}
-				err = row.Scan(&ids)
-				if err != nil {
-					golog.Error(err)
-					w.Write(errorcode.ErrorE(err))
-					return
-				}
+
 				for _, v := range strings.Split(ids, ",") {
 					if v == strconv.FormatInt(bugconfig.CacheNickNameUid[nickname], 10) {
 						rwid = wid
@@ -528,18 +518,13 @@ func ShareRemove(w http.ResponseWriter, r *http.Request) {
 	// 检查文件夹权限
 	var fp string
 	var name string
-	row, err := db.Mconn.GetOne("select filepath,name from sharefile where id=? and ownerid=?", id, bugconfig.CacheNickNameUid[nickname])
+	err := db.Mconn.GetOne("select filepath,name from sharefile where id=? and ownerid=?", id, bugconfig.CacheNickNameUid[nickname]).Scan(&fp, &name)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&fp, &name)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	//还要递归删除子目录和文件
 	//basedir := filepath.Join(bugconfig.ShareDir, fp, name)
 	err = getrow(fp, name)
@@ -615,18 +600,13 @@ func ShareShow(w http.ResponseWriter, r *http.Request) {
 	var readuser bool
 	var rid int64
 	var ownerid int64
-	row, err := db.Mconn.GetOne(getsql, id)
+	err := db.Mconn.GetOne(getsql, id).Scan(&ownerid, &fp, &name, &readuser, &rid)
 	if err != nil {
 		golog.Error(err)
 		w.WriteHeader(http.StatusBadGateway)
 		return
 	}
-	err = row.Scan(&ownerid, &fp, &name, &readuser, &rid)
-	if err != nil {
-		golog.Error(err)
-		w.WriteHeader(http.StatusBadGateway)
-		return
-	}
+
 	// 如果是所属用户
 	if ownerid == uid {
 		haspermision = true
@@ -637,18 +617,13 @@ func ShareShow(w http.ResponseWriter, r *http.Request) {
 		} else {
 			// 判断权限组是否有权限
 			var ids string
-			row, err = db.Mconn.GetOne("select ids from usergroup where id=?", rid)
+			err = db.Mconn.GetOne("select ids from usergroup where id=?", rid).Scan(&ids)
 			if err != nil {
 				golog.Error(err)
 				w.WriteHeader(http.StatusBadGateway)
 				return
 			}
-			err = row.Scan(&ids)
-			if err != nil {
-				golog.Error(err)
-				w.WriteHeader(http.StatusBadGateway)
-				return
-			}
+
 			for _, v := range strings.Split(ids, ",") {
 				if v == strconv.FormatInt(uid, 10) {
 					haspermision = true

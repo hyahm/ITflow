@@ -63,18 +63,13 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 			} else {
 				// 判断是都是可读的用户组
 				var ids string
-				row, err := db.Mconn.GetOne("select ids from usergroup where id=?", rid)
+				err := db.Mconn.GetOne("select ids from usergroup where id=?", rid).Scan(&ids)
 				if err != nil {
 					golog.Error(err)
 					w.Write(errorcode.ErrorE(err))
 					return
 				}
-				err = row.Scan(&ids)
-				if err != nil {
-					golog.Error(err)
-					w.Write(errorcode.ErrorE(err))
-					return
-				}
+
 				var ingroup bool
 				for _, v := range strings.Split(ids, ",") {
 					if v == strconv.FormatInt(rid, 10) {
@@ -98,18 +93,13 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 			} else {
 				// 判断是都是可编辑的用户组
 				var ids string
-				row, err := db.Mconn.GetOne("select ids from usergroup where id=?", eid)
+				err := db.Mconn.GetOne("select ids from usergroup where id=?", eid).Scan(&ids)
 				if err != nil {
 					golog.Error(err)
 					w.Write(errorcode.ErrorE(err))
 					return
 				}
-				err = row.Scan(&ids)
-				if err != nil {
-					golog.Error(err)
-					w.Write(errorcode.ErrorE(err))
-					return
-				}
+
 				var ingroup bool
 				for _, v := range strings.Split(ids, ",") {
 					if v == strconv.FormatInt(eid, 10) {
@@ -348,16 +338,12 @@ func checkapiperm(pid string, uid int64) (bool, error) {
 	var oid int64
 	var rid int64
 	var eid int64
-	row, err := db.Mconn.GetOne("select ownerid,auth,readuser,edituser,rid,eid from apiproject where id=?", pid)
+	err := db.Mconn.GetOne("select ownerid,auth,readuser,edituser,rid,eid from apiproject where id=?", pid).Scan(&oid, &auth, &readuser, &edituser, &rid, &eid)
 	if err != nil {
 		golog.Error(err)
 		return false, err
 	}
-	err = row.Scan(&oid, &auth, &readuser, &edituser, &rid, &eid)
-	if err != nil {
-		golog.Error(err)
-		return false, err
-	}
+
 	if uid == oid {
 		return true, nil
 	}
@@ -372,14 +358,11 @@ func checkapiperm(pid string, uid int64) (bool, error) {
 		} else {
 			// 判断是都是可读的用户组
 			var ids string
-			row, err = db.Mconn.GetOne("select ids from usergroup where id=?", rid)
+			err = db.Mconn.GetOne("select ids from usergroup where id=?", rid).Scan(&ids)
 			if err != nil {
 				return false, err
 			}
-			err = row.Scan(&ids)
-			if err != nil {
-				return false, err
-			}
+
 			for _, v := range strings.Split(ids, ",") {
 				if v == strconv.FormatInt(rid, 10) {
 					return true, nil
@@ -395,11 +378,7 @@ func checkapiperm(pid string, uid int64) (bool, error) {
 		} else {
 			// 判断是都是可编辑的用户组
 			var ids string
-			row, err := db.Mconn.GetOne("select ids from usergroup where id=?", eid)
-			if err != nil {
-				return false, err
-			}
-			err = row.Scan(&ids)
+			err := db.Mconn.GetOne("select ids from usergroup where id=?", eid).Scan(&ids)
 			if err != nil {
 				return false, err
 			}
@@ -420,17 +399,13 @@ func checkeditperm(pid string, uid int64) (bool, error) {
 	var edituser bool
 	var oid int64
 	var eid int64
-	row, err := db.Mconn.GetOne("select ownerid,auth,edituser,eid from apiproject where id=?", pid)
-	if err != nil {
-		golog.Error(err)
-		return false, err
-	}
-	err = row.Scan(
+	err := db.Mconn.GetOne("select ownerid,auth,edituser,eid from apiproject where id=?", pid).Scan(
 		&oid, &auth, &edituser, &eid)
 	if err != nil {
 		golog.Error(err)
 		return false, err
 	}
+
 	if uid == oid {
 		return true, nil
 	}
@@ -444,12 +419,7 @@ func checkeditperm(pid string, uid int64) (bool, error) {
 		} else {
 			// 判断是都是可编辑的用户组
 			var ids string
-			row, err := db.Mconn.GetOne("select ids from usergroup where id=?", eid)
-			if err != nil {
-				return false, err
-			}
-
-			err = row.Scan(&ids)
+			err := db.Mconn.GetOne("select ids from usergroup where id=?", eid).Scan(&ids)
 			if err != nil {
 				return false, err
 			}
@@ -485,18 +455,13 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 
 	//查出旧的
 	var oldopts string
-	row, err := db.Mconn.GetOne("select opts from apilist where id=?", tl.Id)
+	err = db.Mconn.GetOne("select opts from apilist where id=?", tl.Id).Scan(&oldopts)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&oldopts)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	hasperm, err := checkeditperm(strconv.Itoa(tl.Pid), bugconfig.CacheNickNameUid[nickname])
 	if hasperm {
 		oidstr := make([]string, 0)
@@ -677,31 +642,21 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 	var oids string
 	var pid string
 	var uid int64
-	row, err := db.Mconn.GetOne("select pid,opts,uid from apilist where id=?", id)
+	err := db.Mconn.GetOne("select pid,opts,uid from apilist where id=?", id).Scan(&pid, &oids, &uid)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&pid, &oids, &uid)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	var oid int64
-	row, err = db.Mconn.GetOne("select ownerid from apiproject where id=?", pid)
+	err = db.Mconn.GetOne("select ownerid from apiproject where id=?", pid).Scan(&oid)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&oid)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	if uid != bugconfig.CacheNickNameUid[nickname] && oid != bugconfig.CacheNickNameUid[nickname] {
 		w.Write(errorcode.ErrorNoPermission())
@@ -755,14 +710,8 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 	var oids string
 	var ms string
 	var hid int64
-	row, err := db.Mconn.GetOne("select pid,url,information,opts,methods,result,name,hid,calltype,resp from apilist where id=?",
-		id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = row.Scan(
+	err = db.Mconn.GetOne("select pid,url,information,opts,methods,result,name,hid,calltype,resp from apilist where id=?",
+		id).Scan(
 		&sl.Pid,
 		&sl.Url,
 		&sl.Information,
@@ -777,24 +726,20 @@ func ApiOne(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+
 	sl.Resp = html.UnescapeString(sl.Resp)
 	sl.Result = html.UnescapeString(sl.Result)
 
 	// 遍历请求头
 	var ids string
 	if hid > 0 {
-		row, err := db.Mconn.GetOne("select hhids,remark from header where id=?", hid)
+		err := db.Mconn.GetOne("select hhids,remark from header where id=?", hid).Scan(&ids, &sl.Remark)
 		if err != nil {
 			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
-		err = row.Scan(&ids, &sl.Remark)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
+
 		hrows, err := db.Mconn.GetRows(fmt.Sprintf("select k,v from headerlist where id in (%v)", ids))
 		if err != nil {
 			golog.Error(err)
@@ -860,14 +805,8 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 	var oids string
 	var ms string
 	var hid int64
-	row, err := db.Mconn.GetOne("select pid,url,information,opts,methods,result,name,hid,calltype,resp from apilist where id=?",
-		id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = row.Scan(
+	err = db.Mconn.GetOne("select pid,url,information,opts,methods,result,name,hid,calltype,resp from apilist where id=?",
+		id).Scan(
 		&sl.Pid,
 		&sl.Url,
 		&sl.Information,
@@ -882,24 +821,20 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+
 	sl.Resp = html.UnescapeString(sl.Resp)
 	sl.Result = html.UnescapeString(sl.Result)
 
 	// 遍历请求头
 	var ids string
 	if hid > 0 {
-		row, err := db.Mconn.GetOne("select name,hhids,remark from header where id=?", hid)
+		err := db.Mconn.GetOne("select name,hhids,remark from header where id=?", hid).Scan(&sl.Header, &ids, &sl.Remark)
 		if err != nil {
 			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
-		err = row.Scan(&sl.Header, &ids, &sl.Remark)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
+
 	}
 	// 判断权限
 	nickname := xmux.GetData(r).Get("nickname").(string)

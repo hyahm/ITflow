@@ -85,18 +85,13 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var t int
-	row, err := db.Mconn.GetOne("select type from types where id=?", data.Id)
+	err = db.Mconn.GetOne("select type from types where id=?", data.Id).Scan(&t)
 	if t == 0 {
 		golog.Error("can not delete base type")
 		w.Write(errorcode.ErrorNoPermission())
 		return
 	}
-	err = row.Scan(&t)
-	if t == 0 {
-		golog.Error("can not delete base type")
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
+
 	// 垃圾没清理
 	send.Id = data.Id
 	switch data.Types {
@@ -310,18 +305,13 @@ func TypeDel(w http.ResponseWriter, r *http.Request) {
 	}
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	var t int
-	row, err := db.Mconn.GetOne("select type from types where id=?", id)
+	err = db.Mconn.GetOne("select type from types where id=?", id).Scan(&t)
 	if t == 0 {
 		golog.Error("can not delete base type")
 		w.Write(errorcode.ErrorNoPermission())
 		return
 	}
-	err = row.Scan(&t)
-	if t == 0 {
-		golog.Error("can not delete base type")
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
+
 	_, err = db.Mconn.Update("delete from types where id=?", id)
 	if err != nil {
 		golog.Error(err)

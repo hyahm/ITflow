@@ -133,18 +133,13 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 	}
 	// 查看这个header 是否有文档在用
 	var count int
-	row, err := db.Mconn.GetOne(" select count(id) from apilist where hid=?", id)
+	err = db.Mconn.GetOne(" select count(id) from apilist where hid=?", id).Scan(&count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&count)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	// 如果在使用，返回错误
 	if count > 0 {
 		w.Write(errorcode.Error("没有请求头"))
@@ -152,18 +147,13 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 	}
 	// 先要删除子header
 	var hids string
-	row, err = db.Mconn.GetOne("select hhids from header where id=?", id)
+	err = db.Mconn.GetOne("select hhids from header where id=?", id).Scan(&hids)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&hids)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	// 不为空就删
 	if hids != "" {
 		_, err = db.Mconn.Update(fmt.Sprintf("delete from headerlist where id in (%v)", hids))
@@ -223,18 +213,13 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	// 原来的header
 	var oldheadids string
-	row, err := db.Mconn.GetOne("select hhids from header where id=?", data.Id)
+	err = db.Mconn.GetOne("select hhids from header where id=?", data.Id).Scan(&oldheadids)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&oldheadids)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	// 需要删除的hhis
 	delhhids := strings.Split(oldheadids, ",")
 	// 先修改header list

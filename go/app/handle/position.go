@@ -109,35 +109,25 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 
 	// 如果这个职位被使用了，不允许被删除
 	var count int
-	row, err := db.Mconn.GetOne("select count(id) from user where jid=?", id)
+	err = db.Mconn.GetOne("select count(id) from user where jid=?", id).Scan(&count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&count)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	if count > 0 {
 		w.Write(errorcode.ErrorNoPermission())
 		return
 	}
 	// 是否被所属使用
-	row, err = db.Mconn.GetOne("select count(id) from jobs where hypo=?", id)
+	err = db.Mconn.GetOne("select count(id) from jobs where hypo=?", id).Scan(&count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&count)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	if count > 0 {
 		w.Write(errorcode.Error("没有职位"))
 		return
@@ -275,18 +265,13 @@ func GetPositions(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		var name string
-		row, err := db.Mconn.GetOne("select name from jobs where hypo=?", bugconfig.CacheUidJid[bugconfig.CacheNickNameUid[nickname]])
+		err := db.Mconn.GetOne("select name from jobs where hypo=?", bugconfig.CacheUidJid[bugconfig.CacheNickNameUid[nickname]]).Scan(&name)
 		if err != nil {
 			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
-		err = row.Scan(&name)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
+
 		data.Positions = append(data.Positions, name)
 	}
 

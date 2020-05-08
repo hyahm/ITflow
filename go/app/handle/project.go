@@ -132,13 +132,7 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 	}
 	// 是否有bug使用
 	var count int
-	row, err := db.Mconn.GetOne("select count(id) from bugs where pid=?", id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = row.Scan(&count)
+	err = db.Mconn.GetOne("select count(id) from bugs where pid=?", id).Scan(&count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

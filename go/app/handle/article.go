@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"database/sql"
 	"encoding/json"
 	"html"
 	"io"
@@ -269,18 +268,13 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 	getlistsql := "select bugtitle,content,vid,sid,id from bugs where id=?"
 	var statusid int64
 	var vid int64
-	row, err := db.Mconn.GetOne(getlistsql, bid)
+	err = db.Mconn.GetOne(getlistsql, bid).Scan(&sl.Title, &sl.Content, &vid, &statusid, &sl.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&sl.Title, &sl.Content, &vid, &statusid, &sl.Id)
-	if err != nil && err != sql.ErrNoRows {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	sl.Status = bugconfig.CacheSidStatus[statusid]
 	sl.Appversion = bugconfig.CacheVidName[vid]
 	sl.Content = html.UnescapeString(sl.Content)

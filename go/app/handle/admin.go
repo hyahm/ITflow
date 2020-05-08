@@ -22,13 +22,8 @@ func Reset(w http.ResponseWriter, r *http.Request) {
 	}
 	password := r.FormValue("password")
 	var count int
-	row, err := db.Mconn.GetOne("select count(id) from user where rid=0")
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = row.Scan(&count)
+	err := db.Mconn.GetOne("select count(id) from user where rid=0").Scan(&count)
+
 	if err != nil {
 		if err == sql.ErrNoRows || count != 1 {
 			golog.Debug("有且只能有一个admin账户")

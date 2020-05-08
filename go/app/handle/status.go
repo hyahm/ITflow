@@ -76,18 +76,13 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 
 	// 如果bug有这个状态，就不能修改
 	var bcount int
-	row, err := db.Mconn.GetOne("select count(id) from bugs where sid=?", sid)
+	err = db.Mconn.GetOne("select count(id) from bugs where sid=?", sid).Scan(&bcount)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&bcount)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	if bcount > 0 {
 		golog.Errorf("sid:%d 删除失败", sid)
 		w.Write(errorcode.Error("还有bug"))

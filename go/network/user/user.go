@@ -28,12 +28,8 @@ func (login *Login) Check(resp *RespLogin) []byte {
 	enpassword := gaencrypt.PwdEncrypt(login.Password, bugconfig.Salt)
 	getsql := "select nickname from user where email=? and password=? and disable=0"
 
-	row, err := db.Mconn.GetOne(getsql, login.Username, enpassword)
-	if err != nil {
-		golog.Error(err)
-		return errorcode.ConnectMysqlFail()
-	}
-	err = row.Scan(&login.Username)
+	err := db.Mconn.GetOne(getsql, login.Username, enpassword).Scan(&login.Username)
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errorcode.LoginFailed()
@@ -71,32 +67,24 @@ type UserInfo struct {
 func (ui *UserInfo) GetUserInfo() error {
 	sql := "select rid, headimg from user where nickname=?"
 	var rid string
-	row, err := db.Mconn.GetOne(sql, ui.NickName)
+	err := db.Mconn.GetOne(sql, ui.NickName).Scan(&rid, &ui.Avatar)
 	if err != nil {
 		golog.Error(err)
 		return err
 	}
-	err = row.Scan(&rid, &ui.Avatar)
-	if err != nil {
-		golog.Error(err)
-		return err
-	}
+
 	// 管理员
 	if bugconfig.CacheNickNameUid[ui.NickName] == bugconfig.SUPERID {
 		ui.Roles = append(ui.Roles, ui.NickName)
 	} else {
 		var rl string
 		getrole := "select rolelist from rolegroup where id=?"
-		row, err := db.Mconn.GetOne(getrole, rid)
+		err := db.Mconn.GetOne(getrole, rid).Scan(&rl)
 		if err != nil {
 			golog.Error(err)
 			return err
 		}
-		err = row.Scan(&rl)
-		if err != nil {
-			golog.Error(err)
-			return err
-		}
+
 		for _, v := range strings.Split(rl, ",") {
 			id, _ := strconv.Atoi(v)
 			ui.Roles = append(ui.Roles, bugconfig.CacheRidRole[int64(id)])

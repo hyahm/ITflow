@@ -187,13 +187,7 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 
 	basesql, args := managertotal("select count(id) from bugs", searchparam)
 
-	row, err := db.Mconn.GetOne(basesql, args...)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = row.Scan(&al.Count)
+	err = db.Mconn.GetOne(basesql, args...).Scan(&al.Count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -347,16 +341,12 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 		bugsql += fmt.Sprintf("and sid in (%s) ", showstatus)
 	}
 
-	row, err := db.Mconn.GetOne(countbasesql, bugconfig.CacheNickNameUid[nickname])
+	err = db.Mconn.GetOne(countbasesql, bugconfig.CacheNickNameUid[nickname]).Scan(&al.Count)
 	if err != nil {
 		golog.Error(err)
 		return nil, errorcode.ErrorE(err)
 	}
-	err = row.Scan(&al.Count)
-	if err != nil {
-		golog.Error(err)
-		return nil, errorcode.ErrorE(err)
-	}
+
 	// 获取查询的总个数
 	start, end := public.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
 

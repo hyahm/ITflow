@@ -10,6 +10,7 @@ import (
 	"itflow/gaencrypt"
 	"itflow/network/datalog"
 	"itflow/network/response"
+	"itflow/network/user"
 	"net/http"
 	"strconv"
 	"strings"
@@ -19,35 +20,12 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-type getAddUser struct {
-	Nickname    string   `json:"nickname"`
-	Email       string   `json:"email"`
-	Password    string   `json:"password"`
-	Role        []string `json:"role"`
-	RealName    string   `json:"realname"`
-	RoleGroup   string   `json:"rolegroup"`
-	StatusGroup string   `json:"statusgroup"`
-	Position    string   `json:"position"` // 普通用户就是真，管理员就假
-}
-
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	nickname := xmux.GetData(r).Get("nickname").(string)
-	getuser := &getAddUser{}
+	getuser := xmux.GetData(r).Data.(*user.GetAddUser)
 
-	gu, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(gu, getuser)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	//1，先要验证nickname 是否有重复的
 	if _, ok := bugconfig.CacheNickNameUid[getuser.Nickname]; ok {
 		w.Write(errorcode.Error("nickname 重复"))
@@ -104,18 +82,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var level int64
-	row, err := db.Mconn.GetOne("select level from jobs where id=?", jid)
+	err := db.Mconn.GetOne("select level from jobs where id=?", jid).Scan(&level)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&level)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	// 增加用户
 	showstatus := strings.Join(ids, ",")
 	enpassword := gaencrypt.PwdEncrypt(getuser.Password, bugconfig.Salt)
@@ -176,18 +149,13 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 	}
 	// 判断是否有bug
 	var count int
-	row, err := db.Mconn.GetOne("select count(id) from bugs where uid=?", id)
+	err = db.Mconn.GetOne("select count(id) from bugs where uid=?", id).Scan(&count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&count)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	if count > 0 {
 		golog.Error("uid:%v,has bugs,can not remove")
 		w.Write(errorcode.Error("has bugs,can not remove"))
@@ -288,7 +256,6 @@ type userlist struct {
 	RoleGroup   string `json:"rolegroup"`
 	Position    string `json:"position"`
 }
-
 type sendUserList struct {
 	Userlist []*userlist `json:"userlist"`
 	Code     int         `json:"code"`
@@ -433,46 +400,24 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type pwd struct {
-	Oldpassword string `json:"oldpassword"`
-	Newpassword string `json:"newpassword"`
-}
-
 func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
-	getuser := &pwd{}
-	gu, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	getuser := xmux.GetData(r).Data.(*user.ChangePasswod)
 
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	uid := bugconfig.CacheNickNameUid[nickname]
 
-	err = json.Unmarshal(gu, getuser)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	getaritclesql := "select count(id) from user where id=? and password=?"
 	oldpassword := gaencrypt.PwdEncrypt(getuser.Oldpassword, bugconfig.Salt)
 	var n int
-	row, err := db.Mconn.GetOne(getaritclesql, uid, oldpassword)
+	err := db.Mconn.GetOne(getaritclesql, uid, oldpassword).Scan(&n)
 	if err != nil || n != 1 {
 		golog.Error(err)
 		w.Write(errorcode.ErrorNoPermission())
 		return
 	}
-	err = row.Scan(&n)
-	if err != nil || n != 1 {
-		golog.Error(err)
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
+
 	newpassword := gaencrypt.PwdEncrypt(getuser.Newpassword, bugconfig.Salt)
 	chpwdsql := "update user set password=? where id=?"
 
@@ -482,12 +427,7 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = insertlog("resetpassword", "用户"+nickname+"修改了密码", r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -519,16 +459,10 @@ func GetThisRoles(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	var rolestring string
-	row, err := db.Mconn.GetOne("select rolestring from user where id=?", id)
+	err := db.Mconn.GetOne("select rolestring from user where id=?", id).Scan(&rolestring)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = row.Scan(&rolestring)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		w.Write(errorcode.ConnectMysqlFail())
 		return
 	}
 

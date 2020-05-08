@@ -85,14 +85,7 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
 
 	sl := &user.UserInfo{}
 	sl.NickName = xmux.GetData(r).Get("nickname").(string)
-	row, err := db.Mconn.GetOne("select email,realname from user where nickname=?", sl.NickName)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = row.Scan(&sl.Email, &sl.Realname)
-
+	err := db.Mconn.GetOne("select email,realname from user where nickname=?", sl.NickName).Scan(&sl.Email, &sl.Realname)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -316,13 +309,7 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 	al := &model.AllArticleList{}
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	uid := bugconfig.CacheNickNameUid[nickname]
-	row, err := db.Mconn.GetOne("select count(id) from bugs where uid=?", uid)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = row.Scan(&al.Count)
+	err := db.Mconn.GetOne("select count(id) from bugs where uid=?", uid).Scan(&al.Count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -367,18 +354,13 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("id")
 	var uid int64
-	row, err := db.Mconn.GetOne("select uid from bugs where id=?", id)
+	err := db.Mconn.GetOne("select uid from bugs where id=?", id).Scan(&uid)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&uid)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	if uid != bugconfig.CacheNickNameUid[nickname] && uid != bugconfig.SUPERID {
 		golog.Debug("没有权限")
@@ -430,18 +412,13 @@ func BugEdit(w http.ResponseWriter, r *http.Request) {
 	var lid int64
 	var vid int64
 	alsql := "select iid,bugtitle,lid,pid,eid,spusers,vid,content from bugs where id=?"
-	row, err := db.Mconn.GetOne(alsql, id)
+	err := db.Mconn.GetOne(alsql, id).Scan(&iid, &al.Title, &lid, &pid, &eid, &uidlist, &vid, &al.Content)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&iid, &al.Title, &lid, &pid, &eid, &uidlist, &vid, &al.Content)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	al.Importance = bugconfig.CacheIidImportant[iid]
 	al.Level = bugconfig.CacheLidLevel[lid]
 	al.Version = bugconfig.CacheVidName[vid]

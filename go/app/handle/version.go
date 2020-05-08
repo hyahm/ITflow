@@ -138,18 +138,13 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 	var bugcount int
 
-	row, err := db.Mconn.GetOne("select count(id) from bugs where id=?", id)
+	err := db.Mconn.GetOne("select count(id) from bugs where id=?", id).Scan(&bugcount)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = row.Scan(&bugcount)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	if bugcount != 0 {
 		golog.Errorf("vid:%s has bugs", id)
 		w.Write(errorcode.Errorf("vid:%s has bugs", id))
