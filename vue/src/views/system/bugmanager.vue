@@ -1,7 +1,7 @@
 <template>
   <div>
     <p class="warn-content">
-      可以改变bug的所有信息
+      可以改变bug的所有信息, 必须搜索才有显示
     </p>
     <div class="filter-container">
       <el-input v-model="listQuery.id" placeholder="id" type="number" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
@@ -49,7 +49,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="方法" width="100px" align="center">
+      <el-table-column label="处理者" width="100px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.handle }}</span>
         </template>

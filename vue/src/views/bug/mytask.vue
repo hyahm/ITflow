@@ -88,7 +88,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="130" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handlePass(scope.row)">通过</el-button>
+          <el-button type="primary" size="mini" @click="handlePass(scope.row)">转交</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -99,7 +99,7 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item>
+        <el-form-item label="状态:">
           <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
             <el-option v-for="(item, index) in platformsOptions" :key="index" :label="item" :value="item" />
           </el-select>
@@ -121,7 +121,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="说明">
+        <el-form-item label="说明:">
           <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
         </el-form-item>
       </el-form>
