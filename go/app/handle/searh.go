@@ -204,7 +204,7 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("没有找到bug"))
 		return
 	}
-	alsql := "select id,createtime,importent,status,bugtitle,uid,level,pid,env,spusers,dustbin from bugs"
+	alsql := "select id,createtime,iid,sid,bugtitle,uid,lid,pid,eid,spusers,dustbin from bugs"
 
 	rows, err := managersearch(alsql, al.Count, searchparam)
 	if err != nil {
@@ -214,13 +214,16 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 	}
 	for rows.Next() {
 		bl := &model.ArticleList{}
-		var statusid int64
+		var sid, lid int64
 		var spusers string
 		var uid int64
 		var pid int64
 		var eid int64
-		rows.Scan(&bl.ID, &bl.Date, &bl.Importance, &statusid, &bl.Title, &uid, &bl.Level, &pid, &eid, &spusers, &bl.Dustbin)
-		bl.Status = bugconfig.CacheSidStatus[statusid]
+		var iid int64
+		rows.Scan(&bl.ID, &bl.Date, &iid, &sid, &bl.Title, &uid, &lid, &pid, &eid, &spusers, &bl.Dustbin)
+		bl.Level = bugconfig.CacheLidLevel[lid]
+		bl.Importance = bugconfig.CacheIidImportant[iid]
+		bl.Status = bugconfig.CacheSidStatus[sid]
 		bl.Author = bugconfig.CacheUidRealName[uid]
 		bl.Projectname = bugconfig.CachePidName[pid]
 		bl.Handle = formatUserlistToRealname(spusers)

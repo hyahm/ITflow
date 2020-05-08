@@ -22,6 +22,8 @@ github.com/hyahm/cachetable v0.0.0-20200507073204-abe535c45d36 h1:9oanZp291YaE0r
 github.com/hyahm/cachetable v0.0.0-20200507073204-abe535c45d36/go.mod h1:QnKdcDLla3BWwsB8wz19ZOhnbutCDAjab9tUIsWI/1I=
 github.com/hyahm/cachetable v0.0.0-20200507074722-20249a71c18b h1:+W6Xfq9u01a1NOmuV2V98OdctGART6KDRI75czCq7H8=
 github.com/hyahm/cachetable v0.0.0-20200507074722-20249a71c18b/go.mod h1:QnKdcDLla3BWwsB8wz19ZOhnbutCDAjab9tUIsWI/1I=
+github.com/hyahm/cachetable v0.0.0-20200508033447-897d325575c9 h1:DuCMTwN1Z7ouZM2mCYft63G5FblQ+CCJT7pN8oOQI0Q=
+github.com/hyahm/cachetable v0.0.0-20200508033447-897d325575c9/go.mod h1:QnKdcDLla3BWwsB8wz19ZOhnbutCDAjab9tUIsWI/1I=
 github.com/hyahm/goconfig v0.0.0-20200411075020-85401a1b9350 h1:qoiAup0hUzygf7o49SCxkTkXdNvnVRpJT1MkE7cQenU=
 github.com/hyahm/goconfig v0.0.0-20200411075020-85401a1b9350/go.mod h1:ctqVDk4x/EImHB9MaRy+7TV80DcBFsrnLqnlIpOPeVI=
 github.com/hyahm/golog v0.0.0-20200308024922-05e85ded3293/go.mod h1:zKiO0JeV7UoTS6Gx7jZaGr+GblF6B57e04Q+/+ChEZA=

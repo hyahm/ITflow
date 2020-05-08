@@ -12,13 +12,19 @@ type Token struct {
 }
 
 var CT *cachetable.Table
+var ct cachetable.CT
 
 func InitCacheTable() {
-	ct := cachetable.NewCT()
-	ct.Add("token", Token{})
+	ct = cachetable.NewCT()
+	ct.Load(".token.db", &Token{})
+	ct.Add("token", &Token{})
 
 	CT, _ = ct.Table("token")
 
 	CT.SetKeys("Token")
 	go ct.Clean(time.Second * 1)
+}
+
+func SaveCacheTable() error {
+	return ct.Save(".token.db")
 }

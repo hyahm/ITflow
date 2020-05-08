@@ -3,9 +3,9 @@ package handle
 import (
 	"encoding/json"
 	"html"
-	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/db"
+	"itflow/network/bug"
 	"itflow/network/datalog"
 	"itflow/network/response"
 	"net/http"
@@ -40,24 +40,12 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	nickname := xmux.GetData(r).Get("nickname").(string)
-	data := &getArticle{}
+	data := xmux.GetData(r).Data.(*bug.GetArticle)
 	if bugconfig.CacheDefault["status"] <= 0 {
 		w.Write(errorcode.Error("status not set default value"))
 		return
 	}
-	content, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
-	err = json.Unmarshal(content, data)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	// pid
 	var pid int64
 	var eid int64
@@ -93,11 +81,12 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ul := make([]string, 0)
+	golog.Info(data.Selectusers)
 	for _, v := range data.Selectusers {
-		start := strings.Index(v, "(")
-		end := strings.LastIndex(v, ")")
-		v = v[start+1 : end]
-		if udd, ok := bugconfig.CacheRealNameUid[v]; ok {
+		// start := strings.Index(v, "(")
+		// end := strings.LastIndex(v, ")")
+		// v = v[start+1 : end]
+		if udd, ok := bugconfig.CacheNickNameUid[v]; ok {
 			ul = append(ul, strconv.FormatInt(udd, 10))
 		}
 	}
@@ -109,18 +98,20 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 	//
 	if data.Id == -1 {
 		// 插入bug
-
+		db.Mconn.OpenDebug()
 		insertsql := "insert into bugs(uid,bugtitle,sid,content,iid,createtime,lid,pid,eid,spusers,vid) values(?,?,?,?,?,?,?,?,?,?,?)"
 
-		_, err = db.Mconn.Insert(insertsql,
+		_, err := db.Mconn.Insert(insertsql,
 			uid, data.Title, bugconfig.CacheDefault["status"], html.EscapeString(data.Content),
 			iid, errorcode.UpdateTime, lid,
 			pid, eid, spusers, vid)
 		if err != nil {
+			golog.Error(db.Mconn.GetSql())
 			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
+		db.Mconn.CloseDebug()
 		xmux.GetData(r).End = &datalog.AddLog{
 			Ip:       r.RemoteAddr,
 			Username: nickname,
@@ -133,7 +124,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 		// 更新
 		insertsql := "update bugs set bugtitle=?,content=?,iid=?,updatetime=?,lid=?,pid=?,eid=?,spusers=?,vid=? where id=?"
 
-		_, err = db.Mconn.Update(insertsql, data.Title, html.EscapeString(data.Content), iid,
+		_, err := db.Mconn.Update(insertsql, data.Title, html.EscapeString(data.Content), iid,
 			time.Now().Unix(), lid, pid, eid, spusers, vid, data.Id)
 		if err != nil {
 			golog.Error(err)
