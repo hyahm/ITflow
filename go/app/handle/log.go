@@ -123,7 +123,7 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 		Count: count,
 	}
 
-	dsql := "select id,exectime,classify,action,ip from log order by id desc limit ?,?"
+	dsql := "select id,exectime,classify,action,ip,username from log order by id desc limit ?,?"
 	rows, err := db.Mconn.GetRows(dsql, start, end)
 	if err != nil {
 		golog.Error(err)
@@ -132,7 +132,7 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 	}
 	for rows.Next() {
 		log := &log.LogRow{}
-		rows.Scan(&log.Id, &log.Exectime, &log.Classify, &log.Action, &log.Ip)
+		rows.Scan(&log.Id, &log.Exectime, &log.Classify, &log.Action, &log.Ip, &log.UserName)
 		alllog.LogList = append(alllog.LogList, log)
 	}
 	send, _ := json.Marshal(alllog)
