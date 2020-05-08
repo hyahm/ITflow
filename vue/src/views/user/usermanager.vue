@@ -289,6 +289,8 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        console.log(3333)
+        console.log(row.id)
         userRemove(row.id).then(resp => {
           if (resp.data.code === 0) {
             const l = this.userlist.length

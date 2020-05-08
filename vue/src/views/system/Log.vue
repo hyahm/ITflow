@@ -146,6 +146,7 @@ export default {
       getLog(this.listQuery).then(resp => {
         if (resp.data.code === 0) {
           this.list = resp.data.loglist
+          console.log(this.list)
         } else {
           this.$message.error(resp.data.msg)
         }

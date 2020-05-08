@@ -39,10 +39,10 @@ export function userList(data) {
   })
 }
 
-export function createUser(data) {
+export function userRemove(id) {
   return request({
-    url: '/user/create',
-    method: 'post',
-    data
+    url: '/user/remove',
+    method: 'get',
+    params: { id }
   })
 }
