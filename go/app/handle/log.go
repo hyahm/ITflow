@@ -6,7 +6,6 @@ import (
 	"itflow/app/bugconfig"
 	"itflow/app/public"
 	"itflow/db"
-	"itflow/model"
 	"itflow/network/log"
 	"itflow/network/response"
 	"net/http"
@@ -21,9 +20,12 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 
 	alllog := xmux.GetData(r).Data.(*log.Search_log)
 
-	listlog := &model.List_log{}
+	listlog := &log.Loglist{}
 
-	basesql := "select id,exectime,classify,content,ip from log "
+	if alllog.Classify == "" {
+
+	}
+	basesql := "select id,exectime,classify,action,ip,username from log "
 	endsql := ""
 	// 如果搜索了类别
 	if alllog.Classify != "" {
@@ -50,17 +52,19 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 			endsql += fmt.Sprintf(" and exectime between %d and %d ", alllog.StartTime, alllog.EndTime)
 		}
 	}
-	//获取总行数
 
+	//获取总行数
 	err := db.Mconn.GetOne("select count(id) from log " + endsql).Scan(&listlog.Count)
 	if err != nil {
-		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-
+	if listlog.Count == 0 {
+		send, _ := json.Marshal(listlog)
+		w.Write(send)
+		return
+	}
 	start, end := public.GetPagingLimitAndPage(listlog.Count, alllog.Page, alllog.Limit)
-	listlog.Page = start / alllog.Limit
 
 	rows, err := db.Mconn.GetRows(basesql+endsql+" limit ?,?", start, end)
 	if err != nil {
@@ -70,9 +74,9 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for rows.Next() {
-		one := &model.Table_log{}
+		one := &log.LogRow{}
 		//basesql := "select id,exectime,classify,content,ip from log "
-		rows.Scan(&one.Id, &one.Exectime, &one.Classify, &one.Content, &one.Ip)
+		rows.Scan(&one.Id, &one.Exectime, &one.Classify, &one.Action, &one.Ip, &one.UserName)
 		listlog.LogList = append(listlog.LogList, one)
 	}
 
