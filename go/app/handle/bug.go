@@ -3,7 +3,6 @@ package handle
 import (
 	"encoding/json"
 	"html"
-	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/app/public"
 	"itflow/db"
@@ -11,6 +10,8 @@ import (
 	"itflow/network/bug"
 	"itflow/network/datalog"
 	"itflow/network/response"
+	"itflow/network/role"
+	"itflow/network/status"
 	"itflow/network/user"
 	"net/http"
 	"strconv"
@@ -39,14 +40,9 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type mystatus struct {
-	CheckStatus []string `json:"checkstatus"`
-	Code        int      `json:"code"`
-}
-
 func ShowStatus(w http.ResponseWriter, r *http.Request) {
 
-	sl := &mystatus{}
+	sl := xmux.GetData(r).Data.(*status.Status)
 
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	// 遍历出每一个status id
@@ -145,21 +141,7 @@ func UpdateRoles(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	sl := &model.Table_roles{}
-
-	ss, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	err = json.Unmarshal(ss, sl)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	sl := xmux.GetData(r).Data.(*role.Role)
 
 	var rid int64 // 这个是修改后的rid
 	for k, v := range bugconfig.CacheRidGroup {
@@ -174,7 +156,7 @@ func UpdateRoles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = db.Mconn.Update("update user set rid=? where id=?", rid, sl.Id)
+	_, err := db.Mconn.Update("update user set rid=? where id=?", rid, sl.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -203,31 +185,12 @@ type getAllBugSearchParam struct {
 	Handle  []string `json:"handle"`
 }
 
-type getChangeStatus struct {
-	Id     int    `json:"id"`
-	Status string `json:"status"`
-	Code   int    `json:"code"`
-}
-
 func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	param := &getChangeStatus{}
+	param := xmux.GetData(r).Data.(*bug.ChangeStatus)
 
-	searchq, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	err = json.Unmarshal(searchq, param)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	var sid int64
 	var ok bool
 	if sid, ok = bugconfig.CacheStatusSid[param.Status]; !ok {
@@ -238,7 +201,7 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 
 	basesql := "update bugs set sid=? where id=?"
 
-	_, err = db.Mconn.Update(basesql, sid, param.Id)
+	_, err := db.Mconn.Update(basesql, sid, param.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -262,20 +225,8 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	param := &mystatus{}
+	param := xmux.GetData(r).Data.(*status.Status)
 
-	searchq, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(searchq, param)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	ids := make([]string, 0)
 	for _, v := range param.CheckStatus {
 		// 如果存在这个状态才添加进来
@@ -288,7 +239,7 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 	//
 	basesql := "update user set showstatus=? where id=?"
 	nickname := xmux.GetData(r).Get("nickname").(string)
-	_, err = db.Mconn.Update(basesql, showstatus, bugconfig.CacheNickNameUid[nickname])
+	_, err := db.Mconn.Update(basesql, showstatus, bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

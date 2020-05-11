@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/db"
+	"itflow/network/bug"
+	"itflow/network/comment"
 	"itflow/network/response"
 	"net/http"
 	"os"
@@ -171,22 +173,6 @@ func UploadImgs(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type informations struct {
-	User string `json:"user"`
-	Date int64  `json:"date"`
-	Info string `json:"info"`
-}
-
-type showArticle struct {
-	Title      string          `json:"title"`
-	Content    string          `json:"content"`
-	Appversion string          `json:"appversion"`
-	Comment    []*informations `json:"comment"`
-	Status     string          `json:"status"`
-	Id         int             `json:"id"`
-	Code       int             `json:"code"`
-}
-
 type uploadimage struct {
 	Uploaded int    `json:"uploaded"`
 	Url      string `json:"url"`
@@ -247,7 +233,7 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 
 func BugShow(w http.ResponseWriter, r *http.Request) {
 	bid := r.FormValue("id")
-	sl := &showArticle{}
+	sl := &bug.ShowBug{}
 	errorcode := &response.Response{}
 
 	getinfosql := "select uid,info,time from informations where bid=?"
@@ -258,25 +244,22 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for rows.Next() {
-		im := &informations{}
+		im := &comment.Informations{}
 		var uid int64
 		rows.Scan(&uid, &im.Info, &im.Date)
 		im.User = bugconfig.CacheUidRealName[uid]
 		sl.Comment = append(sl.Comment, im)
 	}
 
-	getlistsql := "select bugtitle,content,vid,sid,id from bugs where id=?"
-	var statusid int64
-	var vid int64
-	err = db.Mconn.GetOne(getlistsql, bid).Scan(&sl.Title, &sl.Content, &vid, &statusid, &sl.Id)
+	getlistsql := "select b.id,bugtitle,content,s.name,v.name as name from bugs as b inner join status as s inner join version as v on b.id=? and b.sid=s.id and b.vid=v.id"
+
+	err = db.Mconn.GetOne(getlistsql, bid).Scan(&sl.Id, &sl.Title, &sl.Content, &sl.Status, &sl.Appversion)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
-	sl.Status = bugconfig.CacheSidStatus[statusid]
-	sl.Appversion = bugconfig.CacheVidName[vid]
 	sl.Content = html.UnescapeString(sl.Content)
 	send, _ := json.Marshal(sl)
 	w.Write(send)

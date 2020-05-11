@@ -83,9 +83,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 	ul := make([]string, 0)
 	golog.Info(data.Selectusers)
 	for _, v := range data.Selectusers {
-		// start := strings.Index(v, "(")
-		// end := strings.LastIndex(v, ")")
-		// v = v[start+1 : end]
+
 		if udd, ok := bugconfig.CacheNickNameUid[v]; ok {
 			ul = append(ul, strconv.FormatInt(udd, 10))
 		}

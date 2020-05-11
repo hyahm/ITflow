@@ -32,13 +32,11 @@ func CheckToken(w http.ResponseWriter, r *http.Request) bool {
 	errorcode := &response.Response{}
 	a := r.Header.Get("X-Token")
 	if a == "" {
-		errorcode.Code = 10
-		w.Write(errorcode.Error("token未找到"))
+		w.Write(errorcode.TokenNotFound())
 		return true
 	}
 	if filter, err := db.CT.Filter("Token", a); err != nil {
-		errorcode.Code = 11
-		w.Write(errorcode.Error("没有找到"))
+		w.Write(errorcode.TokenNotFound())
 		return true
 	} else {
 		var nickname string

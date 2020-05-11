@@ -2,25 +2,20 @@ package handle
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/db"
 	"itflow/network/response"
 	"net/http"
 
-	"github.com/hyahm/golog"
-)
+	"itflow/network/defaults"
 
-type DefaultValue struct {
-	DefaultStatus string `json:"defaultstatus"`
-	Important     string `json:"defaultimportant"`
-	Level         string `json:"defaultlevel"`
-	Code          int    `json:"code"`
-}
+	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
+)
 
 func DefaultStatus(w http.ResponseWriter, r *http.Request) {
 
-	sl := &DefaultValue{}
+	sl := &defaults.DefaultValue{}
 	//如果是管理员的话,所有的都可以
 	sl.DefaultStatus = bugconfig.CacheSidStatus[bugconfig.CacheDefault["status"]]
 	send, _ := json.Marshal(sl)
@@ -33,20 +28,8 @@ func DefaultSave(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	sl := &DefaultValue{}
-	bytedata, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	sl := xmux.GetData(r).Data.(*defaults.DefaultValue)
 
-	err = json.Unmarshal(bytedata, sl)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	var sid int64
 	var iid int64
 	var lid int64
@@ -64,7 +47,7 @@ func DefaultSave(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//修改字段
-	_, err = db.Mconn.Update("update defaultvalue set status=?, important=?,level=?", sid, iid, lid)
+	_, err := db.Mconn.Update("update defaultvalue set status=?, important=?,level=?", sid, iid, lid)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

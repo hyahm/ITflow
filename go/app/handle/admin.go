@@ -41,12 +41,14 @@ func Reset(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	err = insertlog("resetadminpassword", "密码为:"+password, r)
-	if err != nil {
-		golog.Error(err)
-		w.Write([]byte(err.Error() + "\n"))
-		return
-	}
+
+	// xmux.GetData(r).End = &datalog.AddLog{
+	// 	Ip:       r.RemoteAddr,
+	// 	Username: nickname,
+	// 	Classify: "superuser",
+	// 	Action:   "update",
+	// }
+
 	w.Write([]byte("修改成功 \n"))
 	return
 

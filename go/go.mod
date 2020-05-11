@@ -3,6 +3,7 @@ module itflow
 go 1.12
 
 require (
+	github.com/aws/aws-sdk-go v1.30.24
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/hyahm/cachetable v0.0.0-20200508033447-897d325575c9
 	github.com/hyahm/goconfig v0.0.0-20200411075020-85401a1b9350

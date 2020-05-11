@@ -3,58 +3,33 @@ package handle
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/db"
 	"itflow/model"
+	"itflow/network/bug"
 	"itflow/network/datalog"
 	"itflow/network/response"
 	"net/http"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
 
-type passBug struct {
-	Id          int      `json:"id"`
-	Date        int64    `json:"date"`
-	Remark      string   `json:"remark"`
-	SelectUsers []string `json:"selectusers"`
-	Status      string   `json:"status"`
-	Code        int      `json:"code"`
-	User        string   `json:"user"`
-	Mu          *sync.Mutex
-}
-
 func PassBug(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	ub := &passBug{}
+	ub := xmux.GetData(r).Data.(*bug.PassBug)
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	// 获取参数
-	ss, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	err = json.Unmarshal(ss, ub)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	// 判断这个bug是不是自己的任务，只有自己的任务才可以转交
 	var splist string
 	var hasperm bool
-	err = db.Mconn.GetOne("select spusers from bugs where id=?", ub.Id).Scan(&splist)
+	err := db.Mconn.GetOne("select spusers from bugs where id=? ", ub.Id).Scan(&splist)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -90,7 +65,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ul := strings.Join(idstr, ",")
-	//添加进information表, 应该要弄成事务,插入转交信息
+
 	remarksql := "insert into informations(uid,bid,info,time) values(?,?,?,?)"
 	_, err = db.Mconn.Insert(remarksql, bugconfig.CacheNickNameUid[nickname], ub.Id, ub.Remark, time.Now().Unix())
 	if err != nil {

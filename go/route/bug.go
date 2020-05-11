@@ -4,6 +4,7 @@ import (
 	"itflow/app/handle"
 	"itflow/midware"
 	"itflow/network/bug"
+	"itflow/network/status"
 
 	"github.com/hyahm/xmux"
 )
@@ -11,12 +12,14 @@ import (
 var Bug *xmux.GroupRoute
 
 func init() {
-	Bug = xmux.NewGroupRoute().ApiCodeField("code").ApiCodeMsg("0", "成功")
+	Bug = xmux.NewGroupRoute().ApiCodeField("code").ApiCodeMsg("0", "成功").ApiCreateGroup("bug", "bug相关接口", "bug相关")
 
-	Bug.Pattern("/bug/pass").Post(handle.PassBug).End(midware.EndLog)
+	Bug.Pattern("/bug/pass").Post(handle.PassBug).End(midware.EndLog).Bind(&bug.PassBug{}).
+		AddMidware(midware.JsonToStruct).ApiDescribe("转交bug").ApiReqStruct(&bug.PassBug{})
 
 	Bug.Pattern("/bug/create").Post(handle.BugCreate).Bind(&bug.GetArticle{}).
-		AddMidware(midware.JsonToStruct).End(midware.EndLog)
+		AddMidware(midware.JsonToStruct).End(midware.EndLog).
+		ApiDescribe("创建或更新bug")
 
 	Bug.Pattern("/bug/edit").Get(handle.BugEdit).End(midware.EndLog)
 
@@ -24,10 +27,26 @@ func init() {
 		End(midware.EndLog)
 
 	Bug.Pattern("/bug/close").Get(handle.CloseBug).End(midware.EndLog)
-	Bug.Pattern("/bug/changestatus").Post(handle.ChangeBugStatus).End(midware.EndLog)
-	Bug.Pattern("/status/filter").Post(handle.ChangeFilterStatus)
-	Bug.Pattern("/status/show").Post(handle.ShowStatus)
-	Bug.Pattern("/bug/show").Get(handle.BugShow)
+	Bug.Pattern("/bug/changestatus").Post(handle.ChangeBugStatus).Bind(&bug.ChangeStatus{}).
+		AddMidware(midware.JsonToStruct).End(midware.EndLog)
+
+	Bug.Pattern("/status/filter").Post(handle.ChangeFilterStatus).Bind(&status.Status{}).
+		AddMidware(midware.JsonToStruct)
+
+	Bug.Pattern("/status/show").Post(handle.ShowStatus).Bind(&status.Status{}).
+		AddMidware(midware.JsonToStruct)
+
+	Bug.Pattern("/bug/show").Get(handle.BugShow).
+		ApiDescribe("获取此bug信息").ApiReqParams(map[string]string{"id": "6"}).ApiResponseTemplate(`{
+			"title": "sdfsdf",
+			"content": "<p>sdfajsdjfsdfsaf</p>",
+			"appversion": "v1.2",
+			"comment": null,
+			"status": "need133",
+			"id": 2,
+			"code": 0
+		}`).ApiResStruct(bug.ShowBug{})
+
 	Bug.Pattern("/search/allbugs").Post(handle.SearchAllBugs)
 	Bug.Pattern("/search/mybugs").Post(handle.SearchMyBugs)
 

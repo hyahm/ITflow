@@ -1,11 +1,5 @@
 package model
 
-type Table_roles struct {
-	Id       int64  `json:"id"`
-	Name     string `json:"name"`
-	rolelist string `json:"rolelist"`
-}
-
 type Data_roles struct {
 	Id       int64    `json:"id"`
 	Name     string   `json:"name"`

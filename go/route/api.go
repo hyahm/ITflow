@@ -4,6 +4,8 @@ import (
 	"itflow/app/handle"
 	"itflow/midware"
 
+	"itflow/network/defaults"
+
 	"github.com/hyahm/xmux"
 )
 
@@ -32,7 +34,8 @@ func init() {
 
 	//---------------------------------------------------------
 	Api.Pattern("/default/status").Post(handle.DefaultStatus)
-	Api.Pattern("/default/save").Post(handle.DefaultSave)
+	Api.Pattern("/default/save").Post(handle.DefaultSave).Bind(&defaults.DefaultValue{}).
+		AddMidware(midware.JsonToStruct)
 	Api.Pattern("/default/important").Post(handle.DefaultImportant)
 	Api.Pattern("/default/level").Post(handle.DefaultLevel)
 }

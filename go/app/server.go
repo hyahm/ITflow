@@ -14,7 +14,6 @@ import (
 )
 
 func RunHttp() {
-
 	router := xmux.NewRouter()
 	router.SetHeader("Access-Control-Allow-Origin", "*")
 	router.SetHeader("Content-Type", "application/x-www-form-urlencoded,application/json; charset=UTF-8")

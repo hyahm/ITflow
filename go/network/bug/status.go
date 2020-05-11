@@ -24,3 +24,9 @@ func (rs *ResponeStatus) Success() []byte {
 	send, _ := json.Marshal(rs)
 	return send
 }
+
+type ChangeStatus struct {
+	Id     int    `json:"id"`
+	Status string `json:"status"`
+	Code   int    `json:"code"`
+}
