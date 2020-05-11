@@ -12,6 +12,7 @@ var Log *xmux.GroupRoute
 
 func init() {
 	Log = xmux.NewGroupRoute().AddMidware(midware.CheckLogPermssion).ApiCreateGroup("log", "日志相关", "log")
+	Log.ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf")
 
 	Log.Pattern("/search/log").Post(handle.SearchLog).Bind(&log.Search_log{}).
 		AddMidware(midware.JsonToStruct).

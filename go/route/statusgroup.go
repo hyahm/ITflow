@@ -18,7 +18,7 @@ func init() {
 	StatusGroup.Pattern("/statusgroup/edit").Post(handle.EditStatusGroup).Bind(&status.StatusGroup{}).
 		AddMidware(midware.JsonToStruct).End(midware.EndLog).
 		ApiDescribe("编辑statusgroup").ApiReqStruct(&status.StatusGroup{}).
-		ApiRequestTemplate(`D:\work\ITflow\go\app\handle\statusgroup.go`).ApiSupplement("如果没有状态组名，就删除")
+		ApiSupplement("如果没有状态组名，就删除")
 
 	StatusGroup.Pattern("/statusgroup/list").Post(handle.StatusGroupList)
 
