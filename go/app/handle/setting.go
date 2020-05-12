@@ -10,6 +10,7 @@ import (
 	"itflow/gaencrypt"
 	"itflow/network/datalog"
 	"itflow/network/response"
+	"itflow/network/rolegroup"
 	"itflow/network/user"
 	"net/http"
 	"strconv"
@@ -433,16 +434,11 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-type getroles struct {
-	Rolelist []string `json:"rolelist"`
-	Code     int      `json:"code"`
-}
-
 func GetRoles(w http.ResponseWriter, r *http.Request) {
 
-	rl := &getroles{}
+	rl := &rolegroup.Roles{}
 	for _, v := range bugconfig.CacheRidRole {
-		rl.Rolelist = append(rl.Rolelist, v)
+		rl.Roles = append(rl.Roles, v)
 	}
 	send, _ := json.Marshal(rl)
 	w.Write(send)
@@ -450,27 +446,27 @@ func GetRoles(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func GetThisRoles(w http.ResponseWriter, r *http.Request) {
+// func GetThisRoles(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
+// 	errorcode := &response.Response{}
 
-	rl := &getroles{}
+// 	rl := &getroles{}
 
-	id := r.FormValue("id")
+// 	id := r.FormValue("id")
 
-	var rolestring string
-	err := db.Mconn.GetOne("select rolestring from user where id=?", id).Scan(&rolestring)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ConnectMysqlFail())
-		return
-	}
+// 	var rolestring string
+// 	err := db.Mconn.GetOne("select rolestring from user where id=?", id).Scan(&rolestring)
+// 	if err != nil {
+// 		golog.Error(err)
+// 		w.Write(errorcode.ConnectMysqlFail())
+// 		return
+// 	}
 
-	send, _ := json.Marshal(rl)
-	w.Write(send)
-	return
+// 	send, _ := json.Marshal(rl)
+// 	w.Write(send)
+// 	return
 
-}
+// }
 
 type sendGroup struct {
 	Groups []string `json:"groups"`

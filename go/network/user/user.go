@@ -94,6 +94,36 @@ func (ui *UserInfo) GetUserInfo() error {
 	return nil
 }
 
+func (ui *UserInfo) Update() error {
+	sql := "select rid, headimg from user where nickname=?"
+	var rid string
+	err := db.Mconn.GetOne(sql, ui.NickName).Scan(&rid, &ui.Avatar)
+	if err != nil {
+		golog.Error(err)
+		return err
+	}
+
+	// 管理员
+	if bugconfig.CacheNickNameUid[ui.NickName] == bugconfig.SUPERID {
+		ui.Roles = append(ui.Roles, ui.NickName)
+	} else {
+		var rl string
+		getrole := "select rolelist from rolegroup where id=?"
+		err := db.Mconn.GetOne(getrole, rid).Scan(&rl)
+		if err != nil {
+			golog.Error(err)
+			return err
+		}
+
+		for _, v := range strings.Split(rl, ",") {
+			id, _ := strconv.Atoi(v)
+			ui.Roles = append(ui.Roles, bugconfig.CacheRidRole[int64(id)])
+		}
+	}
+
+	return nil
+}
+
 func (ui *UserInfo) Json() []byte {
 	send, _ := json.Marshal(ui)
 	return send

@@ -6,9 +6,16 @@ import (
 	"github.com/hyahm/cachetable"
 )
 
+const (
+	TOKEN    = "Token"
+	NICKNAME = "NickName"
+	ID       = "Id"
+)
+
 type Token struct {
 	Token    string
 	NickName string
+	Id       int64
 }
 
 var CT *cachetable.Table
@@ -17,12 +24,12 @@ var ct cachetable.CT
 func InitCacheTable() {
 	ct = cachetable.NewCT()
 	ct.Load(".token.db", &Token{})
-	ct.Add("token", &Token{})
+	ct.Add(TOKEN, &Token{})
 
-	CT, _ = ct.Table("token")
+	CT, _ = ct.Table(TOKEN)
 
-	CT.SetKeys("Token")
-	go ct.Clean(time.Second * 1)
+	CT.SetKeys(TOKEN)
+	go ct.Clean(time.Second * 10)
 }
 
 func SaveCacheTable() error {

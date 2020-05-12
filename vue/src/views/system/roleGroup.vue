@@ -48,7 +48,7 @@
           />
         </el-form-item>
         <el-checkbox-group v-model="form.rolelist">
-          <div v-for="(role, index) in rolelist" :key="index">
+          <div v-for="(role, index) in roles" :key="index">
             <el-checkbox :label="role" />
           </div>
         </el-checkbox-group>
@@ -68,7 +68,7 @@ export default {
   name: 'RoleGroup',
   data() {
     return {
-      rolelist: [],
+      roles: [],
       dialogVisible: false,
       listLoading: false,
       list: [],
@@ -133,7 +133,7 @@ export default {
     getroles() {
       getRoles().then(resp => {
         if (resp.data.code === 0) {
-          this.rolelist = resp.data.rolelist
+          this.roles = resp.data.roles
         } else {
           this.$message.error(resp.data.msg)
         }

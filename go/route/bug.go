@@ -65,6 +65,6 @@ func init() {
 	Bug.Pattern("/get/permstatus").Post(handle.GetPermStatus)
 	Bug.Pattern("/get/info").Post(handle.GetInfo)
 
-	Bug.Pattern("/get/thisrole").Get(handle.GetThisRoles)
+	// Bug.Pattern("/get/thisrole").Get(handle.GetThisRoles)
 	Bug.Pattern("/get/group").Post(handle.GetGroup)
 }
