@@ -5,9 +5,9 @@ import (
 	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/db"
-	network "itflow/model"
 	"itflow/network/datalog"
 	"itflow/network/response"
+	"itflow/network/rolegroup"
 	"net/http"
 	"strconv"
 	"strings"
@@ -19,8 +19,7 @@ import (
 func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-
-	data := &network.List_roles{}
+	data := &rolegroup.List_roles{}
 
 	s := "select id,name,rolelist from rolegroup"
 	rows, err := db.Mconn.GetRows(s)
@@ -31,7 +30,7 @@ func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 	}
 	for rows.Next() {
 		var rids string
-		one := &network.Data_roles{}
+		one := &rolegroup.Data_roles{}
 		rows.Scan(&one.Id, &one.Name, &rids)
 		for _, v := range strings.Split(rids, ",") {
 			id, _ := strconv.Atoi(v)
@@ -45,7 +44,7 @@ func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func RoleDel(w http.ResponseWriter, r *http.Request) {
+func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
@@ -93,30 +92,18 @@ func RoleDel(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func EditRole(w http.ResponseWriter, r *http.Request) {
+func EditRoleGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := &network.Data_roles{}
+	data := xmux.GetData(r).Data.(*rolegroup.Data_roles)
 
-	bytedata, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(bytedata, data)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	rl := make([]string, 0)
 	for _, v := range data.RoleList {
 		rl = append(rl, strconv.FormatInt(bugconfig.CacheRoleRid[v], 10))
 	}
 	gsql := "update rolegroup set name=?,rolelist=?  where id=?"
-	_, err = db.Mconn.Update(gsql, data.Name, strings.Join(rl, ","), data.Id)
+	_, err := db.Mconn.Update(gsql, data.Name, strings.Join(rl, ","), data.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -138,11 +125,11 @@ func EditRole(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func AddRole(w http.ResponseWriter, r *http.Request) {
+func AddRoleGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := &network.Data_roles{}
+	data := &rolegroup.Data_roles{}
 
 	respbyte, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -191,7 +178,7 @@ func AddRole(w http.ResponseWriter, r *http.Request) {
 
 func RoleGroupName(w http.ResponseWriter, r *http.Request) {
 
-	data := &network.Get_roles{}
+	data := &rolegroup.Get_roles{}
 	for _, v := range bugconfig.CacheRidGroup {
 		data.Roles = append(data.Roles, v)
 	}

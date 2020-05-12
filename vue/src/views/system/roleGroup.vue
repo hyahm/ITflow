@@ -147,6 +147,7 @@ export default {
         this.$message.error('name no be need')
       }
       if (this.form.id > 0) {
+        console.log(this.form)
         editRole(this.form).then(resp => {
           if (resp.data.code === 0) {
             const l = this.list.length
