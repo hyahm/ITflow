@@ -35,21 +35,21 @@ type Response struct {
 
 func (es *Response) ErrorE(err error) []byte {
 	es.Msg = err.Error()
-	es.Code = 100
+	es.Code = 1
 	send, _ := json.Marshal(es)
 	return send
 }
 
 func (es *Response) GetDataErr() []byte {
 	es.Msg = "获取请求数据失败"
-	es.Code = 4
+	es.Code = 1
 	send, _ := json.Marshal(es)
 	return send
 }
 
 func (es *Response) NotJsonFormat() []byte {
 	es.Msg = "数据无法被解析"
-	es.Code = 5
+	es.Code = 1
 	send, _ := json.Marshal(es)
 	return send
 }
@@ -62,7 +62,7 @@ func (es *Response) Errorf(format string, args ...interface{}) []byte {
 
 func (es *Response) Error(msg string) []byte {
 	es.Msg = msg
-	es.Code = 20
+	es.Code = 1
 	send, _ := json.Marshal(es)
 	return send
 }
