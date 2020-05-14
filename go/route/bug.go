@@ -22,7 +22,8 @@ func init() {
 		AddMidware(midware.JsonToStruct).End(midware.EndLog).
 		ApiDescribe("创建或更新bug")
 
-	Bug.Pattern("/bug/edit").Get(handle.BugEdit).End(midware.EndLog)
+	Bug.Pattern("/bug/edit").Get(handle.BugEdit).Bind(&bug.BugData{}).AddMidware(midware.JsonToStruct).
+		End(midware.EndLog)
 
 	Bug.Pattern("/bug/mybugs").Post(handle.GetMyBugs).Bind(&bug.SearchParam{}).
 		End(midware.EndLog)
@@ -38,7 +39,7 @@ func init() {
 		AddMidware(midware.JsonToStruct)
 
 	Bug.Pattern("/bug/show").Get(handle.BugShow).
-		ApiDescribe("获取此bug信息").ApiReqParams(map[string]string{"id": "6"}).ApiResponseTemplate(`{
+		ApiDescribe("获取此bug信息").ApiReqParams("id", "6").ApiResponseTemplate(`{
 			"title": "sdfsdf",
 			"content": "<p>sdfajsdjfsdfsaf</p>",
 			"appversion": "v1.2",
@@ -54,12 +55,12 @@ func init() {
 	Bug.Pattern("/search/mytasks").Post(handle.SearchMyTasks).Bind(&bug.SearchParam{}).
 		AddMidware(midware.JsonToStruct)
 
-	Bug.Pattern("/search/bugmanager").Post(handle.SearchBugManager)
+	Bug.Pattern("/search/bugmanager").Post(handle.SearchBugManager).Bind(&bug.BugManager{}).AddMidware(midware.JsonToStruct)
 
 	Bug.Pattern("/get/user").Post(handle.GetUser)
 	Bug.Pattern("/get/project").Post(handle.GetProject)
 	Bug.Pattern("/get/version").Post(handle.GetVersion)
-	Bug.Pattern("/get/env").Post(handle.GetEnv)
+	Bug.Pattern("/get/env").Post(handle.GetEnv).DelMidware(midware.CheckToken)
 	Bug.Pattern("/get/status").Post(handle.GetStatus)
 
 	Bug.Pattern("/get/permstatus").Post(handle.GetPermStatus)

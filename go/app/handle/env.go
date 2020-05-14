@@ -2,10 +2,10 @@ package handle
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/db"
 	"itflow/network/datalog"
+	"itflow/network/env"
 	"itflow/network/response"
 	"net/http"
 	"strconv"
@@ -14,31 +14,22 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-type envlist struct {
-	Elist []*envrow `json:"envlist"`
-	Code  int       `json:"code"`
-}
-
-type envrow struct {
-	Id      int64  `json:"id"`
-	EnvName string `json:"envname"`
-}
-
 func EnvList(w http.ResponseWriter, r *http.Request) {
 
-	env := &envlist{}
+	el := &env.Envlist{
+		Elist: make([]*env.Env, 0),
+	}
 
 	// 管理员
-
 	for k, v := range bugconfig.CacheEidName {
-		pr := &envrow{
+		pr := &env.Env{
 			Id:      k,
 			EnvName: v,
 		}
-		env.Elist = append(env.Elist, pr)
+		el.Elist = append(el.Elist, pr)
 	}
 
-	send, _ := json.Marshal(env)
+	send, _ := json.Marshal(el)
 	w.Write(send)
 	return
 
@@ -80,24 +71,11 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	er := &envrow{}
-
-	bpr, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(bpr, er)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	er := xmux.GetData(r).Data.(*env.Env)
 
 	getaritclesql := "update environment set envname=? where id=?"
 
-	_, err = db.Mconn.Update(getaritclesql, er.EnvName, er.Id)
+	_, err := db.Mconn.Update(getaritclesql, er.EnvName, er.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

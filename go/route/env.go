@@ -3,6 +3,7 @@ package route
 import (
 	"itflow/app/handle"
 	"itflow/midware"
+	"itflow/network/env"
 
 	"github.com/hyahm/xmux"
 )
@@ -16,7 +17,8 @@ func init() {
 
 	Env.Pattern("/env/add").Get(handle.AddEnv).End(midware.EndLog)
 
-	Env.Pattern("/env/update").Post(handle.UpdateEnv).End(midware.EndLog)
+	Env.Pattern("/env/update").Post(handle.UpdateEnv).Bind(&env.Env{}).
+		AddMidware(midware.JsonToStruct).End(midware.EndLog)
 
 	Env.Pattern("/env/delete").Get(handle.DeleteEnv).End(midware.EndLog)
 }

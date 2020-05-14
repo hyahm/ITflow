@@ -3,6 +3,7 @@ package route
 import (
 	"itflow/app/handle"
 	"itflow/midware"
+	"itflow/network/project"
 
 	"github.com/hyahm/xmux"
 )
@@ -16,7 +17,8 @@ func init() {
 
 	Project.Pattern("/project/add").Post(handle.AddProject).End(midware.EndLog)
 
-	Project.Pattern("/project/update").Post(handle.UpdateProject).End(midware.EndLog)
+	Project.Pattern("/project/update").Post(handle.UpdateProject).Bind(&project.Project{}).AddMidware(midware.JsonToStruct).
+		End(midware.EndLog)
 
 	Project.Pattern("/project/delete").Get(handle.DeleteProject).End(midware.EndLog)
 }

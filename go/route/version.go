@@ -3,6 +3,7 @@ package route
 import (
 	"itflow/app/handle"
 	"itflow/midware"
+	"itflow/network/version"
 
 	"github.com/hyahm/xmux"
 )
@@ -18,11 +19,13 @@ func init() {
 	// 最后是错误码
 	Version = xmux.NewGroupRoute().AddMidware(midware.CheckVersionPermssion)
 
-	Version.Pattern("/version/add").Post(handle.AddVersion).End(midware.EndLog)
+	Version.Pattern("/version/add").Post(handle.AddVersion).Bind(&version.Version{}).AddMidware(midware.JsonToStruct).
+		End(midware.EndLog)
 
 	Version.Pattern("/version/list").Post(handle.VersionList)
 
 	Version.Pattern("/version/remove").Get(handle.VersionRemove).End(midware.EndLog)
 
-	Version.Pattern("/version/update").Post(handle.VersionUpdate).End(midware.EndLog)
+	Version.Pattern("/version/update").Post(handle.VersionUpdate).Bind(&version.Version{}).AddMidware(midware.JsonToStruct).
+		End(midware.EndLog)
 }

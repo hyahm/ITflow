@@ -2,9 +2,9 @@ package handle
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/db"
+	"itflow/model"
 	network "itflow/model"
 	"itflow/network/datalog"
 	"itflow/network/response"
@@ -36,20 +36,9 @@ func ImportantAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := &network.Data_importants{}
+	data := xmux.GetData(r).Data.(*model.Data_importants)
 
-	respbyte, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(respbyte, data)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	var err error
 	errorcode.Id, err = db.Mconn.Insert("insert into importants(name) value(?)", data.Name)
 	if err != nil {
 		golog.Error(err)
@@ -136,25 +125,10 @@ func ImportantUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := &network.Update_importants{}
-
-	respbyte, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	err = json.Unmarshal(respbyte, data)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
+	data := xmux.GetData(r).Data.(*model.Update_importants)
 	gsql := "update importants set name=? where id=?"
 
-	_, err = db.Mconn.Update(gsql, data.Name, data.Id)
+	_, err := db.Mconn.Update(gsql, data.Name, data.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

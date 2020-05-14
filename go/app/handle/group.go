@@ -3,7 +3,6 @@ package handle
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/db"
 	"itflow/model"
@@ -23,20 +22,8 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := &status.StatusGroup{}
+	data := xmux.GetData(r).Data.(*status.StatusGroup)
 
-	list, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(list, data)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	// 重新排序
 	ids := make([]string, 0)
 	for _, v := range data.StatusList {
@@ -46,6 +33,7 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 	ss := strings.Join(ids, ",")
 
 	isql := "insert into statusgroup(name,sids) values(?,?)"
+	var err error
 	errorcode.Id, err = db.Mconn.Insert(isql, data.Name, ss)
 	if err != nil {
 		golog.Error(err)
@@ -72,20 +60,8 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := &status.StatusGroup{}
+	data := xmux.GetData(r).Data.(*status.StatusGroup)
 
-	list, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(list, data)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	ssids := make([]string, 0)
 	for _, v := range data.StatusList {
 		// 没找到就是key
@@ -101,7 +77,7 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 	db.Mconn.OpenDebug()
 	defer db.Mconn.CloseDebug()
 	isql := "update statusgroup set name =?,sids=? where id = ?"
-	_, err = db.Mconn.Update(isql, data.Name, ss, data.Id)
+	_, err := db.Mconn.Update(isql, data.Name, ss, data.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -250,19 +226,8 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	nickname := xmux.GetData(r).Get("nickname").(string)
-	data := &model.Get_groups{}
-	respbyte, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(respbyte, data)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	data := xmux.GetData(r).Data.(*model.Get_groups)
+
 	ids := make([]string, 0)
 	for _, v := range data.Users {
 		var uid int64
@@ -274,6 +239,7 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 		ids = append(ids, strconv.FormatInt(uid, 10))
 	}
 	gsql := "insert usergroup(name,ids,cuid) values(?,?,?)"
+	var err error
 	errorcode.Id, err = db.Mconn.Insert(gsql, data.Name, strings.Join(ids, ","), bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
 		golog.Error(err)
@@ -398,20 +364,9 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := &model.Get_groups{}
+	data := xmux.GetData(r).Data.(*model.Get_groups)
 	nickname := xmux.GetData(r).Get("nickname").(string)
-	respbyte, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(respbyte, data)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	gsql := "update usergroup set name=?,ids=? where id=? and cuid=?"
 	ids := ""
 	for i, v := range data.Users {
@@ -421,7 +376,7 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 			ids = ids + "," + strconv.FormatInt(bugconfig.CacheRealNameUid[v], 10)
 		}
 	}
-	_, err = db.Mconn.Update(gsql, data.Name, ids, data.Id, bugconfig.CacheNickNameUid[nickname])
+	_, err := db.Mconn.Update(gsql, data.Name, ids, data.Id, bugconfig.CacheNickNameUid[nickname])
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

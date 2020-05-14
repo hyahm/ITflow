@@ -3,11 +3,11 @@ package handle
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/db"
 	"itflow/network/datalog"
 	"itflow/network/response"
+	"itflow/network/version"
 	"net/http"
 	"strconv"
 	"time"
@@ -16,32 +16,12 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-type addVersion struct {
-	Projectname  string `json:'projectname'`
-	Platform     string `json:'platform'`
-	Version      string `json:'version'`
-	Runenv       string `json:'runenv'`
-	Iphoneurl    string `json:'iphoneurl'`
-	Notiphoneurl string `json:'notiphoneurl'`
-}
-
 func AddVersion(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	version_add := &addVersion{}
-	s, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(s, version_add)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	version_add := xmux.GetData(r).Data.(*version.Version)
+
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	uid := bugconfig.CacheNickNameUid[nickname]
 	add_version_sql := "insert into version(name,urlone,urltwo,createtime,createuid) values(?,?,?,?,?)"
@@ -70,45 +50,11 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type versionInfo struct {
-	Id           int    `json:"id"`
-	Projectname  string `json:"projectname"`
-	Version      string `json:"version"`
-	Runenv       string `json:"runenv"`
-	Iphoneurl    string `json:"iphoneurl"`
-	Notiphoneurl string `json:"notiphoneurl"`
-	Date         int    `json:"date"`
-}
-
-type versionInfoList struct {
-	VersionList []*versionInfo `json:"versionlist"`
-	Code        int            `json:"code"`
-}
-
-type pageLimit struct {
-	Page  int `json:"page"`
-	Limit int `json:"limit"`
-}
-
 func VersionList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	al := &versionInfoList{}
-
-	m, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	pl := &pageLimit{}
-	err = json.Unmarshal(m, pl)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	al := &version.VersionList{}
 
 	get_version_sql := "select id,name,urlone,urltwo,createtime from version order by id desc"
 
@@ -120,7 +66,7 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for rows.Next() {
-		rl := &versionInfo{}
+		rl := &version.Version{}
 		rows.Scan(&rl.Id, &rl.Version, &rl.Iphoneurl, &rl.Notiphoneurl, &rl.Date)
 		al.VersionList = append(al.VersionList, rl)
 	}
@@ -193,24 +139,12 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := &updateversion{}
+	data := xmux.GetData(r).Data.(*version.Version)
 
-	getdata, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(getdata, data)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	uid := bugconfig.CacheNickNameUid[nickname]
 	versionsql := "update version set name=?,urlone=?,urltwo=?,createuid=? where id=?"
-	_, err = db.Mconn.Update(versionsql, data.Name, data.Iphone, data.NoIphone, uid, data.Id)
+	_, err := db.Mconn.Update(versionsql, data.Name, data.Iphoneurl, data.Notiphoneurl, uid, data.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

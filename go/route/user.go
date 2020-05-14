@@ -40,9 +40,10 @@ func init() {
 		ApiCodeMsg("10", "token 过期").
 		ApiResponseTemplate(`{"roles": ["admin"], "code": 0, "avatar":"http://xxxx/aaaa.png", "nickname": "admin"}`)
 
-	User.Pattern("/user/list").Post(handle.UserList)
+	User.Pattern("/user/list").Post(handle.UserList).Bind(&user.UserList{}).AddMidware(midware.JsonToStruct)
 
-	User.Pattern("/user/update").Post(handle.UserUpdate).End(midware.EndLog)
+	User.Pattern("/user/update").Post(handle.UserUpdate).Bind(&user.User{}).AddMidware(midware.JsonToStruct).
+		End(midware.EndLog)
 
 	User.Pattern("/user/create").Post(handle.CreateUser).Bind(&user.GetAddUser{}).
 		AddMidware(midware.JsonToStruct).End(midware.EndLog)
@@ -54,6 +55,6 @@ func init() {
 	User.Pattern("/password/update").Post(handle.ChangePassword).Bind(&user.ChangePasswod{}).
 		AddMidware(midware.JsonToStruct)
 
-	User.Pattern("/password/reset").Post(handle.ResetPwd)
+	User.Pattern("/password/reset").Post(handle.ResetPwd).Bind(&user.ResetPassword{}).AddMidware(midware.JsonToStruct)
 
 }

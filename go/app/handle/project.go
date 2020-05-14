@@ -2,10 +2,10 @@ package handle
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/db"
 	"itflow/network/datalog"
+	"itflow/network/project"
 	"itflow/network/response"
 	"net/http"
 	"strconv"
@@ -14,22 +14,12 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-type projectlist struct {
-	Plist []*projectrow `json:"projectlist"`
-	Code  int           `json:"code"`
-}
-
-type projectrow struct {
-	Id          int64  `json:"id"`
-	ProjectName string `json:"projectname"`
-}
-
 func ProjectList(w http.ResponseWriter, r *http.Request) {
 
-	projects := &projectlist{}
+	projects := &project.ProjectList{}
 
 	for k, v := range bugconfig.CachePidName {
-		pr := &projectrow{
+		pr := &project.Project{
 			Id:          k,
 			ProjectName: v,
 		}
@@ -78,23 +68,11 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	pr := &projectrow{}
+	pr := xmux.GetData(r).Data.(*project.Project)
 
-	bpr, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(bpr, pr)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	getaritclesql := "update projectname set name=? where id=?"
 
-	_, err = db.Mconn.Update(getaritclesql, pr.ProjectName, pr.Id)
+	_, err := db.Mconn.Update(getaritclesql, pr.ProjectName, pr.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

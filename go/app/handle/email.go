@@ -2,7 +2,6 @@ package handle
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/app/mail"
 	"itflow/db"
@@ -10,25 +9,15 @@ import (
 	"net/http"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 func TestEmail(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	getemail := &bugconfig.Email{}
-	b, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(b, getemail)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	getemail := xmux.GetData(r).Data.(*bugconfig.Email)
+
 	mail.TestMail(getemail.EmailAddr, getemail.Password, getemail.Port, getemail.To)
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
@@ -40,30 +29,18 @@ func SaveEmail(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	getemail := &bugconfig.Email{}
-	b, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(b, getemail)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	getemail := xmux.GetData(r).Data.(*bugconfig.Email)
 
-	var id int64
 	if getemail.Id < 0 {
-		id, err = db.Mconn.Insert("insert into email(email,password,port,createuser,createbug,passbug) values(?,?,?,?,?,?)", getemail.EmailAddr, getemail.Password, getemail.Port, getemail.CreateUser, getemail.CreateBug, getemail.PassBug)
+		var err error
+		bugconfig.CacheEmail.Id, err = db.Mconn.Insert("insert into email(email,password,port,createuser,createbug,passbug) values(?,?,?,?,?,?)", getemail.EmailAddr, getemail.Password, getemail.Port, getemail.CreateUser, getemail.CreateBug, getemail.PassBug)
 		if err != nil {
 			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
 	} else {
-		_, err = db.Mconn.Update("update email set email=?,password=?,port=?,createuser=?,createbug=?,passbug=? where id=?", getemail.EmailAddr, getemail.Password, getemail.Port, getemail.CreateUser, getemail.CreateBug, getemail.PassBug, getemail.Id)
+		_, err := db.Mconn.Update("update email set email=?,password=?,port=?,createuser=?,createbug=?,passbug=? where id=?", getemail.EmailAddr, getemail.Password, getemail.Port, getemail.CreateUser, getemail.CreateBug, getemail.PassBug, getemail.Id)
 		if err != nil {
 			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
@@ -74,7 +51,6 @@ func SaveEmail(w http.ResponseWriter, r *http.Request) {
 	bugconfig.CacheEmail.CreateUser = getemail.CreateUser
 	bugconfig.CacheEmail.CreateUser = getemail.CreateUser
 	bugconfig.CacheEmail.EmailAddr = getemail.EmailAddr
-	bugconfig.CacheEmail.Id = id
 	bugconfig.CacheEmail.Port = getemail.Port
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)

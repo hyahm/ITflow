@@ -337,23 +337,11 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type editList struct {
-	Importance  string   `json:"importance"`
-	Title       string   `json:"title"`
-	Level       string   `json:"level"`
-	Version     string   `json:"version"`
-	Projectname string   `json:"projectname"`
-	Env         string   `json:"env"`
-	Handle      []string `json:"handle"`
-	Content     string   `json:"content"`
-	Code        int      `json:"code"`
-}
-
 func BugEdit(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	al := &editList{}
+	al := &bug.BugData{}
 
 	id := r.FormValue("id")
 	var pid int64

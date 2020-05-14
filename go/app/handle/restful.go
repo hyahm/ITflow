@@ -7,9 +7,11 @@ import (
 	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/db"
+	"itflow/model"
 	network "itflow/model"
 	"itflow/network/datalog"
 	"itflow/network/response"
+	"itflow/network/restful"
 	"net/http"
 	"strconv"
 	"strings"
@@ -124,20 +126,8 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 func RestUpdate(w http.ResponseWriter, r *http.Request) {
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	errorcode := &response.Response{}
-	tl := &network.Data_restful{}
+	tl := xmux.GetData(r).Data.(*model.Data_restful)
 
-	respbyte, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(respbyte, tl)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	//验证权限修改
 	// 拥有者才能修改权限
 	var hasperm bool
@@ -172,7 +162,7 @@ func RestUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	_, err = db.Mconn.Update("update apiproject set name=?,auth=?,readuser=?,edituser=?,rid=?,eid=? where id=?",
+	_, err := db.Mconn.Update("update apiproject set name=?,auth=?,readuser=?,edituser=?,rid=?,eid=? where id=?",
 		tl.Name,
 		tl.Auth,
 		tl.Readuser,
@@ -203,19 +193,8 @@ func RestAdd(w http.ResponseWriter, r *http.Request) {
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	uid := bugconfig.CacheNickNameUid[nickname]
 
-	dr := &network.Data_restful{}
-	bytedata, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(bytedata, dr)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	dr := xmux.GetData(r).Data.(*model.Data_restful)
+
 	var rid int64
 	var eid int64
 	if dr.Readuser {
@@ -237,6 +216,7 @@ func RestAdd(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	restsql := "insert into apiproject(name,ownerid,auth,readuser,edituser,rid,eid) values(?,?,?,?,?,?,?)"
+	var err error
 	errorcode.Id, err = db.Mconn.Insert(restsql,
 		dr.Name, uid, dr.Auth, dr.Readuser, dr.Edituser, rid, eid)
 	if err != nil {
@@ -438,24 +418,12 @@ func checkeditperm(pid string, uid int64) (bool, error) {
 func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	tl := &network.Get_apilist{}
+	tl := xmux.GetData(r).Data.(*model.Get_apilist)
 	nickname := xmux.GetData(r).Get("nickname").(string)
-	respbyte, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(respbyte, tl)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	//查出旧的
 	var oldopts string
-	err = db.Mconn.GetOne("select opts from apilist where id=?", tl.Id).Scan(&oldopts)
+	err := db.Mconn.GetOne("select opts from apilist where id=?", tl.Id).Scan(&oldopts)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -543,19 +511,8 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	nickname := xmux.GetData(r).Get("nickname").(string)
-	al := &network.Get_apilist{}
-	respbyte, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(respbyte, al)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	al := xmux.GetData(r).Data.(*model.Get_apilist)
+
 	if al.Name == "" {
 		golog.Error("name is empty")
 		w.Write(errorcode.Error("name is empty"))
@@ -609,7 +566,7 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
+	var err error
 	errorcode.Id, err = db.Mconn.Insert("insert into apilist(pid,url,information,opts,methods,result,name,uid,hid,calltype,resp) values(?,?,?,?,?,?,?,?,?,?,?)",
 		al.Pid, al.Url, html.EscapeString(al.Information), oid, ms,
 		html.EscapeString(al.Result), al.Name, bugconfig.CacheNickNameUid[nickname], hid, al.CallType, html.EscapeString(al.Resp))
@@ -876,34 +833,9 @@ func EditOne(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type header struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}
-
-type resp struct {
-	Headers []*header `json:"header"`
-	Resp    string    `json:"resp"`
-	Url     string    `json:"url"`
-	Method  string    `json:"method"`
-}
-
 func ApiResp(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
-	bb := &resp{}
-	bytedata, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(bytedata, bb)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	bb := xmux.GetData(r).Data.(*restful.Resp)
 
 	client := &http.Client{}
 	//生成要访问的url

@@ -2,9 +2,9 @@ package handle
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/db"
+	"itflow/model"
 	network "itflow/model"
 	"itflow/network/datalog"
 	"itflow/network/response"
@@ -45,25 +45,12 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := &network.Data_jobs{}
-
-	respbyte, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	err = json.Unmarshal(respbyte, data)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	data := xmux.GetData(r).Data.(*model.Data_jobs)
 
 	// 如果不存在管理层名，就参数错误
 	var hid int64
 	var ok bool
+	var err error
 	if data.Hyponame != "" {
 		if hid, ok = bugconfig.CacheJobnameJid[data.Hyponame]; !ok {
 			w.Write(errorcode.ErrorE(err))
@@ -163,21 +150,8 @@ func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := &network.Update_jobs{}
+	data := xmux.GetData(r).Data.(*model.Update_jobs)
 
-	respbyte, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	err = json.Unmarshal(respbyte, data)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	var hid int64
 	var ok bool
 	// 不存在这个职位的hypo，直接返回参数错误
@@ -188,7 +162,7 @@ func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	_, err = db.Mconn.Update("update jobs set name=?,level=?,hypo=? where id=?", data.Name, data.Level, hid, data.Id)
+	_, err := db.Mconn.Update("update jobs set name=?,level=?,hypo=? where id=?", data.Name, data.Level, hid, data.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

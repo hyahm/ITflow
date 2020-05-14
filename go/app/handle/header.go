@@ -3,9 +3,9 @@ package handle
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/db"
+	"itflow/model"
 	network "itflow/model"
 	"itflow/network/datalog"
 	"itflow/network/response"
@@ -66,20 +66,7 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("没有权限"))
 		return
 	}
-	data := &network.Data_header{}
-	respbyte, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	err = json.Unmarshal(respbyte, data)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	data := xmux.GetData(r).Data.(*model.Data_header)
 
 	idstr := make([]string, 0)
 	for _, v := range data.Hhids {
@@ -93,6 +80,7 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 	}
 	ids := strings.Join(idstr, ",")
 	gsql := "insert into header(name,hhids,remark) values(?,?,?)"
+	var err error
 	errorcode.Id, err = db.Mconn.Insert(gsql, data.Name, ids, data.Remark)
 	if err != nil {
 		golog.Error(err)
@@ -192,28 +180,16 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	nickname := xmux.GetData(r).Get("nickname").(string)
-	data := &network.Data_header{}
+	data := xmux.GetData(r).Data.(*model.Data_header)
 	// 管理员
 	if bugconfig.CacheNickNameUid[nickname] != bugconfig.SUPERID {
 		w.Write(errorcode.Error("没有权限"))
 		return
 	}
-	respbyte, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
-	err = json.Unmarshal(respbyte, data)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	// 原来的header
 	var oldheadids string
-	err = db.Mconn.GetOne("select hhids from header where id=?", data.Id).Scan(&oldheadids)
+	err := db.Mconn.GetOne("select hhids from header where id=?", data.Id).Scan(&oldheadids)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

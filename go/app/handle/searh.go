@@ -157,37 +157,16 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type getBugManager struct {
-	Page   int    `json:"page"`
-	Limit  int    `json:"limit"`
-	Id     int    `json:"id"`
-	Title  string `json:"title"`
-	Author string `json:"author"`
-}
-
 func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
 	al := &model.AllArticleList{}
-
-	searchq, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	searchparam := &getBugManager{}
-	err = json.Unmarshal(searchq, searchparam)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	searchparam := xmux.GetData(r).Data.(*bug.BugManager)
 
 	basesql, args := managertotal("select count(id) from bugs", searchparam)
 
-	err = db.Mconn.GetOne(basesql, args...).Scan(&al.Count)
+	err := db.Mconn.GetOne(basesql, args...).Scan(&al.Count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -252,7 +231,7 @@ func searchParamsSql(params *bug.SearchParam) (string, []interface{}) {
 	return basesql, args
 }
 
-func managertotal(basesql string, params *getBugManager) (string, []interface{}) {
+func managertotal(basesql string, params *bug.BugManager) (string, []interface{}) {
 	basesql = basesql + " where 1=1 "
 	args := make([]interface{}, 0)
 
@@ -272,7 +251,7 @@ func managertotal(basesql string, params *getBugManager) (string, []interface{})
 	return basesql, args
 }
 
-func managersearch(basesql string, count int, params *getBugManager) (*sql.Rows, error) {
+func managersearch(basesql string, count int, params *bug.BugManager) (*sql.Rows, error) {
 	searchsql, args := managertotal(basesql, params)
 
 	start, end := public.GetPagingLimitAndPage(count, params.Page, params.Limit)
@@ -288,12 +267,13 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 
 	errorcode := &response.Response{}
 	nickname := xmux.GetData(r).Get("nickname").(string)
+	searchparam := &bug.SearchParam{} // 接收的参数
 	searchq, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		golog.Error(err)
 		return nil, errorcode.ErrorE(err)
 	}
-	searchparam := &bug.SearchParam{} // 接收的参数
+
 	err = json.Unmarshal(searchq, searchparam)
 	if err != nil {
 		golog.Error(err)

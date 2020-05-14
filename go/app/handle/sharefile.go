@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/db"
+	"itflow/model"
 	network "itflow/model"
 	"itflow/network/response"
 	"net/http"
@@ -330,20 +331,8 @@ func ShareRename(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	ps := &network.Data_sharefile{}
+	ps := xmux.GetData(r).Data.(*model.Data_sharefile)
 
-	pb, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(pb, ps)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	var (
 		rid int64
 		wid int64
@@ -378,7 +367,7 @@ func ShareRename(w http.ResponseWriter, r *http.Request) {
 	}
 
 	updatetime := time.Now().Unix()
-	_, err = db.Mconn.Update("update sharefile set readuser=?,rid=?,isfile=?,writeuser=?,wid=?,updatetime=?,name=? where id=? and filepath=?",
+	_, err := db.Mconn.Update("update sharefile set readuser=?,rid=?,isfile=?,writeuser=?,wid=?,updatetime=?,name=? where id=? and filepath=?",
 		ps.ReadUser, rid, ps.IsFile, ps.WriteUser, wid, updatetime, ps.Name, ps.Id, ps.FilePath)
 	if err != nil {
 		golog.Error(err)
@@ -443,19 +432,8 @@ func ShareMkdir(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	nickname := xmux.GetData(r).Get("nickname").(string)
-	ps := &network.Data_sharefile{}
-	pb, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(pb, ps)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	ps := xmux.GetData(r).Data.(*model.Data_sharefile)
+
 	var (
 		rid int64
 		wid int64
@@ -488,7 +466,7 @@ func ShareMkdir(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorNoPermission())
 		return
 	}
-	err = os.MkdirAll(filepath.Join(basedir, ps.Name), 0755)
+	err := os.MkdirAll(filepath.Join(basedir, ps.Name), 0755)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorNoPermission())

@@ -54,6 +54,22 @@ func (login *Login) Check(resp *RespLogin) []byte {
 	return nil
 }
 
+type User struct {
+	Id          int    `json:"id"`
+	Createtime  int64  `json:"createtime"`
+	Realname    string `json:"realname"`
+	Nickname    string `json:"nickname"`
+	Email       string `json:"email"`
+	Disable     int    `json:"disable"`
+	StatusGroup string `json:"statusgroup"`
+	RoleGroup   string `json:"rolegroup"`
+	Position    string `json:"position"`
+}
+type UserList struct {
+	Userlist []*User `json:"userlist"`
+	Code     int     `json:"code"`
+}
+
 type UserInfo struct {
 	Roles    []string `json:"roles" type:"array" need:"否" default:"" information:"角色组"`
 	Code     int      `json:"code" type:"string" need:"是" default:"" information:"状态码， 0为成功"`

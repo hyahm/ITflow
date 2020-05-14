@@ -3,9 +3,9 @@ package handle
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/db"
+	"itflow/model"
 	network "itflow/model"
 	"itflow/network/datalog"
 	"itflow/network/response"
@@ -69,23 +69,12 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := &network.Data_types{}
+	data := xmux.GetData(r).Data.(*model.Data_types)
+
 	send := &network.Send_types{}
-	respbyte, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(respbyte, data)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	var t int
-	err = db.Mconn.GetOne("select type from types where id=?", data.Id).Scan(&t)
+	err := db.Mconn.GetOne("select type from types where id=?", data.Id).Scan(&t)
 	if t == 0 {
 		golog.Error("can not delete base type")
 		w.Write(errorcode.ErrorNoPermission())
@@ -201,20 +190,10 @@ func TypeAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := &network.Data_types{}
-	send := &network.Send_types{}
-	bytedata, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(bytedata, data)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	data := xmux.GetData(r).Data.(*model.Data_types)
+
+	send := &model.Send_types{}
+	var err error
 	switch data.Types {
 	case 1:
 		// list 类型

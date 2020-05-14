@@ -49,12 +49,14 @@ type envList struct {
 }
 
 func GetEnv(w http.ResponseWriter, r *http.Request) {
-
-	el := &envList{}
+	el := &envList{
+		EnvList: make([]string, 0),
+	}
 
 	for _, v := range bugconfig.CacheEidName {
 		el.EnvList = append(el.EnvList, v)
 	}
+
 	send, _ := json.Marshal(el)
 	w.Write(send)
 	return
@@ -110,7 +112,9 @@ type versionList struct {
 
 func GetVersion(w http.ResponseWriter, r *http.Request) {
 
-	vl := &versionList{}
+	vl := &versionList{
+		VersionList: make([]string, 0),
+	}
 
 	for _, v := range bugconfig.CacheVidName {
 		vl.VersionList = append(vl.VersionList, v)

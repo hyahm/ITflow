@@ -3,7 +3,6 @@ package handle
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"itflow/app/bugconfig"
 	"itflow/app/mail"
 	"itflow/db"
@@ -246,22 +245,6 @@ func DisableUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type userlist struct {
-	Id          int    `json:"id"`
-	Createtime  int64  `json:"createtime"`
-	Realname    string `json:"realname"`
-	Nickname    string `json:"nickname"`
-	Email       string `json:"email"`
-	Disable     int    `json:"disable"`
-	StatusGroup string `json:"statusgroup"`
-	RoleGroup   string `json:"rolegroup"`
-	Position    string `json:"position"`
-}
-type sendUserList struct {
-	Userlist []*userlist `json:"userlist"`
-	Code     int         `json:"code"`
-}
-
 // 显示自己能管理的权限，不显示自己的
 func UserList(w http.ResponseWriter, r *http.Request) {
 
@@ -272,7 +255,7 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uls := &sendUserList{}
+	uls := &user.UserList{}
 
 	// 0是系统管理员， 1是管理层， 2是普通用户
 	//switch level {
@@ -285,7 +268,7 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for adminrows.Next() {
-		ul := &userlist{}
+		ul := &user.User{}
 		var rid int64
 		var jid int64
 		var bugsid int64
@@ -311,20 +294,7 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uls := &userlist{}
-	bytedata, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	err = json.Unmarshal(bytedata, uls)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	uls := xmux.GetData(r).Data.(*user.User)
 
 	// 0是系统管理员， 1是管理层， 2是普通用户
 	//switch level {
@@ -366,7 +336,7 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	getallsql := "update user set realname=?,nickname=?,email=?,rid=?,bugsid=?,jid=? where id=?"
-	_, err = db.Mconn.Update(getallsql,
+	_, err := db.Mconn.Update(getallsql,
 		uls.Realname, uls.Nickname, uls.Email, rid, bsid, bugconfig.CacheJobnameJid[uls.Position],
 		uls.Id,
 	)
@@ -483,33 +453,16 @@ func GetGroup(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type resetPassword struct {
-	Id       int    `json:"id"`
-	Password string `json:"newpassword"`
-}
-
 func ResetPwd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	rp := &resetPassword{}
+	rp := xmux.GetData(r).Data.(*user.ResetPassword)
 
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	err = json.Unmarshal(body, rp)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	newpassword := gaencrypt.PwdEncrypt(rp.Password, bugconfig.Salt)
 
 	updatepwdsql := "update user set password=? where id=?"
-	_, err = db.Mconn.Update(updatepwdsql, newpassword, rp.Id)
+	_, err := db.Mconn.Update(updatepwdsql, newpassword, rp.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
