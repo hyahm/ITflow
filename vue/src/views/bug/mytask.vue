@@ -274,6 +274,7 @@ export default {
         checkstatus: this.checkstatus
       }
       this.statuslength = this.checkstatus.length
+      console.log(data)
       statusFilter(data).then(resp => {
         if (resp.data.code === 0) {
           this.statuslength = this.checkstatus.length
@@ -304,6 +305,7 @@ export default {
     getmystatus() {
       // 需要显示的状态
       getShowStatus().then(resp => {
+        console.log(1111)
         if (resp.data.code === 0) {
           if (resp.data.checkstatus !== null) {
             this.checkstatus = resp.data.checkstatus

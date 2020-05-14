@@ -42,8 +42,8 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 
 func ShowStatus(w http.ResponseWriter, r *http.Request) {
 
-	sl := xmux.GetData(r).Data.(*status.Status)
-
+	// sl := xmux.GetData(r).Data.(*status.Status)
+	sl := &status.Status{}
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	// 遍历出每一个status id
 	for _, v := range strings.Split(bugconfig.CacheUidFilter[bugconfig.CacheNickNameUid[nickname]], ",") {
@@ -226,7 +226,7 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	param := xmux.GetData(r).Data.(*status.Status)
-
+	golog.Info(param)
 	ids := make([]string, 0)
 	for _, v := range param.CheckStatus {
 		// 如果存在这个状态才添加进来
