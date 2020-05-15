@@ -3,6 +3,7 @@
     <el-button :style="{background:color,borderColor:color}" icon="el-icon-upload" size="mini" type="primary" @click=" dialogVisible=true">
       upload
     </el-button>
+    <!-- action="https://httpbin.org/post" -->
     <el-dialog :visible.sync="dialogVisible">
       <el-upload
         :multiple="true"
@@ -12,7 +13,7 @@
         :on-success="handleSuccess"
         :before-upload="beforeUpload"
         class="editor-slide-upload"
-        action="https://httpbin.org/post"
+        :action="posturl"
         list-type="picture-card"
       >
         <el-button size="small" type="primary">
@@ -31,7 +32,6 @@
 
 <script>
 // import { getToken } from 'api/qiniu'
-
 export default {
   name: 'EditorSlideUpload',
   props: {
@@ -44,7 +44,8 @@ export default {
     return {
       dialogVisible: false,
       listObj: {},
-      fileList: []
+      fileList: [],
+      posturl: process.env.VUE_APP_BASE_API + '/uploadimg'
     }
   },
   methods: {
@@ -64,10 +65,11 @@ export default {
     },
     handleSuccess(response, file) {
       const uid = file.uid
+
       const objKeyArr = Object.keys(this.listObj)
       for (let i = 0, len = objKeyArr.length; i < len; i++) {
         if (this.listObj[objKeyArr[i]].uid === uid) {
-          this.listObj[objKeyArr[i]].url = response.files.file
+          this.listObj[objKeyArr[i]].url = response.url
           this.listObj[objKeyArr[i]].hasSuccess = true
           return
         }
@@ -84,6 +86,9 @@ export default {
       }
     },
     beforeUpload(file) {
+      console.log('------------')
+      console.log(file)
+      console.log('------------')
       const _self = this
       const _URL = window.URL || window.webkitURL
       const fileName = file.uid
@@ -91,6 +96,7 @@ export default {
       return new Promise((resolve, reject) => {
         const img = new Image()
         img.src = _URL.createObjectURL(file)
+        console.log(img)
         img.onload = function() {
           _self.listObj[fileName] = { hasSuccess: false, uid: file.uid, width: this.width, height: this.height }
         }

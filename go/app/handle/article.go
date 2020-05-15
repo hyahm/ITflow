@@ -128,13 +128,15 @@ func GetVersion(w http.ResponseWriter, r *http.Request) {
 type uploadImage struct {
 	HasSuccess bool   `json:"hasSuccess"`
 	Height     int    `json:"height"`
-	Uid        uint64 `json:"uid"`
+	Uid        int64  `json:"uid"`
 	Url        string `json:"url"`
 	Width      int    `json:"width"`
 }
 
 func UploadImgs(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
+	// b, _ := ioutil.ReadAll(r.Body)
+	// golog.Info(string(b))
 	file, h, err := r.FormFile("file")
 	if err != nil {
 		golog.Error(err)
@@ -170,6 +172,7 @@ func UploadImgs(w http.ResponseWriter, r *http.Request) {
 	sendurl := &uploadImage{
 		HasSuccess: true,
 		Url:        url,
+		Uid:        time.Now().UnixNano(),
 	}
 	send, _ := json.Marshal(sendurl)
 	w.Write(send)

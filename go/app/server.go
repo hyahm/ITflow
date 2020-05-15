@@ -38,7 +38,7 @@ func RunHttp() {
 
 	router.AddGroup(route.Email).AddGroup(route.Share).AddGroup(route.Api)
 
-	router.Pattern("/uploadimg").Post(handle.UploadImgs)
+	router.Pattern("/uploadimg").Post(handle.UploadImgs).DelMidware(midware.CheckToken)
 	router.Pattern("/upload/headimg").Post(handle.UploadHeadImg)
 	router.Pattern("/showimg/{imgname}").Get(handle.ShowImg).SetHeader("Content-Type", "image/png").DelMidware(midware.CheckToken)
 
