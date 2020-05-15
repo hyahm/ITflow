@@ -12,7 +12,11 @@ var Project *xmux.GroupRoute
 
 func init() {
 	Project = xmux.NewGroupRoute().AddMidware(midware.CheckProjectPermssion)
-
+	Project.ApiCodeField("code").ApiCodeMsg("0", "成功")
+	Project.ApiCodeField("code").ApiCodeMsg("20", "token过期")
+	Project.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
+	Project.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
+	Project.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 	Project.Pattern("/project/list").Post(handle.ProjectList)
 
 	Project.Pattern("/project/add").Post(handle.AddProject).End(midware.EndLog)

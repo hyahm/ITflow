@@ -14,8 +14,14 @@ import (
 var Api *xmux.GroupRoute
 
 func init() {
-	Api = xmux.NewGroupRoute()
+	Api = xmux.NewGroupRoute().ApiCreateGroup("api", "与api文档相关的所有的", "api")
 
+	Api.ApiCodeField("code").ApiCodeMsg("0", "成功")
+	Api.ApiCodeField("code").ApiCodeMsg("20", "token过期")
+	Api.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
+	Api.ApiCodeField("code").ApiCodeMsg("其他错误", "请查看返回的msg")
+
+	Api.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 	Api.Pattern("/rest/list").Post(handle.RestList)
 
 	Api.Pattern("/rest/update").Post(handle.RestUpdate).Bind(&model.Data_restful{}).AddMidware(midware.JsonToStruct).

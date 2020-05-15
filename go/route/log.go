@@ -13,6 +13,11 @@ var Log *xmux.GroupRoute
 func init() {
 	Log = xmux.NewGroupRoute().AddMidware(midware.CheckLogPermssion).ApiCreateGroup("log", "日志相关", "log")
 	Log.ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf")
+	Log.ApiCodeField("code").ApiCodeMsg("0", "成功")
+	Log.ApiCodeField("code").ApiCodeMsg("20", "token过期")
+	Log.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
+	Log.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
+	Log.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
 	Log.Pattern("/search/log").Post(handle.SearchLog).Bind(&log.Search_log{}).
 		AddMidware(midware.JsonToStruct).

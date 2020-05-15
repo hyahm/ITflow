@@ -13,9 +13,12 @@ var Status *xmux.GroupRoute
 func init() {
 	Status = xmux.NewGroupRoute().AddMidware(midware.CheckStatusPermssion).
 		ApiCreateGroup("bugstatus", "bug 状态管理", "bug status").
-		ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf").
-		ApiCodeMsg("0", "成功").ApiCodeMsg("3", "没有权限").ApiCodeMsg("10", "token 过期")
-
+		ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf")
+	Status.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
+	Status.ApiCodeField("code").ApiCodeMsg("0", "成功")
+	Status.ApiCodeField("code").ApiCodeMsg("20", "token过期")
+	Status.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
+	Status.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	Status.Pattern("/status/list").Post(handle.StatusList).
 		ApiResStruct(&bug.ListStatus{}).ApiDescribe("获取bugstatus状态列表").
 		ApiResponseTemplate(`{

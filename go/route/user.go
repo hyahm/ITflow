@@ -14,7 +14,11 @@ var User *xmux.GroupRoute
 func init() {
 	User = xmux.NewGroupRoute()
 	User.ApiCreateGroup("user", "用户相关的", "user")
-	User.ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf")
+	User.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
+	User.ApiCodeField("code").ApiCodeMsg("0", "成功")
+	User.ApiCodeField("code").ApiCodeMsg("20", "token过期")
+	User.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
+	User.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 
 	User.Pattern("/user/login").Post(handle.Login).Bind(&user.Login{}).
 		DelMidware(midware.CheckToken).AddMidware(midware.JsonToStruct).End(midware.EndLog).
@@ -23,16 +27,12 @@ func init() {
 		ApiReqStruct(user.Login{}).
 		ApiResStruct(user.RespLogin{}).
 		ApiRequestTemplate(`{"username":"admin", "password": "123456"}`).
-		ApiResponseTemplate(`{"username":"admin","token":"sdfhdffffsdfgasdfasdf", "code": 0}`).
-		ApiCodeMsg("10", "token 过期").
-		ApiCodeMsg("0", "成功")
-
+		ApiResponseTemplate(`{"username":"admin","token":"sdfhdffffsdfgasdfasdf", "code": 0}`)
 	User.Pattern("/user/logout").Post(handle.LoginOut).
 		End(midware.EndLog).
 		ApiDescribe("用户退出接口").
 		ApiResStruct(response.Response{}).
-		ApiSupplement("返回码是大部分公用的").
-		ApiCodeMsg("10", "token 过期").ApiCodeMsg("0", "成功")
+		ApiSupplement("返回码是大部分公用的")
 
 	User.Pattern("/user/info").Get(handle.UserInfo).
 		ApiDescribe("获取用户信息").ApiCodeMsg("10", "token 过期").ApiCodeMsg("0", "成功").

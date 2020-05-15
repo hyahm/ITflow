@@ -11,7 +11,13 @@ import (
 var StatusGroup *xmux.GroupRoute
 
 func init() {
-	StatusGroup = xmux.NewGroupRoute()
+	StatusGroup = xmux.NewGroupRoute().ApiCreateGroup("statusgroup", "状态组操作", "bug status group")
+
+	StatusGroup.ApiCodeField("code").ApiCodeMsg("0", "成功")
+	StatusGroup.ApiCodeField("code").ApiCodeMsg("20", "token过期")
+	StatusGroup.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
+	StatusGroup.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
+	StatusGroup.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 	StatusGroup.Pattern("/statusgroup/add").Post(handle.AddStatusGroup).Bind(&status.StatusGroup{}).
 		AddMidware(midware.JsonToStruct).End(midware.EndLog)
 

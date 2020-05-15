@@ -12,9 +12,13 @@ import (
 var Bug *xmux.GroupRoute
 
 func init() {
-	Bug = xmux.NewGroupRoute().ApiCodeField("code").ApiCodeMsg("0", "成功").ApiCreateGroup("bug", "bug相关接口", "bug相关")
+	Bug = xmux.NewGroupRoute().ApiCreateGroup("bug", "bug相关接口", "bug相关")
+	Bug.ApiCodeField("code").ApiCodeMsg("0", "成功")
+	Bug.ApiCodeField("code").ApiCodeMsg("20", "token过期")
+	Bug.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
+	Bug.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	Bug.ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf")
-
+	Bug.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 	Bug.Pattern("/bug/pass").Post(handle.PassBug).End(midware.EndLog).Bind(&bug.PassBug{}).
 		AddMidware(midware.JsonToStruct).ApiDescribe("转交bug").ApiReqStruct(&bug.PassBug{})
 
@@ -22,7 +26,7 @@ func init() {
 		AddMidware(midware.JsonToStruct).End(midware.EndLog).
 		ApiDescribe("创建或更新bug")
 
-	Bug.Pattern("/bug/edit").Get(handle.BugEdit).Bind(&bug.BugData{}).AddMidware(midware.JsonToStruct).
+	Bug.Pattern("/bug/edit").Get(handle.BugEdit).
 		End(midware.EndLog)
 
 	Bug.Pattern("/bug/mybugs").Post(handle.GetMyBugs).Bind(&bug.SearchParam{}).
