@@ -14,6 +14,6 @@ type Get_groups struct {
 }
 
 type Send_groups struct {
-	GroupList []*Get_groups `json:"grouplist"`
-	Code      int           `json:"code"`
+	GroupList []*Get_groups `json:"grouplist" type:"array" need:"是" information:"返回的grouplist"`
+	Code      int           `json:"code" type:"int" need:"是" information:"错误码"`
 }

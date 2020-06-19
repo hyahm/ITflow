@@ -17,7 +17,6 @@ func init() {
 	User.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 	User.ApiCodeField("code").ApiCodeMsg("0", "成功")
 	User.ApiCodeField("code").ApiCodeMsg("20", "token过期")
-	User.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
 	User.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 
 	User.Pattern("/user/login").Post(handle.Login).Bind(&user.Login{}).
