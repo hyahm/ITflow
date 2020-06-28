@@ -29,6 +29,7 @@ func init() {
 		ApiDescribe("修改角色组").ApiReqStruct(&rolegroup.RoleGroup{}).ApiResStruct(&response.Response{})
 
 	RoleGroup.Pattern("/rolegroup/list").Post(handle.RoleGroupList)
+	RoleGroup.Pattern("/rolegroup/get").Post(handle.GetRoleGroupName)
 
 	RoleGroup.Pattern("/rolegroup/remove").Get(handle.RoleGroupDel).End(midware.EndLog)
 

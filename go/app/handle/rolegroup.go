@@ -43,6 +43,34 @@ func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func GetRoleGroupName(w http.ResponseWriter, r *http.Request) {
+
+	errorcode := &response.Response{}
+
+	s := "select name from rolegroup"
+	rows, err := db.Mconn.GetRows(s)
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	resp := struct {
+		Code     int      `json:"code"`
+		RoleList []string `json:"rolelist"`
+	}{
+		RoleList: make([]string, 0),
+	}
+	for rows.Next() {
+		var name string
+		rows.Scan(&name)
+		resp.RoleList = append(resp.RoleList, name)
+
+	}
+	send, _ := json.Marshal(resp)
+	w.Write(send)
+	return
+}
+
 func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
