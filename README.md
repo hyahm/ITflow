@@ -5,7 +5,6 @@
 文档地址： http://itflow.doc.hyahm.com  
 路由接口文档地址： http://hyahm.com:10001/docs （配合新前端不断更新中）
 
-更改项目路由为：  https://github.com/hyahm/xmux   
 新前端地址：  https://github.com/jiandanzhiyun/vue-elementAdmin （开发完成后会替换掉老的前端）    
 
 ### 功能
@@ -50,4 +49,4 @@
 4. 永久开源  可以自己二次开发 
   
 ### QQ群  
-    928790087@qq.com  
+    928790087
