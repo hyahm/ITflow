@@ -3,7 +3,7 @@ import request from '@/utils/request'
 export function getRoleGroup() {
   return request({
     url: '/rolegroup/get',
-    method: 'get'
+    method: 'post'
   })
 }
 
