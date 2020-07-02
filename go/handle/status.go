@@ -6,6 +6,7 @@ import (
 	"itflow/db"
 	"itflow/internal/datalog"
 	"itflow/internal/response"
+	"itflow/internal/status"
 	network "itflow/model"
 	"net/http"
 	"strconv"
@@ -19,16 +20,7 @@ import (
 
 func StatusList(w http.ResponseWriter, r *http.Request) {
 
-	ls := &bug.ListStatus{}
-	for k, v := range cache.CacheSidStatus {
-		one := &bug.Status{}
-		one.Id = k
-		one.Name = v
-		ls.StatusList = append(ls.StatusList, one)
-	}
-
-	send, _ := json.Marshal(ls)
-	w.Write(send)
+	w.Write(status.StatusList())
 	return
 
 }

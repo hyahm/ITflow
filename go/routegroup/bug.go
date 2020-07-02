@@ -27,8 +27,8 @@ func init() {
 		ApiRequestTemplate(`{"title":"metu","content":"<p>反反复复</p>","id":-1,"selectuser":["sdfsadf"],"projectname":"123","level":"2","envname":"axi","important":"一般ee","version":"V 1.5"}`).
 		ApiResponseTemplate(`{id: 20, code: 0, message: "success"}`)
 
-	// Bug.Pattern("/bug/edit").Get(handle.BugEdit).
-	// 	End(midware.EndLog)
+	Bug.Pattern("/bug/edit").Get(handle.BugEdit).
+		End(midware.EndLog)
 
 	Bug.Pattern("/bug/mybugs").Post(handle.GetMyBugs).Bind(&bug.SearchParam{}).
 		End(midware.EndLog)

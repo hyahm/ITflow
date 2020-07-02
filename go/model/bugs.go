@@ -3,6 +3,7 @@ package model
 import (
 	"html"
 	"itflow/db"
+	"itflow/internal/assist"
 
 	"github.com/hyahm/golog"
 )
@@ -11,7 +12,7 @@ type ArticleList struct {
 	ID          int      `json:"id"`
 	Date        int64    `json:"date"`
 	Author      string   `json:"author"`
-	Importance  string   `json:"importance"`
+	Importance  string   `json:"important"`
 	Status      string   `json:"status"`
 	Title       string   `json:"title"`
 	Action      string   `json:"action"`
@@ -38,7 +39,7 @@ type Bug struct {
 	ImportanceId int64
 	CreateTime   int64
 	VersionId    int64
-	OprateUsers  string
+	OprateUsers  assist.Uid
 	LevelId      int64
 	EnvId        int64
 	ProjectId    int64
@@ -65,15 +66,14 @@ func (bug *Bug) EditBug() (err error) {
 	return
 }
 
-func NewBugById(id interface{}) (*Bug, error) {
-	bug := &Bug{}
+func (bug *Bug) NewBugById(id interface{}) error {
 	alsql := "select iid,title,lid,pid,eid,spusers,vid,content from bugs where id=?"
 	err := db.Mconn.GetOne(alsql, id).Scan(&bug.ImportanceId, &bug.Title, &bug.LevelId, &bug.ProjectId,
 		&bug.EnvId, &bug.OprateUsers, &bug.VersionId, &bug.Content)
 	if err != nil {
 		golog.Error(err)
-		return nil, err
+		return err
 	}
 
-	return bug, nil
+	return nil
 }

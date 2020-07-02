@@ -36,11 +36,18 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	data := xmux.GetData(r).Data.(*bug.RespEditBug)
-	bug, err := data.ToResp()
+	statusId, ok := cache.CacheDefault["status"]
+	if !ok {
+		w.Write([]byte("必须给定一个状态默认值"))
+		return
+	}
+
+	bug, err := data.ToBug()
 	if err != nil {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	bug.StatusId = statusId
 	bug.Uid = xmux.GetData(r).Get("uid").(int64)
 	//
 	xmux.GetData(r).End = &datalog.AddLog{
@@ -52,7 +59,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 	if data.Id <= 0 {
 		// 插入bug
 		bug.CreateTime = time.Now().Unix()
-		err = bug.CreateBug()
+		err = bug.EditBug()
 		if err != nil {
 			w.Write(errorcode.ErrorE(err))
 			return
@@ -63,7 +70,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 		// update
 		errorcode.Id = data.Id
 		bug.UpdateTime = time.Now().Unix()
-		err = bug.CreateBug()
+		err = bug.EditBug()
 		if err != nil {
 			w.Write(errorcode.ErrorE(err))
 			return

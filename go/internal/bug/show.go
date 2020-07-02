@@ -3,7 +3,6 @@ package bug
 import (
 	"itflow/internal/assist"
 	"itflow/internal/comment"
-	"itflow/model"
 )
 
 type RespShowBug struct {
@@ -22,26 +21,26 @@ type RespShowBug struct {
 	Comments    []*comment.Informations `json:"comments,omitempty"`
 }
 
-func (rsb *RespShowBug) ShowBug(id interface{}) ([]byte, error) {
-	_, err := model.NewBugById(id)
-	if err != nil {
-		return nil, err
-	}
+// func (rsb *RespShowBug) ShowBug(id interface{}) ([]byte, error) {
+// 	_, err := model.NewBugById(id)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	// art := &Article{
+// 	// art := &Article{
 
-	// 	Title:       bug.Title,
-	// 	Id:          bug.ID,
-	// 	Important:   cache.CacheIidImportant[bug.ImportanceId],
-	// 	Level:       cache.CacheLidLevel[bug.LevelId],
-	// 	Projectname: cache.CachePidName[bug.ProjectId],
-	// 	Envname:     cache.CacheEidName[bug.EnvId],
-	// 	Version:     cache.CacheVidName[bug.VersionId],
-	// }
+// 	// 	Title:       bug.Title,
+// 	// 	Id:          bug.ID,
+// 	// 	Important:   cache.CacheIidImportant[bug.ImportanceId],
+// 	// 	Level:       cache.CacheLidLevel[bug.LevelId],
+// 	// 	Projectname: cache.CachePidName[bug.ProjectId],
+// 	// 	Envname:     cache.CacheEidName[bug.EnvId],
+// 	// 	Version:     cache.CacheVidName[bug.VersionId],
+// 	// }
 
-	// art.Content = html.UnescapeString(bug.Content)
-	// art.Selectusers = assist.FormatUserlistToShow(bug.OprateUsers)
+// 	// art.Content = html.UnescapeString(bug.Content)
+// 	// art.Selectusers = assist.FormatUserlistToShow(bug.OprateUsers)
 
-	// send, _ := json.Marshal(art)
-	return []byte(""), nil
-}
+// 	// send, _ := json.Marshal(art)
+// 	return []byte(""), nil
+// }

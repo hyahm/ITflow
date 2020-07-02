@@ -1,6 +1,7 @@
 package bug
 
 import (
+	"encoding/json"
 	"errors"
 	"itflow/cache"
 	"itflow/internal/assist"
@@ -24,7 +25,15 @@ type RespEditBug struct {
 	Msg         string       `json:"msg,omitempty"`
 }
 
-func (reb *RespEditBug) ToResp() (*model.Bug, error) {
+func (reb *RespEditBug) Marshal() []byte {
+	if reb == nil {
+		return nil
+	}
+	send, _ := json.Marshal(reb)
+	return send
+}
+
+func (reb *RespEditBug) ToBug() (*model.Bug, error) {
 	// 将获取的数据转为可以存表的数据
 	bug := &model.Bug{}
 	bug.ID = reb.Id
@@ -58,7 +67,7 @@ func (reb *RespEditBug) ToResp() (*model.Bug, error) {
 		return nil, errors.New("没有找到version key")
 	}
 
-	bug.StatusId, ok = cache.CacheDefault["status"]
-	bug.OprateUsers = reb.Selectusers.RealNameToUsers()
+	
+	bug.OprateUsers = reb.Selectusers.RealNameToUsersId()
 	return bug, nil
 }

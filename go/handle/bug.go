@@ -27,14 +27,8 @@ type statusList struct {
 }
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
-
-	sl := &statusList{}
-	for _, v := range cache.CacheSidStatus {
-		sl.StatusList = append(sl.StatusList, v)
-	}
-
-	send, _ := json.Marshal(sl)
-	w.Write(send)
+	// 获取状态名
+	w.Write(status.GetNames())
 	return
 
 }
@@ -336,17 +330,10 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// func BugEdit(w http.ResponseWriter, r *http.Request) {
+func BugEdit(w http.ResponseWriter, r *http.Request) {
 
-// 	errorcode := &response.Response{}
+	id := r.FormValue("id")
+	w.Write(bug.RespEditBugData(id))
+	return
 
-// 	id := r.FormValue("id")
-// 	send, err := bug.ShowBug(id)
-// 	if err != nil {
-// 		w.Write(errorcode.ErrorE(err))
-// 		return
-// 	}
-// 	w.Write(send)
-// 	return
-
-// }
+}

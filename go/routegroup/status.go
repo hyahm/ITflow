@@ -17,8 +17,8 @@ func init() {
 	Status.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 	Status.ApiCodeField("code").ApiCodeMsg("0", "成功")
 	Status.ApiCodeField("code").ApiCodeMsg("20", "token过期")
-	Status.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
 	Status.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
+
 	Status.Pattern("/status/list").Post(handle.StatusList).
 		ApiResStruct(&bug.ListStatus{}).ApiDescribe("获取bugstatus状态列表").
 		ApiResponseTemplate(`{
