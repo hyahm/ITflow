@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"itflow/db"
-	"itflow/network/response"
+	"itflow/internal/response"
 	"net/http"
 
 	"github.com/hyahm/golog"
@@ -40,8 +40,10 @@ func CheckToken(w http.ResponseWriter, r *http.Request) bool {
 		return true
 	} else {
 		var nickname string
-		filter.Get("NickName").Scan(&nickname)
+		var uid int64
+		filter.Get(db.NICKNAME, db.ID).Scan(&nickname, &uid)
 		xmux.GetData(r).Set("nickname", nickname)
+		xmux.GetData(r).Set("uid", uid)
 	}
 
 	return false

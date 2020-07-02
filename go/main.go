@@ -1,9 +1,9 @@
 package main
 
 import (
-	"itflow/app"
-	"itflow/app/bugconfig"
+	"itflow/cache"
 	"itflow/db"
+	"itflow/httpserver"
 	"log"
 	"os"
 	"os/signal"
@@ -22,7 +22,7 @@ func main() {
 	// 初始化redis
 	db.InitCacheTable()
 	// 初始化缓存（后面会使用redis）
-	bugconfig.LoadConfig()
+	cache.LoadConfig()
 	// 初始化日志
 	golog.InitLogger(goconfig.ReadString("log.path", ""),
 		goconfig.ReadInt64("log.size", 0),
@@ -42,5 +42,5 @@ func main() {
 	}()
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
 
-	app.RunHttp()
+	httpserver.RunHttp()
 }

@@ -1,7 +1,7 @@
 package midware
 
 import (
-	"itflow/network/datalog"
+	"itflow/internal/datalog"
 	"strings"
 )
 

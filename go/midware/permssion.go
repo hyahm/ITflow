@@ -1,9 +1,9 @@
 package midware
 
 import (
-	"itflow/app/bugconfig"
+	"itflow/cache"
+	"itflow/internal/response"
 	"itflow/model"
-	"itflow/network/response"
 	"net/http"
 
 	"github.com/hyahm/golog"
@@ -116,7 +116,7 @@ func checkPermssion(nickname, pagename string) ([]byte, bool) {
 	errorcode := &response.Response{}
 
 	// 管理员
-	if bugconfig.CacheNickNameUid[nickname] == bugconfig.SUPERID {
+	if cache.CacheNickNameUid[nickname] == cache.SUPERID {
 		permssion = true
 	} else {
 		rg, err := model.NewRoleGroup(nickname)

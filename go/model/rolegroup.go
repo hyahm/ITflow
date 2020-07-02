@@ -1,7 +1,7 @@
 package model
 
 import (
-	"itflow/app/bugconfig"
+	"itflow/cache"
 	"itflow/db"
 	"strconv"
 	"strings"
@@ -30,8 +30,8 @@ func (rg *RoleGroup) Join() {
 
 func NewRoleGroup(nickname string) (*RoleGroup, error) {
 	// 通过nickname 来获取rid
-	uid := bugconfig.CacheNickNameUid[nickname]
-	rid := bugconfig.CacheUidRid[uid]
+	uid := cache.CacheNickNameUid[nickname]
+	rid := cache.CacheUidRid[uid]
 	rg := &RoleGroup{}
 	err := db.Mconn.GetOne("select name, rolelist from rolegroup where id=?", rid).Scan(&rg.Name, &rg.RoleList)
 	if err != nil {
@@ -47,7 +47,7 @@ func (rg *RoleGroup) CheckPagePerm(name string) bool {
 	rg.RoleArray = strings.Split(rg.RoleList, ",")
 	for _, v := range rg.RoleArray {
 		id, _ := strconv.ParseInt(v, 10, 64)
-		if bugconfig.CacheRidRole[id] == name {
+		if cache.CacheRidRole[id] == name {
 			return true
 		}
 	}
