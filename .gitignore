@@ -1,6 +1,5 @@
 go/bin
 go/bug.ini
-go/pkg
 go/.idea
 vue/.DS_Store
 vue/node_modules/
