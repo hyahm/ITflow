@@ -74,6 +74,6 @@ func (bug *Bug) NewBugById(id interface{}) error {
 		golog.Error(err)
 		return err
 	}
-
+	bug.Content = html.UnescapeString(bug.Content)
 	return nil
 }

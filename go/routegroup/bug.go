@@ -15,8 +15,7 @@ func init() {
 	Bug = xmux.NewGroupRoute().ApiCreateGroup("bug", "bug相关接口", "bug相关")
 	Bug.ApiCodeField("code").ApiCodeMsg("0", "成功")
 	Bug.ApiCodeField("code").ApiCodeMsg("20", "token过期")
-	Bug.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
-	Bug.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
+	Bug.ApiCodeField("code").ApiCodeMsg("1", "其他错误,请查看返回的msg")
 	Bug.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 	Bug.Pattern("/bug/pass").Post(handle.PassBug).End(midware.EndLog).Bind(&bug.PassBug{}).
 		AddMidware(midware.JsonToStruct).ApiDescribe("转交bug").ApiReqStruct(&bug.PassBug{})
@@ -24,11 +23,13 @@ func init() {
 	Bug.Pattern("/bug/create").Post(handle.BugCreate).Bind(&bug.RespEditBug{}).
 		AddMidware(midware.JsonToStruct).End(midware.EndLog).
 		ApiDescribe("创建或更新bug").
-		ApiRequestTemplate(`{"title":"metu","content":"<p>反反复复</p>","id":-1,"selectuser":["sdfsadf"],"projectname":"123","level":"2","envname":"axi","important":"一般ee","version":"V 1.5"}`).
+		ApiRequestTemplate(`{"title":"metu","content":"<p>反反复复</p>","id":1,"selectuser":["sdfsadf"],"projectname":"123","level":"2","envname":"axi","important":"一般ee","version":"V 1.5"}`).
 		ApiResponseTemplate(`{id: 20, code: 0, message: "success"}`)
 
 	Bug.Pattern("/bug/edit").Get(handle.BugEdit).
-		End(midware.EndLog)
+		End(midware.EndLog).
+		ApiDescribe("页面编辑获取数据").
+		ApiResponseTemplate(`{"title":"metu","content":"<p>反反复复</p>","id":-1,"selectuser":["sdfsadf"],"projectname":"123","level":"2","envname":"axi","important":"一般ee","version":"V 1.5"}`)
 
 	Bug.Pattern("/bug/mybugs").Post(handle.GetMyBugs).Bind(&bug.SearchParam{}).
 		End(midware.EndLog)

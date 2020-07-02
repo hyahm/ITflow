@@ -11,7 +11,7 @@ func (reb *RespEditBug) ToResp(b *model.Bug) error {
 
 	reb.Id = b.ID
 
-	reb.Content = b.Content
+	reb.Content =  b.Content
 	reb.Title = b.Title
 
 	var ok bool

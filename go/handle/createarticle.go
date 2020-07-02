@@ -59,7 +59,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 	if data.Id <= 0 {
 		// 插入bug
 		bug.CreateTime = time.Now().Unix()
-		err = bug.EditBug()
+		err = bug.CreateBug()
 		if err != nil {
 			w.Write(errorcode.ErrorE(err))
 			return

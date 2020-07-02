@@ -131,22 +131,24 @@ type uploadImage struct {
 	Uid        int64  `json:"uid"`
 	Url        string `json:"url"`
 	Width      int    `json:"width"`
+	Code       int    `json:"code"`
 }
 
 func UploadImgs(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
-	// b, _ := ioutil.ReadAll(r.Body)
-	// golog.Info(string(b))
-	file, h, err := r.FormFile("file")
+
+	file, h, err := r.FormFile("image")
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	ext := filepath.Ext(h.Filename)
+	golog.Info("upload image")
 	filename := strconv.FormatInt(time.Now().UnixNano(), 10) + ext
-
-	cfile, err := os.OpenFile(path.Join(cache.ImgDir, filename), os.O_CREATE|os.O_RDWR, 0755)
+	p := path.Join(cache.ImgDir, filename)
+	golog.Info(p)
+	cfile, err := os.OpenFile(p, os.O_CREATE|os.O_RDWR, 0755)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
