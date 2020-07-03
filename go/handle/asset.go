@@ -18,7 +18,7 @@ func sortpermlist(permlist []string) []string {
 	newlist := make([]string, 0)
 	for i := 0; i < l; i++ {
 		for _, v := range permlist {
-			if cache.CacheSidStatus[int64(i)] == v {
+			if cache.CacheSidStatus[cache.StatusId(i)].ToString() == v {
 				newlist = append(newlist, v)
 			}
 		}

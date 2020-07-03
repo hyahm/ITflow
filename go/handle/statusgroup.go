@@ -8,7 +8,6 @@ import (
 	"itflow/internal/datalog"
 	"itflow/internal/response"
 	"itflow/internal/status"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -68,19 +67,9 @@ func EditStatusGroup(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("名称不能为空"))
 		return
 	}
-	ssids := make([]string, 0)
-	for _, v := range data.StatusList {
-		// 没找到就是key
-		var sid int64
-		var ok bool
-		if sid, ok = cache.CacheStatusSid[v]; !ok {
-			continue
-		}
-		ssids = append(ssids, strconv.FormatInt(sid, 10))
-	}
-	ss := strings.Join(ssids, ",")
+
 	isql := "update statusgroup set name =?,sids=? where id = ?"
-	_, err := db.Mconn.Update(isql, data.Name, ss, data.Id)
+	_, err := db.Mconn.Update(isql, data.Name, data.StatusList.ToStore(), data.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -115,19 +104,19 @@ func StatusGroupList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for rows.Next() {
-		var ids string
+		var ids cache.StoreStatusId
 		one := &department{}
 		rows.Scan(&one.Id, &one.Name, &ids)
+		one.BugstatusList = ids.ToShow()
+		// for _, v := range strings.Split(ids, ",") {
+		// 	id, err := strconv.Atoi(v)
+		// 	if err != nil {
+		// 		log.Println(err)
+		// 		continue
+		// 	}
 
-		for _, v := range strings.Split(ids, ",") {
-			id, err := strconv.Atoi(v)
-			if err != nil {
-				log.Println(err)
-				continue
-			}
-
-			one.BugstatusList = append(one.BugstatusList, cache.CacheSidStatus[int64(id)])
-		}
+		// 	one.BugstatusList = append(one.BugstatusList, cache.CacheSidStatus[cache.StatusId(id)])
+		// }
 		data.DepartmentList = append(data.DepartmentList, one)
 	}
 	send, _ := json.Marshal(data)

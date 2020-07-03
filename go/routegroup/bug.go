@@ -3,6 +3,7 @@ package routegroup
 import (
 	"itflow/handle"
 	"itflow/internal/bug"
+	"itflow/internal/search"
 	"itflow/internal/status"
 	"itflow/midware"
 
@@ -41,9 +42,6 @@ func init() {
 	Bug.Pattern("/status/filter").Post(handle.ChangeFilterStatus).Bind(&status.Status{}).
 		AddMidware(midware.JsonToStruct)
 
-	Bug.Pattern("/status/show").Post(handle.ShowStatus).
-		ApiDescribe("查询可以查看的状态")
-
 	Bug.Pattern("/bug/show").Get(handle.BugShow).
 		ApiDescribe("获取此bug信息").ApiReqParams("id", "6").ApiResponseTemplate(`{
 			"title": "sdfsdf",
@@ -56,7 +54,7 @@ func init() {
 		}`).ApiResStruct(bug.RespShowBug{})
 
 	Bug.Pattern("/search/allbugs").Post(handle.SearchAllBugs)
-	Bug.Pattern("/search/mybugs").Post(handle.SearchMyBugs)
+	Bug.Pattern("/search/mybugs").Post(handle.SearchMyBugs).Bind(&search.ReqMyBugFilter{}).AddMidware(midware.JsonToStruct)
 
 	Bug.Pattern("/search/mytasks").Post(handle.SearchMyTasks).Bind(&bug.SearchParam{}).
 		AddMidware(midware.JsonToStruct)

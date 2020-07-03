@@ -18,7 +18,6 @@ func JsonToStruct(w http.ResponseWriter, r *http.Request) bool {
 		w.Write(resp.ErrorE(err))
 		return true
 	}
-	golog.Info(string(b))
 	err = json.Unmarshal(b, xmux.GetData(r).Data)
 	if err != nil {
 		golog.Error(err)
@@ -35,16 +34,20 @@ func CheckToken(w http.ResponseWriter, r *http.Request) bool {
 		w.Write(errorcode.TokenNotFound())
 		return true
 	}
-	if filter, err := db.CT.Filter("Token", a); err != nil {
+	filter, err := db.CT.Filter("Token", a)
+	if err != nil {
 		w.Write(errorcode.TokenNotFound())
 		return true
-	} else {
-		var nickname string
-		var uid int64
-		filter.Get(db.NICKNAME, db.ID).Scan(&nickname, &uid)
-		xmux.GetData(r).Set("nickname", nickname)
-		xmux.GetData(r).Set("uid", uid)
 	}
+	var nickname string
+	var uid int64
+	err = filter.Get(db.NICKNAME, db.ID).Scan(&nickname, &uid)
+	if err != nil {
+		golog.Error(err)
+	}
+	xmux.GetData(r).Set("nickname", nickname)
+	golog.Info("uid: ", uid)
+	xmux.GetData(r).Set("uid", uid)
 
 	return false
 }

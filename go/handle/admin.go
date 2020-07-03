@@ -1,8 +1,8 @@
 package handle
 
 import (
-	"itflow/control/local"
 	"itflow/internal/response"
+	"itflow/model"
 	"net/http"
 	"strings"
 
@@ -17,7 +17,9 @@ func Reset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	password := r.FormValue("password")
-	err := local.ResetAdminPassword(password)
+	user := model.User{}
+
+	err := user.UpdateAdminPassword(password)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/hyahm/golog"
+
 	"github.com/hyahm/xmux"
 	//"strings"
 )
@@ -36,8 +38,8 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	data := xmux.GetData(r).Data.(*bug.RespEditBug)
-	statusId, ok := cache.CacheDefault["status"]
-	if !ok {
+	statusId := cache.DefaultSid
+	if statusId == 0 {
 		w.Write([]byte("必须给定一个状态默认值"))
 		return
 	}
@@ -50,6 +52,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 	bug.StatusId = statusId
 	bug.Uid = xmux.GetData(r).Get("uid").(int64)
 	//
+	golog.Info("777777")
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -61,6 +64,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 		bug.CreateTime = time.Now().Unix()
 		err = bug.CreateBug()
 		if err != nil {
+
 			w.Write(errorcode.ErrorE(err))
 			return
 		}

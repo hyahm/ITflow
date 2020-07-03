@@ -63,10 +63,10 @@ func init() {
 	//---------------------------------------------------------
 	Api.Pattern("/default/status").Post(handle.DefaultStatus)
 
-	Api.Pattern("/default/save").Post(handle.DefaultSave).Bind(&defaults.DefaultValue{}).
+	Api.Pattern("/default/save").Post(handle.DefaultSave).Bind(&defaults.ReqDefaultValue{}).
 		AddMidware(midware.JsonToStruct)
 
-	Api.Pattern("/default/important").Post(handle.DefaultImportant)
+	// Api.Pattern("/default/important").Post(handle.DefaultImportant)
 
-	Api.Pattern("/default/level").Post(handle.DefaultLevel)
+	// Api.Pattern("/default/level").Post(handle.DefaultLevel)
 }

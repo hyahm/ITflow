@@ -32,9 +32,7 @@ func (status *Status) List() ([]*Status, error) {
 		golog.Error(err)
 		return ss, err
 	}
-	golog.Infof("%+v", rows)
 	for rows.Next() {
-		golog.Info("--------")
 		st := &Status{}
 		rows.Scan(&st.ID, &st.Name)
 		ss = append(ss, st)

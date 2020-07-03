@@ -2,6 +2,7 @@ package model
 
 import (
 	"html"
+	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/assist"
 
@@ -9,18 +10,18 @@ import (
 )
 
 type ArticleList struct {
-	ID          int      `json:"id"`
-	Date        int64    `json:"date"`
-	Author      string   `json:"author"`
-	Importance  string   `json:"important"`
-	Status      string   `json:"status"`
-	Title       string   `json:"title"`
-	Action      string   `json:"action"`
-	Dustbin     int      `json:"dustbin"`
-	Level       string   `json:"level"`
-	Projectname string   `json:"projectname"`
-	Env         string   `json:"env"`
-	Handle      []string `json:"handle"`
+	ID          int             `json:"id"`
+	Date        int64           `json:"date"`
+	Author      string          `json:"author"`
+	Importance  cache.Important `json:"important"`
+	Status      cache.Status    `json:"status"`
+	Title       string          `json:"title"`
+	Action      string          `json:"action"`
+	Dustbin     int             `json:"dustbin"`
+	Level       cache.Level     `json:"level"`
+	Projectname string          `json:"projectname"`
+	Env         string          `json:"env"`
+	Handle      []string        `json:"handle"`
 }
 
 type AllArticleList struct {
@@ -33,14 +34,14 @@ type AllArticleList struct {
 type Bug struct {
 	ID           int64
 	Uid          int64
-	StatusId     int64 // sid
+	StatusId     cache.StatusId // sid
 	Title        string
 	Content      string
-	ImportanceId int64
+	ImportanceId cache.ImportantId
 	CreateTime   int64
 	VersionId    int64
 	OprateUsers  assist.Uid
-	LevelId      int64
+	LevelId      cache.LevelId
 	EnvId        int64
 	ProjectId    int64
 	UpdateTime   int64

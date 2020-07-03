@@ -2,14 +2,12 @@ package handle
 
 import (
 	"encoding/json"
-	"fmt"
 	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/datalog"
 	"itflow/internal/response"
 	"itflow/internal/status"
 	"itflow/model"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -24,17 +22,17 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 
 	data := xmux.GetData(r).Data.(*status.StatusGroup)
 
-	// 重新排序
-	ids := make([]string, 0)
-	for _, v := range data.StatusList {
-		ids = append(ids, fmt.Sprintf("%d", cache.CacheStatusSid[v]))
-	}
+	// // 重新排序
+	// ids := make([]string, 0)
+	// for _, v := range data.StatusList {
+	// 	ids = append(ids, fmt.Sprintf("%d", cache.CacheStatusSid[v]))
+	// }
 
-	ss := strings.Join(ids, ",")
+	// ss := strings.Join(ids, ",")
 
 	isql := "insert into statusgroup(name,sids) values(?,?)"
 	var err error
-	errorcode.Id, err = db.Mconn.Insert(isql, data.Name, ss)
+	errorcode.Id, err = db.Mconn.Insert(isql, data.Name, data.StatusList.ToStore())
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -62,22 +60,20 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 
 	data := xmux.GetData(r).Data.(*status.StatusGroup)
 
-	ssids := make([]string, 0)
-	for _, v := range data.StatusList {
-		// 没找到就是key
-		var sid int64
-		var ok bool
-		if sid, ok = cache.CacheStatusSid[v]; !ok {
-			w.Write(errorcode.Error("没有找到status"))
-			return
-		}
-		ssids = append(ssids, strconv.FormatInt(sid, 10))
-	}
-	ss := strings.Join(ssids, ",")
-	db.Mconn.OpenDebug()
-	defer db.Mconn.CloseDebug()
+	// ssids := make([]string, 0)
+	// for _, v := range data.StatusList {
+	// 	// 没找到就是key
+	// 	var sid int64
+	// 	var ok bool
+	// 	if sid, ok = cache.CacheStatusSid[v]; !ok {
+	// 		w.Write(errorcode.Error("没有找到status"))
+	// 		return
+	// 	}
+	// 	ssids = append(ssids, strconv.FormatInt(sid, 10))
+	// }
+	// ss := strings.Join(ssids, ",")
 	isql := "update statusgroup set name =?,sids=? where id = ?"
-	_, err := db.Mconn.Update(isql, data.Name, ss, data.Id)
+	_, err := db.Mconn.Update(isql, data.Name, data.StatusList.ToStore(), data.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -101,9 +97,9 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 }
 
 type department struct {
-	Id            int64    `json:"id"`
-	Name          string   `json:"name"`
-	BugstatusList []string `json:"bugstatuslist"`
+	Id            int64            `json:"id"`
+	Name          string           `json:"name"`
+	BugstatusList cache.StatusList `json:"bugstatuslist"`
 }
 
 type departmentList struct {
@@ -124,19 +120,19 @@ func BugGroupList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for rows.Next() {
-		var ids string
+		var ids cache.StoreStatusId
 		one := &department{}
 		rows.Scan(&one.Id, &one.Name, &ids)
+		one.BugstatusList = ids.ToShow()
+		// for _, v := range strings.Split(ids, ",") {
+		// 	id, err := strconv.Atoi(v)
+		// 	if err != nil {
+		// 		log.Println(err)
+		// 		continue
+		// 	}
 
-		for _, v := range strings.Split(ids, ",") {
-			id, err := strconv.Atoi(v)
-			if err != nil {
-				log.Println(err)
-				continue
-			}
-
-			one.BugstatusList = append(one.BugstatusList, cache.CacheSidStatus[int64(id)])
-		}
+		// 	one.BugstatusList = append(one.BugstatusList, cache.CacheSidStatus[int64(id)])
+		// }
 		data.DepartmentList = append(data.DepartmentList, one)
 	}
 	send, _ := json.Marshal(data)

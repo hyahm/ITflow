@@ -8,7 +8,6 @@ import (
 	"itflow/internal/datalog"
 	"itflow/internal/response"
 	"itflow/model"
-	network "itflow/model"
 	"net/http"
 	"strconv"
 	"strings"
@@ -20,7 +19,7 @@ import (
 func TypeList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	tl := &network.List_types{}
+	tl := &model.List_types{}
 
 	rows, err := db.Mconn.GetRows("select id,name,type,opts,tid from types")
 	if err != nil {
@@ -31,7 +30,7 @@ func TypeList(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		var opts string
-		tr := &network.Data_types{}
+		tr := &model.Data_types{}
 		var tid int64
 		rows.Scan(&tr.Id, &tr.Name, &tr.Types, &opts, &tid)
 		tr.Listtype = cache.CacheTidName[tid]
@@ -46,7 +45,7 @@ func TypeList(w http.ResponseWriter, r *http.Request) {
 			}
 
 			for optrows.Next() {
-				one := &network.Options{}
+				one := &model.Options{}
 				var ts int64
 				optrows.Scan(&one.Id, &one.Name, &one.Info, &ts, &one.Default, &one.Need)
 
@@ -71,7 +70,7 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 
 	data := xmux.GetData(r).Data.(*model.Data_types)
 
-	send := &network.Send_types{}
+	send := &model.Send_types{}
 
 	var t int
 	err := db.Mconn.GetOne("select type from types where id=?", data.Id).Scan(&t)
@@ -318,7 +317,7 @@ func GetType(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	types := &network.Send_Types{}
+	types := &model.Send_Types{}
 	rows, err := db.Mconn.GetRows("select name from types")
 	if err != nil {
 		golog.Error(err)

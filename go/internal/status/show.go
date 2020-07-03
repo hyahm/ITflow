@@ -1,8 +1,12 @@
 package status
 
+import (
+	"itflow/cache"
+)
+
 type Status struct {
-	CheckStatus []string `json:"checkstatus"`
-	Code        int      `json:"code"`
+	CheckStatus cache.StatusList `json:"checkstatus"`
+	Code        int              `json:"code"`
 }
 
 type ChangeStatus struct {

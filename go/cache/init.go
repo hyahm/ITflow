@@ -9,7 +9,7 @@ import (
 	"github.com/hyahm/golog"
 )
 
-//const SALT = "hjkkaksjdhfryuooweqzmbvc"
+// 生成初始化本地缓存
 
 var (
 	ImgDir      string
@@ -35,12 +35,6 @@ type Email struct {
 
 // cached
 var (
-	CacheSidStatus map[int64]string
-	CacheStatusSid map[string]int64
-
-	CacheIidImportant map[int64]string
-	CacheImportantIid map[string]int64
-
 	CacheRidRole        map[int64]string
 	CacheRoleRid        map[string]int64
 	CachePidName        map[int64]string
@@ -53,22 +47,21 @@ var (
 	CacheUidSgid        map[int64]int64
 	CacheUidNickName    map[int64]string
 	CacheRidGroup       map[int64]string
-	CacheUidFilter      map[int64]string
-	CacheDefault        map[string]int64
+	CacheUidFilter      map[int64]StoreStatusId
+	DefaultSid          StatusId
 
 	CacheUidRid  map[int64]int64
 	CacheUidJid  map[int64]int64
 	CacheTidName map[int64]string
 	CacheNameTid map[string]int64
 
-	CacheSgidGroup  map[int64]string
-	CacheLidLevel   map[int64]string
+	CacheSgidGroup map[int64]string
+
 	CacheJidJobname map[int64]string
 	CacheJobnameJid map[string]int64
 	CacheHidHeader  map[int64]string
 	CacheHeaderHid  map[string]int64
 
-	CacheLevelLid    map[string]int64
 	CacheNickNameUid map[string]int64
 	CacheRealNameUid map[string]int64
 	CacheUidEmail    map[int64]string
@@ -80,7 +73,7 @@ var (
 )
 
 func LoadConfig() {
-
+	SUPERID = goconfig.ReadInt64("adminid", 0)
 	ImgDir = goconfig.ReadString("imgdir", "/data/bugimg/")
 	err := os.MkdirAll(ImgDir, 0755)
 	if err != nil {
@@ -103,13 +96,12 @@ func LoadConfig() {
 			ShareDir = ShareDir[:len(ShareDir)-1]
 		}
 	}
-	CacheDefault = make(map[string]int64, 0)
-	CacheSidStatus = make(map[int64]string, 0)
+	CacheSidStatus = make(map[StatusId]Status, 0)
 	CacheRidGroup = make(map[int64]string, 0)
 	CacheRidRole = make(map[int64]string, 0)
-	CacheIidImportant = make(map[int64]string, 0)
+	CacheIidImportant = make(map[ImportantId]Important, 0)
 	CacheRoleRid = make(map[string]int64, 0)
-	CacheImportantIid = make(map[string]int64, 0)
+	CacheImportantIid = make(map[Important]ImportantId, 0)
 	CachePidName = make(map[int64]string, 0)
 	CacheUidSgid = make(map[int64]int64, 0)
 	CacheUidRid = make(map[int64]int64, 0)
@@ -119,17 +111,17 @@ func LoadConfig() {
 	CacheVidName = make(map[int64]string, 0)
 	CacheGidGroup = make(map[int64]string, 0)
 	CacheNickNameUid = make(map[string]int64, 0)
-	CacheStatusSid = make(map[string]int64, 0)
+	CacheStatusSid = make(map[Status]StatusId, 0)
 	CacheRealNameUid = make(map[string]int64, 0)
 	CacheProjectPid = make(map[string]int64, 0)
 	CacheVersionNameVid = make(map[string]int64, 0)
 	CacheEnvNameEid = make(map[string]int64, 0)
-	CacheLidLevel = make(map[int64]string, 0)
+	CacheLidLevel = make(map[LevelId]Level, 0)
 	CacheJidJobname = make(map[int64]string, 0)
 	CacheJobnameJid = make(map[string]int64, 0)
-	CacheLevelLid = make(map[string]int64, 0)
+	CacheLevelLid = make(map[Level]LevelId, 0)
 	CacheSgidGroup = make(map[int64]string, 0)
-	CacheUidFilter = make(map[int64]string, 0)
+	CacheUidFilter = make(map[int64]StoreStatusId, 0)
 	CacheUidJid = make(map[int64]int64, 0)
 	CacheUidEmail = make(map[int64]string, 0)
 

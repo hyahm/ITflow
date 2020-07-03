@@ -13,8 +13,6 @@ import (
 	"itflow/model"
 	"itflow/pkg/pager"
 	"net/http"
-	"strconv"
-	"strings"
 
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
@@ -36,16 +34,20 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 func ShowStatus(w http.ResponseWriter, r *http.Request) {
 
 	// sl := xmux.GetData(r).Data.(*status.Status)
-	sl := &status.Status{}
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	// 遍历出每一个status id
-	for _, v := range strings.Split(cache.CacheUidFilter[cache.CacheNickNameUid[nickname]], ",") {
-		sid, _ := strconv.Atoi(v)
-		//判断这个id是否存在
-		if value, ok := cache.CacheSidStatus[int64(sid)]; ok {
-			sl.CheckStatus = append(sl.CheckStatus, value)
-		}
+	sl := &status.Status{
+		CheckStatus: make([]cache.Status, 0),
 	}
+	uid := xmux.GetData(r).Get("uid").(int64)
+	sl.CheckStatus = cache.CacheUidFilter[uid].ToShow()
+
+	// 遍历出每一个status id
+	// for _, v := range strings.Split(cache.CacheUidFilter[uid], ",") {
+	// 	sid, _ := strconv.Atoi(v)
+	// 	//判断这个id是否存在
+	// 	if value := cache.CacheSidStatus[cache.StatusId(sid)]; value.ToString() != "" {
+	// 		sl.CheckStatus = append(sl.CheckStatus, value)
+	// 	}
+	// }
 	send, _ := json.Marshal(sl)
 	w.Write(send)
 	return
@@ -59,7 +61,7 @@ func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 	//如果是管理员的话,所有的都可以
 	if cache.CacheNickNameUid[nickname] == cache.SUPERID {
 		for _, v := range cache.CacheSidStatus {
-			sl.StatusList = append(sl.StatusList, v)
+			sl.StatusList = append(sl.StatusList, v.ToString())
 		}
 	}
 	send, _ := json.Marshal(sl)
@@ -184,9 +186,8 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 
 	param := xmux.GetData(r).Data.(*bug.ChangeStatus)
 
-	var sid int64
-	var ok bool
-	if sid, ok = cache.CacheStatusSid[param.Status]; !ok {
+	sid := param.Status.Id()
+	if sid == 0 {
 		golog.Errorf("找不到status id: %s", param.Status)
 		w.Write(errorcode.Errorf("找不到status id: %s", param.Status))
 		return
@@ -219,28 +220,20 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	param := xmux.GetData(r).Data.(*status.Status)
-	golog.Info(param)
-	ids := make([]string, 0)
-	for _, v := range param.CheckStatus {
-		// 如果存在这个状态才添加进来
-		if value, ok := cache.CacheStatusSid[v]; ok {
-			ids = append(ids, strconv.FormatInt(value, 10))
-		}
 
-	}
-	showstatus := strings.Join(ids, ",")
+	showstatus := param.CheckStatus.ToStore()
 	//
-	basesql := "update user set showstatus=? where id=?"
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	_, err := db.Mconn.Update(basesql, showstatus, cache.CacheNickNameUid[nickname])
+
+	uid := xmux.GetData(r).Get("uid").(int64)
+	user := &model.User{}
+	err := user.UpdateShowStatus(showstatus, uid)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	//更新缓存
-	cache.CacheUidFilter[cache.CacheNickNameUid[nickname]] = showstatus
-
+	cache.CacheUidFilter[uid] = showstatus
 	send, _ := json.Marshal(param)
 	w.Write(send)
 	return
@@ -272,7 +265,7 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 	}
 	for rows.Next() {
 		bl := &model.ArticleList{}
-		var statusid int64
+		var statusid cache.StatusId
 		var uid int64
 		var pid int64
 		var eid int64

@@ -9,6 +9,7 @@ import (
 	"itflow/db"
 	"itflow/internal/bug"
 	"itflow/internal/response"
+	"itflow/internal/search"
 	"itflow/model"
 	"itflow/pkg/pager"
 	"net/http"
@@ -21,12 +22,11 @@ import (
 
 func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 
-	countbasesql := "select count(id) from bugs where dustbin=0 and uid=? "
-	bugsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=0 and uid=? "
-
-	al, err := getbuglist(r, countbasesql, bugsql, false)
+	uid := xmux.GetData(r).Get("uid").(int64)
+	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
+	mybug.GetUsefulCondition(uid)
+	al, err := mybug.GetUsefulCondition(uid)
 	if err != nil {
-		w.Write(err)
 		return
 	}
 	send, _ := json.Marshal(al)
@@ -36,13 +36,19 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 }
 
 func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
+	// 搜索的条件，
+	// page: 1,
+	// limit: 10,
+	// level: '',
+	// project: '',
+	// title: '',
+	// showstatus: []
 
-	countbasesql := "select count(id) from bugs where dustbin=0 and uid=? "
-	bugsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=0 and uid=? "
-
-	al, err := getbuglist(r, countbasesql, bugsql, false)
+	uid := xmux.GetData(r).Get("uid").(int64)
+	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
+	mybug.GetUsefulCondition(uid)
+	al, err := mybug.GetUsefulCondition(uid)
 	if err != nil {
-		w.Write(err)
 		return
 	}
 	send, _ := json.Marshal(al)
@@ -68,7 +74,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 	// 第二步， 检查level
 	if searchparam.Level != "" {
 		// 判断这个值是否存在
-		if lid, ok := cache.CacheLevelLid[searchparam.Level]; ok {
+		if lid := searchparam.Level.Id(); lid != 0 {
 			bugsql += fmt.Sprintf("and lid=%d ", lid)
 			countbasesql += fmt.Sprintf("and lid=%d ", lid)
 		} else {
@@ -107,9 +113,9 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		one := &model.ArticleList{}
-		var iid int64
-		var sid int64
-		var lid int64
+		var iid cache.ImportantId
+		var sid cache.StatusId
+		var lid cache.LevelId
 		var pid int64
 		var eid int64
 		var userlist string
@@ -187,12 +193,13 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 	}
 	for rows.Next() {
 		bl := &model.ArticleList{}
-		var sid, lid int64
+		var sid cache.StatusId
+		var lid cache.LevelId
 		var spusers string
 		var uid int64
 		var pid int64
 		var eid int64
-		var iid int64
+		var iid cache.ImportantId
 		rows.Scan(&bl.ID, &bl.Date, &iid, &sid, &bl.Title, &uid, &lid, &pid, &eid, &spusers, &bl.Dustbin)
 		bl.Level = cache.CacheLidLevel[lid]
 		bl.Importance = cache.CacheIidImportant[iid]
@@ -338,9 +345,9 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 
 	for rows.Next() {
 		one := &model.ArticleList{}
-		var iid int64
-		var sid int64
-		var lid int64
+		var iid cache.ImportantId
+		var sid cache.StatusId
+		var lid cache.LevelId
 		var pid int64
 		var eid int64
 		var userlist string

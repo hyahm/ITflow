@@ -29,7 +29,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	var err error
-	s := xmux.GetData(r).Data.(*bug.Status)
+	s := xmux.GetData(r).Data.(*bug.ReqStatus)
 	errorcode.Id, err = db.Mconn.Insert("insert into status(name) values(?)", s.Name)
 	if err != nil {
 		golog.Error(err)
@@ -46,8 +46,8 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 更新缓存
-	cache.CacheSidStatus[errorcode.Id] = s.Name
-	cache.CacheStatusSid[s.Name] = errorcode.Id
+	cache.CacheSidStatus[cache.StatusId(errorcode.Id)] = s.Name
+	cache.CacheStatusSid[s.Name] = cache.StatusId(errorcode.Id)
 
 	w.Write(errorcode.Success())
 	return
@@ -59,13 +59,19 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	id := r.FormValue("id")
-	sid, err := strconv.Atoi(id)
+	sid, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	if cache.DefaultSid.ToInt64() == sid {
 
+		golog.Error("this status is set to default, can not remove. you can change to other status and delete")
+		w.Write(errorcode.Error("this status is set to default, can not remove. you can change to other status and delete"))
+		return
+
+	}
 	// 如果bug有这个状态，就不能修改
 	var bcount int
 	err = db.Mconn.GetOne("select count(id) from bugs where sid=?", sid).Scan(&bcount)
@@ -104,15 +110,6 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 	}
 	// 默认值
 
-	if cache.CacheDefault["status"] == int64(sid) {
-		cache.CacheDefault["status"] = 0
-		_, err = db.Mconn.Update("update defaultvalue set status=0 ")
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-	}
 	// 增加日志
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
@@ -124,8 +121,8 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 	// 更新缓存
 	// 获取status的索引
 
-	delete(cache.CacheStatusSid, cache.CacheSidStatus[int64(sid)])
-	delete(cache.CacheSidStatus, int64(sid))
+	delete(cache.CacheStatusSid, cache.CacheSidStatus[cache.StatusId(sid)])
+	delete(cache.CacheSidStatus, cache.StatusId(sid))
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
@@ -137,7 +134,7 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	s := xmux.GetData(r).Data.(*bug.Status)
+	s := xmux.GetData(r).Data.(*bug.ReqStatus)
 	_, err := db.Mconn.Update("update status set name=? where id=?", s.Name, s.Id)
 	if err != nil {
 		golog.Error(err)

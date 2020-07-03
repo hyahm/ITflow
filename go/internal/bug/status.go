@@ -1,15 +1,18 @@
 package bug
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"itflow/cache"
+)
 
-type Status struct {
-	Id   int64  `json:"id" type:"int" need:"是" default:"0" information:"无效"`
-	Name string `json:"name" type:"string" need:"是" default:"" information:"状态的名称"`
+type ReqStatus struct {
+	Id   cache.StatusId `json:"id" type:"int" need:"是" default:"0" information:"无效"`
+	Name cache.Status   `json:"name" type:"string" need:"是" default:"" information:"状态的名称"`
 }
 
 type ListStatus struct {
-	StatusList []*Status `json:"statuslist,omitempty" type:"array" need:"否" information:"状态列表"`
-	Code       int       `json:"code" type:"int" need:"是" information:"状态码"`
+	StatusList cache.StatusList `json:"statuslist,omitempty" type:"array" need:"否" information:"状态列表"`
+	Code       int              `json:"code" type:"int" need:"是" information:"状态码"`
 }
 
 // 添加状态管理返回的错误
@@ -26,7 +29,7 @@ func (rs *ResponeStatus) Success() []byte {
 }
 
 type ChangeStatus struct {
-	Id     int    `json:"id"`
-	Status string `json:"status"`
-	Code   int    `json:"code"`
+	Id     int          `json:"id"`
+	Status cache.Status `json:"status"`
+	Code   int          `json:"code"`
 }

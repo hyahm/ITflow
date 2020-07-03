@@ -49,9 +49,9 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 判断状态是否存在
-	var sid int64
 	var ok bool
-	if sid, ok = cache.CacheStatusSid[ub.Status]; !ok {
+	sid := ub.Status.Id()
+	if sid == 0 {
 		w.Write(errorcode.Error("没有status"))
 		return
 	}
@@ -116,7 +116,7 @@ func TaskList(w http.ResponseWriter, r *http.Request) {
 	}
 	for rows.Next() {
 		sendlist := &model.ArticleList{}
-		var statusid int64
+		var statusid cache.StatusId
 		var spusers string
 		var uid int64
 		var pid int64

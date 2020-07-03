@@ -11,10 +11,10 @@ import (
 	"itflow/internal/rolegroup"
 	"itflow/internal/user"
 	"itflow/mail"
+	"itflow/model"
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
@@ -24,13 +24,20 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	nickname := xmux.GetData(r).Get("nickname").(string)
+	uid := xmux.GetData(r).Get("uid").(int64)
 	getuser := xmux.GetData(r).Data.(*user.GetAddUser)
-
+	// 验证组和职位不能为空
+	if getuser.StatusGroup == "" || getuser.RoleGroup == "" || getuser.Position == "" {
+		w.Write(errorcode.Error("验证组和职位不能为空"))
+		return
+	}
 	//1，先要验证nickname 是否有重复的
 	if _, ok := cache.CacheNickNameUid[getuser.Nickname]; ok {
 		w.Write(errorcode.Error("nickname 重复"))
 		return
 	}
+
+	//验证邮箱 是否有重复的
 	var hasemail bool
 	for _, v := range cache.CacheUidEmail {
 		if v == getuser.Email {
@@ -41,15 +48,12 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("email 重复"))
 		return
 	}
-	// 验证组和职位不能为空
-	if getuser.StatusGroup == "" || getuser.RoleGroup == "" || getuser.Position == "" {
-		w.Write(errorcode.Error("验证组和职位不能为空"))
-		return
-	}
+
 	ids := make([]string, 0)
 	for k := range cache.CacheSidStatus {
-		ids = append(ids, strconv.FormatInt(k, 10))
+		ids = append(ids, strconv.FormatInt(k.ToInt64(), 10))
 	}
+
 	var sgid int64
 	var hassggroup bool
 	var hasrolegroup bool
@@ -81,25 +85,28 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("职位不存在"))
 		return
 	}
-	var level int64
-	err := db.Mconn.GetOne("select level from jobs where id=?", jid).Scan(&level)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	// var level int64
+	// err := db.Mconn.GetOne("select level from jobs where id=?", jid).Scan(&level)
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
 
 	// 增加用户
-	showstatus := strings.Join(ids, ",")
 	enpassword := encrypt.PwdEncrypt(getuser.Password, cache.Salt)
-	createusersql := "insert into user(nickname,password,email,headimg,createtime,createuid,realname,showstatus,disable,bugsid,level,rid,jid) values(?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	errorcode.Id, err = db.Mconn.Insert(createusersql,
-		getuser.Nickname, enpassword, getuser.Email,
-		"", time.Now().Unix(), cache.CacheNickNameUid[nickname],
-		getuser.RealName, showstatus, false,
-		sgid, level, rid, jid,
-	)
-
+	user := model.User{
+		NickName:   getuser.Nickname,
+		RealName:   getuser.RealName,
+		Password:   enpassword,
+		Email:      getuser.Email,
+		CreateId:   uid,
+		ShowStatus: cache.StoreLevelId(strings.Join(ids, ",")),
+		BugGroupId: sgid,
+		Roleid:     rid,
+		Jobid:      jid,
+	}
+	err := user.Create()
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -249,8 +256,8 @@ func DisableUser(w http.ResponseWriter, r *http.Request) {
 func UserList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	if cache.SUPERID != cache.CacheNickNameUid[nickname] {
+	uid := xmux.GetData(r).Get("uid").(int64)
+	if cache.SUPERID != uid {
 		w.Write(errorcode.ErrorNoPermission())
 		return
 	}

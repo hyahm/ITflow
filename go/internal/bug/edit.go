@@ -11,11 +11,12 @@ func (reb *RespEditBug) ToResp(b *model.Bug) error {
 
 	reb.Id = b.ID
 
-	reb.Content =  b.Content
+	reb.Content = b.Content
 	reb.Title = b.Title
 
 	var ok bool
-	if reb.Level, ok = cache.CacheLidLevel[b.LevelId]; !ok {
+	reb.Level = cache.LevelId(b.LevelId).Name()
+	if reb.Level == "" {
 		return errors.New("没有找到level key")
 	}
 	if reb.Projectname, ok = cache.CachePidName[b.ProjectId]; !ok {

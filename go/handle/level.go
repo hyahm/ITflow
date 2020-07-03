@@ -18,7 +18,6 @@ import (
 func LevelGet(w http.ResponseWriter, r *http.Request) {
 
 	data := &network.List_levels{}
-
 	for k, v := range cache.CacheLidLevel {
 		one := &network.Table_level{}
 		one.Id = k
@@ -55,8 +54,9 @@ func LevelAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//更新缓存
-	cache.CacheLevelLid[data.Name] = errorcode.Id
-	cache.CacheLidLevel[errorcode.Id] = data.Name
+	cache.CacheLidLevel[cache.LevelId(errorcode.Id)] = data.Name
+	cache.CacheLevelLid[data.Name] = cache.LevelId(errorcode.Id)
+
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -68,7 +68,7 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	id := r.FormValue("id")
-	id32, err := strconv.Atoi(id)
+	id64, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -77,7 +77,7 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 
 	// 判断bug是否在使用
 	var count int
-	err = db.Mconn.GetOne("select count(id) from bugs where lid=?", id32).Scan(&count)
+	err = db.Mconn.GetOne("select count(id) from bugs where lid=?", id64).Scan(&count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -89,10 +89,10 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 是否设定为了默认值
-	if cache.CacheDefault["level"] == int64(id32) {
-		w.Write(errorcode.Error("没有设置 level 默认值"))
-		return
-	}
+	// if cache.CacheDefault["level"] == int64(id32) {
+	// 	w.Write(errorcode.Error("没有设置 level 默认值"))
+	// 	return
+	// }
 	gsql := "delete from level where id=?"
 	_, err = db.Mconn.Update(gsql, id)
 	if err != nil {
@@ -111,8 +111,8 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 删除缓存
-	delete(cache.CacheLevelLid, cache.CacheLidLevel[int64(id32)])
-	delete(cache.CacheLidLevel, int64(id32))
+	delete(cache.CacheLevelLid, cache.CacheLidLevel[cache.LevelId(id64)])
+	delete(cache.CacheLidLevel, cache.LevelId(id64))
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -154,8 +154,8 @@ func LevelUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 type levelslist struct {
-	Levels []string `json:"levels"`
-	Code   int      `json:"code"`
+	Levels cache.LevelList `json:"levels"`
+	Code   int             `json:"code"`
 }
 
 func GetLevels(w http.ResponseWriter, r *http.Request) {

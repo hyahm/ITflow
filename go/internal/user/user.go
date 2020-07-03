@@ -27,9 +27,9 @@ func (login *Login) Check(resp *RespLogin) []byte {
 	errorcode := &response.Response{}
 	enpassword := encrypt.PwdEncrypt(login.Password, cache.Salt)
 	golog.Info(enpassword)
-	getsql := "select nickname from user where email=? and password=? and disable=0"
-
-	err := db.Mconn.GetOne(getsql, login.Username, enpassword).Scan(&login.Username)
+	getsql := "select id,nickname from user where email=? and password=? and disable=0"
+	var id int64
+	err := db.Mconn.GetOne(getsql, login.Username, enpassword).Scan(&id, &login.Username)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -38,11 +38,12 @@ func (login *Login) Check(resp *RespLogin) []byte {
 		golog.Error(err)
 		return errorcode.ConnectMysqlFail()
 	}
-
+	golog.Info(id)
 	resp.Token = encrypt.Token(login.Username, cache.Salt)
 	token := &db.Token{
 		Token:    resp.Token,
 		NickName: login.Username,
+		Id:       id,
 	}
 
 	err = db.CT.Add(token, time.Duration(goconfig.ReadInt("expiration", 120))*time.Minute)
@@ -81,7 +82,8 @@ type UserInfo struct {
 	Email    string   `json:"email,omitempty" type:"string" need:"否" default:"" information:"邮箱地址"`
 }
 
-func (ui *UserInfo) GetUserInfo() error {
+func (ui *UserInfo) GetUserInfo(uid int64) error {
+
 	sql := "select rid, headimg from user where nickname=?"
 	var rid string
 	err := db.Mconn.GetOne(sql, ui.NickName).Scan(&rid, &ui.Avatar)
@@ -91,7 +93,7 @@ func (ui *UserInfo) GetUserInfo() error {
 	}
 
 	// 管理员
-	if cache.CacheNickNameUid[ui.NickName] == cache.SUPERID {
+	if uid == cache.SUPERID {
 		ui.Roles = append(ui.Roles, ui.NickName)
 	} else {
 		var rl string
