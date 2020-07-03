@@ -51,7 +51,6 @@ const actions = {
     return new Promise(resolve => {
       let accessedRoutes
       if (roles.includes('admin')) {
-        console.log(roles)
         accessedRoutes = asyncRouterMap || []
       } else {
         accessedRoutes = filterAsyncRoutes(asyncRouterMap, roles)

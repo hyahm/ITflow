@@ -77,7 +77,7 @@
           </router-link>
         </template>
       </el-table-column>
-      <el-table-column label="方法" align="center" width="300">
+      <el-table-column label="任务者" align="center" width="300">
         <template slot-scope="scope">
           <span>{{ scope.row.handle }}</span>
           <!--<span v-if="scope.row.handle" class="link-type" @click='handleFetchPv(scope.row.pageviews)'>{{scope.row.pageviews}}</span>-->
@@ -158,9 +158,9 @@ export default {
       listQuery: {
         page: 1,
         limit: 10,
-        level: undefined,
-        project: undefined,
-        title: undefined,
+        level: '',
+        project: '',
+        title: '',
         showstatus: []
       },
       projectnames: [],
@@ -186,6 +186,7 @@ export default {
       const data = {
         checkstatus: this.listQuery.showstatus
       }
+
       statusFilter(data).then(resp => {
         if (resp.data.code === 0) {
           this.statuslength = this.listQuery.showstatus.length
@@ -224,11 +225,10 @@ export default {
     getmystatus() {
       // 需要显示的状态
       getShowStatus().then(resp => {
+        console.log(resp.data)
         if (resp.data.code === 0) {
-          if (resp.data.checkstatus !== null) {
-            this.listQuery.showstatus = resp.data.checkstatus
-            this.statuslength = this.listQuery.showstatus.length
-          }
+          this.listQuery.showstatus = resp.data.checkstatus
+          this.statuslength = this.listQuery.showstatus.length
         } else {
           this.$message.error(resp.data.msg)
         }
@@ -294,6 +294,7 @@ export default {
       })
     },
     handleFilter() {
+      // 获取过滤后的bug
       this.listQuery.page = 1
       this.listLoading = true
       searchMyBugs(this.listQuery).then(resp => {
@@ -351,7 +352,6 @@ export default {
         limit: this.listQuery.limit
       }
       searchMyBugs(pager).then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.list = resp.data.articlelist
           this.total = resp.data.total

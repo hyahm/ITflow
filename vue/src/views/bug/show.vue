@@ -126,7 +126,7 @@ export default {
     }
   },
   created() {
-    this.create()
+    this.fetchData()
     // this.getusers()
     // this.getstatus()
   },
@@ -134,14 +134,7 @@ export default {
     // this.getstatus()
   },
   methods: {
-    // getstatus() {
-    //   getPermStatus().then(response => {
-    //     if (response.data.statuscode === 0) {
-    //       const tmp = response.data.statuslist
-    //       this.statusOptions = tmp
-    //     }
-    //   })
-    // },
+
     draftForm() {
 
     },
@@ -152,26 +145,15 @@ export default {
       //   this.$refs['dataForm'].clearValidate()
       // })
     },
-    // getusers() {
-    //   getUsers().then(response => {
-    //     if (response.data.statuscode === 0) {
-    //       const data = response.data.users
-    //       const l = data.length
-    //       for (let i = 0; i < l; i++) {
-    //         this.users.push(data[i].nickname + '(' + data[i].realname + ')')
-    //       }
-    //     }
-    //   }).catch(err => {
-    //     console.log(err)
-    //   })
-    // },
-    create() {
+
+    fetchData() {
       const url = window.location.href
       const ul = url.split('/')
       const id = ul[ul.length - 1]
       if (id % 1 === 0) {
         this.temp.id = parseInt(id)
         showBug(id).then(resp => {
+          console.log(resp.data)
           if (resp.data.code === 0) {
             this.bug = resp.data
           } else {

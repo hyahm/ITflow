@@ -95,41 +95,29 @@
         </el-form-item>
 
         <!--</template>-->
+
         <el-form-item>
-          <div class="editor-container">
-            <Tinymce ref="editor" v-model="postForm.content" />
+          <div id="main">
+            <mavon-editor ref="md" v-model="postForm.content" @imgAdd="imgAdd" />
           </div>
+          <!-- <div class="editor-container">
+            <Tinymce ref="editor" v-model="postForm.content" />
+          </div> -->
         </el-form-item>
 
       </div>
-      <!--<el-form-item style="margin-bottom: 40px;" label-width="45px" label="摘要:">-->
-      <!--<el-input type="textarea" class="article-textarea" :rows="1" autosize placeholder="请输入内容" v-model="postForm.content_short">-->
-      <!--</el-input>-->
-      <!--<span class="word-counter" v-show="contentShortLength">{{contentShortLength}}字</span>-->
-      <!--</el-form-item>-->
-
-      <!--<div style="margin-bottom: 20px;">-->
-      <!--<Upload v-model="postForm.image_uri" />-->
-      <!--</div>-->
-      <!--</div>-->
     </el-form>
   </div>
 </template>
 
 <script>
-import Tinymce from '@/components/Tinymce'
-// import Upload from '@/components/Upload/singleImage3'
-// import MDinput from '@/components/MDinput'
-// import Multiselect from 'vue-multiselect'// 使用的一个多选框组件，element-ui的select不能满足所有需求
-// import 'vue-multiselect/dist/vue-multiselect.min.css'// 多选框组件css
+// import Tinymce from '@/components/Tinymce'
+
 import Sticky from '@/components/Sticky' // 粘性header组件
 import { validateURL } from '@/utils/validate'
 import { fetchBug, createBug } from '@/api/bugs'
-import { level, important } from '@/api/defaultvalue'
+import { uploadImg } from '@/api/uploadimg'
 import { getEnv, getProject, getUsers, getVersion, getLevels, getImportants } from '@/api/get'
-// import Warning from './Warning'
-// import { removeToken } from '@/utils/auth'
-// import { CommentDropdown, PlatformDropdown, SourceUrlDropdown } from './Dropdown'
 
 const defaultForm = {
   // status: 'draft',
@@ -140,21 +128,15 @@ const defaultForm = {
   projectname: '',
   level: '',
   envname: '',
-  important: '一般',
+  important: '',
   version: ''
 }
 
 export default {
   name: 'ArticleDetail',
   components: {
-    Tinymce,
-    // MDinput,
-    // Multiselect,
+    // Tinymce,
     Sticky
-    // Warning
-    // CommentDropdown,
-    // PlatformDropdown,
-    // SourceUrlDropdown
   },
   props: {
     isEdit: {
@@ -200,20 +182,10 @@ export default {
       envnames: []
     }
   },
-  activated() {
-    this.getuser()
-    this.getversion()
-    this.getproject()
-    this.getenv()
-    this.getlevels()
-    this.getimportants()
-    this.defaultimportant()
-    this.defaultlevel()
-  },
   created() {
     this.getimportants()
-    this.defaultimportant()
-    this.defaultlevel()
+    // this.defaultimportant()
+    // this.defaultlevel()
     this.getuser()
     this.getproject()
     this.getversion()
@@ -228,30 +200,12 @@ export default {
     }
   },
   methods: {
-    defaultimportant() {
-      important().then(resp => {
-        if (resp.data.code === 0) {
-          this.postForm.important = resp.data.defaultimportant
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
-    },
     getimportants() {
       getImportants().then(resp => {
         if (resp.data.code === 0) {
           if (resp.data.importants !== null) {
             this.importants = resp.data.importants
           }
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
-    },
-    defaultlevel() {
-      level().then(resp => {
-        if (resp.data.code === 0) {
-          this.postForm.level = resp.data.defaultlevel
         } else {
           this.$message.error(resp.data.msg)
         }
@@ -314,12 +268,14 @@ export default {
       fetchBug(id).then(resp => {
         if (resp.data.code === 0) {
           const dd = resp.data
+          console.log(dd)
           this.postForm.title = dd.title
           this.postForm.content = dd.content
-          this.postForm.importance = dd.importance
+          this.postForm.important = dd.important
           this.postForm.version = dd.version
-          this.postForm.selectuser = dd.handle
-          this.postForm.envname = dd.env
+          this.postForm.selectuser = dd.selectuser
+          this.postForm.envname = dd.envname
+          this.postForm.level = dd.level
           this.postForm.projectname = dd.projectname
         } else {
           this.$message.error(resp.data.msg)
@@ -355,9 +311,50 @@ export default {
         this.ispub = false
         return
       }
+      if (this.postForm.level.length < 1) {
+        this.$message({
+          message: '请选择项目级别',
+          type: 'error'
+        })
+        this.ispub = false
+        return
+      }
+      if (this.postForm.important.length < 1) {
+        this.$message({
+          message: '请选择项目严重程度',
+          type: 'error'
+        })
+        this.ispub = false
+        return
+      }
+      if (this.postForm.content.length < 1) {
+        this.$message({
+          message: '请填写内容',
+          type: 'error'
+        })
+        this.ispub = false
+        return
+      }
+      if (this.postForm.envname.length < 1) {
+        this.$message({
+          message: '请选择运行环境',
+          type: 'error'
+        })
+        this.ispub = false
+        return
+      }
+      if (this.postForm.version.length < 1) {
+        this.$message({
+          message: '请选择版本',
+          type: 'error'
+        })
+        this.ispub = false
+        return
+      }
       this.$refs.postForm.validate(valid => {
         if (valid) {
           createBug(this.postForm).then(resp => {
+            console.log(resp.data)
             if (resp.data.code === 0) {
               if (this.postForm.id === -1) {
                 this.$notify({
@@ -365,6 +362,7 @@ export default {
                   message: '发布成功',
                   type: 'success'
                 })
+                this.$router.push({ path: '/bug/edit/' + resp.data.id })
               } else {
                 this.$notify({
                   title: '成功',
@@ -375,11 +373,33 @@ export default {
             } else {
               this.$message.error(resp.data.msg)
             }
-            // this.$router.push('/bug/allbugs')
           })
         }
         this.ispub = false
       })
+    },
+    imgAdd(pos, $file) {
+      // 第一步.将图片上传到服务器.
+      var formdata = new FormData()
+      formdata.append('image', $file)
+      uploadImg(formdata).then(resp => {
+        console.log(resp)
+        if (resp.data.code === 0) {
+          this.$refs.md.$img2Url(pos, resp.data.url)
+        } else {
+          this.$message.error('上传失败')
+        }
+      })
+      // axios({
+      //   url: '/uploadimg',
+      //   method: 'post',
+      //   data: formdata,
+      //   headers: { 'Content-Type': 'multipart/form-data' }
+      // }).then((url) => {
+      //   // 第二步.将返回的url替换到文本原位置![...](0) -> ![...](url)
+      //   // $vm.$img2Url 详情见本页末尾
+      //   $vm.$img2Url(pos, url)
+      // })
     },
     draftForm() {
       if (this.postForm.content.length === 0 || this.postForm.title.length === 0) {

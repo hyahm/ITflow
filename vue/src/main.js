@@ -13,6 +13,11 @@ import App from './App'
 import store from './store'
 import router from './router'
 
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
+// use
+Vue.use(mavonEditor)
+
 import './icons' // icon
 import './permission' // permission control
 import './utils/error-log' // error log

@@ -4,7 +4,7 @@
       某些选项的默认值
     </p>
     <div style="margin: 10px 0 10px 10px"> 新建bug的状态:
-      <el-select v-model="form.defaultstatus" placeholder="Select" @change="handleChangeStatus">
+      <el-select v-model="defaultstatus" placeholder="Select" @change="handleChangeStatus">
         <el-option
           v-for="(status, index) in statuslist"
           :key="index"
@@ -13,7 +13,7 @@
         />
       </el-select>
     </div>
-    <div style="margin: 10px 0 10px 10px"> 重要程度:
+    <!-- <div style="margin: 10px 0 10px 10px"> 重要程度:
       <el-select v-model="form.defaultimportant" placeholder="Select" @change="handleChangeimportants">
         <el-option
           v-for="(important, index) in importants"
@@ -32,7 +32,7 @@
           :value="important"
         />
       </el-select>
-    </div>
+    </div> -->
     <el-button type="primary" plain @click="handleSave">保存</el-button>
   </div>
 </template>
@@ -44,11 +44,12 @@ export default {
   name: 'DefaultValue',
   data() {
     return {
-      form: {
-        defaultstatus: '',
-        defaultimportant: '',
-        defaultlevel: ''
-      },
+      // form: {
+      //   defaultstatus: '',
+      //   defaultimportant: '',
+      //   defaultlevel: ''
+      // },
+      defaultstatus: '',
       statuslist: [],
       importants: [],
       levels: []
@@ -57,10 +58,10 @@ export default {
   created() {
     this.getdefaultstatus()
     this.getstatuslist()
-    this.getimportantlist()
-    this.getlevels()
-    this.getdefaultimportant()
-    this.getdefaultlevel()
+    // this.getimportantlist()
+    // this.getlevels()
+    // this.getdefaultimportant()
+    // this.getdefaultlevel()
   },
   methods: {
     getlevels() {
@@ -105,8 +106,9 @@ export default {
     },
     getdefaultstatus() {
       status().then(resp => {
+        console.log(resp.data)
         if (resp.data.code === 0) {
-          this.form.defaultstatus = resp.data.defaultstatus
+          this.defaultstatus = resp.data.defaultstatus
         } else {
           this.$message.error(resp.data.msg)
         }
@@ -127,13 +129,17 @@ export default {
       this.form.defaultimportant = e
     },
     handleChangeStatus(e) {
-      this.form.defaultstatus = e
+      this.defaultstatus = e
     },
     handleChangeLevel(e) {
       this.form.defaultlevel = e
     },
     handleSave() {
-      save(this.form).then(resp => {
+      const data = {
+        'defaultstatus': this.defaultstatus
+      }
+      save(data).then(resp => {
+        console.log(resp.data)
         if (resp.data.code === 0) {
           this.$message.success('保存成功')
         } else {

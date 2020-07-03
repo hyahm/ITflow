@@ -77,6 +77,7 @@ export default {
   methods: {
     getstatus() {
       getStatusList().then(resp => {
+        console.log(resp.data)
         if (resp.data.code === 0) {
           if (resp.data.statuslist !== null) {
             this.tableData = resp.data.statuslist
