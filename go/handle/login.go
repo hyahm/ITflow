@@ -29,6 +29,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Action:   "login",
 	}
 	send, _ := json.Marshal(resp)
+	golog.Info(string(send))
+	golog.Info("login success")
 	w.Write(send)
 	return
 

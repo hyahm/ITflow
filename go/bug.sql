@@ -650,7 +650,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'admin','69ad5117e7553ecfa7f918a223426dd8da08a57f','admin@qq.com','http://127.0.0.1:10001/showimg/1588816996826858100.png',1557131883,0,'admin','5,6,7,10,8,9',0,0,0,0,0);
+INSERT INTO `user` VALUES (1,'admin','69ad5117e7553ecfa7f918a223426dd8da08a57f','admin@qq.com','http://127.0.0.1:10001/showimg/1588816996826858100.png',1557131883,0,'admin','',0,0,0,0,0);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 

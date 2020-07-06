@@ -8,10 +8,10 @@ import (
 	"itflow/internal/datalog"
 	"itflow/internal/response"
 	"itflow/internal/role"
+	"itflow/internal/search"
 	"itflow/internal/status"
 	"itflow/internal/user"
 	"itflow/model"
-	"itflow/pkg/pager"
 	"net/http"
 
 	"github.com/hyahm/golog"
@@ -241,47 +241,57 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 
 func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
-
-	al := &model.AllArticleList{}
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	uid := cache.CacheNickNameUid[nickname]
-	err := db.Mconn.GetOne("select count(id) from bugs where uid=?", uid).Scan(&al.Count)
+	// errorcode := &response.Response{}
+	uid := xmux.GetData(r).Get("uid").(int64)
+	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
+	// mybug.GetUsefulCondition(uid)
+	search, err := mybug.GetUsefulCondition(uid)
 	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		res := &response.Response{}
+		w.Write(res.ErrorE(err))
 		return
 	}
 
-	searchparam := xmux.GetData(r).Data.(*bug.SearchParam)
-	start, end := pager.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
+	w.Write(search.GetMyBugs())
+	// al := &model.AllArticleList{}
+	// nickname := xmux.GetData(r).Get("nickname").(string)
+	// uid := cache.CacheNickNameUid[nickname]
+	// err := db.Mconn.GetOne("select count(id) from bugs where uid=?", uid).Scan(&al.Count)
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
 
-	alsql := "select id,createtime,importent,status,title,uid,level,pid,env,spusers from bugs where uid=? and dustbin=0 order by id desc limit ?,?"
-	rows, err := db.Mconn.GetRows(alsql, uid, start, end)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	for rows.Next() {
-		bl := &model.ArticleList{}
-		var statusid cache.StatusId
-		var uid int64
-		var pid int64
-		var eid int64
-		rows.Scan(&bl.ID, &bl.Date, &bl.Importance, &statusid, &bl.Title, &uid, &bl.Level, &pid, &eid, &bl.Handle)
+	// searchparam := xmux.GetData(r).Data.(*bug.ReqMyBugFilter)
+	// start, end := pager.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
 
-		bl.Status = cache.CacheSidStatus[statusid]
-		bl.Author = cache.CacheUidRealName[uid]
-		bl.Projectname = cache.CachePidName[pid]
-		bl.Env = cache.CacheEidName[eid]
+	// alsql := "select id,createtime,importent,status,title,uid,level,pid,env,spusers from bugs where uid=? and dustbin=0 order by id desc limit ?,?"
+	// rows, err := db.Mconn.GetRows(alsql, uid, start, end)
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
+	// for rows.Next() {
+	// 	bl := &model.ArticleList{}
+	// 	var statusid cache.StatusId
+	// 	var uid int64
+	// 	var pid int64
+	// 	var eid int64
+	// 	rows.Scan(&bl.ID, &bl.Date, &bl.Importance, &statusid, &bl.Title, &uid, &bl.Level, &pid, &eid, &bl.Handle)
 
-		al.Al = append(al.Al, bl)
+	// 	bl.Status = cache.CacheSidStatus[statusid]
+	// 	bl.Author = cache.CacheUidRealName[uid]
+	// 	bl.Projectname = cache.CachePidName[pid]
+	// 	bl.Env = cache.CacheEidName[eid]
 
-	}
-	send, _ := json.Marshal(al)
-	w.Write(send)
-	return
+	// 	al.Al = append(al.Al, bl)
+
+	// }
+	// send, _ := json.Marshal(al)
+	// w.Write(send)
+	// return
 
 }
 

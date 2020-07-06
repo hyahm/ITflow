@@ -24,13 +24,15 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 
 	uid := xmux.GetData(r).Get("uid").(int64)
 	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
-	mybug.GetUsefulCondition(uid)
-	al, err := mybug.GetUsefulCondition(uid)
+	// mybug.GetUsefulCondition(uid)
+	search, err := mybug.GetUsefulCondition(uid)
 	if err != nil {
+		res := &response.Response{}
+		w.Write(res.ErrorE(err))
 		return
 	}
-	send, _ := json.Marshal(al)
-	w.Write(send)
+
+	w.Write(search.GetMyBugs())
 	return
 
 }
@@ -46,13 +48,15 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 
 	uid := xmux.GetData(r).Get("uid").(int64)
 	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
-	mybug.GetUsefulCondition(uid)
-	al, err := mybug.GetUsefulCondition(uid)
+	// mybug.GetUsefulCondition(uid)
+	search, err := mybug.GetUsefulCondition(uid)
 	if err != nil {
+		res := &response.Response{}
+		w.Write(res.ErrorE(err))
 		return
 	}
-	send, _ := json.Marshal(al)
-	w.Write(send)
+
+	w.Write(search.GetMyBugs())
 	return
 
 }

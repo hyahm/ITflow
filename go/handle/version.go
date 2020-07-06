@@ -26,7 +26,7 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 	uid := cache.CacheNickNameUid[nickname]
 	add_version_sql := "insert into version(name,urlone,urltwo,createtime,createuid) values(?,?,?,?,?)"
 
-	vid, err := db.Mconn.Insert(add_version_sql, version_add.Version, version_add.Iphoneurl, version_add.Notiphoneurl, time.Now().Unix(), uid)
+	vid, err := db.Mconn.Insert(add_version_sql, version_add.Name, version_add.IphoneUrl, version_add.NotIphoneUrl, time.Now().Unix(), uid)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -38,12 +38,12 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 		Username: nickname,
 		Classify: "version",
 		Action:   "add",
-		Msg:      fmt.Sprintf("add version id: %s", version_add.Version),
+		Msg:      fmt.Sprintf("add version id: %s", version_add.Name),
 	}
 
 	// 增加缓存
-	cache.CacheVidName[vid] = version_add.Version
-	cache.CacheVersionNameVid[version_add.Version] = vid
+	cache.CacheVidName[vid] = version_add.Name
+	cache.CacheVersionNameVid[version_add.Name] = vid
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -54,7 +54,9 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	al := &version.VersionList{}
+	al := &version.VersionList{
+		VersionList: make([]*version.Version, 0),
+	}
 
 	get_version_sql := "select id,name,urlone,urltwo,createtime from version order by id desc"
 
@@ -67,7 +69,7 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		rl := &version.Version{}
-		rows.Scan(&rl.Id, &rl.Version, &rl.Iphoneurl, &rl.Notiphoneurl, &rl.Date)
+		rows.Scan(&rl.Id, &rl.Name, &rl.IphoneUrl, &rl.NotIphoneUrl, &rl.Date)
 		al.VersionList = append(al.VersionList, rl)
 	}
 
@@ -144,7 +146,7 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	uid := cache.CacheNickNameUid[nickname]
 	versionsql := "update version set name=?,urlone=?,urltwo=?,createuid=? where id=?"
-	_, err := db.Mconn.Update(versionsql, data.Name, data.Iphoneurl, data.Notiphoneurl, uid, data.Id)
+	_, err := db.Mconn.Update(versionsql, data.Name, data.IphoneUrl, data.NotIphoneUrl, uid, data.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

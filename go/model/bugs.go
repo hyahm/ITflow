@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"html"
 	"itflow/cache"
 	"itflow/db"
@@ -29,6 +30,12 @@ type AllArticleList struct {
 	Code  int            `json:"code"`
 	Count int            `json:"total"`
 	Page  int            `json:"page"`
+	Msg   string         `json:"msg"`
+}
+
+func (al *AllArticleList) Marshal() []byte {
+	send, _ := json.Marshal(al)
+	return send
 }
 
 type Bug struct {

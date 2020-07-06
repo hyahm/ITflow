@@ -32,7 +32,7 @@ func init() {
 		ApiDescribe("页面编辑获取数据").
 		ApiResponseTemplate(`{"title":"metu","content":"<p>反反复复</p>","id":-1,"selectuser":["sdfsadf"],"projectname":"123","level":"2","envname":"axi","important":"一般ee","version":"V 1.5"}`)
 
-	Bug.Pattern("/bug/mybugs").Post(handle.GetMyBugs).Bind(&bug.SearchParam{}).
+	Bug.Pattern("/bug/mybugs").Post(handle.GetMyBugs).Bind(&search.ReqMyBugFilter{}).
 		End(midware.EndLog)
 
 	Bug.Pattern("/bug/close").Get(handle.CloseBug).End(midware.EndLog)
