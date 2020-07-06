@@ -11,8 +11,31 @@ var CacheImportantIid map[Important]ImportantId
 type Important string
 type ImportantId int64
 
-type ImportantList []Important
-type StoreImportantId string
+type StoreImportantIds string
+
+func (si StoreImportantIds) ToIds() []ImportantId {
+	its := make([]ImportantId, 0)
+	for _, v := range strings.Split(string(si), ",") {
+		i64, err := strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			return nil
+		}
+		its = append(its, ImportantId(i64))
+	}
+	return its
+}
+
+func (si StoreImportantIds) ToNames() []Important {
+	its := make([]Important, 0)
+	for _, v := range strings.Split(string(si), ",") {
+		i64, err := strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			return nil
+		}
+		its = append(its, ImportantId(i64).Name())
+	}
+	return its
+}
 
 var DefaultImportantId ImportantId = 0
 
@@ -34,6 +57,7 @@ func (si ImportantId) Name() Important {
 }
 
 func (s Important) Id() ImportantId {
+	s = s.Trim()
 	if v, ok := CacheImportantIid[s]; ok {
 		return v
 	} else {
@@ -46,24 +70,4 @@ func (s Important) ToString() string {
 }
 func (s Important) Trim() Important {
 	return Important(strings.Trim(string(s), " "))
-}
-
-func (sl ImportantList) ToStore() StoreImportantId {
-	tmp := make([]string, 0)
-	for _, v := range sl {
-		tmp = append(tmp, v.Id().ToString())
-	}
-	return StoreImportantId(strings.Join(tmp, ","))
-}
-
-func (ssi StoreImportantId) ToShow() ImportantList {
-	sl := make([]Important, 0)
-	for _, v := range strings.Split(string(ssi), ",") {
-		i64, err := strconv.ParseInt(v, 10, 64)
-		if err != nil {
-			continue
-		}
-		sl = append(sl, ImportantId(i64).Name())
-	}
-	return sl
 }

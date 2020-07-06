@@ -49,22 +49,22 @@ func (l Level) ToString() string {
 	return string(l)
 }
 
-func (ll LevelList) ToStore() StoreLevelId {
-	tmp := make([]string, 0)
-	for _, v := range ll {
-		tmp = append(tmp, v.Id().ToString())
-	}
-	return StoreLevelId(strings.Join(tmp, ","))
-}
+// func ToStore(ll LevelList) StoreLevelId {
+// 	tmp := make([]string, 0)
+// 	for _, v := range ll {
+// 		tmp = append(tmp, v.Id().ToString())
+// 	}
+// 	return StoreLevelId(strings.Join(tmp, ","))
+// }
 
-func (sli StoreLevelId) ToShow() LevelList {
-	sl := make([]Level, 0)
-	for _, v := range strings.Split(string(sli), ",") {
-		i64, err := strconv.ParseInt(v, 10, 64)
-		if err != nil {
-			continue
-		}
-		sl = append(sl, LevelId(i64).Name())
-	}
-	return sl
-}
+// func (sli StoreLevelId) ToShow() LevelList {
+// 	sl := make([]Level, 0)
+// 	for _, v := range strings.Split(string(sli), ",") {
+// 		i64, err := strconv.ParseInt(v, 10, 64)
+// 		if err != nil {
+// 			continue
+// 		}
+// 		sl = append(sl, LevelId(i64).Name())
+// 	}
+// 	return sl
+// }
