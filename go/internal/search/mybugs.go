@@ -10,7 +10,7 @@ import (
 )
 
 type ReqMyBugFilter struct {
-	page        int              `json:"page"`
+	Page        int              `json:"page"`
 	Limit       int              `json:"limit"`
 	Level       cache.Level      `json:"level"`
 	Project     string           `json:"project"`
@@ -64,7 +64,7 @@ func (rmf *ReqMyBugFilter) GetUsefulCondition(uid int64) (*search.BugList, error
 		ListSql:  bugsql,
 		Uid:      uid,
 		Limit:    rmf.Limit,
-		Page:     rmf.page,
+		Page:     rmf.Page,
 	}
 
 	return sb, nil

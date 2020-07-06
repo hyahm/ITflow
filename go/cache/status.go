@@ -48,22 +48,22 @@ func (s Status) Trim() Status {
 	return Status(strings.Trim(string(s), " "))
 }
 
-// func (sl StatusList) ToStore() StoreStatusId {
-// 	tmp := make([]string, 0)
-// 	for _, v := range sl {
-// 		tmp = append(tmp, v.Id().ToString())
-// 	}
-// 	return StoreStatusId(strings.Join(tmp, ","))
-// }
+func (sl StatusList) ToStore() StoreStatusId {
+	tmp := make([]string, 0)
+	for _, v := range sl {
+		tmp = append(tmp, v.Id().ToString())
+	}
+	return StoreStatusId(strings.Join(tmp, ","))
+}
 
-// func (ssi StoreStatusId) ToShow() StatusList {
-// 	sl := make([]Status, 0)
-// 	for _, v := range strings.Split(string(ssi), ",") {
-// 		i64, err := strconv.ParseInt(v, 10, 64)
-// 		if err != nil {
-// 			continue
-// 		}
-// 		sl = append(sl, StatusId(i64).Name())
-// 	}
-// 	return sl
-// }
+func (ssi StoreStatusId) ToShow() StatusList {
+	sl := make([]Status, 0)
+	for _, v := range strings.Split(string(ssi), ",") {
+		i64, err := strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			continue
+		}
+		sl = append(sl, StatusId(i64).Name())
+	}
+	return sl
+}

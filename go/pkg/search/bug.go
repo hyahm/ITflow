@@ -24,18 +24,19 @@ func (pl *BugList) GetMyBugs() []byte {
 		Al: make([]*model.ArticleList, 0),
 	}
 	// 获取所有数据的行
-	var count int
 	golog.Info(pl.CountSql)
-	err := db.Mconn.GetOne(pl.CountSql, pl.Uid).Scan(&count)
+	err := db.Mconn.GetOne(pl.CountSql, pl.Uid).Scan(&al.Count)
 	if err != nil {
 		golog.Error(err)
 		al.Msg = err.Error()
 		al.Code = 1
 		return al.Marshal()
 	}
-	golog.Info("count: ", count)
-	start, end := pager.GetPagingLimitAndPage(count, pl.Page, pl.Limit)
-	pl.ListSql += " limit ?,?"
+	golog.Infof("----%+v-------\n", pl)
+	start, end := pager.GetPagingLimitAndPage(al.Count, pl.Page, pl.Limit)
+	pl.ListSql += " order by id desc limit ?,? "
+	golog.Info(start, end)
+	golog.Info(pl.ListSql)
 	rows, err := db.Mconn.GetRows(pl.ListSql, pl.Uid, start, end)
 	if err != nil {
 		golog.Error(err)
