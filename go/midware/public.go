@@ -14,10 +14,11 @@ import (
 func JsonToStruct(w http.ResponseWriter, r *http.Request) bool {
 	resp := &response.Response{}
 	b, err := ioutil.ReadAll(r.Body)
-	if err != nil || len(b) == 0 {
+	if err != nil {
 		w.Write(resp.ErrorE(err))
 		return true
 	}
+	golog.Info(string(b))
 	err = json.Unmarshal(b, xmux.GetData(r).Data)
 	if err != nil {
 		golog.Error(err)
@@ -34,7 +35,7 @@ func CheckToken(w http.ResponseWriter, r *http.Request) bool {
 		w.Write(errorcode.TokenNotFound())
 		return true
 	}
-	filter, err := db.CT.Filter("Token", a)
+	filter, err := db.Table.Filter("Token", a)
 	if err != nil {
 		w.Write(errorcode.TokenNotFound())
 		return true

@@ -19,7 +19,9 @@ func PositionGet(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := &network.List_jobs{}
+	data := &network.List_jobs{
+		Positions: make([]*network.Table_jobs, 0),
+	}
 
 	rows, err := db.Mconn.GetRows("select id,name,level,hypo from jobs")
 	if err != nil {
@@ -198,7 +200,9 @@ func GetHypos(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	nickname := xmux.GetData(r).Get("nickname").(string)
-	data := &hypos{}
+	data := &hypos{
+		Hypos: make([]string, 0),
+	}
 	// 管理员
 	if cache.CacheNickNameUid[nickname] != cache.SUPERID {
 		w.Write(errorcode.ErrorNoPermission())

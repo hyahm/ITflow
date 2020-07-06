@@ -11,7 +11,7 @@ import (
 func GetExpire(w http.ResponseWriter, r *http.Request) {
 	token := xmux.Var(r)["token"]
 	golog.Info(token)
-	filter, err := db.CT.Filter("Token", token)
+	filter, err := db.Table.Filter("Token", token)
 	if err != nil {
 		w.Write([]byte(err.Error()))
 		return

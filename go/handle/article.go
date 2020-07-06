@@ -83,7 +83,9 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	ul := &userList{}
+	ul := &userList{
+		Users: make([]string, 0),
+	}
 
 	getusersql := "select realname from user"
 	rows, err := db.Mconn.GetRows(getusersql)

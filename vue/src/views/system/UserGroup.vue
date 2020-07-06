@@ -79,7 +79,7 @@ export default {
   data() {
     return {
       dialogFormVisible: false,
-      list: null,
+      list: [],
       form: {
         id: -1,
         name: '',
@@ -95,9 +95,7 @@ export default {
   methods: {
     getuser() {
       getUsers().then(resp => {
-        if (resp.data.userlist === null) {
-          this.users = []
-        } else {
+        if (resp.data.code === 0) {
           this.users = resp.data.users
         }
       })
@@ -136,6 +134,8 @@ export default {
         })
       } else {
         addGroup(this.form).then(resp => {
+          console.log(resp.data)
+          console.log(this.list)
           if (resp.data.code === 0) {
             this.list.push({
               id: resp.data.id,

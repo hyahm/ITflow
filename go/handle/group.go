@@ -193,7 +193,9 @@ func GroupGet(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := &model.Send_groups{}
+	data := &model.Send_groups{
+		GroupList: make([]*model.Get_groups, 0),
+	}
 
 	gsql := "select id,name,ids from usergroup"
 	rows, err := db.Mconn.GetRows(gsql)

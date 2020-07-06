@@ -486,6 +486,17 @@ CREATE TABLE `roles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+INSERT INTO roles(role) VALUES('env');
+INSERT INTO roles(role) VALUES('important');
+INSERT INTO roles(role) VALUES('level');
+INSERT INTO roles(role) VALUES('log');
+INSERT INTO roles(role) VALUES('position');
+INSERT INTO roles(role) VALUES('project');
+INSERT INTO roles(role) VALUES('rolegroup');
+INSERT INTO roles(role) VALUES('status');
+INSERT INTO roles(role) VALUES('statusgroup');
+INSERT INTO roles(role) VALUES('usergroup');
+INSERT INTO roles(role) VALUES('version');
 --
 -- Dumping data for table `roles`
 --

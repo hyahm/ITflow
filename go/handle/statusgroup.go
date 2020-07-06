@@ -180,7 +180,9 @@ func GetStatusGroupName(w http.ResponseWriter, r *http.Request) {
 	data := &struct {
 		Names []string `json:"names"`
 		Code  int      `json:"code"`
-	}{}
+	}{
+		Names: make([]string, 0),
+	}
 	s := "select name from statusgroup"
 	rows, err := db.Mconn.GetRows(s)
 	if err != nil {

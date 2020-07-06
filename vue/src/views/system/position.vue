@@ -5,7 +5,7 @@
     </p>
     <el-table
       :data="tableData"
-      height="250"
+      height="600"
       style="width: 100%"
     >
       <el-table-column
@@ -49,13 +49,13 @@
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.row.id)"
+            @click="handleDelete(scope.row)"
           >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <div>
-      <el-button type="success" plain style="margin: 20px" @click="addstatus">添加职位</el-button>
+      <el-button type="success" plain style="margin: 20px" @click="addposition">添加职位</el-button>
     </div>
     <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" title="职位管理">
       <el-form>
@@ -72,9 +72,9 @@
       <el-form style="margin-top: 10px">
         <!--从属于哪个管理者-->
         <el-form-item label="从属于">
-          <el-select v-model="form.hypo" placeholder="Select">
+          <el-select v-model="form.hypo" clearable placeholder="Select">
             <el-option
-              v-for="(hypo, index) in hypos"
+              v-for="(hypo, index) in manager"
               :key="index"
               :label="hypo"
               :value="hypo"
@@ -106,13 +106,14 @@ export default {
   },
   data() {
     return {
+      changeName: '',
       tableData: [],
       statuslist: [],
       dialogFormVisible: false,
       status: '',
       levelone: 1,
       leveltwo: 2,
-      hypos: [],
+      manager: [],
       form: {
         id: -1,
         name: '',
@@ -129,7 +130,7 @@ export default {
     gethypos() {
       getHypos().then(resp => {
         if (resp.data.code === 0) {
-          this.hypos = resp.data.hypos
+          this.manager = resp.data.hypos
         } else {
           this.$message.error(resp.data.msg)
         }
@@ -138,9 +139,7 @@ export default {
     getlist() {
       PositionsList().then(resp => {
         if (resp.data.code === 0) {
-          if (resp.data.positions != null) {
-            this.tableData = resp.data.positions
-          }
+          this.tableData = resp.data.positions
         } else {
           this.$message.error(resp.data.msg)
         }
@@ -156,6 +155,10 @@ export default {
               hypo: this.form.hypo,
               level: this.form.level
             })
+
+            if (this.form.level === 1) {
+              this.manager.push(this.form.name)
+            }
           } else {
             this.$message.error(resp.data.msg)
           }
@@ -167,6 +170,13 @@ export default {
             for (let i = 0; i < l; i++) {
               if (this.tableData[i].id === this.form.id) {
                 this.tableData[i].name = this.form.name
+                break
+              }
+              for (let i = 0; i < this.manager.length; i++) {
+                if (this.manager[i] === this.changeName) {
+                  this.manager[i] = this.form.name
+                  return
+                }
               }
             }
           } else {
@@ -179,13 +189,13 @@ export default {
     cancel() {
       this.dialogFormVisible = false
     },
-    handleDelete(id) {
+    handleDelete(row) {
       this.$confirm('此操作将关闭bug, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        delPosition(id).then(resp => {
+        delPosition(row.id).then(resp => {
           // console
           if (resp.data.code === 21) {
             this.$message.error('此职位有用户在使用')
@@ -198,8 +208,15 @@ export default {
           if (resp.data.code === 0) {
             const l = this.tableData.length
             for (let i = 0; i < l; i++) {
-              if (this.tableData[i].id === id) {
+              if (this.tableData[i].id === row.id) {
                 this.tableData.splice(i, 1)
+                break
+              }
+            }
+            for (let i = 0; i < this.manager.length; i++) {
+              if (this.manager[i] === row.name) {
+                this.manager.splice(i, 1)
+                break
               }
             }
             this.$message.success('删除成功')
@@ -214,13 +231,16 @@ export default {
         })
       })
     },
-    addstatus() {
+    addposition() {
       this.dialogFormVisible = true
       this.form.id = -1
+      this.form.level = 0
+      this.form.hypo = ''
       this.form.name = ''
     },
     handleUpdate(row) {
       this.form = row
+      this.changeName = row.name
       this.dialogFormVisible = true
     }
   }

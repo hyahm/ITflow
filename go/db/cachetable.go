@@ -1,9 +1,11 @@
 package db
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/hyahm/cachetable"
+	"github.com/hyahm/golog"
 )
 
 const (
@@ -18,20 +20,27 @@ type Token struct {
 	Id       int64
 }
 
-var CT *cachetable.Table
+var Table *cachetable.Table
 var ct cachetable.CT
 
 func InitCacheTable() {
 	ct = cachetable.NewCT()
 	ct.Load(".token.db", &Token{})
-	ct.Add(TOKEN, &Token{})
+	err := ct.CreateTable(TOKEN, &Token{})
+	if err != nil {
+		if err != cachetable.ExsitErr {
+			panic(err)
+		}
 
-	CT, _ = ct.Table(TOKEN)
+	}
 
-	CT.SetKeys(TOKEN)
+	Table, _ = ct.Use(TOKEN)
+	golog.Infof("%+v", Table)
+	Table.SetKeys(TOKEN)
 	go ct.Clean(time.Second * 10)
 }
 
 func SaveCacheTable() error {
+	fmt.Println("save db")
 	return ct.Save(".token.db")
 }
