@@ -39,7 +39,7 @@ func main() {
 	goconfig.WriteBool("log.everyday", false, "每天备份一次 大小也存在的话，此项优先 ，false为不每天备份一次")
 
 	goconfig.WriteString("mysql.user", "root")
-	goconfig.WriteString("mysql.pwd", "")
+	goconfig.WritePassword("mysql.pwd", "123456")
 	goconfig.WriteString("mysql.host", "127.0.0.1")
 	goconfig.WriteInt("mysql.port", 3306)
 	goconfig.WriteString("mysql.db", "project")
