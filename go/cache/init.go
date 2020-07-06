@@ -73,7 +73,7 @@ var (
 )
 
 func LoadConfig() {
-	SUPERID = goconfig.ReadInt64("adminid", 0)
+	SUPERID = goconfig.ReadInt64("adminid", 1)
 	ImgDir = goconfig.ReadString("imgdir", "/data/bugimg/")
 	err := os.MkdirAll(ImgDir, 0755)
 	if err != nil {

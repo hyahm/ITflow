@@ -45,7 +45,7 @@ func (user *User) Create() error {
 func (user *User) CheckHaveAdminUser() error {
 	// 返回nil 表示存在admin账号
 	var count int
-	err := db.Mconn.GetOne("select count(id) from user where rid=?", goconfig.ReadInt("adminid", 0)).Scan(&count)
+	err := db.Mconn.GetOne("select count(id) from user where rid=?", goconfig.ReadInt("adminid", 1)).Scan(&count)
 	if err != nil {
 		if err == sql.ErrNoRows || count != 1 {
 			return errors.New("有且只能有一个admin账户 \n")
@@ -58,7 +58,7 @@ func (user *User) CheckHaveAdminUser() error {
 
 func (user *User) UpdateAdminPassword(password string) error {
 	// 修改密码
-	_, err := db.Mconn.Update("update user set password=? where rid=?", password, goconfig.ReadInt("adminid", 0))
+	_, err := db.Mconn.Update("update user set password=? where rid=?", password, goconfig.ReadInt("adminid", 1))
 	return err
 
 }
