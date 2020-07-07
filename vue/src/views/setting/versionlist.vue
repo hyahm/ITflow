@@ -46,7 +46,7 @@
 
       <el-table-column label="版本" width="90px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.version }}</span>
+          <span>{{ scope.row.name }}</span>
           <!--<svg-icon v-for="n in +scope.row.importance" icon-class="star" class="meta-item__icon" :key="n"></svg-icon>-->
         </template>
       </el-table-column>
@@ -107,7 +107,7 @@ export default {
   name: 'Versionlist',
   data() {
     return {
-      list: null,
+      list: [],
       dialogFormVisible: false,
       listLoading: false,
       tableKey: 0,
@@ -130,14 +130,10 @@ export default {
   methods: {
     getversionlist() {
       getVersion(this.listQuery).then(resp => {
+        console.log(resp.data)
         if (resp.data.code === 0) {
-          if (resp.data.versionlist === null) {
-            this.list = []
-            this.total = 0
-          } else {
-            this.list = resp.data.versionlist
-            this.total = resp.data.versionlist.length
-          }
+          this.list = resp.data.versionlist
+          this.total = resp.data.versionlist.length
         } else {
           this.$message.error(resp.data.msg)
         }
@@ -154,7 +150,7 @@ export default {
     handleModifyStatus(row) {
       this.dialogFormVisible = true
       this.form.id = row.id
-      this.form.name = row.version
+      this.form.name = row.name
       this.form.iphone = row.iphoneurl
       this.form.noiphone = row.notiphoneurl
     },
@@ -165,7 +161,7 @@ export default {
           const l = this.list.length
           for (let i = 0; i < l; i++) {
             if (this.list[i].id === this.form.id) {
-              this.list[i].version = this.form.name
+              this.list[i].name = this.form.name
               this.list[i].iphoneurl = this.form.iphone
               this.list[i].notiphoneurl = this.form.noiphone
               break

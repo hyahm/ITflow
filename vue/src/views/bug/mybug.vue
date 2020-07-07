@@ -56,7 +56,7 @@
 
       <el-table-column label="重要性" width="100px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.importance }}</span>
+          <span>{{ scope.row.important }}</span>
         </template>
       </el-table-column>
 
@@ -116,7 +116,7 @@ import { closeBug, changeStatus } from '@/api/bugs'
 import { searchMyBugs } from '@/api/search'
 import { statusFilter } from '@/api/status'
 import waves from '@/directive/waves' // 水波纹指令
-import { getProject, getStatus, getShowStatus, getPermStatus } from '@/api/get'
+import { getProject, getStatus, getShowStatus, getPermStatus, getLevels } from '@/api/get'
 // import { PlatformDropdown } from './components/Dropdown'
 
 const calendarTypeOptions = [
@@ -166,13 +166,14 @@ export default {
       projectnames: [],
       platformsOptions: [],
       statuslist: [],
-      levels: ['高', '中', '低'],
+      levels: [],
       statuslength: 0
     }
   },
   mounted() {
     this.getstatus()
     this.getpname()
+    this.getlevels()
     this.getList()
   },
   activated() {
@@ -182,6 +183,16 @@ export default {
     this.getmystatus()
   },
   methods: {
+    getlevels() {
+      getLevels().then(resp => {
+        console.log(resp.data)
+        if (resp.data.code === 0) {
+          this.levels = resp.data.levels
+        } else {
+          this.$message.error(resp.data.msg)
+        }
+      })
+    },
     HandleChange() {
       const data = {
         checkstatus: this.listQuery.showstatus
@@ -347,11 +358,12 @@ export default {
     // },
     getList() {
       this.listLoading = true
-      const pager = {
-        page: this.listQuery.page,
-        limit: this.listQuery.limit
-      }
-      searchMyBugs(pager).then(resp => {
+      // const pager = {
+      //   page: this.listQuery.page,
+      //   limit: this.listQuery.limit
+      // }
+      searchMyBugs(this.listQuery).then(resp => {
+        console.log(resp.data)
         if (resp.data.code === 0) {
           this.list = resp.data.articlelist
           this.total = resp.data.total

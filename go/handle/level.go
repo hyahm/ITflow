@@ -17,7 +17,9 @@ import (
 
 func LevelGet(w http.ResponseWriter, r *http.Request) {
 
-	data := &network.List_levels{}
+	data := &network.List_levels{
+		Levels: make([]*network.Table_level, 0),
+	}
 	for k, v := range cache.CacheLidLevel {
 		one := &network.Table_level{}
 		one.Id = k
@@ -154,13 +156,15 @@ func LevelUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 type levelslist struct {
-	Levels cache.LevelList `json:"levels"`
-	Code   int             `json:"code"`
+	Levels []cache.Level `json:"levels"`
+	Code   int           `json:"code"`
 }
 
 func GetLevels(w http.ResponseWriter, r *http.Request) {
 
-	data := &levelslist{}
+	data := &levelslist{
+		Levels: make([]cache.Level, 0),
+	}
 	for _, v := range cache.CacheLidLevel {
 		data.Levels = append(data.Levels, v)
 	}

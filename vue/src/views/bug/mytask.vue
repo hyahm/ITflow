@@ -74,7 +74,7 @@
       </el-table-column>
       <el-table-column label="重要性" width="80px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.importance }}</span>
+          <span>{{ scope.row.important }}</span>
           <!--<svg-icon v-for="n in +scope.row.importance" icon-class="star" class="meta-item__icon" :key="n"></svg-icon>-->
         </template>
       </el-table-column>
@@ -136,7 +136,7 @@
 </template>
 
 <script>
-import { getUsers, getPermStatus, getProject, getStatus, getShowStatus } from '@/api/get'
+import { getUsers, getPermStatus, getProject, getStatus, getShowStatus, getLevels } from '@/api/get'
 import { passBug, changeStatus } from '@/api/bugs'
 import { searchMyTasks } from '@/api/search'
 import { statusFilter } from '@/api/status'
@@ -232,7 +232,7 @@ export default {
         title: [{ required: true, message: 'title is required', trigger: 'blur' }]
       },
       downloadLoading: false,
-      levels: ['高', '中', '低'],
+      levels: [],
       projectnames: [],
       checkstatus: [],
       statuslength: 0
@@ -240,6 +240,7 @@ export default {
   },
   activated() {
     this.getstatus()
+    this.getlevels()
     this.getList()
   },
   mounted() {
@@ -253,6 +254,16 @@ export default {
     // this.gettaskstatus()
   },
   methods: {
+    getlevels() {
+      getLevels().then(resp => {
+        console.log(resp.data)
+        if (resp.data.code === 0) {
+          this.levels = resp.data.levels
+        } else {
+          this.$message.error(resp.data.msg)
+        }
+      })
+    },
     getstatus() {
       getStatus().then(resp => {
         if (resp.data.code === 0) {

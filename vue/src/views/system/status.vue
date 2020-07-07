@@ -1,7 +1,7 @@
 <template>
   <div>
     <p class="warn-content">
-      bug的所有状态
+      bug的所有状态流程， 比如从新建->解决中->测试->完成 等
     </p>
     <el-table
       :data="tableData"

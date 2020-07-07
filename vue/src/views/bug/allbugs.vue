@@ -79,7 +79,7 @@
       </el-table-column>
       <el-table-column label="重要性" width="80px" class-name="status-col">
         <template slot-scope="scope">
-          <span>{{ scope.row.importance }}</span>
+          <span>{{ scope.row.important }}</span>
           <!--<svg-icon v-for="n in +scope.row.importance" icon-class="star" class="meta-item__icon" :key="n"></svg-icon>-->
         </template>
       </el-table-column>
@@ -97,11 +97,10 @@
           <!--<span v-else>0</span>-->
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="状态" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-select v-model="scope.row.status" style="width: 200px" class="filter-item" placeholder="修改状态" @change="changestatus(scope.row)">
-            <el-option v-for="(status, index) in filterstatus" :key="index" :label="status" :value="status" />
-          </el-select>
+          <span>{{ scope.row.status }}</span>
+          <!-- <el-select v-model="scope.row.status" style="width: 200px" class="filter-item" placeholder="修改状态" @change="changestatus(scope.row)" /> -->
         </template>
       </el-table-column>
     </el-table>
@@ -127,7 +126,7 @@
 import { changeStatus } from '@/api/bugs'
 import { statusFilter, showStatus } from '@/api/status'
 import { searchAllBugs } from '@/api/search'
-import { getProject, getPermStatus, getStatus } from '@/api/get'
+import { getProject, getPermStatus, getStatus, getLevels } from '@/api/get'
 import waves from '@/directive/waves' // 水波纹指令
 import { parseTime } from '@/utils'
 
@@ -220,7 +219,7 @@ export default {
       },
       downloadLoading: false,
       filterstatus: [],
-      levels: ['高', '中', '低'],
+      levels: [],
       checkstatus: [],
       statuslength: 0,
       allstatus: []
@@ -233,21 +232,30 @@ export default {
   created() {
     this.getstatus()
     this.getmystatus()
+    this.getlevels()
     this.getList()
     this.getprojectname()
     // this.gettaskstatus()
   },
   methods: {
+    getlevels() {
+      getLevels().then(resp => {
+        console.log(resp.data)
+        if (resp.data.code === 0) {
+          this.levels = resp.data.levels
+        } else {
+          this.$message.error(resp.data.msg)
+        }
+      })
+    },
     HandleChange() {
       const data = {
         checkstatus: this.checkstatus
       }
       statusFilter(data).then(resp => {
         if (resp.data.code === 0) {
-          if (resp.data.checkstatus !== null) {
-            this.checkstatus = resp.data.checkstatus
-            this.statuslength = this.checkstatus.length
-          }
+          this.checkstatus = resp.data.checkstatus
+          this.statuslength = this.checkstatus.length
           this.listLoading = true
           searchAllBugs(this.listQuery).then(resp => {
             if (resp.data.code === 0) {

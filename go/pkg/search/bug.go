@@ -1,6 +1,8 @@
 package search
 
 import (
+	"database/sql"
+	"encoding/json"
 	"itflow/cache"
 	"itflow/db"
 	"itflow/model"
@@ -17,34 +19,47 @@ type BugList struct {
 	Page     int
 	Uid      int64
 	Limit    int
+	Count    int
+}
+
+func (pl *BugList) rows() (*sql.Rows, error) {
+	var err error
+	err = db.Mconn.GetOne(pl.CountSql).Scan(&pl.Count)
+
+	if err != nil {
+		golog.Error(err)
+
+		return nil, err
+	}
+	golog.Infof("----%+v-------\n", pl)
+	// 增加显示的状态
+	start, end := pager.GetPagingLimitAndPage(pl.Count, pl.Page, pl.Limit)
+	pl.ListSql += " order by id desc limit ?,? "
+	var rows *sql.Rows
+
+	rows, err = db.Mconn.GetRows(pl.ListSql, start, end)
+
+	if err != nil {
+		golog.Error(err)
+		return nil, err
+	}
+	return rows, nil
 }
 
 func (pl *BugList) GetMyBugs() []byte {
+
+	// 获取所有数据的行
+
 	al := &model.AllArticleList{
 		Al: make([]*model.ArticleList, 0),
 	}
-	// 获取所有数据的行
-	golog.Info(pl.CountSql)
-	err := db.Mconn.GetOne(pl.CountSql, pl.Uid).Scan(&al.Count)
+	rows, err := pl.rows()
 	if err != nil {
-		golog.Error(err)
 		al.Msg = err.Error()
 		al.Code = 1
-		return al.Marshal()
+		send, _ := json.Marshal(al)
+		return send
 	}
-	golog.Infof("----%+v-------\n", pl)
-	start, end := pager.GetPagingLimitAndPage(al.Count, pl.Page, pl.Limit)
-	pl.ListSql += " order by id desc limit ?,? "
-	golog.Info(start, end)
-	golog.Info(pl.ListSql)
-	rows, err := db.Mconn.GetRows(pl.ListSql, pl.Uid, start, end)
-	if err != nil {
-		golog.Error(err)
-		al.Msg = err.Error()
-		al.Code = 1
-		return al.Marshal()
-	}
-
 	for rows.Next() {
 		one := &model.ArticleList{}
 		var iid cache.ImportantId
@@ -60,20 +75,6 @@ func (pl *BugList) GetMyBugs() []byte {
 		one.Level = cache.CacheLidLevel[lid]
 		one.Projectname = cache.CachePidName[pid]
 		one.Env = cache.CacheEidName[eid]
-		// 显示realname
-
-		//如果是我的任务
-
-		// for _, v := range strings.Split(userlist, ",") {
-		// 	//判断用户是否存在，不存在就 删吗 ， 先不删
-		// 	userid32, _ := strconv.Atoi(v)
-		// 	if realname, ok := cache.CacheUidRealName[int64(userid32)]; ok {
-		// 		one.Handle = append(one.Handle, realname)
-		// 	}
-		// }
-
-		// if mytask {
-		// 判断是否是自己的任务，先要过滤查询条件，然后查询spusers
 
 		for _, v := range strings.Split(userlist, ",") {
 			//判断用户是否存在，不存在就 删吗 ， 先不删

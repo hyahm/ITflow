@@ -32,10 +32,10 @@ const system = {
     },
     {
       path: 'bugmanager',
-      component: () => import('@/views/system/bugmanager'),
+      component: () => import('@/views/system/bugdustbin'),
       name: 'bugmanager',
       meta: {
-        title: 'bug管理',
+        title: 'bug垃圾箱',
         icon: 'email',
         roles: ['admin']
       }

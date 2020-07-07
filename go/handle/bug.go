@@ -20,8 +20,8 @@ import (
 )
 
 type statusList struct {
-	StatusList []string `json:"statuslist"`
-	Code       int      `json:"code"`
+	StatusList []cache.Status `json:"statuslist"`
+	Code       int            `json:"code"`
 }
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
@@ -38,6 +38,7 @@ func ShowStatus(w http.ResponseWriter, r *http.Request) {
 		CheckStatus: make([]cache.Status, 0),
 	}
 	uid := xmux.GetData(r).Get("uid").(int64)
+
 	sl.CheckStatus = cache.CacheUidFilter[uid].ToShow()
 
 	// 遍历出每一个status id
@@ -55,15 +56,16 @@ func ShowStatus(w http.ResponseWriter, r *http.Request) {
 
 func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 
-	nickname := xmux.GetData(r).Get("nickname").(string)
+	uid := xmux.GetData(r).Get("uid").(int64)
 
 	sl := &statusList{}
 	//如果是管理员的话,所有的都可以
-	if cache.CacheNickNameUid[nickname] == cache.SUPERID {
-		for _, v := range cache.CacheSidStatus {
-			sl.StatusList = append(sl.StatusList, v.ToString())
-		}
-	}
+	sl.StatusList = cache.CacheUidFilter[uid].ToShow()
+	// if  == cache.SUPERID {
+	// 	for _, v := range cache.CacheSidStatus {
+	// 		sl.StatusList = append(sl.StatusList, v.ToString())
+	// 	}
+	// }
 	send, _ := json.Marshal(sl)
 	w.Write(send)
 	return
@@ -245,7 +247,9 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetData(r).Get("uid").(int64)
 	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
 	// mybug.GetUsefulCondition(uid)
-	search, err := mybug.GetUsefulCondition(uid)
+	countsql := "select count(id) from bugs where dustbin=0 and uid=? "
+	searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=0 and uid=? "
+	search, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
 	if err != nil {
 		res := &response.Response{}
 		w.Write(res.ErrorE(err))

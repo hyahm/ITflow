@@ -86,3 +86,4 @@ export function fetchBug(id) {
     params: { id }
   })
 }
+
