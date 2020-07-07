@@ -1,5 +1,5 @@
 import { login, logout, getInfo } from '@/api/user'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { getToken, setToken, removeToken, setTimeout } from '@/utils/auth'
 // import router, { resetRouter } from '@/router'
 import router from '@/router'
 
@@ -36,10 +36,10 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
         const { data } = response
-        console.log(data)
         if (data.code === 0) {
           commit('SET_TOKEN', data.token)
           setToken(data.token)
+          setTimeout()
           resolve()
         } else {
           reject()
@@ -53,9 +53,11 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
+      console.log(state.token)
       getInfo(state.token).then(response => {
-        console.log('111')
+        console.log('116666666666666661')
         const { data } = response
+        console.log(data)
         // console.log(data)
         if (data.code !== 0) {
           reject('Verification failed, please Login again.')

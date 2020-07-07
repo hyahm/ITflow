@@ -85,13 +85,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("职位不存在"))
 		return
 	}
-	// var level int64
-	// err := db.Mconn.GetOne("select level from jobs where id=?", jid).Scan(&level)
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(errorcode.ErrorE(err))
-	// 	return
-	// }
 
 	// 增加用户
 	enpassword := encrypt.PwdEncrypt(getuser.Password, cache.Salt)

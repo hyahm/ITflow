@@ -25,6 +25,6 @@ func init() {
 
 	Env.Pattern("/env/update").Post(handle.UpdateEnv).Bind(&env.Env{}).
 		AddMidware(midware.JsonToStruct).End(midware.EndLog)
-	Env.Pattern("/get/env").Post(handle.GetEnv).DelMidware(midware.CheckToken)
+	Env.Pattern("/get/env").Post(handle.GetEnv).DelMidware(midware.CheckToken).DelMidware(midware.CheckEnvPermssion)
 	Env.Pattern("/env/delete").Get(handle.DeleteEnv).End(midware.EndLog)
 }

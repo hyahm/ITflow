@@ -25,5 +25,5 @@ func init() {
 		End(midware.EndLog)
 
 	Project.Pattern("/project/delete").Get(handle.DeleteProject).End(midware.EndLog)
-	Bug.Pattern("/get/project").Post(handle.GetProject)
+	Bug.Pattern("/get/project").Post(handle.GetProject).DelMidware(midware.CheckProjectPermssion)
 }

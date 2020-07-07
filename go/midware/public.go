@@ -32,11 +32,13 @@ func CheckToken(w http.ResponseWriter, r *http.Request) bool {
 	errorcode := &response.Response{}
 	a := r.Header.Get("X-Token")
 	if a == "" {
+		golog.Error("not found token")
 		w.Write(errorcode.TokenNotFound())
 		return true
 	}
 	filter, err := db.Table.Filter("Token", a)
 	if err != nil {
+		golog.Error(err)
 		w.Write(errorcode.TokenNotFound())
 		return true
 	}

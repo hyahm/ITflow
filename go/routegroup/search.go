@@ -2,7 +2,6 @@ package routegroup
 
 import (
 	"itflow/handle"
-	"itflow/internal/bug"
 	"itflow/internal/search"
 	"itflow/midware"
 
@@ -21,7 +20,7 @@ func init() {
 	Search.Pattern("/search/allbugs").Post(handle.SearchAllBugs).Bind(&search.ReqMyBugFilter{}).AddMidware(midware.JsonToStruct)
 	Search.Pattern("/search/mybugs").Post(handle.SearchMyBugs).Bind(&search.ReqMyBugFilter{}).AddMidware(midware.JsonToStruct)
 
-	Search.Pattern("/search/mytasks").Post(handle.SearchMyTasks).Bind(&bug.SearchParam{}).
+	Search.Pattern("/search/mytasks").Post(handle.SearchMyTasks).Bind(&search.ReqMyBugFilter{}).
 		AddMidware(midware.JsonToStruct)
 
 	Search.Pattern("/search/bugmanager").Post(handle.SearchBugManager).Bind(&search.ReqMyBugFilter{}).AddMidware(midware.JsonToStruct)

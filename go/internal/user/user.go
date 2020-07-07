@@ -45,7 +45,8 @@ func (login *Login) Check(resp *RespLogin) []byte {
 		NickName: login.Username,
 		Id:       id,
 	}
-
+	golog.Info(token)
+	// err = db.Table.Add(token, time.Second*20)
 	err = db.Table.Add(token, time.Duration(goconfig.ReadInt("expiration", 120))*time.Minute)
 	if err != nil {
 		golog.Error(err)

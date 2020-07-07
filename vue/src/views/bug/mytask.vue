@@ -241,7 +241,7 @@ export default {
   activated() {
     this.getstatus()
     this.getlevels()
-    this.getList()
+    this.handleFilter()
   },
   mounted() {
     this.getspuser()
@@ -249,7 +249,7 @@ export default {
   created() {
     this.getstatus()
     this.getmystatus()
-    this.getList()
+    this.handleFilter()
     this.getpname()
     // this.gettaskstatus()
   },
@@ -285,17 +285,19 @@ export default {
       }
       this.statuslength = this.checkstatus.length
       statusFilter(data).then(resp => {
+        console.log(resp.data)
         if (resp.data.code === 0) {
           this.statuslength = this.checkstatus.length
           this.listLoading = true
-
-          searchMyTasks(this.listQuery).then(resp => {
-            if (resp.data.code === 0) {
-              this.list = resp.data.articlelist
-              this.total = resp.data.total
-              this.listQuery.page = resp.data.page
-            }
-          })
+          this.handleFilter()
+          // searchMyTasks(this.listQuery).then(respfilter => {
+          //   console.log(respfilter)
+          //   if (respfilter.data.code === 0) {
+          //     this.list = respfilter.data.articlelist
+          //     this.total = respfilter.data.total
+          //     this.listQuery.page = respfilter.data.page
+          //   }
+          // })
           this.listLoading = false
         } else {
           this.$message.error(resp.data.msg)
@@ -314,7 +316,6 @@ export default {
     getmystatus() {
       // 需要显示的状态
       getShowStatus().then(resp => {
-        console.log(1111)
         if (resp.data.code === 0) {
           if (resp.data.checkstatus !== null) {
             this.checkstatus = resp.data.checkstatus
@@ -334,23 +335,16 @@ export default {
         }
       })
     },
-    getList() {
+    handleFilter() {
       this.listLoading = true
       searchMyTasks(this.listQuery).then(resp => {
-        if (resp.data.code === 0) {
-          this.list = resp.data.articlelist
-          this.total = resp.data.total
-          this.listQuery.page = resp.data.page
-        } else {
-          this.$message.error(resp.data.msg)
-        }
+        this.list = resp.data.articlelist
+        this.total = resp.data.total
+        this.listQuery.page = resp.data.page
       })
       this.listLoading = false
     },
-    handleFilter() {
-      this.listQuery.page = 1
-      this.getList()
-    },
+
     handleSizeChange(val) {
       this.listQuery.limit = val
       this.getList()
@@ -423,7 +417,9 @@ export default {
         id: row.id,
         status: row.status
       }
+      console.log(8888)
       changeStatus(param).then(response => {
+        console.log(response.data)
         if (response.data.code === 0) {
           this.$notify({
             title: '成功',

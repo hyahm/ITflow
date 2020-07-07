@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie'
 
 const TokenKey = 'Admin-Token'
-const inFifteenMinutes = new Date(new Date().getTime() + 120 * 60 * 1000 * 24)
+// const inFifteenMinutes = new Date(new Date().getTime() + 120 * 60 * 1000 * 24)
 export function getToken() {
   return Cookies.get(TokenKey)
 }
@@ -15,7 +15,5 @@ export function removeToken() {
 }
 
 export function setTimeout() {
-  return Cookies.set(TokenKey, getToken(TokenKey), {
-    expires: inFifteenMinutes
-  })
+  return Cookies.set(TokenKey, getToken(TokenKey))
 }

@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"fmt"
 	"itflow/db"
 	"net/http"
 
@@ -18,5 +19,5 @@ func GetExpire(w http.ResponseWriter, r *http.Request) {
 	}
 	time := filter.TTL()
 
-	w.Write([]byte(time.String()))
+	w.Write([]byte(fmt.Sprintf("%d", time)))
 }

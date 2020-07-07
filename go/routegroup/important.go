@@ -11,7 +11,7 @@ import (
 var Important *xmux.GroupRoute
 
 func init() {
-	Important = xmux.NewGroupRoute()
+	Important = xmux.NewGroupRoute().AddMidware(midware.CheckImportantPermssion)
 	Important.ApiCodeField("code").ApiCodeMsg("0", "成功")
 	Important.ApiCodeField("code").ApiCodeMsg("20", "token过期")
 	Important.ApiCodeField("code").ApiCodeMsg("1", "其他错误,请查看返回的msg")
@@ -27,6 +27,6 @@ func init() {
 	Important.Pattern("/important/update").Post(handle.ImportantUpdate).Bind(&model.Importants{}).AddMidware(midware.JsonToStruct).
 		End(midware.EndLog)
 
-	Important.Pattern("/get/importants").Post(handle.GetImportants)
+	Important.Pattern("/get/importants").Post(handle.GetImportants).DelMidware(midware.CheckImportantPermssion)
 
 }

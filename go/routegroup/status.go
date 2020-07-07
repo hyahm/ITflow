@@ -11,7 +11,7 @@ import (
 var Status *xmux.GroupRoute
 
 func init() {
-	Status = xmux.NewGroupRoute().
+	Status = xmux.NewGroupRoute().AddMidware(midware.CheckStatusPermssion).
 		ApiCreateGroup("bugstatus", "bug 状态管理", "bug status").
 		ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf")
 	Status.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
@@ -49,7 +49,8 @@ func init() {
 		ApiReqStruct(&bug.ReqStatus{}).ApiRequestTemplate(`{"id": 0, "name": "普通"}`).
 		ApiResStruct(&bug.ResponeStatus{}).ApiResponseTemplate(`{"id": 8,"code": 0}`)
 
-	Status.Pattern("/get/status").Post(handle.GetStatus)
+	Status.Pattern("/get/status").Post(handle.GetStatus).DelMidware(midware.CheckStatusPermssion)
+
 	Status.Pattern("/status/remove").Get(handle.StatusRemove).
 		End(midware.EndLog).
 		ApiDescribe("删除bug 状态").ApiSupplement("当此状态有bug在使用时， 无法删除")
@@ -60,6 +61,6 @@ func init() {
 		ApiReqStruct(&bug.ReqStatus{}).ApiRequestTemplate(`{"id": 0, "name": "普通"}`).
 		ApiResStruct(&bug.ResponeStatus{}).ApiResponseTemplate(`{"code": 0}`)
 
-	Status.Pattern("/status/show").Post(handle.ShowStatus).
+	Status.Pattern("/status/show").Post(handle.ShowStatus).DelMidware(midware.CheckStatusPermssion).
 		ApiDescribe("查询可以查看的状态")
 }

@@ -30,8 +30,13 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 
 	search, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
 	if err != nil {
-		res := &response.Response{}
-		w.Write(res.ErrorE(err))
+		golog.Error(err)
+		al := &model.AllArticleList{
+			Al:   make([]*model.ArticleList, 0),
+			Code: 1,
+			Msg:  err.Error(),
+		}
+		w.Write(al.Marshal())
 		return
 	}
 
@@ -57,8 +62,13 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 
 	search, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
 	if err != nil {
-		res := &response.Response{}
-		w.Write(res.ErrorE(err))
+		golog.Error(err)
+		al := &model.AllArticleList{
+			Al:   make([]*model.ArticleList, 0),
+			Code: 1,
+			Msg:  err.Error(),
+		}
+		w.Write(al.Marshal())
 		return
 	}
 
@@ -68,107 +78,23 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 }
 
 func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
-	countbasesql := "select count(id) from bugs where dustbin=0 "
-	bugsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=0 "
-	errorcode := &response.Response{}
-	al := &model.AllArticleList{}
-	// 获取状态
-
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	showstatus := cache.CacheUidFilter[cache.CacheNickNameUid[nickname]]
-
-	//更新缓存
-	cache.CacheUidFilter[cache.CacheNickNameUid[nickname]] = showstatus
-
-	searchparam := xmux.GetData(r).Data.(*bug.SearchParam)
-	// 第二步， 检查level
-	if searchparam.Level != "" {
-		// 判断这个值是否存在
-		if lid := searchparam.Level.Id(); lid != 0 {
-			bugsql += fmt.Sprintf("and lid=%d ", lid)
-			countbasesql += fmt.Sprintf("and lid=%d ", lid)
-		} else {
-			golog.Error("没有搜索到什么")
-			w.Write(errorcode.Error("没有搜索到什么"))
-			return
-		}
-	}
-	// 第三步， 检查Title
-	if searchparam.Title != "" {
-		bugsql += fmt.Sprintf("and title like '%s' ", searchparam.Title)
-		countbasesql += fmt.Sprintf("and title like '%s' ", searchparam.Title)
-
-	}
-	// 第四步， 检查Project
-	if searchparam.Project != "" {
-		// 判断这个值是否存在
-		if pid, ok := cache.CacheProjectPid[searchparam.Project]; ok {
-			bugsql += fmt.Sprintf("and pid=%d ", pid)
-			countbasesql += fmt.Sprintf("and pid=%d ", pid)
-		} else {
-			golog.Error("没有搜索到什么")
-			w.Write(errorcode.Error("没有搜索到什么"))
-			return
-		}
-	}
-	if showstatus != "" {
-		bugsql += fmt.Sprintf("and sid in (%s)", showstatus)
-	}
-	rows, err := db.Mconn.GetRows(bugsql)
+	uid := xmux.GetData(r).Get("uid").(int64)
+	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
+	countsql := "select spusers from bugs where dustbin=0 "
+	searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=0 "
+	search, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		al := &model.AllArticleList{
+			Al:   make([]*model.ArticleList, 0),
+			Code: 1,
+			Msg:  err.Error(),
+		}
+		w.Write(al.Marshal())
 		return
 	}
-
-	for rows.Next() {
-		one := &model.ArticleList{}
-		var iid cache.ImportantId
-		var sid cache.StatusId
-		var lid cache.LevelId
-		var pid int64
-		var eid int64
-		var userlist string
-		rows.Scan(&one.ID, &one.Date, &iid, &sid, &one.Title, &lid, &pid, &eid, &userlist)
-		// 如果不存在这么办， 添加修改的时候需要判断
-		one.Importance = cache.CacheIidImportant[iid]
-		one.Status = cache.CacheSidStatus[sid]
-		one.Level = cache.CacheLidLevel[lid]
-		one.Projectname = cache.CachePidName[pid]
-		one.Env = cache.CacheEidName[eid]
-		// 显示realname
-
-		// 判断是否是自己的任务
-		var ismytask bool
-		for _, v := range strings.Split(userlist, ",") {
-			if v == strconv.FormatInt(cache.CacheNickNameUid[nickname], 10) {
-				ismytask = true
-				break
-			}
-		}
-
-		if ismytask {
-			for _, v := range strings.Split(userlist, ",") {
-				//判断用户是否存在，不存在就 删吗 ， 先不删
-				userid32, _ := strconv.Atoi(v)
-				if realname, ok := cache.CacheUidRealName[int64(userid32)]; ok {
-					one.Handle = append(one.Handle, realname)
-				}
-			}
-			one.Author = cache.CacheUidRealName[cache.CacheNickNameUid[nickname]]
-			al.Count++
-			al.Al = append(al.Al, one)
-		}
-
-	}
-	// 获取查询的开始位置
-	start, end := pager.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
-	if len(al.Al) > end {
-		al.Al = al.Al[start:end]
-	}
-
-	send, _ := json.Marshal(al)
-	w.Write(send)
+	// 获取状态
+	w.Write(search.GetMyTasks())
 	return
 
 }

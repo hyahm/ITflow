@@ -19,10 +19,8 @@ github.com/gogo/protobuf v1.1.1/go.mod h1:r8qH/GZQm5c6nD/R0oafs1akxWv10x8SbQlK7a
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/golang/protobuf v1.3.1/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/golang/protobuf v1.3.2/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
-github.com/hyahm/cachetable v0.0.0-20200706025718-e6d2168627bc h1:YptX6om9AAdzgj5eAHxyh9v5xG5sm50lyvuBBF03pWI=
-github.com/hyahm/cachetable v0.0.0-20200706025718-e6d2168627bc/go.mod h1:QnKdcDLla3BWwsB8wz19ZOhnbutCDAjab9tUIsWI/1I=
-github.com/hyahm/cachetable v0.0.0-20200706030556-cfc6f7ebe369 h1:PSTgeZcGMyRRIw8W+jGKTqTdez/HBeR7VWK2f5pr5oI=
-github.com/hyahm/cachetable v0.0.0-20200706030556-cfc6f7ebe369/go.mod h1:QnKdcDLla3BWwsB8wz19ZOhnbutCDAjab9tUIsWI/1I=
+github.com/hyahm/cachetable v0.0.0-20200707100838-5dd5455ce3d5 h1:TSf5ceweAcaiO4Ih/SnOUUb63q28kL5ErKt4GkZugr0=
+github.com/hyahm/cachetable v0.0.0-20200707100838-5dd5455ce3d5/go.mod h1:QnKdcDLla3BWwsB8wz19ZOhnbutCDAjab9tUIsWI/1I=
 github.com/hyahm/goconfig v0.0.0-20200628025142-b47dc058161f h1:VnS2QUgHUzKi23iKsgyIurb+EGjAoBrQ69JiqOAhraY=
 github.com/hyahm/goconfig v0.0.0-20200628025142-b47dc058161f/go.mod h1:Re12/rBckdrhQ0zR1cyLPRFZTcmzf3U46P92eW9QArI=
 github.com/hyahm/golog v0.0.0-20200308024922-05e85ded3293/go.mod h1:zKiO0JeV7UoTS6Gx7jZaGr+GblF6B57e04Q+/+ChEZA=

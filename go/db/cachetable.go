@@ -25,7 +25,7 @@ var ct cachetable.CT
 
 func InitCacheTable() {
 	ct = cachetable.NewCT()
-	ct.Load(".token.db", &Token{})
+	// ct.Load(".token.db", &Token{})
 	err := ct.CreateTable(TOKEN, &Token{})
 	if err != nil {
 		if err != cachetable.ExsitErr {
@@ -37,6 +37,7 @@ func InitCacheTable() {
 	Table, _ = ct.Use(TOKEN)
 	golog.Infof("%+v", Table)
 	Table.SetKeys(TOKEN)
+
 	go ct.Clean(time.Second * 10)
 }
 

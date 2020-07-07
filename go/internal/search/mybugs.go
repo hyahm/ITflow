@@ -52,6 +52,7 @@ func (rmf *ReqMyBugFilter) GetUsefulCondition(uid int64, countsql, searchsql str
 	showstatus := cache.CacheUidFilter[uid].ToShow()
 	if len(showstatus) == 0 {
 		// 没选择状态，返回空数组
+
 		golog.Info("没选择状态，返回空数组")
 		return nil, errors.New("没选择状态，返回空数组")
 	}

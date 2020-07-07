@@ -31,7 +31,7 @@ func (user *User) Create() error {
 	user.HeadImg = goconfig.ReadString("defaulthead")
 
 	var err error
-	createusersql := "insert into user(nickname,password,email,headimg,createtime,createuid,realname,showstatus,disable,bugsid,rid,jid) values(?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	createusersql := "insert into user(nickname,password,email,headimg,createtime,createuid,realname,showstatus,disable,bugsid,rid,jid) values(?,?,?,?,?,?,?,?,?,?,?,?)"
 	user.ID, err = db.Mconn.Insert(createusersql,
 		user.NickName, user.Password, user.Email,
 		user.HeadImg, time.Now().Unix(), user.CreateId,
