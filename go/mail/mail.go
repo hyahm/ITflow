@@ -3,6 +3,7 @@ package mail
 import (
 	"crypto/tls"
 	"itflow/cache"
+	"strings"
 
 	"gopkg.in/gomail.v2"
 )
@@ -13,7 +14,7 @@ func SendMail(subject string, content string, touser ...string) error {
 	m := gomail.NewMessage()
 	m.SetHeader("From", cache.CacheEmail.EmailAddr)
 	m.SetHeader("To", touser...)
-	m.SetAddressHeader("Cc", "dan@example.com", "Dan")
+	// m.SetAddressHeader("Cc", "dan@example.com", "Dan")
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", content)
 	// mailconf.SendMail()
@@ -21,15 +22,16 @@ func SendMail(subject string, content string, touser ...string) error {
 }
 
 func TestMail(username string, password string, port int, touser string) error {
-	d := gomail.NewDialer("smtp.example.com", 587, "user", "123456")
+	host := "smtp." + strings.Split(username, "@")[1]
+	d := gomail.NewDialer(host, port, username, password)
 	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	m := gomail.NewMessage()
-	m.SetHeader("From", "alex@example.com")
-	m.SetHeader("To", "bob@example.com", "cora@example.com")
-	m.SetAddressHeader("Cc", "dan@example.com", "Dan")
-	m.SetHeader("Subject", "Hello!")
-	m.SetBody("text/html", "Hello <b>Bob</b> and <i>Cora</i>!")
+	m.SetHeader("From", username)
+	m.SetHeader("To", strings.Split(touser, ",")...)
+	// m.SetAddressHeader("Cc", "dan@example.com", "Dan")
+	m.SetHeader("Subject", "验证您的邮箱是否能收到邮件")
+	m.SetBody("text/html", "恭喜， 您的邮箱可以使用")
 	// m.Attach("/home/Alex/lolcat.jpg")
 
 	return d.DialAndSend(m)

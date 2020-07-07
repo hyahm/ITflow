@@ -54,7 +54,7 @@
         clearable
         style="width: 500px"
       >
-        <el-input v-model="email.to" type="email" placeholder="请输入测试邮箱" />
+        <el-input v-model="email.to" type="email" placeholder="请输入接收邮箱" />
       </el-form-item>
       <el-button style="margin-left: 40px" type="primary" @click="handleTest">验证</el-button>
       <el-button style="margin-left: 40px" type="primary" @click="handleSave">保存</el-button>
@@ -94,6 +94,7 @@ export default {
       })
     },
     handleTest() {
+      this.email.port = parseInt(this.email.port)
       testEmail(this.email).then(resp => {
         if (resp.data.code === 0) {
           this.$message.success('发送成功')
