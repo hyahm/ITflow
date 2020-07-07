@@ -105,7 +105,7 @@
           <router-link :to="'/bug/edit/'+scope.row.id">
             <el-button type="primary" size="mini">编辑</el-button>
           </router-link>
-          <el-button type="success" size="mini" @click="handleClose(scope.row)">关闭</el-button>
+          <el-button type="success" size="mini" @click="resume(scope.row.id)">恢复</el-button>
           <!--<el-button type="danger" size="mini" @click="handleRemove(scope.row)">{{ $t('list.remove') }}</el-button>-->
         </template>
       </el-table-column>
@@ -125,6 +125,7 @@
 <script>
 import waves from '@/directive/waves' // 水波纹指令
 import { bugFilter } from '@/api/search' // 水波纹指令
+import { resumeBug } from '@/api/bugs'
 import { statusFilter } from '@/api/status'
 import { getProject, getLevels, getStatus, getPermStatus } from '@/api/get'
 export default {
@@ -213,6 +214,25 @@ export default {
       bugFilter(this.listQuery).then(resp => {
         if (resp.data.code === 0) {
           this.list = resp.data.articlelist
+        }
+      })
+    },
+    resume(id) {
+      resumeBug(id).then(resp => {
+        if (resp.data.code === 0) {
+          console.log(this.list)
+          const l = this.list.length
+          for (var i = 0; i < l; i++) {
+            console.log(i)
+            console.log(this.list[i].id)
+            if (this.list[i].id === id) {
+              this.list.splice(i, 1)
+              this.$message.success('恢复成功')
+              return
+            }
+          }
+        } else {
+          this.$message.error(resp.data.msg)
         }
       })
     }

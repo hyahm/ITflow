@@ -1,8 +1,6 @@
 package pager
 
 import (
-	"fmt"
-
 	"github.com/hyahm/golog"
 )
 
@@ -15,11 +13,8 @@ func GetPagingLimitAndPage(count int, page int, limit int) (int, int) {
 	if page < 1 {
 		return 1, count % limit
 	}
-	fmt.Println(444444)
-	golog.Info(11111)
 	// 超出了，返回最大的页码
 	if page*limit > count+limit {
-		golog.Info(33333)
 		if count%limit == 0 {
 			return ((count / limit) - 1) * limit, limit
 		} else {
@@ -27,7 +22,6 @@ func GetPagingLimitAndPage(count int, page int, limit int) (int, int) {
 		}
 	} else {
 		// if count%limit == 0 {
-		golog.Info(22222)
 		start := (page - 1) * limit
 		golog.Info(start)
 

@@ -54,6 +54,7 @@ const actions = {
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
+        console.log('111')
         const { data } = response
         // console.log(data)
         if (data.code !== 0) {

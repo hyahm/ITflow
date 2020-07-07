@@ -53,22 +53,9 @@ func init() {
 			"code": 0
 		}`).ApiResStruct(bug.RespShowBug{})
 
-	Bug.Pattern("/search/allbugs").Post(handle.SearchAllBugs).Bind(&search.ReqMyBugFilter{}).AddMidware(midware.JsonToStruct)
-	Bug.Pattern("/search/mybugs").Post(handle.SearchMyBugs).Bind(&search.ReqMyBugFilter{}).AddMidware(midware.JsonToStruct)
-
-	Bug.Pattern("/search/mytasks").Post(handle.SearchMyTasks).Bind(&bug.SearchParam{}).
-		AddMidware(midware.JsonToStruct)
-
-	Bug.Pattern("/search/bugmanager").Post(handle.SearchBugManager).Bind(&search.ReqMyBugFilter{}).AddMidware(midware.JsonToStruct)
-
-	Bug.Pattern("/get/user").Post(handle.GetUser)
-	Bug.Pattern("/get/project").Post(handle.GetProject)
-	Bug.Pattern("/get/version").Post(handle.GetVersion)
-	Bug.Pattern("/get/env").Post(handle.GetEnv).DelMidware(midware.CheckToken)
-	Bug.Pattern("/get/status").Post(handle.GetStatus)
+	Bug.Pattern("/bug/resume").Get(handle.ResumeBug)
 
 	Bug.Pattern("/get/permstatus").Post(handle.GetPermStatus)
-	Bug.Pattern("/get/info").Post(handle.GetInfo)
 
 	// Bug.Pattern("/get/thisrole").Get(handle.GetThisRoles)
 	Bug.Pattern("/get/group").Post(handle.GetGroup)

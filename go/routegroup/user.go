@@ -18,7 +18,6 @@ func init() {
 	User.ApiCodeField("code").ApiCodeMsg("0", "成功")
 	User.ApiCodeField("code").ApiCodeMsg("20", "token过期")
 	User.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
-
 	User.Pattern("/user/login").Post(handle.Login).Bind(&user.Login{}).
 		DelMidware(midware.CheckToken).AddMidware(midware.JsonToStruct).End(midware.EndLog).
 		ApiDescribe("用户登录接口").
@@ -54,5 +53,5 @@ func init() {
 		AddMidware(midware.JsonToStruct)
 
 	User.Pattern("/password/reset").Post(handle.ResetPwd).Bind(&user.ResetPassword{}).AddMidware(midware.JsonToStruct)
-
+	User.Pattern("/get/user").Post(handle.GetUser)
 }

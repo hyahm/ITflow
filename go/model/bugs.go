@@ -55,6 +55,14 @@ type Bug struct {
 	Dustbin      bool
 }
 
+func (bug *Bug) Resume(id interface{}) error {
+	getlistsql := "update bugs set dustbin=0 where id=?"
+
+	_, err := db.Mconn.Update(getlistsql, id)
+
+	return err
+}
+
 func (bug *Bug) CreateBug() (err error) {
 	insertsql := "insert into bugs(uid,title,sid,content,iid,createtime,lid,pid,eid,spusers,vid) values(?,?,?,?,?,?,?,?,?,?,?)"
 	bug.ID, err = db.Mconn.Insert(insertsql,

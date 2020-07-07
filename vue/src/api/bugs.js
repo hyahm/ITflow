@@ -8,6 +8,14 @@ export function getAllBugs(query) {
   })
 }
 
+export function resumeBug(id) {
+  return request({
+    url: '/bug/resume',
+    method: 'get',
+    params: { id }
+  })
+}
+
 export function getMyBugs(data) {
   return request({
     url: '/bug/mybugs',

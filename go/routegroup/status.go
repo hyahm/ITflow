@@ -49,6 +49,7 @@ func init() {
 		ApiReqStruct(&bug.ReqStatus{}).ApiRequestTemplate(`{"id": 0, "name": "普通"}`).
 		ApiResStruct(&bug.ResponeStatus{}).ApiResponseTemplate(`{"id": 8,"code": 0}`)
 
+	Status.Pattern("/get/status").Post(handle.GetStatus)
 	Status.Pattern("/status/remove").Get(handle.StatusRemove).
 		End(midware.EndLog).
 		ApiDescribe("删除bug 状态").ApiSupplement("当此状态有bug在使用时， 无法删除")

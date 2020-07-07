@@ -53,12 +53,12 @@ func UserInfo(w http.ResponseWriter, r *http.Request) {
 	userinfo := &user.UserInfo{}
 	userinfo.NickName = xmux.GetData(r).Get("nickname").(string)
 	uid := xmux.GetData(r).Get("uid").(int64)
-
+	golog.Info("111111111111111")
 	err := userinfo.GetUserInfo(uid)
 	if err != nil {
 		golog.Error(err)
 		userinfo.Msg = err.Error()
-		userinfo.Code = 2
+		userinfo.Code = 1
 		w.Write(userinfo.Json())
 		return
 	}

@@ -21,6 +21,7 @@ func RunHttp() {
 
 	router.AddGroup(routegroup.User)
 	router.AddGroup(routegroup.Bug)
+	router.AddGroup(routegroup.Search)
 
 	router.AddGroup(routegroup.Version)
 	router.AddGroup(routegroup.Admin)

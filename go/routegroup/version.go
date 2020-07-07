@@ -29,7 +29,7 @@ func init() {
 	Version.Pattern("/version/list").Post(handle.VersionList)
 
 	Version.Pattern("/version/remove").Get(handle.VersionRemove).End(midware.EndLog)
-
+	Version.Pattern("/get/version").Post(handle.GetVersion)
 	Version.Pattern("/version/update").Post(handle.VersionUpdate).Bind(&version.Version{}).AddMidware(midware.JsonToStruct).
 		End(midware.EndLog)
 }

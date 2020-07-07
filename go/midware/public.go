@@ -47,7 +47,6 @@ func CheckToken(w http.ResponseWriter, r *http.Request) bool {
 		golog.Error(err)
 	}
 	xmux.GetData(r).Set("nickname", nickname)
-	golog.Info("uid: ", uid)
 	xmux.GetData(r).Set("uid", uid)
 
 	return false

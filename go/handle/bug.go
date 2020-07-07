@@ -257,46 +257,24 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(search.GetMyBugs())
-	// al := &model.AllArticleList{}
-	// nickname := xmux.GetData(r).Get("nickname").(string)
-	// uid := cache.CacheNickNameUid[nickname]
-	// err := db.Mconn.GetOne("select count(id) from bugs where uid=?", uid).Scan(&al.Count)
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(errorcode.ErrorE(err))
-	// 	return
-	// }
 
-	// searchparam := xmux.GetData(r).Data.(*bug.ReqMyBugFilter)
-	// start, end := pager.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
+}
 
-	// alsql := "select id,createtime,importent,status,title,uid,level,pid,env,spusers from bugs where uid=? and dustbin=0 order by id desc limit ?,?"
-	// rows, err := db.Mconn.GetRows(alsql, uid, start, end)
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(errorcode.ErrorE(err))
-	// 	return
-	// }
-	// for rows.Next() {
-	// 	bl := &model.ArticleList{}
-	// 	var statusid cache.StatusId
-	// 	var uid int64
-	// 	var pid int64
-	// 	var eid int64
-	// 	rows.Scan(&bl.ID, &bl.Date, &bl.Importance, &statusid, &bl.Title, &uid, &bl.Level, &pid, &eid, &bl.Handle)
-
-	// 	bl.Status = cache.CacheSidStatus[statusid]
-	// 	bl.Author = cache.CacheUidRealName[uid]
-	// 	bl.Projectname = cache.CachePidName[pid]
-	// 	bl.Env = cache.CacheEidName[eid]
-
-	// 	al.Al = append(al.Al, bl)
-
-	// }
-	// send, _ := json.Marshal(al)
-	// w.Write(send)
-	// return
-
+func ResumeBug(w http.ResponseWriter, r *http.Request) {
+	id := r.FormValue("id")
+	golog.Info("0000")
+	golog.Info(id)
+	errorcode := &response.Response{}
+	bug := &model.Bug{}
+	err := bug.Resume(id)
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	golog.Info("0000")
+	w.Write(errorcode.Success())
+	return
 }
 
 func CloseBug(w http.ResponseWriter, r *http.Request) {

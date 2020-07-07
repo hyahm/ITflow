@@ -256,7 +256,6 @@ export default {
   methods: {
     getlevels() {
       getLevels().then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.levels = resp.data.levels
         } else {
@@ -285,7 +284,6 @@ export default {
         checkstatus: this.checkstatus
       }
       this.statuslength = this.checkstatus.length
-      console.log(data)
       statusFilter(data).then(resp => {
         if (resp.data.code === 0) {
           this.statuslength = this.checkstatus.length
@@ -338,9 +336,7 @@ export default {
     },
     getList() {
       this.listLoading = true
-      console.log('+++++++++++++++')
       searchMyTasks(this.listQuery).then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.list = resp.data.articlelist
           this.total = resp.data.total

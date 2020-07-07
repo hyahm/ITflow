@@ -31,7 +31,6 @@ func (pl *BugList) rows() (*sql.Rows, error) {
 
 		return nil, err
 	}
-	golog.Infof("----%+v-------\n", pl)
 	// 增加显示的状态
 	start, end := pager.GetPagingLimitAndPage(pl.Count, pl.Page, pl.Limit)
 	pl.ListSql += " order by id desc limit ?,? "
