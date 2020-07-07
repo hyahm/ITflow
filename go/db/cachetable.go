@@ -25,7 +25,7 @@ var ct cachetable.CT
 
 func InitCacheTable() {
 	ct = cachetable.NewCT()
-	// ct.Load(".token.db", &Token{})
+	ct.Load(".token.db", &Token{})
 	err := ct.CreateTable(TOKEN, &Token{})
 	if err != nil {
 		if err != cachetable.ExsitErr {
