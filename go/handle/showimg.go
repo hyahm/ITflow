@@ -14,8 +14,6 @@ import (
 func ShowImg(w http.ResponseWriter, r *http.Request) {
 
 	name := xmux.Var(r)["imgname"]
-	golog.Info(name)
-	golog.Infof("image name %s", filepath.Join(cache.ImgDir, name))
 	file, err := os.Open(filepath.Join(cache.ImgDir, name))
 	if err != nil {
 		golog.Error(err)

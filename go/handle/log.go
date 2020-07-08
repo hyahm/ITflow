@@ -16,10 +16,8 @@ import (
 
 func SearchLog(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
-
 	alllog := xmux.GetData(r).Data.(*log.Search_log)
-
+	golog.Info(111111111111)
 	listlog := &log.Loglist{}
 
 	basesql := "select id,exectime,classify,action,ip,username from log "
@@ -36,7 +34,8 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		}
 		if !realclassify {
 			golog.Debug("没有找到key")
-			w.Write(errorcode.Error("没有找到key"))
+
+			w.Write(listlog.Error("没有找到key"))
 			return
 		}
 		endsql = fmt.Sprintf("where classify='%v' ", alllog.Classify)
@@ -51,23 +50,27 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//获取总行数
-	err := db.Mconn.GetOne("select count(id) from log " + endsql).Scan(&alllog.Count)
+	countsql := "select count(id) from log " + endsql
+	golog.Info(endsql)
+	err := db.Mconn.GetOne(countsql).Scan(&alllog.Count)
 	if err != nil {
-		w.Write(errorcode.ErrorE(err))
+		golog.Error(err)
+		w.Write(listlog.ErrorE(err))
 		return
 	}
-	if listlog.Count == 0 {
-		send, _ := json.Marshal(listlog)
-		w.Write(send)
+	if alllog.Count == 0 {
+		golog.Error("no rows")
+		w.Write(listlog.NoRows())
 		return
 	}
 
 	start, end := alllog.GetPagingLimitAndPage()
-
+	golog.Info(start)
+	golog.Info(end)
 	rows, err := db.Mconn.GetRows(basesql+endsql+" order by id desc limit ?,?", start, end)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		w.Write(listlog.ErrorE(err))
 		return
 	}
 
@@ -78,6 +81,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		listlog.LogList = append(listlog.LogList, one)
 	}
 	listlog.Page = alllog.Page
+	listlog.Count = alllog.Count
 	send, _ := json.Marshal(listlog)
 	w.Write(send)
 	return
