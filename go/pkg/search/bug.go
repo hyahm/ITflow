@@ -113,6 +113,7 @@ func (pl *BugList) GetMyBugs() []byte {
 		al.Al = append(al.Al, one)
 
 	}
+	golog.Info(pl.Count)
 	al.Count = pl.Count
 	al.Page = pl.Page
 	return al.Marshal()
@@ -211,6 +212,10 @@ func (pl *BugList) GetMyTasks() []byte {
 
 		// }
 		if isMyTask {
+			// 超过了后面就不用做了
+			if timer >= end {
+				break
+			}
 			if timer >= start && timer < end {
 				one.Importance = cache.CacheIidImportant[iid]
 				one.Status = cache.CacheSidStatus[sid]

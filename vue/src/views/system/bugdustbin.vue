@@ -226,6 +226,8 @@ export default {
       bugFilter(this.listQuery).then(resp => {
         if (resp.data.code === 0) {
           this.list = resp.data.articlelist
+          this.total = resp.data.total
+          this.listQuery.page = resp.data.page
         }
       })
     },
@@ -243,8 +245,6 @@ export default {
           console.log(this.list)
           const l = this.list.length
           for (var i = 0; i < l; i++) {
-            console.log(i)
-            console.log(this.list[i].id)
             if (this.list[i].id === id) {
               this.list.splice(i, 1)
               this.$message.success('恢复成功')
