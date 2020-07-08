@@ -4,7 +4,7 @@ import (
 	"github.com/hyahm/golog"
 )
 
-// 返回正确的起始值,和末尾数, 总数，页数，显示数
+// 返回正确的起始值,和末尾数, 总数，页数， 索引为0 显示数
 func GetPagingLimitAndPage(count int, page int, limit int) (int, int) {
 	// 都小于1了
 	if limit == 0 {

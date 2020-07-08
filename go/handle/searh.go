@@ -28,8 +28,15 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 	countsql := "select count(id) from bugs where dustbin=0  "
 	searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=0  "
 
-	search, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
+	sch, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
 	if err != nil {
+		if err == search.ErrorNoStatus {
+			al := &model.AllArticleList{
+				Al: make([]*model.ArticleList, 0),
+			}
+			w.Write(al.Marshal())
+			return
+		}
 		golog.Error(err)
 		al := &model.AllArticleList{
 			Al:   make([]*model.ArticleList, 0),
@@ -40,7 +47,7 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(search.GetMyBugs())
+	w.Write(sch.GetMyBugs())
 	return
 
 }
@@ -60,8 +67,15 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 	countsql := fmt.Sprintf("select count(id) from bugs where dustbin=0 and uid=%d ", uid)
 	searchsql := fmt.Sprintf("select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=0 and uid=%d ", uid)
 
-	search, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
+	sch, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
 	if err != nil {
+		if err == search.ErrorNoStatus {
+			al := &model.AllArticleList{
+				Al: make([]*model.ArticleList, 0),
+			}
+			w.Write(al.Marshal())
+			return
+		}
 		golog.Error(err)
 		al := &model.AllArticleList{
 			Al:   make([]*model.ArticleList, 0),
@@ -71,8 +85,7 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 		w.Write(al.Marshal())
 		return
 	}
-
-	w.Write(search.GetMyBugs())
+	w.Write(sch.GetMyBugs())
 	return
 
 }
@@ -82,8 +95,15 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
 	countsql := "select spusers from bugs where dustbin=0 "
 	searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=0 "
-	search, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
+	sch, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
 	if err != nil {
+		if err == search.ErrorNoStatus {
+			al := &model.AllArticleList{
+				Al: make([]*model.ArticleList, 0),
+			}
+			w.Write(al.Marshal())
+			return
+		}
 		golog.Error(err)
 		al := &model.AllArticleList{
 			Al:   make([]*model.ArticleList, 0),
@@ -94,7 +114,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 获取状态
-	w.Write(search.GetMyTasks())
+	w.Write(sch.GetMyTasks())
 	return
 
 }
@@ -107,14 +127,26 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 	// mybug.GetUsefulCondition(uid)
 	countsql := "select count(id) from bugs where dustbin=1 "
 	searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=1 "
-	search, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
+	sch, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
 	if err != nil {
-		res := &response.Response{}
-		w.Write(res.ErrorE(err))
+		if err == search.ErrorNoStatus {
+			al := &model.AllArticleList{
+				Al: make([]*model.ArticleList, 0),
+			}
+			w.Write(al.Marshal())
+			return
+		}
+		golog.Error(err)
+		al := &model.AllArticleList{
+			Al:   make([]*model.ArticleList, 0),
+			Code: 1,
+			Msg:  err.Error(),
+		}
+		w.Write(al.Marshal())
 		return
 	}
 
-	w.Write(search.GetMyBugs())
+	w.Write(sch.GetMyBugs())
 	// al := &model.AllArticleList{}
 	// searchparam := xmux.GetData(r).Data.(*bug.BugManager)
 

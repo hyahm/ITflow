@@ -9,6 +9,8 @@ import (
 	"github.com/hyahm/golog"
 )
 
+var ErrorNoStatus = errors.New("没选择状态，返回空数组")
+
 type ReqMyBugFilter struct {
 	Page        int              `json:"page"`
 	Limit       int              `json:"limit"`
@@ -49,16 +51,20 @@ func (rmf *ReqMyBugFilter) GetUsefulCondition(uid int64, countsql, searchsql str
 	}
 	// 获取此用户能看到的状态
 	golog.Info(uid)
-	showstatus := cache.CacheUidFilter[uid].ToShow()
-	if len(showstatus) == 0 {
-		// 没选择状态，返回空数组
+	statuslist := cache.CacheUidFilter[uid].ToShow()
 
+	if len(statuslist) == 0 {
+		// 没选择状态，返回空数组
 		golog.Info("没选择状态，返回空数组")
-		return nil, errors.New("没选择状态，返回空数组")
+		return nil, ErrorNoStatus
+	} else if len(statuslist) == 1 {
+		countsql += fmt.Sprintf("and sid=%s", cache.CacheUidFilter[uid])
+		searchsql += fmt.Sprintf("and sid=%s", cache.CacheUidFilter[uid])
+	} else {
+		countsql += fmt.Sprintf("and sid in (%s)", cache.CacheUidFilter[uid])
+		searchsql += fmt.Sprintf("and sid in (%s) ", cache.CacheUidFilter[uid])
 	}
 
-	countsql += fmt.Sprintf("and sid in (%s)", cache.CacheUidFilter[uid])
-	searchsql += fmt.Sprintf("and sid in (%s) ", cache.CacheUidFilter[uid])
 	sb := &search.BugList{
 		CountSql: countsql,
 		ListSql:  searchsql,

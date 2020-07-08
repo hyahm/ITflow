@@ -174,7 +174,7 @@ export default {
     this.getstatus()
     this.getpname()
     this.getlevels()
-    this.getList()
+    this.handleFilter()
   },
   activated() {
     this.getpname()
@@ -185,7 +185,6 @@ export default {
   methods: {
     getlevels() {
       getLevels().then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.levels = resp.data.levels
         } else {
@@ -201,15 +200,7 @@ export default {
       statusFilter(data).then(resp => {
         if (resp.data.code === 0) {
           this.statuslength = this.listQuery.showstatus.length
-          this.listLoading = true
-          searchMyBugs(this.listQuery).then(resp => {
-            if (resp.data.code === 0) {
-              this.list = resp.data.articlelist
-              this.total = resp.data.total
-              this.listQuery.page = resp.data.page
-            }
-          })
-          this.listLoading = false
+          this.handleFilter()
         } else {
           this.$message.error(resp.data.msg)
         }
@@ -236,7 +227,6 @@ export default {
     getmystatus() {
       // 需要显示的状态
       getShowStatus().then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.listQuery.showstatus = resp.data.checkstatus
           this.statuslength = this.listQuery.showstatus.length
@@ -306,9 +296,9 @@ export default {
     },
     handleFilter() {
       // 获取过滤后的bug
-      this.listQuery.page = 1
       this.listLoading = true
       searchMyBugs(this.listQuery).then(resp => {
+        console.log(resp.data)
         if (resp.data.code === 0) {
           this.list = resp.data.articlelist
           this.total = resp.data.total
@@ -326,54 +316,8 @@ export default {
     handleCurrentChange(val) {
       this.listQuery.page = val
       this.getList()
-    },
-    // handleRemove(row) {
-    //   this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-    //     confirmButtonText: '确定',
-    //     cancelButtonText: '取消',
-    //     type: 'warning'
-    //   }).then(() => {
-    //     removeBug(row.id).then(response => {
-    //       if (response.data === 'ok') {
-    //         this.$message({
-    //           message: '已删除',
-    //           type: 'success'
-    //         })
-    //         this.list = this.list.filter(items => {
-    //           return items.id !== row.id
-    //         })
-    //       } else {
-    //         this.$message({
-    //           message: '操作失败',
-    //           type: 'error'
-    //         })
-    //       }
-    //     })
-    //   }).catch(() => {
-    //     this.$message({
-    //       type: 'info',
-    //       message: '已取消删除'
-    //     })
-    //   })
-    // },
-    getList() {
-      this.listLoading = true
-      // const pager = {
-      //   page: this.listQuery.page,
-      //   limit: this.listQuery.limit
-      // }
-      searchMyBugs(this.listQuery).then(resp => {
-        console.log(resp.data)
-        if (resp.data.code === 0) {
-          this.list = resp.data.articlelist
-          this.total = resp.data.total
-          this.listQuery.page = resp.data.page
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
-      this.listLoading = false
     }
+
   }
 }
 </script>

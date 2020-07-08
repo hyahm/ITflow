@@ -6,7 +6,6 @@ import (
 	"itflow/cache"
 	"itflow/db"
 	"itflow/model"
-	"itflow/pkg/pager"
 	"strconv"
 	"strings"
 
@@ -22,20 +21,49 @@ type BugList struct {
 	Count    int
 }
 
-func (pl *BugList) rows() (*sql.Rows, error) {
-	var err error
-	err = db.Mconn.GetOne(pl.CountSql).Scan(&pl.Count)
+func (pl *BugList) GetPagingLimitAndPage() (int, int) {
+	// 都小于1了
+	if pl.Limit == 0 {
+		return 0, 0
+	}
+	if pl.Page < 1 {
+		pl.Page = 1
+	}
+	// 超出了，返回最大的页码
+	if pl.Page*pl.Limit > pl.Count+pl.Limit {
+		if pl.Count%pl.Limit == 0 {
+			return ((pl.Count / pl.Limit) - 1) * pl.Limit, pl.Limit
+		} else {
+			return (pl.Count/pl.Limit + 1) * pl.Limit, pl.Count % pl.Limit
+		}
+	} else {
+		// if count%limit == 0 {
 
+		start := (pl.Page - 1) * pl.Limit
+		if pl.Count-start < pl.Limit {
+			return start, pl.Count - start
+		} else {
+			return start, pl.Limit
+		}
+
+	}
+}
+
+func (pl *BugList) rows() (*sql.Rows, error) {
+	golog.Info(pl.CountSql)
+	err := db.Mconn.GetOne(pl.CountSql).Scan(&pl.Count)
 	if err != nil {
 		golog.Error(err)
-
 		return nil, err
 	}
+	golog.Info(pl.Count)
 	// 增加显示的状态
-	start, end := pager.GetPagingLimitAndPage(pl.Count, pl.Page, pl.Limit)
+	start, end := pl.GetPagingLimitAndPage()
 	pl.ListSql += " order by id desc limit ?,? "
 	var rows *sql.Rows
-
+	golog.Info(pl.ListSql)
+	golog.Info(start)
+	golog.Info(end)
 	rows, err = db.Mconn.GetRows(pl.ListSql, start, end)
 
 	if err != nil {
@@ -73,7 +101,6 @@ func (pl *BugList) GetMyBugs() []byte {
 		for _, v := range strings.Split(userlist, ",") {
 			//判断用户是否存在，不存在就 删吗 ， 先不删
 			userid64, _ := strconv.ParseInt(v, 10, 64)
-
 			if realname, ok := cache.CacheUidRealName[userid64]; ok {
 				one.Handle = append(one.Handle, realname)
 			}
@@ -89,6 +116,8 @@ func (pl *BugList) GetMyBugs() []byte {
 		al.Al = append(al.Al, one)
 
 	}
+	al.Count = pl.Count
+	al.Page = pl.Page
 	return al.Marshal()
 }
 
@@ -116,7 +145,7 @@ func (pl *BugList) myTaskRows() (*sql.Rows, error) {
 		}
 	}
 	// 增加显示的状态
-	start, end := pager.GetPagingLimitAndPage(pl.Count, pl.Page, pl.Limit)
+	start, end := pl.GetPagingLimitAndPage()
 	pl.ListSql += " order by id desc limit ?,? "
 	var rows *sql.Rows
 
@@ -193,5 +222,7 @@ func (pl *BugList) GetMyTasks() []byte {
 		}
 
 	}
+	al.Count = pl.Count
+	al.Page = pl.Page
 	return al.Marshal()
 }

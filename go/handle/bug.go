@@ -249,14 +249,25 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 	// mybug.GetUsefulCondition(uid)
 	countsql := "select count(id) from bugs where dustbin=0 and uid=? "
 	searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=0 and uid=? "
-	search, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
+	sch, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
 	if err != nil {
-		res := &response.Response{}
-		w.Write(res.ErrorE(err))
+		if err == search.ErrorNoStatus {
+			al := &model.AllArticleList{
+				Al: make([]*model.ArticleList, 0),
+			}
+			w.Write(al.Marshal())
+			return
+		}
+		golog.Error(err)
+		al := &model.AllArticleList{
+			Al:   make([]*model.ArticleList, 0),
+			Code: 1,
+			Msg:  err.Error(),
+		}
+		w.Write(al.Marshal())
 		return
 	}
-
-	w.Write(search.GetMyBugs())
+	w.Write(sch.GetMyBugs())
 
 }
 
