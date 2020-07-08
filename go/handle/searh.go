@@ -147,53 +147,6 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(sch.GetMyBugs())
-	// al := &model.AllArticleList{}
-	// searchparam := xmux.GetData(r).Data.(*bug.BugManager)
-
-	// basesql, args := managertotal("select count(id) from bugs", searchparam)
-
-	// err := db.Mconn.GetOne(basesql, args...).Scan(&al.Count)
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(errorcode.ErrorE(err))
-	// 	return
-	// }
-
-	// if al.Count == 0 {
-	// 	w.Write(errorcode.Error("没有找到bug"))
-	// 	return
-	// }
-	// alsql := "select id,createtime,iid,sid,title,uid,lid,pid,eid,spusers,dustbin from bugs"
-
-	// rows, err := managersearch(alsql, al.Count, searchparam)
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(errorcode.ErrorE(err))
-	// 	return
-	// }
-	// for rows.Next() {
-	// 	bl := &model.ArticleList{}
-	// 	var sid cache.StatusId
-	// 	var lid cache.LevelId
-	// 	var spusers string
-	// 	var uid int64
-	// 	var pid int64
-	// 	var eid int64
-	// 	var iid cache.ImportantId
-	// 	rows.Scan(&bl.ID, &bl.Date, &iid, &sid, &bl.Title, &uid, &lid, &pid, &eid, &spusers, &bl.Dustbin)
-	// 	bl.Level = cache.CacheLidLevel[lid]
-	// 	bl.Importance = cache.CacheIidImportant[iid]
-	// 	bl.Status = cache.CacheSidStatus[sid]
-	// 	bl.Author = cache.CacheUidRealName[uid]
-	// 	bl.Projectname = cache.CachePidName[pid]
-	// 	bl.Handle = formatUserlistToRealname(spusers)
-	// 	bl.Env = cache.CacheEidName[eid]
-	// 	al.Al = append(al.Al, bl)
-	// }
-
-	// send, _ := json.Marshal(al)
-	// w.Write(send)
-	// return
 
 }
 

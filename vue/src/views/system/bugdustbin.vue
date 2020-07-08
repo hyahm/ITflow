@@ -110,6 +110,18 @@
         </template>
       </el-table-column>
     </el-table>
+    <div class="pagination-container">
+      <el-pagination
+        :current-page="listQuery.page"
+        :page-sizes="[10,15,20,30]"
+        :page-size="listQuery.limit"
+        :total="total"
+        background
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
+    </div>
     <!--<el-pagination-->
     <!--:current-page="currentPage4"-->
     <!--:page-sizes="[100, 200, 300, 400]"-->
@@ -216,6 +228,14 @@ export default {
           this.list = resp.data.articlelist
         }
       })
+    },
+    handleSizeChange(val) {
+      this.listQuery.limit = val
+      this.handleFilter()
+    },
+    handleCurrentChange(val) {
+      this.listQuery.page = val
+      this.handleFilter()
     },
     resume(id) {
       resumeBug(id).then(resp => {

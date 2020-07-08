@@ -61,9 +61,6 @@ func (pl *BugList) rows() (*sql.Rows, error) {
 	start, end := pl.GetPagingLimitAndPage()
 	pl.ListSql += " order by id desc limit ?,? "
 	var rows *sql.Rows
-	golog.Info(pl.ListSql)
-	golog.Info(start)
-	golog.Info(end)
 	rows, err = db.Mconn.GetRows(pl.ListSql, start, end)
 
 	if err != nil {
