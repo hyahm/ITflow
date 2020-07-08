@@ -143,14 +143,9 @@ export default {
     },
 
     handleFilter() {
-      this.listQuery.page = 1
       searchLog(this.listQuery).then(resp => {
         if (resp.data.code === 0) {
-          if (resp.data.loglist !== null) {
-            this.list = resp.data.loglist
-          } else {
-            this.list = []
-          }
+          this.list = resp.data.loglist
           this.count = resp.data.count
           this.listQuery.page = resp.data.page
         } else {

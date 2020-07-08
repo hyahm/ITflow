@@ -31,9 +31,12 @@ func (pl *BugList) GetPagingLimitAndPage() (int, int) {
 	}
 	// 超出了，返回最大的页码
 	if pl.Page*pl.Limit > pl.Count+pl.Limit {
+
 		if pl.Count%pl.Limit == 0 {
+			pl.Page = pl.Count / pl.Limit
 			return ((pl.Count / pl.Limit) - 1) * pl.Limit, pl.Limit
 		} else {
+			pl.Page = pl.Count/pl.Limit + 1
 			return (pl.Count/pl.Limit + 1) * pl.Limit, pl.Count % pl.Limit
 		}
 	} else {

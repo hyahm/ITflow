@@ -22,9 +22,6 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 
 	listlog := &log.Loglist{}
 
-	if alllog.Classify == "" {
-
-	}
 	basesql := "select id,exectime,classify,action,ip,username from log "
 	endsql := ""
 	// 如果搜索了类别
@@ -54,7 +51,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//获取总行数
-	err := db.Mconn.GetOne("select count(id) from log " + endsql).Scan(&listlog.Count)
+	err := db.Mconn.GetOne("select count(id) from log " + endsql).Scan(&alllog.Count)
 	if err != nil {
 		w.Write(errorcode.ErrorE(err))
 		return
@@ -64,7 +61,8 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		w.Write(send)
 		return
 	}
-	start, end := pager.GetPagingLimitAndPage(listlog.Count, alllog.Page, alllog.Limit)
+
+	start, end := alllog.GetPagingLimitAndPage()
 
 	rows, err := db.Mconn.GetRows(basesql+endsql+" order by id desc limit ?,?", start, end)
 	if err != nil {
@@ -79,7 +77,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		rows.Scan(&one.Id, &one.Exectime, &one.Classify, &one.Action, &one.Ip, &one.UserName)
 		listlog.LogList = append(listlog.LogList, one)
 	}
-
+	listlog.Page = alllog.Page
 	send, _ := json.Marshal(listlog)
 	w.Write(send)
 	return
