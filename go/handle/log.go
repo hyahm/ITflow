@@ -66,7 +66,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 	}
 	start, end := pager.GetPagingLimitAndPage(listlog.Count, alllog.Page, alllog.Limit)
 
-	rows, err := db.Mconn.GetRows(basesql+endsql+" limit ?,?", start, end)
+	rows, err := db.Mconn.GetRows(basesql+endsql+" order by id desc limit ?,?", start, end)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
