@@ -338,6 +338,7 @@ export default {
     handleFilter() {
       this.listLoading = true
       searchMyTasks(this.listQuery).then(resp => {
+        console.log(resp.data)
         this.list = resp.data.articlelist
         this.total = resp.data.total
         this.listQuery.page = resp.data.page
@@ -347,11 +348,11 @@ export default {
 
     handleSizeChange(val) {
       this.listQuery.limit = val
-      this.getList()
+      this.handleFilter()
     },
     handleCurrentChange(val) {
       this.listQuery.page = val
-      this.getList()
+      this.handleFilter()
     },
     handleModifyStatus(row) {
       this.changeaction.id = row.id

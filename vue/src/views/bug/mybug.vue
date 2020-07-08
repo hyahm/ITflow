@@ -311,11 +311,11 @@ export default {
     },
     handleSizeChange(val) {
       this.listQuery.limit = val
-      this.getList()
+      this.handleFilter()
     },
     handleCurrentChange(val) {
       this.listQuery.page = val
-      this.getList()
+      this.handleFilter()
     }
 
   }

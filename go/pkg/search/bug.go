@@ -145,11 +145,11 @@ func (pl *BugList) myTaskRows() (*sql.Rows, error) {
 		}
 	}
 	// 增加显示的状态
-	start, end := pl.GetPagingLimitAndPage()
-	pl.ListSql += " order by id desc limit ?,? "
+
+	pl.ListSql += " order by id desc "
 	var rows *sql.Rows
 
-	rows, err = db.Mconn.GetRows(pl.ListSql, start, end)
+	rows, err = db.Mconn.GetRows(pl.ListSql)
 
 	if err != nil {
 		golog.Error(err)
@@ -171,6 +171,8 @@ func (pl *BugList) GetMyTasks() []byte {
 		send, _ := json.Marshal(al)
 		return send
 	}
+	start, end := pl.GetPagingLimitAndPage()
+	var timer int
 	for rows.Next() {
 		one := &model.ArticleList{}
 		var iid cache.ImportantId
@@ -212,13 +214,16 @@ func (pl *BugList) GetMyTasks() []byte {
 
 		// }
 		if isMyTask {
-			one.Importance = cache.CacheIidImportant[iid]
-			one.Status = cache.CacheSidStatus[sid]
-			one.Level = cache.CacheLidLevel[lid]
-			one.Projectname = cache.CachePidName[pid]
-			one.Env = cache.CacheEidName[eid]
-			one.Author = cache.CacheUidRealName[pl.Uid]
-			al.Al = append(al.Al, one)
+			if timer >= start && timer < end {
+				one.Importance = cache.CacheIidImportant[iid]
+				one.Status = cache.CacheSidStatus[sid]
+				one.Level = cache.CacheLidLevel[lid]
+				one.Projectname = cache.CachePidName[pid]
+				one.Env = cache.CacheEidName[eid]
+				one.Author = cache.CacheUidRealName[pl.Uid]
+				al.Al = append(al.Al, one)
+			}
+			timer++
 		}
 
 	}
