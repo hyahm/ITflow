@@ -96,7 +96,7 @@
 
 <script>
 import waves from '@/directive/waves' // 水波纹指令
-import { getLog, searchLog, logClassify } from '@/api/log'
+import { searchLog, logClassify } from '@/api/log'
 export default {
   name: 'Log',
   directives: {
@@ -119,7 +119,7 @@ export default {
     }
   },
   created() {
-    this.getlog()
+    this.handleFilter()
     this.classifylist()
   },
   methods: {
@@ -141,18 +141,7 @@ export default {
         this.listQuery.endtime = e[1] / 1000
       }
     },
-    getlog() {
-      this.listLoading = true
-      getLog(this.listQuery).then(resp => {
-        if (resp.data.code === 0) {
-          this.list = resp.data.loglist
-          console.log(this.list)
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
-      this.listLoading = false
-    },
+
     handleFilter() {
       this.listQuery.page = 1
       searchLog(this.listQuery).then(resp => {
