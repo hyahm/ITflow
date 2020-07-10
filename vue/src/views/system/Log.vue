@@ -143,7 +143,9 @@ export default {
     },
 
     handleFilter() {
+      console.log(this.listQuery)
       searchLog(this.listQuery).then(resp => {
+        console.log(resp.data)
         if (resp.data.code === 0) {
           this.list = resp.data.loglist
           this.count = resp.data.count

@@ -11,7 +11,7 @@ import (
 var Log *xmux.GroupRoute
 
 func init() {
-	Log = xmux.NewGroupRoute().AddMidware(midware.CheckLogPermssion).ApiCreateGroup("log", "日志相关", "log")
+	Log = xmux.NewGroupRoute().ApiCreateGroup("log", "日志查询", "日志")
 	Log.ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf")
 	Log.ApiCodeField("code").ApiCodeMsg("0", "成功")
 	Log.ApiCodeField("code").ApiCodeMsg("20", "token过期")

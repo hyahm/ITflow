@@ -17,11 +17,14 @@ func init() {
 	Bug.ApiCodeField("code").ApiCodeMsg("1", "其他错误,请查看返回的msg")
 	Bug.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
-	Search.Pattern("/search/allbugs").Post(handle.SearchAllBugs).Bind(&search.ReqMyBugFilter{}).AddMidware(midware.JsonToStruct)
-	Search.Pattern("/search/mybugs").Post(handle.SearchMyBugs).Bind(&search.ReqMyBugFilter{}).AddMidware(midware.JsonToStruct)
+	Search.Pattern("/search/allbugs").Post(handle.SearchAllBugs).Bind(&search.ReqMyBugFilter{}).AddMidware(midware.JsonToStruct).
+		ApiDescribe("所有所有bug")
+	Search.Pattern("/search/mybugs").Post(handle.SearchMyBugs).Bind(&search.ReqMyBugFilter{}).AddMidware(midware.JsonToStruct).
+		ApiDescribe("所有我创建的bug")
 
 	Search.Pattern("/search/mytasks").Post(handle.SearchMyTasks).Bind(&search.ReqMyBugFilter{}).
-		AddMidware(midware.JsonToStruct)
+		AddMidware(midware.JsonToStruct).ApiDescribe("所有我的任务")
 
-	Search.Pattern("/search/bugmanager").Post(handle.SearchBugManager).Bind(&search.ReqMyBugFilter{}).AddMidware(midware.JsonToStruct)
+	Search.Pattern("/search/bugmanager").Post(handle.SearchBugManager).Bind(&search.ReqMyBugFilter{}).
+		AddMidware(midware.JsonToStruct).ApiDescribe("搜索垃圾箱的bug")
 }

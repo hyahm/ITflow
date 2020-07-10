@@ -17,7 +17,6 @@ import (
 func SearchLog(w http.ResponseWriter, r *http.Request) {
 
 	alllog := xmux.GetData(r).Data.(*log.Search_log)
-	golog.Info(111111111111)
 	listlog := &log.Loglist{}
 
 	basesql := "select id,exectime,classify,action,ip,username from log "
@@ -51,7 +50,6 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 
 	//获取总行数
 	countsql := "select count(id) from log " + endsql
-	golog.Info(endsql)
 	err := db.Mconn.GetOne(countsql).Scan(&alllog.Count)
 	if err != nil {
 		golog.Error(err)
@@ -65,8 +63,6 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	start, end := alllog.GetPagingLimitAndPage()
-	golog.Info(start)
-	golog.Info(end)
 	rows, err := db.Mconn.GetRows(basesql+endsql+" order by id desc limit ?,?", start, end)
 	if err != nil {
 		golog.Error(err)

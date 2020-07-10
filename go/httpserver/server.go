@@ -28,6 +28,7 @@ func RunHttp() {
 	router.AddGroup(routegroup.Project)
 	router.AddGroup(routegroup.Env)
 	router.AddGroup(routegroup.StatusGroup)
+	router.AddGroup(routegroup.UserManager)
 
 	router.AddGroup(routegroup.RoleGroup)
 

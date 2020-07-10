@@ -61,7 +61,6 @@ func UserInfo(w http.ResponseWriter, r *http.Request) {
 		w.Write(userinfo.Json())
 		return
 	}
-	golog.Infof("%+v", userinfo)
 	w.Write(userinfo.Json())
 	return
 }

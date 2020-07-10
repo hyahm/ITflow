@@ -62,3 +62,12 @@ export function userRemove(id) {
     params: { id }
   })
 }
+
+export function updateUser(data) {
+  return request({
+    url: '/user/update',
+    method: 'post',
+    data
+  })
+}
+
