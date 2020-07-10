@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"fmt"
 	"os"
 	"runtime"
 	"time"
@@ -135,9 +134,7 @@ func LoadConfig() {
 	CacheEmail = &Email{}
 
 	golog.Info("cookie过期时间为：", goconfig.ReadDuration("expiration", 120*time.Minute))
-	fmt.Println("++++++++++++++++++++++++++")
 	initCache()
-	fmt.Println("----------------------------------")
 	// 添加一个admin 用户的权限，默认全是1
 	cacheemail()
 

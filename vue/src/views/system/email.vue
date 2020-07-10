@@ -89,7 +89,7 @@ export default {
         if (resp.data.code === 0) {
           this.email = resp.data
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -99,7 +99,7 @@ export default {
         if (resp.data.code === 0) {
           this.$message.success('发送成功')
         } else {
-          this.$message.success(resp.data.msg)
+          this.$message.success(resp.data.message)
         }
       })
     },
@@ -109,7 +109,7 @@ export default {
         if (resp.data.code === 0) {
           this.$message.success('保存成功')
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     }

@@ -158,7 +158,7 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 
 	if count > 0 {
 		golog.Error("uid:%v,has bugs,can not remove")
-		w.Write(errorcode.Error("has bugs,can not remove"))
+		w.Write(errorcode.IsUse())
 		return
 	}
 	// 查看用户组是否存在此用户

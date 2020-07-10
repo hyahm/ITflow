@@ -40,8 +40,8 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-button style="margin: 20px" type="success" size="mini" @click="addp">添加项目名</el-button>
-    <el-dialog :visible.sync="dialogFormVisible" width="60%" title="项目管理">
+    <el-button style="margin: 20px" type="success" size="mini" @click="addProject">添加项目名</el-button>
+    <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" width="60%" title="项目管理">
       <el-form :model="form">
         <el-form-item label="项目名">
           <el-input v-model="form.projectname" width="200" auto-complete="off" />
@@ -84,16 +84,19 @@ export default {
           }
           this.tableData = resp.data.projectlist
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
-    addp() {
+    addProject() {
       this.form.id = -1
       this.dialogFormVisible = true
     },
     handleDelete(id) {
       deleteProjectName(id).then(resp => {
+        if (resp === undefined) {
+          return
+        }
         if (resp.data.code === 0) {
           const fl = this.tableData.length
           for (let i = 0; i < fl; i++) {
@@ -105,7 +108,7 @@ export default {
           this.$message.success('删除成功')
           return
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -144,7 +147,7 @@ export default {
             }
             this.$message.success('更新成功')
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       }

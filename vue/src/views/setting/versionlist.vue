@@ -23,7 +23,9 @@
       <!--<el-button class="filter-item" type="primary" :loading="downloadLoading" v-waves icon="el-icon-download" @click="handleDownload">{{$t('table.export')}}</el-button>-->
       <!--<el-checkbox class="filter-item" style='margin-left:15px;' @change='tableKey=tableKey+1' v-model="showReviewer">{{$t('table.reviewer')}}</el-checkbox>-->
     </div>
-
+    <div>
+      <el-button type="success" plain style="margin: 20px" @click="add">添加版本</el-button>
+    </div>
     <el-table
       :key="tableKey"
       v-loading="listLoading"
@@ -52,13 +54,13 @@
       </el-table-column>
       <el-table-column label="地址一" width="130px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.iphoneurl }}</span>
+          <span>{{ scope.row.url }}</span>
           <!--<svg-icon v-for="n in +scope.row.importance" icon-class="star" class="meta-item__icon" :key="n"></svg-icon>-->
         </template>
       </el-table-column>
       <el-table-column label="地址二" class-name="status-col" width="150">
         <template slot-scope="scope">
-          <span>{{ scope.row.notiphoneurl }}</span>
+          <span>{{ scope.row.bakurl }}</span>
           <!--<el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>-->
         </template>
       </el-table-column>
@@ -80,16 +82,16 @@
     <!--<el-pagination :current-page="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>-->
     <!--</div>-->
 
-    <el-dialog :visible.sync="dialogFormVisible" width="60%" title="版本管理">
+    <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" width="60%" title="版本管理">
       <el-form :model="form">
         <el-form-item label-width="100" label="版本名">
           <el-input v-model="form.name" auto-complete="off" />
         </el-form-item>
         <el-form-item label-width="100" label="地址一">
-          <el-input v-model="form.iphone" auto-complete="off" />
+          <el-input v-model="form.url" auto-complete="off" />
         </el-form-item>
         <el-form-item label-width="100" label="地址二">
-          <el-input v-model="form.noiphone" auto-complete="off" />
+          <el-input v-model="form.bakurl" auto-complete="off" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -102,7 +104,7 @@
 </template>
 
 <script>
-import { getVersion, removeVersion, updateVersion } from '@/api/version'
+import { getVersion, removeVersion, updateVersion, addVersion } from '@/api/version'
 export default {
   name: 'Versionlist',
   data() {
@@ -119,8 +121,8 @@ export default {
       form: {
         id: -1,
         name: '',
-        iphone: '',
-        noiphone: ''
+        url: '',
+        bakurl: ''
       }
     }
   },
@@ -128,13 +130,21 @@ export default {
     this.getversionlist()
   },
   methods: {
+    add() {
+      this.form.id = -1
+      this.form.name = ''
+      this.form.url = ''
+      this.form.bakurl = ''
+      this.dialogFormVisible = true
+    },
     getversionlist() {
-      getVersion(this.listQuery).then(resp => {
+      getVersion().then(resp => {
+        console.log(resp.data)
         if (resp.data.code === 0) {
           this.list = resp.data.versionlist
           this.total = resp.data.versionlist.length
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -150,29 +160,44 @@ export default {
       this.dialogFormVisible = true
       this.form.id = row.id
       this.form.name = row.name
-      this.form.iphone = row.iphoneurl
-      this.form.noiphone = row.notiphoneurl
+      this.form.url = row.url
+      this.form.bakurl = row.bakurl
     },
     confirm() {
-      updateVersion(this.form).then(resp => {
-        if (resp.data.code === 0) {
-          this.$message.success('修改成功')
-          const l = this.list.length
-          for (let i = 0; i < l; i++) {
-            if (this.list[i].id === this.form.id) {
-              this.list[i].name = this.form.name
-              this.list[i].iphoneurl = this.form.iphone
-              this.list[i].notiphoneurl = this.form.noiphone
-              break
-            }
+      if (this.form.id <= 0) {
+        addVersion(this.form).then(response => {
+          if (response.data.code === 0) {
+            var row = this.form
+            row.id = response.data.id
+            row.date = response.data.updatetime
+            this.list.unshift(row)
+            this.$message.success('添加成功')
+          } else {
+            this.$message.error(response.data.message)
           }
-          this.$message.success('修改成功')
-          this.dialogFormVisible = false
-          return
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
+        }).catch()
+      } else {
+        updateVersion(this.form).then(resp => {
+          if (resp.data.code === 0) {
+            this.$message.success('修改成功')
+            const l = this.list.length
+            for (let i = 0; i < l; i++) {
+              if (this.list[i].id === this.form.id) {
+                this.list[i].name = this.form.name
+                this.list[i].iphoneurl = this.form.iphone
+                this.list[i].notiphoneurl = this.form.noiphone
+                break
+              }
+            }
+            this.$message.success('修改成功')
+            this.dialogFormVisible = false
+            return
+          } else {
+            this.$message.error(resp.data.message)
+          }
+        })
+      }
+
       this.dialogFormVisible = false
     },
     cancel() {
@@ -185,10 +210,10 @@ export default {
         type: 'warning'
       }).then(() => {
         removeVersion(row.id).then(resp => {
-          if (resp.data.code === 20) {
-            this.$message.error('此版本有bug,无法删除')
+          if (resp === undefined) {
             return
           }
+          // if (resp.data === null) {
           if (resp.data.code === 0) {
             const l = this.list.length
             for (let i = 0; i < l; i++) {
@@ -199,6 +224,7 @@ export default {
             this.$message.success('删除成功')
             return
           }
+          // }
           this.$message.error('删除失败')
         })
       }).catch(() => {

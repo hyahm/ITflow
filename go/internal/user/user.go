@@ -79,7 +79,7 @@ type UserInfo struct {
 	Code     int      `json:"code" type:"string" need:"是" default:"" information:"状态码， 0为成功"`
 	Avatar   string   `json:"avatar" type:"string" need:"否" default:"" information:"个人头像地址"`
 	NickName string   `json:"nickname" type:"string" need:"否" default:"" information:"用户昵称"`
-	Msg      string   `json:"msg,omitempty" type:"string" need:"否" default:"" information:"错误信息"`
+	Msg      string   `json:"message,omitempty" type:"string" need:"否" default:"" information:"错误信息"`
 	Realname string   `json:"realname,omitempty" type:"string" need:"否" default:"" information:"真实姓名"`
 	Email    string   `json:"email,omitempty" type:"string" need:"否" default:"" information:"邮箱地址"`
 }

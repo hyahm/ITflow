@@ -86,7 +86,7 @@ func ImportantDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if count > 0 {
-		w.Write(errorcode.Error("不存在bug"))
+		w.Write(errorcode.IsUse())
 		return
 	}
 	// 是否设定为了默认值

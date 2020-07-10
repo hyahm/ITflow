@@ -16,7 +16,7 @@ type Role struct {
 type RespRoles struct {
 	Roles []*model.Role `json:"roles"`
 	Code  int           `json:"code"`
-	Msg   string        `json:"msg"`
+	Msg   string        `json:"message"`
 }
 
 func (rr *RespRoles) Marshal() []byte {

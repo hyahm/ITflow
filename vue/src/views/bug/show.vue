@@ -156,7 +156,7 @@ export default {
           if (resp.data.code === 0) {
             this.bug = resp.data
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       }
@@ -181,7 +181,7 @@ export default {
             type: 'success'
           })
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
         this.dialogFormVisible = false
       })

@@ -47,6 +47,13 @@ func (es *Response) GetDataErr() []byte {
 	return send
 }
 
+func (es *Response) IsUse() []byte {
+	es.Msg = "使用中，无法删除"
+	es.Code = 10
+	send, _ := json.Marshal(es)
+	return send
+}
+
 func (es *Response) NotJsonFormat() []byte {
 	es.Msg = "数据无法被解析"
 	es.Code = 1

@@ -87,7 +87,7 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if count > 0 {
-		w.Write(errorcode.Error("没有bug"))
+		w.Write(errorcode.IsUse())
 		return
 	}
 	// 是否设定为了默认值

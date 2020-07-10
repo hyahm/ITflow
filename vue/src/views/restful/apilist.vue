@@ -182,7 +182,7 @@ export default {
             this.headers = resp.data.headers
           }
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -193,7 +193,7 @@ export default {
             this.types = resp.data.types
           }
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -229,7 +229,7 @@ export default {
           }
           this.form = resp.data
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
       this.dialogFormVisible = true
@@ -248,7 +248,7 @@ export default {
               }
             }
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       }).catch(() => {

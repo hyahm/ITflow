@@ -82,7 +82,7 @@ export default {
             this.tableData = resp.data.importantlist
           }
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -108,7 +108,7 @@ export default {
               }
             }
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       }
@@ -125,14 +125,10 @@ export default {
       }).then(() => {
         delImportant(id).then(resp => {
           // console
-          if (resp.data.code === 40) {
-            this.$message.error('此重要性是默认值')
+          if (resp === undefined) {
             return
           }
-          if (resp.data.code === 20) {
-            this.$message.error('此状态有bug在使用，请更改状态再删除')
-            return
-          }
+
           if (resp.data.code === 0) {
             const l = this.tableData.length
             for (let i = 0; i < l; i++) {

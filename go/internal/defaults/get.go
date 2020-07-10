@@ -7,5 +7,5 @@ import (
 type RespDefaultStatus struct {
 	Status cache.Status `json:"defaultstatus"`
 	Code   int          `json:"code"`
-	Msg    string       `json:"msg,omitempty"`
+	Msg    string       `json:"message,omitempty"`
 }

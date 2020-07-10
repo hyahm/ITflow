@@ -106,7 +106,7 @@ export default {
             this.list = resp.data.departmentlist
           }
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -122,10 +122,10 @@ export default {
       this.$confirm('确认关闭？')
         .then(_ => {
           removeStatusGroup(id).then(resp => {
-            if (resp.data.code === 23) {
-              this.$message.warning('删除失败，此状态组有用户在使用')
+            if (resp === undefined) {
               return
             }
+
             if (resp.data.code === 0) {
               const l = this.list.length
               for (let i = 0; i < l; i++) {
@@ -136,7 +136,7 @@ export default {
               this.$message.success('删除成功')
               return
             }
-            this.$message.success('删除失败,错误码：' + resp.data.msg)
+            this.$message.success('删除失败,错误码：' + resp.data.message)
           })
         })
         .catch(_ => {})
@@ -168,7 +168,7 @@ export default {
             }
             this.$message.success('修改成功')
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       } else {
@@ -181,7 +181,7 @@ export default {
             })
             this.$message.success('添加成功')
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       }

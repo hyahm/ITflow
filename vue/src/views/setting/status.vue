@@ -82,7 +82,7 @@ export default {
             this.tableData = resp.data.statuslist
           }
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -96,7 +96,7 @@ export default {
             })
             this.$message.success('添加成功')
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       } else {
@@ -110,7 +110,7 @@ export default {
             }
             this.$message.success('更新成功')
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       }
@@ -127,6 +127,9 @@ export default {
       }).then(() => {
         removeStatus(id).then(resp => {
           // console
+          if (resp === undefined) {
+            return
+          }
           if (resp.data.code === 0) {
             const l = this.tableData.length
             for (let i = 0; i < l; i++) {
@@ -136,7 +139,7 @@ export default {
             }
             this.$message.success('删除成功')
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       }).catch(() => {

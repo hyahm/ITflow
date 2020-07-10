@@ -10,6 +10,13 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+const (
+	SELECT = 1
+	REMOVE = 2
+	UPDATE = 4
+	CREATE = 8
+)
+
 func CheckStatusPermssion(w http.ResponseWriter, r *http.Request) bool {
 
 	uid := xmux.GetData(r).Get("uid").(int64)

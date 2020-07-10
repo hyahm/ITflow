@@ -132,7 +132,7 @@ export default {
         if (resp.data.code === 0) {
           this.manager = resp.data.hypos
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -141,7 +141,7 @@ export default {
         if (resp.data.code === 0) {
           this.tableData = resp.data.positions
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -160,7 +160,7 @@ export default {
               this.manager.push(this.form.name)
             }
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       } else {
@@ -180,7 +180,7 @@ export default {
               }
             }
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       }
@@ -197,14 +197,10 @@ export default {
       }).then(() => {
         delPosition(row.id).then(resp => {
           // console
-          if (resp.data.code === 21) {
-            this.$message.error('此职位有用户在使用')
+          if (resp === undefined) {
             return
           }
-          if (resp.data.code === 24) {
-            this.$message.error('此职位在使用')
-            return
-          }
+
           if (resp.data.code === 0) {
             const l = this.tableData.length
             for (let i = 0; i < l; i++) {

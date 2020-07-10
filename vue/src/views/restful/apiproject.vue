@@ -137,7 +137,7 @@ export default {
             this.users = resp.data.users
           }
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
         this.readlist = this.users
         this.rdwrlist = this.users
@@ -150,7 +150,7 @@ export default {
             this.groups = resp.data.grouplist
           }
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -191,7 +191,7 @@ export default {
             this.list = resp.data.list
           }
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },

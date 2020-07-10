@@ -207,7 +207,7 @@ export default {
             this.importants = resp.data.importants
           }
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -218,7 +218,7 @@ export default {
             this.levels = resp.data.levels
           }
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -227,7 +227,7 @@ export default {
         if (resp.data.code === 0) {
           this.envnames = resp.data.envlist
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -236,7 +236,7 @@ export default {
         if (resp.data.code === 0) {
           this.projectnames = resp.data.projectlist
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -245,7 +245,7 @@ export default {
         if (resp.data.code === 0) {
           this.versions = resp.data.versionlist
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       }).catch(err => {
         this.$message.error(err)
@@ -257,7 +257,7 @@ export default {
           if (resp.data.users !== null) {
             this.users = resp.data.users
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         }
       }).catch(err => {
@@ -277,7 +277,7 @@ export default {
           this.postForm.level = dd.level
           this.postForm.projectname = dd.projectname
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       }).catch(err => {
         console.log(err)
@@ -369,7 +369,7 @@ export default {
                 })
               }
             } else {
-              this.$message.error(resp.data.msg)
+              this.$message.error(resp.data.message)
             }
           })
         }

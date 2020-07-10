@@ -104,10 +104,8 @@ export default {
     },
     getTemplate() {
       // 获取模板
-      console.log(333)
       getPermTemplate().then(resp => {
         this.templateperm = resp.data
-        console.log(this.templateperm)
       })
     },
     handleEdit(row) {
@@ -121,7 +119,7 @@ export default {
         if (resp.data.code === 0) {
           this.list = resp.data.rolelist
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -133,6 +131,9 @@ export default {
       this.$confirm('确认关闭？')
         .then(_ => {
           removeRole(id).then(resp => {
+            if (resp === undefined) {
+              return
+            }
             if (resp.data.code === 0) {
               const l = this.list.length
               for (let i = 0; i < l; i++) {
@@ -143,7 +144,7 @@ export default {
               this.$message.success('删除成功')
               return
             } else {
-              this.$message.error(resp.data.msg)
+              this.$message.error(resp.data.message)
             }
           })
         })
@@ -170,7 +171,7 @@ export default {
             }
             this.$message.success('修改成功')
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       } else {
@@ -183,7 +184,7 @@ export default {
             })
             this.$message.success('添加成功')
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       }

@@ -8,7 +8,7 @@ import (
 type RespGetNames struct {
 	StatusList []string `json:"statuslist"`
 	Code       int      `json:"code"`
-	Msg        string   `json:"msg"`
+	Msg        string   `json:"message"`
 }
 
 func (rgn *RespGetNames) Marshal() []byte {

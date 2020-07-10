@@ -160,7 +160,7 @@ export default {
           //   this.list.result = JSON.parse(this.list.result)
           // }
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     }

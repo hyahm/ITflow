@@ -112,7 +112,7 @@ export default {
             this.list = resp.data.headers
           }
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -138,7 +138,7 @@ export default {
               }
             }
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       }).catch(() => {

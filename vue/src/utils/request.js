@@ -23,7 +23,12 @@ service.interceptors.request.use(
   },
   error => {
     // do something with request error
-    this.$message.error(error) // for debug
+    Message({
+      message: error.message,
+      type: 'error',
+      duration: 5 * 1000
+    })
+    // for debug
     return Promise.reject(error)
   }
 )
@@ -46,6 +51,14 @@ service.interceptors.response.use(
       if (response.data.code === 20) {
         removeToken()
         location.href = '/login'
+      } else if (response.data.code === 10) {
+        console.log(response.data)
+        Message({
+          message: response.data.message,
+          type: 'error',
+          duration: 5 * 1000
+        })
+        return
       }
     }
     return response

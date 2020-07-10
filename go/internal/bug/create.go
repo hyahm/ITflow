@@ -22,7 +22,7 @@ type RespEditBug struct {
 	Envname     string          `json:"envname"`
 	Version     string          `json:"version"`
 	Code        int             `json:"code"`
-	Msg         string          `json:"msg,omitempty"`
+	Msg         string          `json:"message,omitempty"`
 }
 
 func (reb *RespEditBug) Marshal() []byte {

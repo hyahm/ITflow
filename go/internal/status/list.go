@@ -3,14 +3,12 @@ package status
 import (
 	"encoding/json"
 	"itflow/model"
-
-	"github.com/hyahm/golog"
 )
 
 type RespStatusList struct {
 	StatusList []*model.Status `json:"statuslist"`
 	Code       int             `json:"code"`
-	Msg        string          `json:"msg,omitempty"`
+	Msg        string          `json:"message,omitempty"`
 }
 
 func (rsl *RespStatusList) Marshal() []byte {
@@ -25,7 +23,6 @@ func (rsl *RespStatusList) Marshal() []byte {
 func StatusList() []byte {
 	resp := &RespStatusList{}
 	st := &model.Status{}
-	golog.Info(st)
 	var err error
 	resp.StatusList, err = st.List()
 	if err != nil {
@@ -34,6 +31,5 @@ func StatusList() []byte {
 
 		return resp.Marshal()
 	}
-	golog.Info(resp.StatusList)
 	return resp.Marshal()
 }

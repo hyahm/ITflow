@@ -29,8 +29,6 @@ func (pl *BugList) GetPagingLimitAndPage() (int, int) {
 	if pl.Page < 1 {
 		pl.Page = 1
 	}
-	golog.Info(pl.Count)
-	golog.Info(pl.Limit)
 	// 超出了，返回最大的页码
 	if pl.Page*pl.Limit > pl.Count+pl.Limit {
 
@@ -52,13 +50,11 @@ func (pl *BugList) GetPagingLimitAndPage() (int, int) {
 }
 
 func (pl *BugList) rows() (*sql.Rows, error) {
-	golog.Info(pl.CountSql)
 	err := db.Mconn.GetOne(pl.CountSql).Scan(&pl.Count)
 	if err != nil {
 		golog.Error(err)
 		return nil, err
 	}
-	golog.Info(pl.Count)
 	// 增加显示的状态
 	start, end := pl.GetPagingLimitAndPage()
 	pl.ListSql += " order by id desc limit ?,? "

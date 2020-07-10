@@ -71,7 +71,7 @@ export default {
             this.levels = resp.data.levels
           }
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -80,7 +80,7 @@ export default {
         if (resp.data.code === 0) {
           this.form.defaultlevel = resp.data.defaultlevel
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -91,7 +91,7 @@ export default {
             this.importants = resp.data.importants
           }
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -100,7 +100,7 @@ export default {
         if (resp.data.code === 0) {
           this.form.defaultimportant = resp.data.defaultimportant
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -110,7 +110,7 @@ export default {
         if (resp.data.code === 0) {
           this.defaultstatus = resp.data.defaultstatus
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -121,7 +121,7 @@ export default {
             this.statuslist = resp.data.statuslist
           }
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },

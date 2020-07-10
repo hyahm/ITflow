@@ -12,16 +12,6 @@ const setting = {
   },
   children: [
     {
-      path: 'addversion',
-      component: () => import('@/views/setting/pubversion'),
-      name: 'pubversion',
-      meta: {
-        title: '发布版本',
-        icon: 'guide',
-        roles: ['admin', 'version']
-      }
-    },
-    {
       path: 'bugstatus',
       component: () => import('@/views/setting/status'),
       name: 'bugstatus',

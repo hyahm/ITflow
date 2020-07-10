@@ -253,7 +253,7 @@ export default {
         if (resp.data.code === 0) {
           this.levels = resp.data.levels
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -262,14 +262,14 @@ export default {
         if (resp.data.code === 0) {
           this.platformsOptions = resp.data.statuslist
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
       getPermStatus().then(resp => {
         if (resp.data.code === 0) {
           this.statuslist = resp.data.statuslist
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -293,7 +293,7 @@ export default {
           // })
           this.listLoading = false
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -302,7 +302,7 @@ export default {
         if (resp.data.code === 0) {
           this.projectnames = resp.data.projectlist
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -315,7 +315,7 @@ export default {
             this.statuslength = this.checkstatus.length
           }
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -324,7 +324,7 @@ export default {
         if (resp.data.code === 0) {
           this.users = resp.data.users
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -376,7 +376,7 @@ export default {
             type: 'success'
           })
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
       this.dialogFormVisible = false

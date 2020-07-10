@@ -66,8 +66,6 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if cache.DefaultSid.ToInt64() == sid {
-
-		golog.Error("this status is set to default, can not remove. you can change to other status and delete")
 		w.Write(errorcode.Error("this status is set to default, can not remove. you can change to other status and delete"))
 		return
 
@@ -83,7 +81,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 
 	if bcount > 0 {
 		golog.Errorf("sid:%d 删除失败", sid)
-		w.Write(errorcode.Error("还有bug"))
+		w.Write(errorcode.IsUse())
 		return
 	}
 

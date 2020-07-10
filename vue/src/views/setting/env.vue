@@ -39,7 +39,7 @@
       </el-table-column>
     </el-table>
     <el-button style="margin: 20px" type="success" size="mini" @click="handleAdd">添加环境</el-button>
-    <el-dialog :visible.sync="dialogFormVisible" width="60%" title="运行环境">
+    <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" width="60%" title="运行环境">
       <el-form :model="form">
         <el-form-item label="环境名">
           <el-input v-model="form.envname" auto-complete="off" />
@@ -83,7 +83,7 @@ export default {
           }
           this.tableData = resp.data.envlist
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -93,6 +93,9 @@ export default {
     },
     handleDelete(id) {
       deleteEnvName(id).then(resp => {
+        if (resp === undefined) {
+          return
+        }
         if (resp.data.code === 0) {
           const fl = this.tableData.length
           for (let i = 0; i < fl; i++) {
@@ -124,7 +127,7 @@ export default {
             this.$message.success('添加成功')
             return
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       } else {
@@ -140,7 +143,7 @@ export default {
             this.$message.success('修改成功')
             return
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       }

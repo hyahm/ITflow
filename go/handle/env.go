@@ -122,7 +122,7 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if count > 0 {
-		w.Write(errorcode.Error("存在此env"))
+		w.Write(errorcode.IsUse())
 		return
 	}
 	getaritclesql := "delete from environment where id=?"

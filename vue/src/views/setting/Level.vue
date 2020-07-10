@@ -41,7 +41,7 @@
     <div>
       <el-button type="success" plain style="margin: 20px" @click="addstatus">添加严重级别</el-button>
     </div>
-    <el-dialog :visible.sync="dialogFormVisible" title="严重级别管理">
+    <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" title="严重级别管理">
       <el-form>
         <el-form-item label="严重级别">
           <el-input v-model="form.name" auto-complete="off" />
@@ -87,7 +87,7 @@ export default {
             }
           }
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -100,7 +100,7 @@ export default {
               name: this.form.name
             })
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       } else {
@@ -113,7 +113,7 @@ export default {
               }
             }
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       }
@@ -129,14 +129,10 @@ export default {
         type: 'warning'
       }).then(() => {
         delLevel(id).then(resp => {
-          if (resp.data.code === 40) {
-            this.$message.error('此严重级别是默认值')
+          if (resp === undefined) {
             return
           }
-          if (resp.data.code === 20) {
-            this.$message.error('此状态有bug在使用，请更改状态再删除')
-            return
-          }
+
           if (resp.data.code === 0) {
             const l = this.tableData.length
             for (let i = 0; i < l; i++) {

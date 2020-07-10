@@ -11,8 +11,8 @@ import (
 var Status *xmux.GroupRoute
 
 func init() {
-	Status = xmux.NewGroupRoute().AddMidware(midware.CheckStatusPermssion).
-		ApiCreateGroup("bugstatus", "bug 状态管理", "bug status").
+	Status = xmux.NewGroupRoute().
+		ApiCreateGroup("bugstatus", "bug 状态管理", "bug状态").
 		ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf")
 	Status.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 	Status.ApiCodeField("code").ApiCodeMsg("0", "成功")

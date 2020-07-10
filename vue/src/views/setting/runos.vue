@@ -36,7 +36,7 @@
       </el-table-column>
     </el-table>
     <el-button @click="addp">添加运行平台</el-button>
-    <el-dialog :visible.sync="dialogFormVisible" title="平台管理">
+    <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" title="平台管理">
       <el-form :model="form">
         <el-form-item :label-width="formLabelWidth" label="平台">
           <el-input v-model="form.osname" auto-complete="off" />
@@ -79,7 +79,7 @@ export default {
           }
           this.tableData = resp.data.oslist
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -89,6 +89,9 @@ export default {
     },
     handleDelete(id) {
       deleteOSName(id).then(resp => {
+        if (resp === undefined) {
+          return
+        }
         if (resp.data.code === 0) {
           const fl = this.tableData.length
           for (let i = 0; i < fl; i++) {
@@ -98,7 +101,7 @@ export default {
             }
           }
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.message)
         }
       })
     },
@@ -117,7 +120,7 @@ export default {
               osname: this.form.osname
             })
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       } else {
@@ -131,7 +134,7 @@ export default {
               }
             }
           } else {
-            this.$message.error(resp.data.msg)
+            this.$message.error(resp.data.message)
           }
         })
       }

@@ -30,7 +30,7 @@ type AllArticleList struct {
 	Code  int            `json:"code"`
 	Count int            `json:"total"`
 	Page  int            `json:"page"`
-	Msg   string         `json:"msg"`
+	Msg   string         `json:"message"`
 }
 
 func (al *AllArticleList) Marshal() []byte {
