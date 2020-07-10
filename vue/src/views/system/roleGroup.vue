@@ -104,8 +104,10 @@ export default {
     },
     getTemplate() {
       // 获取模板
+      console.log(333)
       getPermTemplate().then(resp => {
         this.templateperm = resp.data
+        console.log(this.templateperm)
       })
     },
     handleEdit(row) {

@@ -19,7 +19,7 @@ const userRoute = {
       meta: {
         title: '添加用户',
         icon: 'edit',
-        roles: ['admin', 'usermanager']
+        roles: ['admin']
       }
     },
     {
@@ -39,7 +39,7 @@ const userRoute = {
       meta: {
         title: '用户管理',
         icon: 'user',
-        roles: ['admin', 'usermanager']
+        roles: ['admin']
       }
     },
     {

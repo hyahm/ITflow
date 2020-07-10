@@ -247,9 +247,8 @@ func DisableUser(w http.ResponseWriter, r *http.Request) {
 
 // 显示自己能管理的权限，不显示自己的
 func UserList(w http.ResponseWriter, r *http.Request) {
-
-	errorcode := &response.Response{}
 	uid := xmux.GetData(r).Get("uid").(int64)
+	errorcode := &response.Response{}
 	if cache.SUPERID != uid {
 		w.Write(errorcode.ErrorNoPermission())
 		return
@@ -260,8 +259,8 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 	// 0是系统管理员， 1是管理层， 2是普通用户
 	//switch level {
 	//case 0:
-	getallsql := "select id,createtime,realname,nickname,email,disable,rid,bugsid,jid from user where level<>0"
-	adminrows, err := db.Mconn.GetRows(getallsql)
+	getallsql := "select id,createtime,realname,nickname,email,disable,rid,bugsid,jid from user where id<>?"
+	adminrows, err := db.Mconn.GetRows(getallsql, cache.SUPERID)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

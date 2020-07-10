@@ -462,6 +462,16 @@ CREATE TABLE `rolegroup` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+DROP TABLE IF EXISTS `perm`;
+CREATE TABLE `perm` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `find` tinyint(1) NOT NULL DEFAULT '0',
+  `remove` tinyint(1) NOT NULL DEFAULT '0',
+  `revise` tinyint(1) NOT NULL DEFAULT '0',
+  `increase` tinyint(1) NOT NULL DEFAULT '0',
+  `rid` bigint(20) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8 
 --
 -- Dumping data for table `rolegroup`
 --
@@ -507,7 +517,6 @@ INSERT INTO roles(role,info) VALUES('status', "bug状态流程页面");
 INSERT INTO roles(role,info) VALUES('statusgroup', "状态组页面");
 INSERT INTO roles(role,info) VALUES('version', "版本页面");
 INSERT INTO roles(role,info) VALUES('allbug', "所有bug的页面");
-INSERT INTO roles(role,info) VALUES('usermanager', "用户管理页面");
 --
 -- Dumping data for table `roles`
 --
