@@ -78,7 +78,7 @@ type UserInfo struct {
 	Roles    []string `json:"roles" type:"array" need:"否" default:"" information:"角色组"`
 	Code     int      `json:"code" type:"string" need:"是" default:"" information:"状态码， 0为成功"`
 	Avatar   string   `json:"avatar" type:"string" need:"否" default:"" information:"个人头像地址"`
-	NickName string   `json:"nickname" type:"string" need:"否" default:"" information:"用户昵称"`
+	NickName string   `json:"name" type:"string" need:"否" default:"" information:"用户昵称"`
 	Msg      string   `json:"message,omitempty" type:"string" need:"否" default:"" information:"错误信息"`
 	Realname string   `json:"realname,omitempty" type:"string" need:"否" default:"" information:"真实姓名"`
 	Email    string   `json:"email,omitempty" type:"string" need:"否" default:"" information:"邮箱地址"`
@@ -86,6 +86,11 @@ type UserInfo struct {
 
 func (ui *UserInfo) GetUserInfo(uid int64) error {
 	ui.Roles = make([]string, 0)
+	err := db.Mconn.GetOne("select nickname, headimg from user where id=?", uid).Scan(&ui.NickName, &ui.Avatar)
+	if err != nil {
+		golog.Error(err)
+		return err
+	}
 	// 管理员
 	if uid == cache.SUPERID {
 		ui.Roles = append(ui.Roles, "admin")
