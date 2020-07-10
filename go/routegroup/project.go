@@ -11,7 +11,7 @@ import (
 var Project *xmux.GroupRoute
 
 func init() {
-	Project = xmux.NewGroupRoute().AddMidware(midware.CheckProjectPermssion)
+	Project = xmux.NewGroupRoute()
 	Project.ApiCodeField("code").ApiCodeMsg("0", "成功")
 	Project.ApiCodeField("code").ApiCodeMsg("20", "token过期")
 	Project.ApiCodeField("code").ApiCodeMsg("2", "系统错误")

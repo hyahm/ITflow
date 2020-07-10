@@ -11,7 +11,7 @@ import (
 var Important *xmux.GroupRoute
 
 func init() {
-	Important = xmux.NewGroupRoute().AddMidware(midware.CheckImportantPermssion)
+	Important = xmux.NewGroupRoute()
 	Important.ApiCodeField("code").ApiCodeMsg("0", "成功")
 	Important.ApiCodeField("code").ApiCodeMsg("20", "token过期")
 	Important.ApiCodeField("code").ApiCodeMsg("1", "其他错误,请查看返回的msg")
