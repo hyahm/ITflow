@@ -248,7 +248,7 @@ export default {
           this.$message.error(resp.data.msg)
         }
       }).catch(err => {
-        console.log(err)
+        this.$message.error(err)
       })
     },
     getuser() {
@@ -261,14 +261,13 @@ export default {
           }
         }
       }).catch(err => {
-        console.log(err)
+        this.$message.error(err)
       })
     },
     fetchData(id) {
       fetchBug(id).then(resp => {
         if (resp.data.code === 0) {
           const dd = resp.data
-          console.log(dd)
           this.postForm.title = dd.title
           this.postForm.content = dd.content
           this.postForm.important = dd.important
@@ -354,7 +353,6 @@ export default {
       this.$refs.postForm.validate(valid => {
         if (valid) {
           createBug(this.postForm).then(resp => {
-            console.log(resp.data)
             if (resp.data.code === 0) {
               if (this.postForm.id === -1) {
                 this.$notify({
@@ -383,7 +381,6 @@ export default {
       var formdata = new FormData()
       formdata.append('image', $file)
       uploadImg(formdata).then(resp => {
-        console.log(resp)
         if (resp.data.code === 0) {
           this.$refs.md.$img2Url(pos, resp.data.url)
         } else {

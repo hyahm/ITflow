@@ -38,7 +38,8 @@ const bugRouter = {
       name: 'bugs',
       meta: {
         title: '所有bug',
-        icon: 'bug'
+        icon: 'bug',
+        roles: ['admin', 'allbug']
       }
     },
     {

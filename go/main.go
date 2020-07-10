@@ -18,17 +18,21 @@ func main() {
 	// 初始化配置文件
 	goconfig.InitConf("bug.ini", goconfig.INI)
 	//初始化mysql
+
 	db.InitMysql()
 	// 初始化redis
 	db.InitCacheTable()
+
 	// 初始化缓存（后面会使用redis）
 	cache.LoadConfig()
+
 	// 初始化日志
 	golog.InitLogger(goconfig.ReadString("log.path", ""),
 		goconfig.ReadInt64("log.size", 0),
 		goconfig.ReadBool("log.everyday", false))
 	////
 	signalChan := make(chan os.Signal)
+
 	go func() {
 		//阻塞程序运行，直到收到终止的信号
 		<-signalChan

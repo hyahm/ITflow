@@ -23,6 +23,14 @@ export function editRole(data) {
   })
 }
 
+export function getPermTemplate(data) {
+  return request({
+    url: '/rolegroup/template',
+    method: 'post',
+    data
+  })
+}
+
 export function removeRole(id) {
   return request({
     url: '/rolegroup/remove',

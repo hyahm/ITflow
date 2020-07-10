@@ -134,8 +134,6 @@ export default {
         })
       } else {
         addGroup(this.form).then(resp => {
-          console.log(resp.data)
-          console.log(this.list)
           if (resp.data.code === 0) {
             this.list.push({
               id: resp.data.id,

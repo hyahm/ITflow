@@ -86,9 +86,6 @@ export default {
       }
     },
     beforeUpload(file) {
-      console.log('------------')
-      console.log(file)
-      console.log('------------')
       const _self = this
       const _URL = window.URL || window.webkitURL
       const fileName = file.uid
@@ -96,7 +93,6 @@ export default {
       return new Promise((resolve, reject) => {
         const img = new Image()
         img.src = _URL.createObjectURL(file)
-        console.log(img)
         img.onload = function() {
           _self.listObj[fileName] = { hasSuccess: false, uid: file.uid, width: this.width, height: this.height }
         }

@@ -1,12 +1,14 @@
 package handle
 
 import (
+	"database/sql"
 	"encoding/json"
 	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/datalog"
 	"itflow/internal/response"
 	"itflow/internal/rolegroup"
+	"itflow/model"
 	"net/http"
 	"strconv"
 	"strings"
@@ -18,9 +20,11 @@ import (
 func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	data := &rolegroup.RoleGroupList{}
+	data := &rolegroup.RespRoleGroup{
+		RoleList: make([]*rolegroup.ReqRoleGroup, 0),
+	}
 
-	s := "select id,name,rolelist from rolegroup"
+	s := "select id,name,permids from rolegroup"
 	rows, err := db.Mconn.GetRows(s)
 	if err != nil {
 		golog.Error(err)
@@ -28,14 +32,38 @@ func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for rows.Next() {
-		var rids string
-		one := &rolegroup.RoleGroup{}
-		rows.Scan(&one.Id, &one.Name, &rids)
-		for _, v := range strings.Split(rids, ",") {
-			id, _ := strconv.Atoi(v)
-			one.RoleList = append(one.RoleList, cache.CacheRidRole[int64(id)])
+		var permids string // 保存perm表的所有id
+		one := &rolegroup.ReqRoleGroup{
+			RoleList: make([]*rolegroup.PermRole, 0),
 		}
-		data.DataList = append(data.DataList, one)
+		rows.Scan(&one.Id, &one.Name, &permids)
+		for _, v := range strings.Split(permids, ",") {
+			perm, err := model.NewPerm(v)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					continue
+				}
+				golog.Error(err)
+				w.Write(data.ErrorE(err))
+				return
+			}
+			if name, ok := cache.CacheRidRole[perm.Rid]; ok {
+				if info, infook := cache.CacheRidInfo[perm.Rid]; infook {
+					one.RoleList = append(one.RoleList, &rolegroup.PermRole{
+						Add:    perm.Increase,
+						Select: perm.Find,
+						Update: perm.Revise,
+						Remove: perm.Remove,
+						Name:   name,
+						Info:   info,
+					})
+				}
+
+			}
+			// 最好清除无效的数据
+
+		}
+		data.RoleList = append(data.RoleList, one)
 	}
 	send, _ := json.Marshal(data)
 	w.Write(send)
@@ -45,28 +73,32 @@ func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 
 func GetRoleGroupName(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
+	// errorcode := &response.Response{}
 
-	s := "select name from rolegroup"
-	rows, err := db.Mconn.GetRows(s)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	resp := struct {
+	// s := "select name from rolegroup"
+	// rows, err := db.Mconn.GetRows(s)
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
+	resp := &struct {
 		Code     int      `json:"code"`
 		RoleList []string `json:"rolelist"`
 	}{
 		RoleList: make([]string, 0),
 	}
-	for rows.Next() {
-		var name string
-		rows.Scan(&name)
-		resp.RoleList = append(resp.RoleList, name)
+	// for rows.Next() {
+	// 	var name string
+	// 	rows.Scan(&name)
+	// 	resp.RoleList = append(resp.RoleList, name)
 
+	// }
+	for _, v := range cache.CacheRidGroup {
+		resp.RoleList = append(resp.RoleList, v)
 	}
 	send, _ := json.Marshal(resp)
+	golog.Info(string(send))
 	w.Write(send)
 	return
 }
@@ -121,84 +153,48 @@ func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 
 func EditRoleGroup(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
+	data := xmux.GetData(r).Data.(*rolegroup.ReqRoleGroup)
 
-	data := xmux.GetData(r).Data.(*rolegroup.RoleGroup)
-
-	if err := data.Update(); err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	// 增加日志
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "role",
-		Action:   "update",
-	}
-
-	cache.CacheRidGroup[data.Id] = data.Name
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
+	uid := xmux.GetData(r).Get("uid").(int64)
+	w.Write(data.Update(uid))
 	return
 
 }
 
 func AddRoleGroup(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
-
-	data := xmux.GetData(r).Data.(*rolegroup.RoleGroup)
-
-	if data.Name == "" {
-		golog.Error("name is empty")
-		w.Write(errorcode.Error("name is empty"))
-		return
-	}
-	// 插入数据
-	if err := data.Insert(); err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	// 增加日志
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "role",
-		Action:   "add",
-	}
-
-	cache.CacheRidGroup[data.Id] = data.Name
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
+	data := xmux.GetData(r).Data.(*rolegroup.ReqRoleGroup)
+	uid := xmux.GetData(r).Get("uid").(int64)
+	w.Write(data.Add(uid))
 	return
 
 }
 
-func RoleGroupName(w http.ResponseWriter, r *http.Request) {
+func RoleTemplate(w http.ResponseWriter, r *http.Request) {
 
-	data := &rolegroup.Roles{}
-	for _, v := range cache.CacheRidGroup {
-		data.Roles = append(data.Roles, v)
+	data := make([]*rolegroup.PermRole, 0)
+
+	for rid, info := range cache.CacheRidInfo {
+		data = append(data, &rolegroup.PermRole{
+			Info: info,
+			Name: cache.CacheRidRole[rid],
+		})
 	}
+
 	send, _ := json.Marshal(data)
 	w.Write(send)
 	return
 
 }
 
-func GetRoleGroup(w http.ResponseWriter, r *http.Request) {
+// func GetRoleGroup(w http.ResponseWriter, r *http.Request) {
 
-	rl := &rolegroup.Roles{}
-	for _, v := range cache.CacheRidGroup {
-		rl.Roles = append(rl.Roles, v)
-	}
-	send, _ := json.Marshal(rl)
-	w.Write(send)
-	return
+// 	rl := &rolegroup.Roles{}
+// 	for _, v := range cache.CacheRidGroup {
+// 		rl.Roles = append(rl.Roles, v)
+// 	}
+// 	send, _ := json.Marshal(rl)
+// 	w.Write(send)
+// 	return
 
-}
+// }

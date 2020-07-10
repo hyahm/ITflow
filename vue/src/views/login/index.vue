@@ -75,11 +75,10 @@ export default {
             this.loading = false
             this.$router.push('/dashboard')
           }).catch(() => {
-            console.log(111)
             this.loading = false
           })
         } else {
-          console.log('error submit!!')
+          this.$message.error('error submit!!')
           return false
         }
       })

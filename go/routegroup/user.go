@@ -37,7 +37,7 @@ func init() {
 		ApiResStruct(user.UserInfo{}).
 		ApiResponseTemplate(`{"roles": ["admin"], "code": 0, "avatar":"http://xxxx/aaaa.png", "nickname": "admin"}`)
 
-	User.Pattern("/user/list").Post(handle.UserList).Bind(&user.UserList{}).AddMidware(midware.JsonToStruct)
+	User.Pattern("/user/list").Post(handle.UserList)
 
 	User.Pattern("/user/update").Post(handle.UserUpdate).Bind(&user.User{}).AddMidware(midware.JsonToStruct).
 		End(midware.EndLog)

@@ -11,7 +11,8 @@ import (
 var Position *xmux.GroupRoute
 
 func init() {
-	Position = xmux.NewGroupRoute().AddMidware(midware.CheckPositionPermssion)
+	Position = xmux.NewGroupRoute()
+	// AddMidware(midware.CheckPositionPermssion)
 	Position.ApiCodeField("code").ApiCodeMsg("0", "成功")
 	Position.ApiCodeField("code").ApiCodeMsg("20", "token过期")
 	Position.ApiCodeField("code").ApiCodeMsg("2", "系统错误")

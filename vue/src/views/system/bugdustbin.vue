@@ -173,7 +173,6 @@ export default {
   methods: {
     getstatus() {
       getStatus().then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.allStatus = resp.data.statuslist
         } else {
@@ -182,7 +181,6 @@ export default {
       })
       // 可以修改的权限
       getPermStatus().then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.showstatus = resp.data.statuslist
           this.statuslength = this.showstatus.length
@@ -242,7 +240,6 @@ export default {
     resume(id) {
       resumeBug(id).then(resp => {
         if (resp.data.code === 0) {
-          console.log(this.list)
           const l = this.list.length
           for (var i = 0; i < l; i++) {
             if (this.list[i].id === id) {

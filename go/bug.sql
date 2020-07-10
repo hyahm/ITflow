@@ -456,7 +456,7 @@ DROP TABLE IF EXISTS `rolegroup`;
 CREATE TABLE `rolegroup` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL DEFAULT '',
-  `rolelist` varchar(200) DEFAULT '',
+  `permids` varchar(200) DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -481,22 +481,23 @@ DROP TABLE IF EXISTS `roles`;
 CREATE TABLE `roles` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `role` varchar(30) NOT NULL DEFAULT '',
+  `info` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `role` (`role`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-INSERT INTO roles(role) VALUES('env');
-INSERT INTO roles(role) VALUES('important');
-INSERT INTO roles(role) VALUES('level');
-INSERT INTO roles(role) VALUES('log');
-INSERT INTO roles(role) VALUES('position');
-INSERT INTO roles(role) VALUES('project');
-INSERT INTO roles(role) VALUES('rolegroup');
-INSERT INTO roles(role) VALUES('status');
-INSERT INTO roles(role) VALUES('statusgroup');
-INSERT INTO roles(role) VALUES('usergroup');
-INSERT INTO roles(role) VALUES('version');
+INSERT INTO roles(role,info) VALUES('env', "环境页面");
+INSERT INTO roles(role,info) VALUES('important', "重要性页面");
+INSERT INTO roles(role,info) VALUES('level', "重要性页面");
+INSERT INTO roles(role,info) VALUES('log', "查看日志");
+INSERT INTO roles(role,info) VALUES('position', "职位页面");
+INSERT INTO roles(role,info) VALUES('project', "项目页面");
+INSERT INTO roles(role,info) VALUES('status', "bug状态流程页面");
+INSERT INTO roles(role,info) VALUES('statusgroup', "状态组页面");
+INSERT INTO roles(role,info) VALUES('version', "版本页面");
+INSERT INTO roles(role,info) VALUES('allbug', "所有bug的页面");
+INSERT INTO roles(role,info) VALUES('usermanager', "用户管理页面");
 --
 -- Dumping data for table `roles`
 --

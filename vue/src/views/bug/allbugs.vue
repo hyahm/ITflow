@@ -240,7 +240,6 @@ export default {
   methods: {
     getlevels() {
       getLevels().then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.levels = resp.data.levels
         } else {

@@ -7,6 +7,7 @@ import (
 	"itflow/db"
 	"itflow/encrypt"
 	"itflow/internal/response"
+	"itflow/model"
 	"strconv"
 	"strings"
 	"time"
@@ -84,33 +85,34 @@ type UserInfo struct {
 }
 
 func (ui *UserInfo) GetUserInfo(uid int64) error {
-
-	sql := "select rid, headimg from user where nickname=?"
-	var rid string
-	err := db.Mconn.GetOne(sql, ui.NickName).Scan(&rid, &ui.Avatar)
-	if err != nil {
-		golog.Error(err)
-		return err
-	}
-
+	ui.Roles = make([]string, 0)
 	// 管理员
 	if uid == cache.SUPERID {
-		ui.Roles = append(ui.Roles, ui.NickName)
+		ui.Roles = append(ui.Roles, "admin")
 	} else {
-		var rl string
-		getrole := "select rolelist from rolegroup where id=?"
-		err := db.Mconn.GetOne(getrole, rid).Scan(&rl)
+		var pids string
+		permids := "select permids from rolegroup where id=(select rid from user where id=?)"
+		err := db.Mconn.GetOne(permids, uid).Scan(&pids)
 		if err != nil {
 			golog.Error(err)
 			return err
 		}
 
-		for _, v := range strings.Split(rl, ",") {
-			id, _ := strconv.Atoi(v)
-			ui.Roles = append(ui.Roles, cache.CacheRidRole[int64(id)])
+		for _, v := range strings.Split(pids, ",") {
+			perm, err := model.NewPerm(v)
+			if err != nil {
+				golog.Error(err)
+				return err
+			}
+			if perm.Find {
+				ui.Roles = append(ui.Roles, cache.CacheRidRole[perm.Rid])
+			}
+
 		}
 	}
-
+	if len(ui.Roles) == 0 {
+		ui.Roles = append(ui.Roles, "test")
+	}
 	return nil
 }
 

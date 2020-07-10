@@ -285,7 +285,6 @@ export default {
       }
       this.statuslength = this.checkstatus.length
       statusFilter(data).then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.statuslength = this.checkstatus.length
           this.listLoading = true
@@ -338,7 +337,6 @@ export default {
     handleFilter() {
       this.listLoading = true
       searchMyTasks(this.listQuery).then(resp => {
-        console.log(resp.data)
         this.list = resp.data.articlelist
         this.total = resp.data.total
         this.listQuery.page = resp.data.page
@@ -418,9 +416,7 @@ export default {
         id: row.id,
         status: row.status
       }
-      console.log(8888)
       changeStatus(param).then(response => {
-        console.log(response.data)
         if (response.data.code === 0) {
           this.$notify({
             title: '成功',

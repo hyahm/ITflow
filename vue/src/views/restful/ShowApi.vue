@@ -146,7 +146,6 @@ export default {
 
       apiResp(data).then(resp => {
         this.result = resp.data
-        console.log(this.result)
         // if (typeof(this.result) == 'object' && Object.prototype.toString.call(this.result).toLowerCase() == '[object object]' && !this.result.length){
         //   this.isjson = true
         // }

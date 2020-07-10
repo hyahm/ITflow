@@ -267,7 +267,6 @@ export default {
               }
             }
             if (this.form.checktype === 2) {
-              console.log(resp.data)
               const data = this.form
               data.id = resp.data.id
               data.opts = resp.data.opts

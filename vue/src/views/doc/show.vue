@@ -29,13 +29,10 @@ export default {
 
     },
     one() {
-      console.log(12222)
       this.projects.push(new Date())
-      console.log(this.projects)
     },
     addproject() {
       addProject().then(resp => {
-        console.log(resp.data)
       })
     }
   }

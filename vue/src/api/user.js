@@ -47,6 +47,14 @@ export function userList(data) {
   })
 }
 
+export function resetPwd(data) {
+  return request({
+    url: '/password/reset',
+    method: 'post',
+    data
+  })
+}
+
 export function userRemove(id) {
   return request({
     url: '/user/remove',

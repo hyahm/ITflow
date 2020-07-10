@@ -130,7 +130,6 @@ export default {
   methods: {
     getversionlist() {
       getVersion(this.listQuery).then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.list = resp.data.versionlist
           this.total = resp.data.versionlist.length

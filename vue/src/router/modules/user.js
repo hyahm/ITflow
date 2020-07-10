@@ -1,5 +1,7 @@
 import Layout from '@/layout'
 
+// 用户添加和管理的权限   usermanager
+
 const userRoute = {
   path: '/user',
   component: Layout,
@@ -17,7 +19,7 @@ const userRoute = {
       meta: {
         title: '添加用户',
         icon: 'edit',
-        roles: ['admin', 'user']
+        roles: ['admin', 'usermanager']
       }
     },
     {
@@ -49,15 +51,6 @@ const userRoute = {
         icon: 'user'
       }
     }
-    // {
-    //   path: 'changeinfo',
-    //   component: () => import('@/views/user/changeinfo'),
-    //   name: 'changeinfo',
-    //   meta: {
-    //     title: 'changeinfo',
-    //     icon: 'user'
-    //   }
-    // }
   ]
 }
 

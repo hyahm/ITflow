@@ -209,21 +209,18 @@ export default {
   },
   created() {
     this.getuserList()
-    this.getroles()
     this.getgrouplist()
   },
   methods: {
     getgrouplist() {
       getRoleGroup().then(resp => {
         if (resp.data.code === 0) {
-          this.rolegrouplist = resp.data.roles
-        } else {
-          this.$message.error(resp.data.msg)
+          this.rolegrouplist = resp.data.rolelist
         }
       })
       getStatusGroupName().then(resp => {
         if (resp.data.code === 0) {
-          this.statusgrouplist = resp.data.statuslist
+          this.statusgrouplist = resp.data.names
         } else {
           this.$message.error(resp.data.msg)
         }
@@ -236,15 +233,7 @@ export default {
         }
       })
     },
-    getroles() {
-      getRoleGroup().then(resp => {
-        if (resp.data.code === 0) {
-          this.rolelist = resp.data.roles
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
-    },
+
     cancel() {
       this.dialogVisible = false
     },
@@ -276,7 +265,7 @@ export default {
           this.$message.error(resp.data.msg)
         }
       }).catch(err => {
-        console.log(err)
+        this.$message.error(err)
       })
     },
     handlePermission(row) {
@@ -289,8 +278,6 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        console.log(3333)
-        console.log(row.id)
         userRemove(row.id).then(resp => {
           if (resp.data.code === 0) {
             const l = this.userlist.length
@@ -329,14 +316,16 @@ export default {
     },
     handleResetPwd(row) {
       this.$prompt('请输入密码', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消'
+        cancelButtonText: '取消',
+        confirmButtonText: '确定'
+
       }).then(({ value }) => {
         const data = {
           id: row.id,
           newpassword: value
         }
         resetPwd(data).then(resp => {
+          console.log(resp.data)
           if (resp.data.code === 0) {
             this.$message({
               type: 'success',

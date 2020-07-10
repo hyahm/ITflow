@@ -53,12 +53,10 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      console.log(state.token)
       getInfo(state.token).then(response => {
-        console.log('116666666666666661')
         const { data } = response
         console.log(data)
-        // console.log(data)
+
         if (data.code !== 0) {
           reject('Verification failed, please Login again.')
         }

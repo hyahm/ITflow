@@ -8,7 +8,7 @@ import (
 	"itflow/encrypt"
 	"itflow/internal/datalog"
 	"itflow/internal/response"
-	"itflow/internal/rolegroup"
+	"itflow/internal/role"
 	"itflow/internal/user"
 	"itflow/mail"
 	"itflow/model"
@@ -406,12 +406,9 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 
 func GetRoles(w http.ResponseWriter, r *http.Request) {
 
-	rl := &rolegroup.Roles{}
-	for _, v := range cache.CacheRidRole {
-		rl.Roles = append(rl.Roles, v)
-	}
-	send, _ := json.Marshal(rl)
-	w.Write(send)
+	rl := &role.RespRoles{}
+
+	w.Write(rl.List())
 	return
 
 }

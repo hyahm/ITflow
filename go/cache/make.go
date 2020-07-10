@@ -21,16 +21,18 @@ func initCache() {
 		CacheStatusSid[name] = id
 	}
 
-	rolerows, err := db.Mconn.GetRows("select id,role from roles")
+	rolerows, err := db.Mconn.GetRows("select id,role,info from roles")
 	if err != nil {
 		panic(err)
 	}
 	for rolerows.Next() {
 		var id int64
 		var name string
-		rolerows.Scan(&id, &name)
+		var info string
+		rolerows.Scan(&id, &name, &info)
 		CacheRidRole[id] = name
 		CacheRoleRid[name] = id
+		CacheRidInfo[id] = info
 	}
 
 	prows, err := db.Mconn.GetRows("select id,name from projectname")

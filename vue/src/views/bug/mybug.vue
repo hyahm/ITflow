@@ -298,7 +298,6 @@ export default {
       // 获取过滤后的bug
       this.listLoading = true
       searchMyBugs(this.listQuery).then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.list = resp.data.articlelist
           this.total = resp.data.total

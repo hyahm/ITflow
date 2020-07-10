@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"fmt"
 	"os"
 	"runtime"
 	"time"
@@ -36,6 +37,7 @@ type Email struct {
 // cached
 var (
 	CacheRidRole        map[int64]string
+	CacheRidInfo        map[int64]string
 	CacheRoleRid        map[string]int64
 	CachePidName        map[int64]string
 	CacheProjectPid     map[string]int64
@@ -98,6 +100,7 @@ func LoadConfig() {
 	}
 	CacheSidStatus = make(map[StatusId]Status, 0)
 	CacheRidGroup = make(map[int64]string, 0)
+	CacheRidInfo = make(map[int64]string, 0)
 	CacheRidRole = make(map[int64]string, 0)
 	CacheIidImportant = make(map[ImportantId]Important, 0)
 	CacheRoleRid = make(map[string]int64, 0)
@@ -132,8 +135,9 @@ func LoadConfig() {
 	CacheEmail = &Email{}
 
 	golog.Info("cookie过期时间为：", goconfig.ReadDuration("expiration", 120*time.Minute))
-
+	fmt.Println("++++++++++++++++++++++++++")
 	initCache()
+	fmt.Println("----------------------------------")
 	// 添加一个admin 用户的权限，默认全是1
 	cacheemail()
 

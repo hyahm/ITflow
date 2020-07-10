@@ -141,10 +141,8 @@ export default {
     getstatusgroups() {
       getStatusGroupName().then(resp => {
         if (resp.data.code === 0) {
-          console.log(resp.data)
           if (resp.data.names.length > 0) {
             this.statusgroups = resp.data.names
-            console.log(1111)
           }
         } else {
           this.$message.error(resp.data.msg)
@@ -153,7 +151,6 @@ export default {
     },
     getrolegroups() {
       getRoleGroup().then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           if (resp.data.rolelist !== null) {
             this.rolegroups = resp.data.rolelist
