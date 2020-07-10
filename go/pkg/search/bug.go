@@ -29,24 +29,23 @@ func (pl *BugList) GetPagingLimitAndPage() (int, int) {
 	if pl.Page < 1 {
 		pl.Page = 1
 	}
+	golog.Info(pl.Count)
+	golog.Info(pl.Limit)
 	// 超出了，返回最大的页码
 	if pl.Page*pl.Limit > pl.Count+pl.Limit {
 
 		if pl.Count%pl.Limit == 0 {
 			pl.Page = pl.Count / pl.Limit
-			return ((pl.Count / pl.Limit) - 1) * pl.Limit, pl.Limit
+			return (pl.Page - 1) * pl.Limit, pl.Limit
 		} else {
 			pl.Page = pl.Count/pl.Limit + 1
-			return (pl.Count/pl.Limit + 1) * pl.Limit, pl.Count % pl.Limit
+			return (pl.Page - 1) * pl.Limit, pl.Count % pl.Limit
 		}
 	} else {
-		// if count%limit == 0 {
-
-		start := (pl.Page - 1) * pl.Limit
-		if pl.Count-start < pl.Limit {
-			return start, pl.Count - start
+		if pl.Count%pl.Limit == 0 {
+			return (pl.Page - 1) * pl.Limit, pl.Limit
 		} else {
-			return start, pl.Limit
+			return (pl.Page - 1) * pl.Limit, pl.Count % pl.Limit
 		}
 
 	}
@@ -124,32 +123,30 @@ func (pl *BugList) GetMyBugs() []byte {
 
 func (pl *BugList) myTaskRows() (*sql.Rows, error) {
 	var err error
-
+	golog.Info(pl.CountSql)
 	countrows, err := db.Mconn.GetRows(pl.CountSql)
 	if err != nil {
 		golog.Error(err)
 		return nil, err
 	}
 	for countrows.Next() {
-		var isMyTask bool
 		var userlist string
 		countrows.Scan(&userlist)
 		for _, v := range strings.Split(userlist, ",") {
 			//判断用户是否存在，不存在就 删吗 ， 先不删
 			userid64, _ := strconv.ParseInt(v, 10, 64)
 			if userid64 == pl.Uid {
-				isMyTask = true
+				pl.Count++
+				break
 			}
 		}
-		if isMyTask {
-			pl.Count++
-		}
+
 	}
 	// 增加显示的状态
 
 	pl.ListSql += " order by id desc "
 	var rows *sql.Rows
-
+	golog.Info(pl.ListSql)
 	rows, err = db.Mconn.GetRows(pl.ListSql)
 
 	if err != nil {
@@ -173,6 +170,8 @@ func (pl *BugList) GetMyTasks() []byte {
 		return send
 	}
 	start, end := pl.GetPagingLimitAndPage()
+	golog.Info(start)
+	golog.Info(end)
 	var timer int
 	for rows.Next() {
 		one := &model.ArticleList{}

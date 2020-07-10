@@ -474,8 +474,18 @@ UNLOCK TABLES;
 --
 -- Table structure for table `roles`
 --
-
 DROP TABLE IF EXISTS `roles`;
+CREATE TABLE `roles` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `role` varchar(30) NOT NULL DEFAULT '',
+  `info` varchar(50) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `role` (`role`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 
+
+
+
+
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `roles` (

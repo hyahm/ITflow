@@ -99,7 +99,7 @@
     <div class="pagination-container">
       <el-pagination
         :current-page="listQuery.page"
-        :page-sizes="[10,15,20, 30]"
+        :page-sizes="[10]"
         :page-size="listQuery.limit"
         :total="total"
         background

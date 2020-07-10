@@ -94,7 +94,7 @@
     </el-table>
 
     <div class="pagination-container">
-      <el-pagination :current-page="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+      <el-pagination :current-page="listQuery.page" :page-sizes="[10]" :page-size="listQuery.limit" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
@@ -184,27 +184,21 @@ export default {
       listLoading: true,
       listQuery: {
         page: 1,
-        limit: 5,
+        limit: 10,
         importance: undefined,
         title: undefined,
         type: undefined,
         sort: '+id',
         status: []
       },
-      importanceOptions: [1, 2, 3, 4, 5],
       calendarTypeOptions,
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
       showReviewer: false,
       temp: {
         id: undefined,
-        // importance: 1,
         remark: '',
-        // timestamp: new Date(),
-        // title: '',
-        // type: '',
         status: '新建',
         selectusers: ''
-        // status: 'published'
       },
       changeaction: {
         id: 0,
