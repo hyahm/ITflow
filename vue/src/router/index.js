@@ -14,8 +14,8 @@ import system from './modules/system'
 import setting from './modules/setting'
 import userRoute from './modules/user'
 import bugRouter from './modules/bug'
-import shareRouter from './modules/sharefile'
-import restfulRouter from './modules/restful'
+// import shareRouter from './modules/sharefile'
+// import restfulRouter from './modules/restful'
 
 /** note: submenu only apppear when children.length>=1
  *  detail see  https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
@@ -89,7 +89,7 @@ export const asyncRouterMap = [
   userRoute,
   bugRouter,
   setting,
-  shareRouter,
-  restfulRouter,
+  // shareRouter,
+  // restfulRouter,
   { path: '*', redirect: '/404', hidden: true }
 ]
