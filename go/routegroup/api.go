@@ -5,7 +5,6 @@ import (
 	"itflow/midware"
 	"itflow/model"
 
-	"itflow/internal/defaults"
 	"itflow/internal/restful"
 
 	"github.com/hyahm/xmux"
@@ -14,7 +13,7 @@ import (
 var Api *xmux.GroupRoute
 
 func init() {
-	Api = xmux.NewGroupRoute().ApiCreateGroup("api", "与api文档相关的所有的", "api")
+	Api = xmux.NewGroupRoute().ApiCreateGroup("api", "与api文档相关的所有的", "接口文档")
 
 	Api.ApiCodeField("code").ApiCodeMsg("0", "成功")
 	Api.ApiCodeField("code").ApiCodeMsg("20", "token过期")
@@ -61,10 +60,6 @@ func init() {
 	Api.Pattern("/header/get").Post(handle.HeaderGet)
 
 	//---------------------------------------------------------
-	Api.Pattern("/default/status").Post(handle.DefaultStatus)
-
-	Api.Pattern("/default/save").Post(handle.DefaultSave).Bind(&defaults.ReqDefaultValue{}).
-		AddMidware(midware.JsonToStruct)
 
 	// Api.Pattern("/default/important").Post(handle.DefaultImportant)
 

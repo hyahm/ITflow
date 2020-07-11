@@ -41,6 +41,7 @@ func RunHttp() {
 	router.AddGroup(routegroup.Important)
 	router.AddGroup(routegroup.Log)
 	router.AddGroup(routegroup.UserGroup)
+	router.AddGroup(routegroup.DefaultValue)
 
 	router.AddGroup(routegroup.Email)
 	router.AddGroup(routegroup.Share)
