@@ -13,6 +13,7 @@ import (
 	"itflow/internal/user"
 	"itflow/model"
 	"net/http"
+	"time"
 
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
@@ -195,9 +196,9 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	basesql := "update bugs set sid=? where id=?"
+	basesql := "update bugs set sid=?,updatetime=? where id=?"
 
-	_, err := db.Mconn.Update(basesql, sid, param.Id)
+	_, err := db.Mconn.Update(basesql, sid, time.Now().Unix(), param.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

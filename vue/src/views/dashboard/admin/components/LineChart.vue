@@ -6,6 +6,7 @@
 import echarts from 'echarts'
 require('echarts/theme/macarons') // echarts theme
 import { debounce } from '@/utils'
+import { getBugCount } from '@/api/dashboard'
 
 export default {
   props: {
@@ -24,27 +25,26 @@ export default {
     autoResize: {
       type: Boolean,
       default: true
-    },
-    chartData: {
-      type: Object,
-      default: null
     }
+    // chartData: {
+    //   type: Object,
+    //   default: null
+    // }
   },
   data() {
     return {
-      chart: null
-    }
-  },
-  watch: {
-    chartData: {
-      deep: true,
-      handler(val) {
-        this.setOptions(val)
+      chart: null,
+      chartData: {
+        createdData: [],
+        completedData: [],
+        xData: []
       }
     }
   },
+
   mounted() {
-    this.initChart()
+    this.x()
+    this.getdata()
     if (this.autoResize) {
       this.__resizeHanlder = debounce(() => {
         if (this.chart) {
@@ -73,10 +73,29 @@ export default {
     this.chart = null
   },
   methods: {
-    setOptions({ expectedData, actualData } = {}) {
+    x() {
+      var data = new Date()
+      this.chartData.xData[0] = data.getDate()
+      for (var i = 0; i < 6; i++) {
+        var time = data.getTime() - 24 * 60 * 60 * 1000
+        data = new Date(time)
+        this.chartData.xData.unshift(data.getDate())
+      }
+    },
+    getdata() {
+      getBugCount().then(resp => {
+        this.chartData.createdData = resp.data.created
+        this.chartData.completedData = resp.data.completed
+        this.chart = echarts.init(this.$el, 'macarons')
+        this.setOptions(this.chartData)
+      })
+    },
+    setOptions(data) {
+      var { createdData, completedData, xData } = data
+      console.log(createdData)
       this.chart.setOption({
         xAxis: {
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          data: xData,
           boundaryGap: false,
           axisTick: {
             show: false
@@ -98,14 +117,14 @@ export default {
         },
         yAxis: {
           axisTick: {
-            show: false
+            show: true
           }
         },
         legend: {
-          data: ['expected', 'actual']
+          data: ['create', 'complate']
         },
         series: [{
-          name: 'expected', itemStyle: {
+          name: 'create', itemStyle: {
             normal: {
               color: '#FF005A',
               lineStyle: {
@@ -116,12 +135,12 @@ export default {
           },
           smooth: true,
           type: 'line',
-          data: expectedData,
+          data: createdData,
           animationDuration: 2800,
           animationEasing: 'cubicInOut'
         },
         {
-          name: 'actual',
+          name: 'complate',
           smooth: true,
           type: 'line',
           itemStyle: {
@@ -136,16 +155,13 @@ export default {
               }
             }
           },
-          data: actualData,
+          data: completedData,
           animationDuration: 2800,
           animationEasing: 'quadraticOut'
         }]
       })
-    },
-    initChart() {
-      this.chart = echarts.init(this.$el, 'macarons')
-      this.setOptions(this.chartData)
     }
+
   }
 }
 </script>

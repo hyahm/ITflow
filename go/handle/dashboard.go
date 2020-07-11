@@ -3,6 +3,7 @@ package handle
 import (
 	"encoding/json"
 	"itflow/db"
+	"itflow/internal/dashboard"
 	"itflow/internal/response"
 	"net/http"
 
@@ -46,6 +47,11 @@ func UserCount(w http.ResponseWriter, r *http.Request) {
 	w.Write(send)
 	return
 
+}
+
+func BugCount(w http.ResponseWriter, r *http.Request) {
+	w.Write(dashboard.GetCount())
+	return
 }
 
 type projectCount struct {

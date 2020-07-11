@@ -11,4 +11,5 @@ type PassBug struct {
 	SelectUsers []string     `json:"selectusers"  type:"string" need:"是" default:"" information:"转交的任务"`
 	Status      cache.Status `json:"status"  type:"string" need:"是" default:"" information:"转交后的状态"`
 	User        string       `json:"user"  type:"string" need:"是" default:"" information:"处理人"`
+	ProjectName string       `json:"projectname"  type:"string" need:"是" default:"" information:"项目名"`
 }

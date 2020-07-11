@@ -170,7 +170,7 @@ func initCache() {
 
 	//检查默认值是否只有一行
 	var checkdefaultcount int
-	err = db.Mconn.GetOne("select count(status) from defaultvalue").Scan(&checkdefaultcount)
+	err = db.Mconn.GetOne("select count(created) from defaultvalue").Scan(&checkdefaultcount)
 	if err != nil {
 		golog.Error(err)
 		panic(err)
@@ -206,11 +206,12 @@ func initCache() {
 	}
 
 	//默认值
-	var status StatusId
-	err = db.Mconn.GetOne("select status from defaultvalue").Scan(&status)
+	var created, complete StatusId
+	err = db.Mconn.GetOne("select created, completed from defaultvalue").Scan(&created, &complete)
 	if err != nil {
 		panic(err)
 	}
-	DefaultSid = status
+	DefaultCreateSid = created
+	DefaultCompleteSid = complete
 
 }

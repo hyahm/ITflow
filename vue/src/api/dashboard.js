@@ -30,3 +30,9 @@ export function getprojectlist() {
   })
 }
 
+export function getBugCount() {
+  return request({
+    url: '/dashboard/bugcount',
+    method: 'post'
+  })
+}

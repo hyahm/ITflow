@@ -1,7 +1,7 @@
 <template>
   <div>
     <p class="warn-content">
-      一个公司可能不止一个项目
+      如果删除的此项目的某参与者， 在他任务里面还是会显示，只不过没操作权限
     </p>
     <el-table
       :data="tableData"

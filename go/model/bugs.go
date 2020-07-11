@@ -55,6 +55,18 @@ type Bug struct {
 	Dustbin      bool
 }
 
+func GetCreatedCountByTime(start, end, statusid int64) (int, error) {
+	var count int
+	err := db.Mconn.GetOne("select count(id) from bugs where dustbin=0 and createtime between ? and ? and sid=?", start, end, statusid).Scan(&count)
+	return count, err
+}
+
+func GetCompletedCountByTime(start, end, statusid int64) (int, error) {
+	var count int
+	err := db.Mconn.GetOne("select count(id) from bugs where dustbin=0 and updatetime between ? and ? and sid=?", start, end, statusid).Scan(&count)
+	return count, err
+}
+
 func (bug *Bug) Resume(id interface{}) error {
 	getlistsql := "update bugs set dustbin=0 where id=?"
 

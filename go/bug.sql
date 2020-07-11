@@ -122,8 +122,8 @@ DROP TABLE IF EXISTS `defaultvalue`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `defaultvalue` (
-  `status` bigint(20) NOT NULL DEFAULT '0',
-  `important` bigint(20) NOT NULL DEFAULT '0',
+  `created` bigint(20) NOT NULL DEFAULT '0',
+  `completed` bigint(20) NOT NULL DEFAULT '0',
   `level` bigint(20) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

@@ -65,7 +65,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	if cache.DefaultSid.ToInt64() == sid {
+	if cache.DefaultCreateSid.ToInt64() == sid {
 		w.Write(errorcode.Error("this status is set to default, can not remove. you can change to other status and delete"))
 		return
 

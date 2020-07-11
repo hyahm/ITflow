@@ -5,7 +5,8 @@ import (
 )
 
 type RespDefaultStatus struct {
-	Status cache.Status `json:"defaultstatus"`
-	Code   int          `json:"code"`
-	Msg    string       `json:"message,omitempty"`
+	Created   cache.Status `json:"created"`
+	Completed cache.Status `json:"completed"`
+	Code      int          `json:"code"`
+	Msg       string       `json:"message,omitempty"`
 }

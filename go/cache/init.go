@@ -49,7 +49,8 @@ var (
 	CacheUidNickName    map[int64]string
 	CacheRidGroup       map[int64]string
 	CacheUidFilter      map[int64]StoreStatusId
-	DefaultSid          StatusId
+	DefaultCreateSid    StatusId
+	DefaultCompleteSid  StatusId
 
 	CacheUidRid  map[int64]int64
 	CacheUidJid  map[int64]int64

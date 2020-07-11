@@ -166,8 +166,6 @@ func (pl *BugList) GetMyTasks() []byte {
 		return send
 	}
 	start, end := pl.GetPagingLimitAndPage()
-	golog.Info(start)
-	golog.Info(end)
 	var timer int
 	for rows.Next() {
 		one := &model.ArticleList{}

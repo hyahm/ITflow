@@ -6,10 +6,12 @@ import (
 )
 
 type DefaultValue struct {
-	Status cache.StatusId // statusid
+	Created   cache.StatusId // statusid
+	Completed cache.StatusId // statusid
+
 }
 
 func (dv *DefaultValue) Update() error {
-	_, err := db.Mconn.Update("update defaultvalue set status=?", dv.Status)
+	_, err := db.Mconn.Update("update defaultvalue set created=?,completed=?", dv.Created, dv.Completed)
 	return err
 }

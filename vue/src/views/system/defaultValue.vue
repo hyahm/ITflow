@@ -3,8 +3,8 @@
     <p class="warn-content">
       某些选项的默认值
     </p>
-    <div style="margin: 10px 0 10px 10px"> 新建bug的状态:
-      <el-select v-model="defaultstatus" placeholder="Select" @change="handleChangeStatus">
+    <div style="margin: 10px 0 10px 10px"> bug创建时的状态:
+      <el-select v-model="form.created" placeholder="Select" @change="handleCreated">
         <el-option
           v-for="(status, index) in statuslist"
           :key="index"
@@ -13,17 +13,17 @@
         />
       </el-select>
     </div>
-    <!-- <div style="margin: 10px 0 10px 10px"> 重要程度:
-      <el-select v-model="form.defaultimportant" placeholder="Select" @change="handleChangeimportants">
+    <div style="margin: 10px 0 10px 10px"> bug完成时的状态:
+      <el-select v-model="form.completed" placeholder="Select" @change="handleCompleted">
         <el-option
-          v-for="(important, index) in importants"
+          v-for="(status, index) in statuslist"
           :key="index"
-          :label="important"
-          :value="important"
+          :label="status"
+          :value="status"
         />
       </el-select>
     </div>
-    <div style="margin: 10px 0 10px 10px"> 严重级别:
+    <!-- <div style="margin: 10px 0 10px 10px"> 严重级别:
       <el-select v-model="form.defaultlevel" placeholder="Select" @change="handleChangeLevel">
         <el-option
           v-for="(important, index) in levels"
@@ -44,12 +44,12 @@ export default {
   name: 'DefaultValue',
   data() {
     return {
-      // form: {
-      //   defaultstatus: '',
-      //   defaultimportant: '',
-      //   defaultlevel: ''
-      // },
-      defaultstatus: '',
+      form: {
+        created: '',
+        completed: ''
+        // defaultlevel: ''
+      },
+
       statuslist: [],
       importants: [],
       levels: []
@@ -58,18 +58,12 @@ export default {
   created() {
     this.getdefaultstatus()
     this.getstatuslist()
-    // this.getimportantlist()
-    // this.getlevels()
-    // this.getdefaultimportant()
-    // this.getdefaultlevel()
   },
   methods: {
     getlevels() {
       getLevels().then(resp => {
         if (resp.data.code === 0) {
-          if (resp.data.levels !== null) {
-            this.levels = resp.data.levels
-          }
+          this.levels = resp.data.levels
         } else {
           this.$message.error(resp.data.message)
         }
@@ -87,9 +81,7 @@ export default {
     getimportantlist() {
       getImportants().then(resp => {
         if (resp.data.code === 0) {
-          if (resp.data.importantlist !== null) {
-            this.importants = resp.data.importants
-          }
+          this.importants = resp.data.importants
         } else {
           this.$message.error(resp.data.message)
         }
@@ -106,9 +98,10 @@ export default {
     },
     getdefaultstatus() {
       status().then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
-          this.defaultstatus = resp.data.defaultstatus
+          console.log(resp.data)
+          this.form.created = resp.data.created
+          this.form.completed = resp.data.completed
         } else {
           this.$message.error(resp.data.message)
         }
@@ -117,29 +110,23 @@ export default {
     getstatuslist() {
       getStatus().then(resp => {
         if (resp.data.code === 0) {
-          if (resp.data.statuslist !== null) {
-            this.statuslist = resp.data.statuslist
-          }
+          this.statuslist = resp.data.statuslist
         } else {
           this.$message.error(resp.data.message)
         }
       })
     },
-    handleChangeimportants(e) {
-      this.form.defaultimportant = e
+    handleCompleted(e) {
+      this.form.completed = e
     },
-    handleChangeStatus(e) {
-      this.defaultstatus = e
+    handleCreated(e) {
+      this.form.created = e
     },
     handleChangeLevel(e) {
       this.form.defaultlevel = e
     },
     handleSave() {
-      const data = {
-        'defaultstatus': this.defaultstatus
-      }
-      save(data).then(resp => {
-        console.log(resp.data)
+      save(this.form).then(resp => {
         if (resp.data.code === 0) {
           this.$message.success('保存成功')
         } else {

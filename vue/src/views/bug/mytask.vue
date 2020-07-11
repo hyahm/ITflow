@@ -198,7 +198,8 @@ export default {
         id: undefined,
         remark: '',
         status: '新建',
-        selectusers: ''
+        selectusers: '',
+        projectname: ''
       },
       changeaction: {
         id: 0,
@@ -357,11 +358,19 @@ export default {
     handlePass(row) {
       this.temp.id = parseInt(row.id) // copy obj
       this.temp.status = row.status
-      this.temp.selectusers = row.handle
+      this.temp.projectname = row.projectname
+      this.temp.selectusers = []
       this.users = []
       getProjectUser(row.projectname).then(resp => {
         if (resp.data.code === 0) {
           this.users = resp.data.name
+          for (var i = 0; i < this.users.length; i++) {
+            for (var j = 0; j < row.handle.selectusers.length; j++) {
+              if (row.temp.selectusers[j] === this.users[i]) {
+                this.temp.selectusers.push(this.users[i])
+              }
+            }
+          }
         } else {
           this.$message.error(resp.data.message)
         }
@@ -369,6 +378,11 @@ export default {
       this.dialogFormVisible = true
     },
     updateData() {
+      if (this.temp.selectusers.length === 0) {
+        this.$message.error('至少选择一个处理人')
+        return
+      }
+
       passBug(this.temp).then(resp => {
         if (resp.data.code === 0) {
           const data = resp.data

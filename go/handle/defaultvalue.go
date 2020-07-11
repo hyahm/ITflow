@@ -17,7 +17,8 @@ func DefaultStatus(w http.ResponseWriter, r *http.Request) {
 
 	sl := &defaults.RespDefaultStatus{}
 	//如果是管理员的话,所有的都可以
-	sl.Status = cache.DefaultSid.Name()
+	sl.Created = cache.DefaultCreateSid.Name()
+	sl.Completed = cache.DefaultCompleteSid.Name()
 	send, _ := json.Marshal(sl)
 	w.Write(send)
 	return
