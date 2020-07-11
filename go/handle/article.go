@@ -112,7 +112,6 @@ func GetProjectUser(w http.ResponseWriter, r *http.Request) {
 	// 通过project 来获取所属用户
 	projectname := r.FormValue("name")
 	uid := xmux.GetData(r).Get("uid").(int64)
-	golog.Info("222222222")
 	// 先要判断下， 这个用户是否有这个项目的权限
 	w.Write(project.GetUsersByProjectName(uid, projectname))
 	return
