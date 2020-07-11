@@ -1,11 +1,13 @@
 ### 简介
-  一个开源的bug管理系统，IT人员开发全过程，文件存储，接口文档, 单接口测试功能  
+  一个开源的bug管理系统，IT人员开发全过程，文件存储，接口文档, 单接口测试功能   
+  bug管理功能基本能满足90%以上的需求， 其他需求可以自己开发，也可以提交issues    
+  文件存储和接口文档长时间不会更新，有很多bug， 不建议使用   
  
 
 文档地址： http://itflow.doc.hyahm.com  
 路由接口文档地址： http://hyahm.com:10001/docs （配合新前端不断更新中）
 
-新前端地址：  https://github.com/jiandanzhiyun/vue-elementAdmin （开发完成后会替换掉老的前端）    
+新前端地址：  https://github.com/jiandanzhiyun/vue-elementAdmin   
 
 ### 功能
 - [x] 增加bug，改变bug状态，转交bug 
@@ -33,6 +35,7 @@
 - [x] 增加接口测试  
 - [x] go代码优化
 - [x] vue代码优化
+- [x] 项目管理增加用户权限
 - [x] 为了更好的使用，增加消息提示
 - [ ] 增加docker-compose一条命令启动服务
 
