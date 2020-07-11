@@ -26,7 +26,7 @@
         </el-row>
 
         <el-form-item style="display: inline-block;width: 300px" label="项目名称：">
-          <el-select v-model="postForm.projectname" placeholder="请选择">
+          <el-select v-model="postForm.projectname" placeholder="请选择" @change="changeProject(postForm.projectname)">
             <el-option
               v-for="(item, index) in projectnames"
               :key="index"
@@ -117,7 +117,7 @@ import Sticky from '@/components/Sticky' // 粘性header组件
 import { validateURL } from '@/utils/validate'
 import { fetchBug, createBug } from '@/api/bugs'
 import { uploadImg } from '@/api/uploadimg'
-import { getEnv, getProject, getUsers, getVersion, getLevels, getImportants } from '@/api/get'
+import { getEnv, getMyProject, getVersion, getLevels, getImportants, getProjectUser } from '@/api/get'
 
 const defaultForm = {
   // status: 'draft',
@@ -184,9 +184,6 @@ export default {
   },
   created() {
     this.getimportants()
-    // this.defaultimportant()
-    // this.defaultlevel()
-    this.getuser()
     this.getproject()
     this.getversion()
     this.getlevels()
@@ -200,6 +197,20 @@ export default {
     }
   },
   methods: {
+    changeProject(name) {
+      // 选择不用项目会显示不同的用户
+      this.users = []
+      getProjectUser(name).then(resp => {
+        console.log(resp.data)
+        if (resp.data.code === 0) {
+          this.users = resp.data.name
+          this.postForm.selectuser = []
+        } else {
+          this.$message.error(resp.data.message)
+        }
+        //
+      })
+    },
     getimportants() {
       getImportants().then(resp => {
         if (resp.data.code === 0) {
@@ -214,9 +225,7 @@ export default {
     getlevels() {
       getLevels().then(resp => {
         if (resp.data.code === 0) {
-          if (resp.data.levels !== null) {
-            this.levels = resp.data.levels
-          }
+          this.levels = resp.data.levels
         } else {
           this.$message.error(resp.data.message)
         }
@@ -232,9 +241,10 @@ export default {
       })
     },
     getproject() {
-      getProject().then(resp => {
+      getMyProject().then(resp => {
+        console.log(resp.data)
         if (resp.data.code === 0) {
-          this.projectnames = resp.data.projectlist
+          this.projectnames = resp.data.name
         } else {
           this.$message.error(resp.data.message)
         }
@@ -251,19 +261,7 @@ export default {
         this.$message.error(err)
       })
     },
-    getuser() {
-      getUsers().then(resp => {
-        if (resp.data.code === 0) {
-          if (resp.data.users !== null) {
-            this.users = resp.data.users
-          } else {
-            this.$message.error(resp.data.message)
-          }
-        }
-      }).catch(err => {
-        this.$message.error(err)
-      })
-    },
+
     fetchData(id) {
       fetchBug(id).then(resp => {
         if (resp.data.code === 0) {

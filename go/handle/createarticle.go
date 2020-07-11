@@ -5,6 +5,7 @@ import (
 	"itflow/cache"
 	"itflow/internal/bug"
 	"itflow/internal/datalog"
+	"itflow/internal/project"
 	"itflow/internal/response"
 	"net/http"
 	"time"
@@ -29,6 +30,17 @@ func GetProject(w http.ResponseWriter, r *http.Request) {
 	}
 	send, _ := json.Marshal(pl)
 	w.Write(send)
+	return
+
+}
+
+func GetMyProject(w http.ResponseWriter, r *http.Request) {
+	myproject := &project.MyProject{
+		Name: make([]string, 0),
+	}
+	uid := xmux.GetData(r).Get("uid").(int64)
+
+	w.Write(myproject.Get(uid))
 	return
 
 }

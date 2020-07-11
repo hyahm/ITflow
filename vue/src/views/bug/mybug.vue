@@ -116,7 +116,7 @@ import { closeBug, changeStatus } from '@/api/bugs'
 import { searchMyBugs } from '@/api/search'
 import { statusFilter } from '@/api/status'
 import waves from '@/directive/waves' // 水波纹指令
-import { getProject, getStatus, getShowStatus, getPermStatus, getLevels } from '@/api/get'
+import { getMyProject, getStatus, getShowStatus, getPermStatus, getLevels } from '@/api/get'
 // import { PlatformDropdown } from './components/Dropdown'
 
 const calendarTypeOptions = [
@@ -236,9 +236,9 @@ export default {
       })
     },
     getpname() {
-      getProject().then(resp => {
+      getMyProject().then(resp => {
         if (resp.data.code === 0) {
-          this.projectnames = resp.data.projectlist
+          this.projectnames = resp.data.name
         } else {
           this.$message.error(resp.data.message)
         }

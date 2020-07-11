@@ -25,6 +25,17 @@
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.projectname }}</span>
         </template>
+
+      </el-table-column>
+
+      <el-table-column
+        label="参与者"
+        width="800"
+      >
+
+        <template slot-scope="scope">
+          <span style="margin-left: 10px">{{ scope.row.selectuser }}</span>
+        </template>
       </el-table-column>
       <el-table-column label="操作" width="200">
         <template slot-scope="scope">
@@ -35,7 +46,7 @@
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.row.id)"
+            @click="handleDelete(scope.row.selectuser)"
           >删除</el-button>
         </template>
       </el-table-column>
@@ -46,16 +57,29 @@
         <el-form-item label="项目名">
           <el-input v-model="form.projectname" width="200" auto-complete="off" />
         </el-form-item>
+
+        <el-form-item style="display: inline-block;width: 300px" label="参与者：">
+          <el-select v-model="form.selectuser" multiple placeholder="参与者">
+            <el-option
+              v-for="(item, index) in users"
+              :key="index"
+              :label="item"
+              :value="item"
+            />
+          </el-select>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="cancel">取 消</el-button>
         <el-button type="primary" @click="confirm">确 定</el-button>
       </div>
+
     </el-dialog>
   </div>
 </template>
 
 <script>
+import { getUsers } from '@/api/get'
 import { getProjectName, addProjectName, updateProjectName, deleteProjectName } from '@/api/project'
 export default {
   name: 'Addproject',
@@ -64,24 +88,36 @@ export default {
       dialogFormVisible: false,
       form: {
         projectname: '',
-        delivery: false,
+        selectuser: [],
         id: -1
       },
+      users: [],
       formLabelWidth: '120px',
       tableData: []
     }
   },
   created() {
+    this.getuser()
     this.getprojectname()
   },
   methods: {
+    getuser() {
+      getUsers().then(resp => {
+        if (resp.data.code === 0) {
+          if (resp.data.users !== null) {
+            this.users = resp.data.users
+          } else {
+            this.$message.error(resp.data.message)
+          }
+        }
+      }).catch(err => {
+        this.$message.error(err)
+      })
+    },
     getprojectname() {
       getProjectName().then(resp => {
+        console.log(resp.data)
         if (resp.data.code === 0) {
-          if (resp.data.projectlist === null) {
-            this.$message.info('no data')
-            return
-          }
           this.tableData = resp.data.projectlist
         } else {
           this.$message.error(resp.data.message)
@@ -90,6 +126,8 @@ export default {
     },
     addProject() {
       this.form.id = -1
+      this.form.projectname = ''
+      this.form.selectuser = []
       this.dialogFormVisible = true
     },
     handleDelete(id) {
@@ -113,19 +151,22 @@ export default {
       })
     },
     updatep(row) {
+      this.form = row
       this.dialogFormVisible = true
-      this.form.id = row.id
-      this.form.projectname = row.projectname
     },
     confirm() {
       this.dialogFormVisible = false
-      if (this.form.id === -1) {
-        addProjectName(this.form.projectname).then(resp => {
+      if (this.form.projectname === '') {
+        this.$message.success('至少选择一个名称')
+      }
+      if (this.form.selectuser.length === 0) {
+        this.$message.success('至少选择一个参与者')
+      }
+      if (this.form.id <= 0) {
+        addProjectName(this.form).then(resp => {
           if (resp.data.code === 0) {
-            this.tableData.push({
-              id: resp.data.id,
-              projectname: this.form.projectname
-            })
+            this.form.id = resp.data.id
+            this.tableData.push(this.form)
             this.$message.success('添加成功')
           } else {
             this.$message.error('添加错误')
@@ -141,7 +182,7 @@ export default {
             const fl = this.tableData.length
             for (let i = 0; i < fl; i++) {
               if (this.tableData[i].id === this.form.id) {
-                this.tableData[i].projectname = this.form.projectname
+                this.tableData[i] = this.form
                 break
               }
             }

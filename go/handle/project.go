@@ -16,38 +16,23 @@ import (
 
 func ProjectList(w http.ResponseWriter, r *http.Request) {
 
-	projects := &project.ProjectList{}
-
-	for k, v := range cache.CachePidName {
-		pr := &project.Project{
-			Id:          k,
-			ProjectName: v,
-		}
-		projects.Plist = append(projects.Plist, pr)
-	}
-
-	send, _ := json.Marshal(projects)
-	w.Write(send)
+	w.Write(project.GetList())
 	return
 
 }
 
 func AddProject(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
-
-	name := r.FormValue("name")
-
-	getaritclesql := "insert into projectname(name) values(?)"
-	var err error
-	errorcode.Id, err = db.Mconn.Insert(getaritclesql, name)
+	data := xmux.GetData(r).Data.(*project.ReqProject)
+	uid := xmux.GetData(r).Get("uid").(int64)
+	send, err := data.Add(uid)
 	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		w.Write(send)
 		return
 	}
-	// 增加日志
 	nickname := xmux.GetData(r).Get("nickname").(string)
+	w.Write(send)
+
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
@@ -55,46 +40,25 @@ func AddProject(w http.ResponseWriter, r *http.Request) {
 		Action:   "add",
 	}
 
-	// 更新缓存
-	cache.CacheProjectPid[name] = errorcode.Id
-	cache.CachePidName[errorcode.Id] = name
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
-	return
-
 }
 
 func UpdateProject(w http.ResponseWriter, r *http.Request) {
-
-	errorcode := &response.Response{}
-
-	pr := xmux.GetData(r).Data.(*project.Project)
-
-	getaritclesql := "update projectname set name=? where id=?"
-
-	_, err := db.Mconn.Update(getaritclesql, pr.ProjectName, pr.Id)
+	data := xmux.GetData(r).Data.(*project.ReqProject)
+	uid := xmux.GetData(r).Get("uid").(int64)
+	send, err := data.Update(uid)
 	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		w.Write(send)
 		return
 	}
 	nickname := xmux.GetData(r).Get("nickname").(string)
+	w.Write(send)
+
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,
 		Classify: "project",
 		Action:   "update",
 	}
-
-	// 更新缓存
-	delete(cache.CacheProjectPid, cache.CachePidName[int64(pr.Id)])
-	cache.CachePidName[int64(pr.Id)] = pr.ProjectName
-	cache.CacheProjectPid[pr.ProjectName] = int64(pr.Id)
-
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
-	return
-
 }
 
 func DeleteProject(w http.ResponseWriter, r *http.Request) {
@@ -122,7 +86,7 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	getaritclesql := "delete from projectname where id=?"
+	getaritclesql := "delete from project where id=?"
 
 	_, err = db.Mconn.Insert(getaritclesql, id)
 	if err != nil {

@@ -399,13 +399,13 @@ LOCK TABLES `options` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `projectname`
+-- Table structure for table `project`
 --
 
-DROP TABLE IF EXISTS `projectname`;
+DROP TABLE IF EXISTS `project`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `projectname` (
+CREATE TABLE `project` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
@@ -414,12 +414,12 @@ CREATE TABLE `projectname` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `projectname`
+-- Dumping data for table `project`
 --
 
-LOCK TABLES `projectname` WRITE;
-/*!40000 ALTER TABLE `projectname` DISABLE KEYS */;
-/*!40000 ALTER TABLE `projectname` ENABLE KEYS */;
+LOCK TABLES `project` WRITE;
+/*!40000 ALTER TABLE `project` DISABLE KEYS */;
+/*!40000 ALTER TABLE `project` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

@@ -136,7 +136,7 @@
 </template>
 
 <script>
-import { getUsers, getPermStatus, getProject, getStatus, getShowStatus, getLevels } from '@/api/get'
+import { getUsers, getPermStatus, getMyProject, getStatus, getShowStatus, getLevels, getProjectUser } from '@/api/get'
 import { passBug, changeStatus } from '@/api/bugs'
 import { searchMyTasks } from '@/api/search'
 import { statusFilter } from '@/api/status'
@@ -232,19 +232,14 @@ export default {
       statuslength: 0
     }
   },
-  activated() {
-    this.getstatus()
-    this.getlevels()
-    this.handleFilter()
-  },
-  mounted() {
-    this.getspuser()
-  },
+
   created() {
     this.getstatus()
     this.getmystatus()
     this.handleFilter()
+    this.getlevels()
     this.getpname()
+    this.getspuser()
     // this.gettaskstatus()
   },
   methods: {
@@ -298,9 +293,10 @@ export default {
       })
     },
     getpname() {
-      getProject().then(resp => {
+      getMyProject().then(resp => {
+        console.log(resp.data)
         if (resp.data.code === 0) {
-          this.projectnames = resp.data.projectlist
+          this.projectnames = resp.data.name
         } else {
           this.$message.error(resp.data.message)
         }
@@ -362,6 +358,14 @@ export default {
       this.temp.id = parseInt(row.id) // copy obj
       this.temp.status = row.status
       this.temp.selectusers = row.handle
+      this.users = []
+      getProjectUser(row.projectname).then(resp => {
+        if (resp.data.code === 0) {
+          this.users = resp.data.name
+        } else {
+          this.$message.error(resp.data.message)
+        }
+      })
       this.dialogFormVisible = true
     },
     updateData() {

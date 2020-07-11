@@ -44,4 +44,5 @@ func init() {
 		AddMidware(midware.JsonToStruct)
 
 	User.Pattern("/get/user").Post(handle.GetUser)
+	User.Pattern("/get/project/user").Get(handle.GetProjectUser)
 }

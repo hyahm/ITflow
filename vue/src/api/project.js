@@ -7,11 +7,11 @@ export function getProjectName() {
   })
 }
 
-export function addProjectName(name) {
+export function addProjectName(data) {
   return request({
     url: '/project/add',
     method: 'post',
-    params: { name }
+    data
   })
 }
 
@@ -19,7 +19,7 @@ export function updateProjectName(data) {
   return request({
     url: '/project/update',
     method: 'post',
-    data: data
+    data
   })
 }
 

@@ -50,7 +50,7 @@
         </el-form-item>
         <!-- <el-checkbox-group v-model="perm"> -->
         <div v-for="(role, index) in form.rolelist" :key="index">
-          <label class="name">{{ role.name }}</label>
+          <!-- <label class="name">{{ role.name }}</label> -->
           <!-- <el-checkbox v-model="role.checked" :label="role.name" style="width:150px" @change="changeChecked(role)" /> -->
           <el-checkbox v-model="role.select" style="width:50px" label="select" @change="changeChecked(role)" />
           <el-checkbox v-model="role.add" :disabled="!role.select" style="width:50px" label="add" />

@@ -28,10 +28,19 @@ export function getProject() {
   })
 }
 
-export function getUsers() {
+export function getMyProject() {
+  return request({
+    url: '/get/myproject',
+    method: 'post'
+  })
+}
+
+// 获取某项目的用户真实姓名
+export function getUsers(data) {
   return request({
     url: '/get/user',
-    method: 'post'
+    method: 'post',
+    data
   })
 }
 
@@ -89,5 +98,13 @@ export function getLevels() {
   return request({
     url: '/get/levels',
     method: 'post'
+  })
+}
+
+export function getProjectUser(name) {
+  return request({
+    url: '/get/project/user',
+    method: 'get',
+    params: { name }
   })
 }

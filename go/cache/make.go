@@ -35,7 +35,7 @@ func initCache() {
 		CacheRidInfo[id] = info
 	}
 
-	prows, err := db.Mconn.GetRows("select id,name from projectname")
+	prows, err := db.Mconn.GetRows("select id,name from project")
 	if err != nil {
 		panic(err)
 	}
