@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/hyahm/cachetable"
-	"github.com/hyahm/golog"
 )
 
 const (
@@ -35,7 +34,6 @@ func InitCacheTable() {
 	}
 
 	Table, _ = ct.Use(TOKEN)
-	golog.Infof("%+v", Table)
 	Table.SetKeys(TOKEN)
 
 	go ct.Clean(time.Second * 10)

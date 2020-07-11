@@ -17,7 +17,7 @@ func init() {
 	Admin.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
 	Admin.ApiCodeField("code").ApiCodeMsg("其他错误", "请查看返回的msg")
 	Admin.Pattern("/dashboard/usercount").Post(handle.UserCount)
-	Admin.Pattern("/dashboard/projectcount").Post(handle.ProjectCount)
+
 	Admin.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
 	Admin.Pattern("/admin/reset").Get(handle.Reset)

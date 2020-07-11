@@ -32,6 +32,6 @@ func (qdv *ReqDefaultValue) Save() error {
 	}
 	// 	// 更新缓存
 	cache.DefaultCreateSid = sid
-	cache.DefaultCompleteSid = sid
+	cache.DefaultCompleteSid = cid
 	return nil
 }

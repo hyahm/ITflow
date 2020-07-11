@@ -37,8 +37,7 @@ func DefaultSave(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	// cache.CacheDefault["important"] = iid
-	// cache.CacheDefault["level"] = lid
+
 	w.Write(errorcode.Success())
 	return
 
