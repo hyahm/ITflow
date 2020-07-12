@@ -204,6 +204,7 @@ export default {
         console.log(resp.data)
         if (resp.data.code === 0) {
           this.users = resp.data.name
+          this.versions = resp.data.versions
           this.postForm.selectuser = []
         } else {
           this.$message.error(resp.data.message)

@@ -8,9 +8,10 @@ import (
 )
 
 type MyProject struct {
-	Name []string `json:"name"`
-	Code int      `json:"code"`
-	Msg  string   `json:"message"`
+	Name     []string `json:"name"`
+	Versions []string `json:"versions"`
+	Code     int      `json:"code"`
+	Msg      string   `json:"message"`
 }
 
 func (mp *MyProject) Marshal() []byte {

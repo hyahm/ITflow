@@ -10,7 +10,7 @@ import (
 // 通过project 获取用户
 
 func GetUsersByProjectName(userid int64, name cache.Project) []byte {
-
+	// 获取所属用户和所属版本
 	resp := &MyProject{
 		Name: make([]string, 0),
 	}
@@ -44,5 +44,14 @@ func GetUsersByProjectName(userid int64, name cache.Project) []byte {
 		resp.Msg = "你没有此项目权限"
 		return resp.Marshal()
 	}
+	version := &model.Version{}
+	ps, err := version.GetProjectNameByPid(name.Id())
+	if err != nil {
+		resp.Name = make([]string, 0)
+		resp.Code = 1
+		resp.Msg = err.Error()
+		return resp.Marshal()
+	}
+	resp.Versions = ps
 	return resp.Marshal()
 }
