@@ -38,8 +38,6 @@ var (
 	CacheRidRole        map[int64]string
 	CacheRidInfo        map[int64]string
 	CacheRoleRid        map[string]int64
-	CachePidName        map[int64]string
-	CacheProjectPid     map[string]int64
 	CacheEidName        map[int64]string
 	CacheEnvNameEid     map[string]int64
 	CacheUidRealName    map[int64]string
@@ -105,7 +103,7 @@ func LoadConfig() {
 	CacheIidImportant = make(map[ImportantId]Important, 0)
 	CacheRoleRid = make(map[string]int64, 0)
 	CacheImportantIid = make(map[Important]ImportantId, 0)
-	CachePidName = make(map[int64]string, 0)
+	CachePidProject = make(map[ProjectId]Project, 0)
 	CacheUidSgid = make(map[int64]int64, 0)
 	CacheUidRid = make(map[int64]int64, 0)
 	CacheEidName = make(map[int64]string, 0)
@@ -116,7 +114,7 @@ func LoadConfig() {
 	CacheNickNameUid = make(map[string]int64, 0)
 	CacheStatusSid = make(map[Status]StatusId, 0)
 	CacheRealNameUid = make(map[string]int64, 0)
-	CacheProjectPid = make(map[string]int64, 0)
+	CacheProjectPid = make(map[Project]ProjectId, 0)
 	CacheVersionNameVid = make(map[string]int64, 0)
 	CacheEnvNameEid = make(map[string]int64, 0)
 	CacheLidLevel = make(map[LevelId]Level, 0)

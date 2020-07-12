@@ -8,7 +8,6 @@ import (
 	"itflow/db"
 	"itflow/internal/response"
 	"itflow/model"
-	network "itflow/model"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -29,7 +28,7 @@ func ShareList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	nickname := xmux.GetData(r).Get("nickname").(string)
-	fd := &network.List_sharelist{}
+	fd := &model.List_sharelist{}
 	uid := cache.CacheNickNameUid[nickname]
 	path := r.FormValue("path")
 	grows, err := db.Mconn.GetRows("select id,ids from usergroup")
@@ -63,7 +62,7 @@ func ShareList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for rows.Next() {
-		od := &network.Data_sharefile{}
+		od := &model.Data_sharefile{}
 		var oid int64
 		var rid int64
 		var wid int64

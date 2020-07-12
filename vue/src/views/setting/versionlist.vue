@@ -45,8 +45,12 @@
           <span>{{ scope.row.date | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column label="版本" width="90px" align="center">
+      <el-table-column label="项目名" width="150px" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.project }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="版本号" width="90px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
           <!--<svg-icon v-for="n in +scope.row.importance" icon-class="star" class="meta-item__icon" :key="n"></svg-icon>-->
@@ -84,7 +88,17 @@
 
     <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" width="60%" title="版本管理">
       <el-form :model="form">
-        <el-form-item label-width="100" label="版本名">
+        <el-form-item label-width="100" label="项目名">
+          <el-select v-model="form.project" placeholder="请选择">
+            <el-option
+              v-for="(item, index) in projects"
+              :key="index"
+              :label="item"
+              :value="item"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label-width="100" label="版本号">
           <el-input v-model="form.name" auto-complete="off" />
         </el-form-item>
         <el-form-item label-width="100" label="地址一">
@@ -105,6 +119,7 @@
 
 <script>
 import { getVersion, removeVersion, updateVersion, addVersion } from '@/api/version'
+import { getMyProject } from '@/api/get'
 export default {
   name: 'Versionlist',
   data() {
@@ -112,6 +127,7 @@ export default {
       list: [],
       dialogFormVisible: false,
       listLoading: false,
+      projects: [],
       tableKey: 0,
       listQuery: {
         page: 1,
@@ -122,19 +138,32 @@ export default {
         id: -1,
         name: '',
         url: '',
-        bakurl: ''
+        bakurl: '',
+        project: ''
       }
     }
   },
   created() {
     this.getversionlist()
+    this.getproject()
   },
   methods: {
+    getproject() {
+      getMyProject().then(resp => {
+        console.log(resp.data)
+        if (resp.data.code === 0) {
+          this.projects = resp.data.name
+        } else {
+          this.$message.error(resp.data.message)
+        }
+      })
+    },
     add() {
       this.form.id = -1
       this.form.name = ''
       this.form.url = ''
       this.form.bakurl = ''
+      this.form.project = ''
       this.dialogFormVisible = true
     },
     getversionlist() {
@@ -162,6 +191,7 @@ export default {
       this.form.name = row.name
       this.form.url = row.url
       this.form.bakurl = row.bakurl
+      this.form.project = row.project
     },
     confirm() {
       if (this.form.id <= 0) {
@@ -170,6 +200,9 @@ export default {
             var row = this.form
             row.id = response.data.id
             row.date = response.data.updatetime
+            row.url = response.data.url
+            row.bakurl = response.data.bakurl
+            row.project = response.data.project
             this.list.unshift(row)
             this.$message.success('添加成功')
           } else {
@@ -184,8 +217,9 @@ export default {
             for (let i = 0; i < l; i++) {
               if (this.list[i].id === this.form.id) {
                 this.list[i].name = this.form.name
-                this.list[i].iphoneurl = this.form.iphone
-                this.list[i].notiphoneurl = this.form.noiphone
+                this.list[i].url = this.form.url
+                this.list[i].bakurl = this.form.bakurl
+                this.list[i].project = this.form.project
                 break
               }
             }

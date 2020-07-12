@@ -700,9 +700,10 @@ CREATE TABLE `version` (
   `urltwo` varchar(30) DEFAULT '',
   `createtime` varchar(30) DEFAULT '0',
   `createuid` bigint(20) NOT NULL,
+  `pid` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `idx_version` (`pid`,`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

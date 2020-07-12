@@ -103,8 +103,8 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 更新缓存
-	delete(cache.CacheProjectPid, cache.CachePidName[int64(pid)])
-	delete(cache.CachePidName, int64(pid))
+	delete(cache.CacheProjectPid, cache.CachePidProject[cache.ProjectId(pid)])
+	delete(cache.CachePidProject, cache.ProjectId(pid))
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)

@@ -22,7 +22,7 @@ func init() {
 	Version.ApiCodeField("code").ApiCodeMsg("20", "token过期")
 	Version.ApiCodeField("code").ApiCodeMsg("1", "其他错误,请查看返回的msg")
 	Version.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
-	Version.Pattern("/version/add").Post(handle.AddVersion).Bind(&version.Version{}).AddMidware(midware.JsonToStruct).
+	Version.Pattern("/version/add").Post(handle.AddVersion).Bind(&version.RespVersion{}).AddMidware(midware.JsonToStruct).
 		End(midware.EndLog).ApiDescribe("添加版本")
 
 	Version.Pattern("/version/list").Post(handle.VersionList).ApiDescribe("显示版本")
@@ -31,6 +31,6 @@ func init() {
 
 	Version.Pattern("/get/version").Post(handle.GetVersion)
 
-	Version.Pattern("/version/update").Post(handle.VersionUpdate).Bind(&version.Version{}).AddMidware(midware.JsonToStruct).
+	Version.Pattern("/version/update").Post(handle.VersionUpdate).Bind(&version.RespVersion{}).AddMidware(midware.JsonToStruct).
 		End(midware.EndLog).ApiDescribe("修改版本")
 }

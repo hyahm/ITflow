@@ -19,7 +19,8 @@ func (reb *RespEditBug) ToResp(b *model.Bug) error {
 	if reb.Level == "" {
 		return errors.New("没有找到level key")
 	}
-	if reb.Projectname, ok = cache.CachePidName[b.ProjectId]; !ok {
+	reb.Projectname = b.ProjectId.Name()
+	if reb.Projectname == "" {
 		return errors.New("没有找到project key")
 	}
 	//

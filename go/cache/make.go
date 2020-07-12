@@ -40,10 +40,10 @@ func initCache() {
 		panic(err)
 	}
 	for prows.Next() {
-		var id int64
-		var name string
+		var id ProjectId
+		var name Project
 		prows.Scan(&id, &name)
-		CachePidName[id] = name
+		CachePidProject[id] = name
 		CacheProjectPid[name] = id
 	}
 

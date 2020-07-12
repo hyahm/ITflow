@@ -15,7 +15,7 @@ type ReqMyBugFilter struct {
 	Page        int              `json:"page"`
 	Limit       int              `json:"limit"`
 	Level       cache.Level      `json:"level"`
-	Project     string           `json:"project"`
+	Project     cache.Project    `json:"project"`
 	Title       string           `json:"title"`
 	ShowsStatus cache.StatusList // 这个应该从数据库获取
 }

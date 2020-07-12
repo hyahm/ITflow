@@ -20,7 +20,7 @@ type ArticleList struct {
 	Action      string          `json:"action"`
 	Dustbin     int             `json:"dustbin"`
 	Level       cache.Level     `json:"level"`
-	Projectname string          `json:"projectname"`
+	Projectname cache.Project   `json:"projectname"`
 	Env         string          `json:"env"`
 	Handle      []string        `json:"handle"`
 }
@@ -50,7 +50,7 @@ type Bug struct {
 	OprateUsers  assist.Uid
 	LevelId      cache.LevelId
 	EnvId        int64
-	ProjectId    int64
+	ProjectId    cache.ProjectId
 	UpdateTime   int64
 	Dustbin      bool
 }

@@ -151,13 +151,13 @@ func TaskList(w http.ResponseWriter, r *http.Request) {
 		var statusid cache.StatusId
 		var spusers string
 		var uid int64
-		var pid int64
+		var pid cache.ProjectId
 		rows.Scan(&sendlist.ID, &sendlist.Date, &sendlist.Importance, &statusid, &sendlist.Title, &uid, &sendlist.Level, &pid, &spusers)
 		sendlist.Handle = assist.FormatUserlistToShow(spusers)
 		sendlist.Status = cache.CacheSidStatus[statusid]
 
 		sendlist.Author = cache.CacheUidRealName[uid]
-		sendlist.Projectname = cache.CachePidName[pid]
+		sendlist.Projectname = cache.CachePidProject[pid]
 
 		al.Al = append(al.Al, sendlist)
 	}

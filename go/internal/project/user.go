@@ -9,7 +9,7 @@ import (
 
 // 通过project 获取用户
 
-func GetUsersByProjectName(userid int64, name string) []byte {
+func GetUsersByProjectName(userid int64, name cache.Project) []byte {
 
 	resp := &MyProject{
 		Name: make([]string, 0),

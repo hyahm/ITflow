@@ -1,19 +1,21 @@
 package model
 
 import (
+	"itflow/cache"
 	"itflow/db"
 
 	"github.com/hyahm/golog"
 )
 
 type Project struct {
-	Id          int64
-	Name        string
+	Id          cache.ProjectId
+	Name        cache.Project
 	Participant string
 }
 
-func (p *Project) Insert() (err error) {
-	p.Id, err = db.Mconn.Insert("insert into project(name,participant) values(?,?)", p.Name, p.Participant)
+func (p *Project) Insert() error {
+	pid, err := db.Mconn.Insert("insert into project(name,participant) values(?,?)", p.Name, p.Participant)
+	p.Id = cache.ProjectId(pid)
 	return err
 }
 

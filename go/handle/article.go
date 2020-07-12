@@ -113,7 +113,7 @@ func GetProjectUser(w http.ResponseWriter, r *http.Request) {
 	projectname := r.FormValue("name")
 	uid := xmux.GetData(r).Get("uid").(int64)
 	// 先要判断下， 这个用户是否有这个项目的权限
-	w.Write(project.GetUsersByProjectName(uid, projectname))
+	w.Write(project.GetUsersByProjectName(uid, cache.Project(projectname)))
 	return
 
 }

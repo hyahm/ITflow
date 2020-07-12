@@ -20,14 +20,14 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	version_add := xmux.GetData(r).Data.(*version.Version)
+	version_add := xmux.GetData(r).Data.(*version.RespVersion)
 
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	uid := cache.CacheNickNameUid[nickname]
-	add_version_sql := "insert into version(name,urlone,urltwo,createtime,createuid) values(?,?,?,?,?)"
+	add_version_sql := "insert into version(pid,name,urlone,urltwo,createtime,createuid) values(?,?,?,?,?,?)"
 	var err error
 	errorcode.UpdateTime = time.Now().Unix()
-	errorcode.Id, err = db.Mconn.Insert(add_version_sql, version_add.Name, version_add.Url, version_add.BakUrl, errorcode.UpdateTime, uid)
+	errorcode.Id, err = db.Mconn.Insert(add_version_sql, version_add.Project.Id(), version_add.Name, version_add.Url, version_add.BakUrl, errorcode.UpdateTime, uid)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -56,10 +56,10 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	al := &version.VersionList{
-		VersionList: make([]*version.Version, 0),
+		VersionList: make([]*version.RespVersion, 0),
 	}
 
-	get_version_sql := "select id,name,urlone,urltwo,createtime from version order by id desc"
+	get_version_sql := "select id,pid,name,urlone,urltwo,createtime from version order by id desc"
 
 	rows, err := db.Mconn.GetRows(get_version_sql)
 	if err != nil {
@@ -69,8 +69,11 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for rows.Next() {
-		rl := &version.Version{}
-		rows.Scan(&rl.Id, &rl.Name, &rl.Url, &rl.BakUrl, &rl.Date)
+		var pid cache.ProjectId
+		rl := &version.RespVersion{}
+		rows.Scan(&rl.Id, &pid, &rl.Name, &rl.Url, &rl.BakUrl, &rl.Date)
+		rl.Project = pid.Name()
+		golog.Info(rl.Name)
 		al.VersionList = append(al.VersionList, rl)
 	}
 
@@ -142,12 +145,12 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := xmux.GetData(r).Data.(*version.Version)
+	data := xmux.GetData(r).Data.(*version.RespVersion)
 
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	uid := cache.CacheNickNameUid[nickname]
-	versionsql := "update version set name=?,urlone=?,urltwo=?,createuid=? where id=?"
-	_, err := db.Mconn.Update(versionsql, data.Name, data.Url, data.BakUrl, uid, data.Id)
+	versionsql := "update version set pid=?,name=?,urlone=?,urltwo=?,createuid=? where id=?"
+	_, err := db.Mconn.Update(versionsql, data.Project.Id(), data.Name, data.Url, data.BakUrl, uid, data.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

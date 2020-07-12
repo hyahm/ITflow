@@ -87,7 +87,7 @@ func (pl *BugList) GetMyBugs() []byte {
 		var iid cache.ImportantId
 		var sid cache.StatusId
 		var lid cache.LevelId
-		var pid int64
+		var pid cache.ProjectId
 		var eid int64
 		var userlist string
 		rows.Scan(&one.ID, &one.Date, &iid, &sid, &one.Title, &lid, &pid, &eid, &userlist)
@@ -105,7 +105,7 @@ func (pl *BugList) GetMyBugs() []byte {
 		one.Importance = cache.CacheIidImportant[iid]
 		one.Status = cache.CacheSidStatus[sid]
 		one.Level = cache.CacheLidLevel[lid]
-		one.Projectname = cache.CachePidName[pid]
+		one.Projectname = cache.CachePidProject[pid]
 		one.Env = cache.CacheEidName[eid]
 		one.Author = cache.CacheUidRealName[pl.Uid]
 		al.Al = append(al.Al, one)
@@ -172,7 +172,7 @@ func (pl *BugList) GetMyTasks() []byte {
 		var iid cache.ImportantId
 		var sid cache.StatusId
 		var lid cache.LevelId
-		var pid int64
+		var pid cache.ProjectId
 		var eid int64
 		var userlist string
 		rows.Scan(&one.ID, &one.Date, &iid, &sid, &one.Title, &lid, &pid, &eid, &userlist)
@@ -180,7 +180,7 @@ func (pl *BugList) GetMyTasks() []byte {
 		one.Importance = cache.CacheIidImportant[iid]
 		one.Status = cache.CacheSidStatus[sid]
 		one.Level = cache.CacheLidLevel[lid]
-		one.Projectname = cache.CachePidName[pid]
+		one.Projectname = cache.CachePidProject[pid]
 		one.Env = cache.CacheEidName[eid]
 		// 显示realname
 
@@ -216,7 +216,7 @@ func (pl *BugList) GetMyTasks() []byte {
 				one.Importance = cache.CacheIidImportant[iid]
 				one.Status = cache.CacheSidStatus[sid]
 				one.Level = cache.CacheLidLevel[lid]
-				one.Projectname = cache.CachePidName[pid]
+				one.Projectname = cache.CachePidProject[pid]
 				one.Env = cache.CacheEidName[eid]
 				one.Author = cache.CacheUidRealName[pl.Uid]
 				al.Al = append(al.Al, one)

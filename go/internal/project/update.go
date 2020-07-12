@@ -43,7 +43,7 @@ func (rp *ReqProject) Update(userid int64) ([]byte, error) {
 		golog.Error(err)
 		return resp.ErrorE(err), err
 	}
-	resp.Id = project.Id
-	cache.CachePidName[resp.Id] = rp.ProjectName
+	resp.Id = project.Id.ToInt64()
+	cache.CachePidProject[cache.ProjectId(resp.Id)] = rp.ProjectName
 	return resp.Success(), nil
 }

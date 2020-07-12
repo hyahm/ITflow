@@ -18,7 +18,7 @@ type RespEditBug struct {
 	Selectusers assist.Names    `json:"selectuser"`
 	Important   cache.Important `json:"important"`
 	Level       cache.Level     `json:"level"`
-	Projectname string          `json:"projectname"`
+	Projectname cache.Project   `json:"projectname"`
 	Envname     string          `json:"envname"`
 	Version     string          `json:"version"`
 	Code        int             `json:"code"`
@@ -42,7 +42,7 @@ func (reb *RespEditBug) ToBug() (*model.Bug, error) {
 	bug.Content = reb.Content
 	bug.Title = reb.Title
 	reb.Level = reb.Level.Trim()
-	reb.Projectname = strings.Trim(reb.Projectname, " ")
+	reb.Projectname = reb.Projectname.Trim()
 	reb.Version = strings.Trim(reb.Version, " ")
 	if reb.Envname == "" || reb.Important == "" || reb.Level == "" ||
 		reb.Projectname == "" || reb.Version == "" {
@@ -53,7 +53,8 @@ func (reb *RespEditBug) ToBug() (*model.Bug, error) {
 	if bug.LevelId == 0 {
 		return nil, errors.New("没有找到level key")
 	}
-	if bug.ProjectId, ok = cache.CacheProjectPid[reb.Projectname]; !ok {
+	bug.ProjectId = reb.Projectname.Id()
+	if bug.ProjectId == 0 {
 		return nil, errors.New("没有找到project key")
 	}
 	//

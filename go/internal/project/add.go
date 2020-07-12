@@ -12,9 +12,9 @@ import (
 )
 
 type ReqProject struct {
-	Id          int64    `json:"id"`
-	ProjectName string   `json:"projectname"`
-	SelectUser  []string `json:"selectuser"`
+	Id          cache.ProjectId `json:"id"`
+	ProjectName cache.Project   `json:"projectname"`
+	SelectUser  []string        `json:"selectuser"`
 }
 
 var ProjectNameIsEmpty = errors.New("Project name is empty")
@@ -61,8 +61,8 @@ func (rp *ReqProject) Add(userid int64) ([]byte, error) {
 		golog.Error(err)
 		return resp.ErrorE(err), err
 	}
-	resp.Id = project.Id
-	cache.CacheProjectPid[rp.ProjectName] = resp.Id
-	cache.CachePidName[resp.Id] = rp.ProjectName
+	resp.Id = project.Id.ToInt64()
+	cache.CacheProjectPid[rp.ProjectName] = cache.ProjectId(resp.Id)
+	cache.CachePidProject[cache.ProjectId(resp.Id)] = rp.ProjectName
 	return resp.Success(), nil
 }
