@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"itflow/cache"
 	"itflow/model"
-	"strconv"
-	"strings"
 )
 
 type ResProjectList struct {
@@ -19,11 +17,11 @@ func (rpl *ResProjectList) Marshal() []byte {
 	return send
 }
 
-func GetList() []byte {
+func GetList(uid int64) []byte {
 	rpl := &ResProjectList{
 		ProjectList: make([]*ReqProject, 0),
 	}
-	ps, err := model.NewProjectList()
+	ps, err := model.NewProjectListCheckId(uid)
 	if err != nil {
 		rpl.Code = 1
 		rpl.Msg = err.Error()
@@ -32,25 +30,17 @@ func GetList() []byte {
 
 	for _, p := range ps {
 		rp := &ReqProject{
-			SelectUser: make([]string, 0),
+			ProjectName: p.Name,
 		}
 		rp.Id = p.Id
-		rp.ProjectName = p.Name
+		rp.GroupName = cache.CacheGidGroup[p.Gid].Name
 		// 防止空数据错误， 正常环境是不会出现这个问题的
-		pl := strings.Split(p.Participant, ",")
-		if len(pl) == 1 && pl[0] == "" {
-			rpl.ProjectList = append(rpl.ProjectList, rp)
-			continue
-		}
-		for _, v := range pl {
-			uid, err := strconv.ParseInt(v, 10, 64)
-			if err != nil {
-				rpl.Code = 1
-				rpl.Msg = err.Error()
-				return rpl.Marshal()
-			}
-			rp.SelectUser = append(rp.SelectUser, cache.CacheUidRealName[uid])
-		}
+		// pl := strings.Split(p.Gid, ",")
+		// if len(pl) == 1 && pl[0] == "" {
+		// 	rpl.ProjectList = append(rpl.ProjectList, rp)
+		// 	continue
+		// }
+
 		rpl.ProjectList = append(rpl.ProjectList, rp)
 	}
 	return rpl.Marshal()

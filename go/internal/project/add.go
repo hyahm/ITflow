@@ -5,8 +5,6 @@ import (
 	"itflow/cache"
 	"itflow/internal/response"
 	"itflow/model"
-	"strconv"
-	"strings"
 
 	"github.com/hyahm/golog"
 )
@@ -14,7 +12,7 @@ import (
 type ReqProject struct {
 	Id          cache.ProjectId `json:"id"`
 	ProjectName cache.Project   `json:"projectname"`
-	SelectUser  []string        `json:"selectuser"`
+	GroupName   string          `json:"groupname"`
 }
 
 var ProjectNameIsEmpty = errors.New("Project name is empty")
@@ -24,7 +22,7 @@ func (rp *ReqProject) checkValid() error {
 	if rp.ProjectName == "" {
 		return ProjectNameIsEmpty
 	}
-	if len(rp.SelectUser) == 0 {
+	if len(rp.GroupName) == 0 {
 		return ParticipantIsEmpty
 	}
 	return nil
@@ -38,23 +36,23 @@ func (rp *ReqProject) Add(userid int64) ([]byte, error) {
 		golog.Error(err)
 		return resp.ErrorE(err), err
 	}
-	uids := make([]string, 0)
-	needAdd := true
-	for _, v := range rp.SelectUser {
-		// 获取的真实用户名
-		if uid, ok := cache.CacheRealNameUid[v]; ok {
-			if uid == userid {
-				needAdd = false
-			}
-			uids = append(uids, strconv.FormatInt(uid, 10))
-		}
-	}
-	if needAdd {
-		uids = append(uids, strconv.FormatInt(userid, 10))
-	}
+	// uids := make([]string, 0)
+	// needAdd := true
+	// for _, v := range cache.CacheGidGroup[rp.Gid].Uids {
+	// 	// 获取的真实用户名
+	// 	if uid, ok := cache.CacheRealNameUid[v.]; ok {
+	// 		if uid == userid {
+	// 			needAdd = false
+	// 		}
+	// 		uids = append(uids, strconv.FormatInt(uid, 10))
+	// 	}
+	// }
+	// if needAdd {
+	// 	uids = append(uids, strconv.FormatInt(userid, 10))
+	// }
 	project := &model.Project{
-		Name:        rp.ProjectName,
-		Participant: strings.Join(uids, ","),
+		Name: rp.ProjectName,
+		Gid:  cache.CacheGroupGid[rp.GroupName].Gid,
 	}
 	err = project.Insert()
 	if err != nil {

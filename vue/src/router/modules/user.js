@@ -43,6 +43,15 @@ const userRoute = {
       }
     },
     {
+      path: 'usergroup',
+      component: () => import('@/views/user/UserGroup'),
+      name: 'usergroup',
+      meta: {
+        title: '用户组',
+        icon: 'user'
+      }
+    },
+    {
       path: 'uploadhead',
       component: () => import('@/views/user/headImg'),
       name: 'uploadhead',

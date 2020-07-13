@@ -85,7 +85,7 @@ func ShareList(w http.ResponseWriter, r *http.Request) {
 			// 找得到就退出循环
 			for _, v := range rg {
 				if hasperm || v == rid {
-					od.ReadName = cache.CacheGidGroup[rid]
+					od.ReadName = cache.CacheGidGroup[rid].Name
 					hasperm = true
 					break
 				}
@@ -101,7 +101,7 @@ func ShareList(w http.ResponseWriter, r *http.Request) {
 		} else {
 			for _, v := range rg {
 				if hasperm || v == wid {
-					od.WriteName = cache.CacheGidGroup[wid]
+					od.WriteName = cache.CacheGidGroup[wid].Name
 					hasperm = true
 					break
 				}
@@ -340,7 +340,7 @@ func ShareRename(w http.ResponseWriter, r *http.Request) {
 		rid = cache.CacheRealNameUid[ps.ReadName]
 	} else {
 		for k, v := range cache.CacheGidGroup {
-			if v == ps.ReadName {
+			if v.Name == ps.ReadName {
 				rid = k
 				break
 			}
@@ -350,7 +350,7 @@ func ShareRename(w http.ResponseWriter, r *http.Request) {
 		wid = cache.CacheRealNameUid[ps.WriteName]
 	} else {
 		for k, v := range cache.CacheGidGroup {
-			if ps.WriteName == v {
+			if ps.WriteName == v.Name {
 				wid = k
 				break
 			}
@@ -441,7 +441,7 @@ func ShareMkdir(w http.ResponseWriter, r *http.Request) {
 		rid = cache.CacheRealNameUid[ps.ReadName]
 	} else {
 		for k, v := range cache.CacheGidGroup {
-			if v == ps.ReadName {
+			if v.Name == ps.ReadName {
 				rid = k
 				break
 			}
@@ -451,7 +451,7 @@ func ShareMkdir(w http.ResponseWriter, r *http.Request) {
 		wid = cache.CacheRealNameUid[ps.WriteName]
 	} else {
 		for k, v := range cache.CacheGidGroup {
-			if ps.WriteName == v {
+			if ps.WriteName == v.Name {
 				wid = k
 				break
 			}

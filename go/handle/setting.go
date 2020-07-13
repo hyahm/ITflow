@@ -119,7 +119,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	if cache.CacheEmail.Enable {
 		content := fmt.Sprintf("你的用户名: %v;<br> 密码: %v", getuser.Email, getuser.Password)
-		cache.CacheEmail.SendMail("创建用户成功", content, getuser.Email)
+		go cache.CacheEmail.SendMail("创建用户成功", content, getuser.Email)
 	}
 
 	// 更新日志

@@ -21,6 +21,12 @@ var (
 	CLASSIFY    = []string{"login", "user", "bug", "version", "project", "env", "statusgroup", "role", "status", "restfulproject", "api", "type", "usergroup", "header", "important", "level", "position"}
 )
 
+type UG struct {
+	Gid  int64
+	Name string
+	Uids string
+}
+
 // cached
 var (
 	CacheRidRole       map[int64]string
@@ -51,7 +57,8 @@ var (
 	CacheUidEmail    map[int64]string
 	CacheEmail       *Email
 
-	CacheGidGroup map[int64]string
+	CacheGidGroup map[int64]*UG
+	CacheGroupGid map[string]*UG
 	DEADLINE      time.Duration
 	SUPERID       int64
 )
@@ -94,7 +101,8 @@ func LoadConfig() {
 	CacheUidRealName = make(map[int64]string, 0)
 	CacheUidNickName = make(map[int64]string, 0)
 	CacheVidVersion = make(map[VersionId]Version, 0)
-	CacheGidGroup = make(map[int64]string, 0)
+	CacheGidGroup = make(map[int64]*UG, 0)
+	CacheGroupGid = make(map[string]*UG, 0)
 	CacheNickNameUid = make(map[string]int64, 0)
 	CacheStatusSid = make(map[Status]StatusId, 0)
 	CacheRealNameUid = make(map[string]int64, 0)

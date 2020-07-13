@@ -26,7 +26,7 @@ func GetUsersByProjectName(userid int64, name cache.Project) []byte {
 		resp.Msg = err.Error()
 		return resp.Marshal()
 	}
-	uids := strings.Split(p.Participant, ",")
+	uids := strings.Split(cache.CacheGidGroup[p.Gid].Uids, ",")
 	var perm bool
 	for _, u := range uids {
 		uid, err := strconv.ParseInt(u, 10, 64)

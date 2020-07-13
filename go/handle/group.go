@@ -196,24 +196,45 @@ func GroupGet(w http.ResponseWriter, r *http.Request) {
 	data := &model.Send_groups{
 		GroupList: make([]*model.Get_groups, 0),
 	}
-
-	gsql := "select id,name,ids from usergroup"
-	rows, err := db.Mconn.GetRows(gsql)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	for rows.Next() {
-		onegroup := &model.Get_groups{}
-		var users string
-		rows.Scan(&onegroup.Id, &onegroup.Name, &users)
-		for _, v := range strings.Split(users, ",") {
-			uid, _ := strconv.Atoi(v)
-			onegroup.Users = append(onegroup.Users, cache.CacheUidRealName[int64(uid)])
+	uid := xmux.GetData(r).Get("uid").(int64)
+	if cache.SUPERID == uid {
+		gsql := "select id,name,ids from usergroup"
+		rows, err := db.Mconn.GetRows(gsql)
+		if err != nil {
+			golog.Error(err)
+			w.Write(errorcode.ErrorE(err))
+			return
 		}
-		data.GroupList = append(data.GroupList, onegroup)
+		for rows.Next() {
+			onegroup := &model.Get_groups{}
+			var users string
+			rows.Scan(&onegroup.Id, &onegroup.Name, &users)
+			for _, v := range strings.Split(users, ",") {
+				uid, _ := strconv.Atoi(v)
+				onegroup.Users = append(onegroup.Users, cache.CacheUidRealName[int64(uid)])
+			}
+			data.GroupList = append(data.GroupList, onegroup)
+		}
+	} else {
+		gsql := "select id,name,ids from usergroup where cuid=?"
+		rows, err := db.Mconn.GetRows(gsql, uid)
+		if err != nil {
+			golog.Error(err)
+			w.Write(errorcode.ErrorE(err))
+			return
+		}
+		for rows.Next() {
+			onegroup := &model.Get_groups{}
+			var users string
+			rows.Scan(&onegroup.Id, &onegroup.Name, &users)
+			for _, v := range strings.Split(users, ",") {
+				uid, _ := strconv.Atoi(v)
+				onegroup.Users = append(onegroup.Users, cache.CacheUidRealName[int64(uid)])
+			}
+			data.GroupList = append(data.GroupList, onegroup)
+		}
 	}
+
 	send, _ := json.Marshal(data)
 	w.Write(send)
 	return
@@ -252,8 +273,12 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 		Classify: "usergroup",
 		Action:   "add",
 	}
-
-	cache.CacheGidGroup[errorcode.Id] = data.Name
+	ug := &cache.UG{}
+	ug.Gid = errorcode.Id
+	ug.Name = data.Name
+	ug.Uids = strings.Join(ids, ",")
+	cache.CacheGidGroup[errorcode.Id] = ug
+	cache.CacheGroupGid[ug.Name] = ug
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -264,8 +289,9 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	nickname := xmux.GetData(r).Get("nickname").(string)
+	uid := xmux.GetData(r).Get("uid").(int64)
 	id := r.FormValue("id")
-	id32, err := strconv.Atoi(id)
+	id64, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -274,75 +300,76 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 
 	// 判断共享文件是否有在使用
 
-	var hasshare bool
-	sharerows, err := db.Mconn.GetRows("select readuser,rid,wid,writeuser from  sharefile")
+	// var hasshare bool
+	// sharerows, err := db.Mconn.GetRows("select readuser,rid,wid,writeuser from  sharefile")
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
+	// for sharerows.Next() {
+	// 	var readuser bool
+	// 	var rid int64
+	// 	var wid int64
+	// 	var writeuser bool
+	// 	sharerows.Scan(&readuser, &rid, &wid, &writeuser)
+	// 	if !readuser {
+	// 		if rid == int64(id32) {
+	// 			hasshare = true
+	// 			return
+	// 		}
+	// 	}
+	// 	if !writeuser {
+	// 		if wid == int64(id32) {
+	// 			hasshare = true
+	// 			return
+	// 		}
+	// 	}
+	// }
+
+	// if hasshare {
+	// 	w.Write(errorcode.Error("没有权限"))
+	// 	return
+	// }
+	// // 判断接口是否有在使用
+	// var hasrest bool
+	// restrows, err := db.Mconn.GetRows("select readuser,edituser,rid,eid from  apiproject")
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
+	// for restrows.Next() {
+	// 	var readuser bool
+	// 	var rid int64
+	// 	var eid int64
+	// 	var edituser bool
+	// 	restrows.Scan(&readuser, &rid, &eid, &edituser)
+	// 	if !readuser {
+	// 		if rid == int64(id32) {
+	// 			hasshare = true
+	// 		}
+	// 	}
+	// 	if !edituser {
+	// 		if eid == int64(id32) {
+	// 			hasshare = true
+	// 			return
+	// 		}
+	// 	}
+	// }
+	// if hasrest {
+	// 	w.Write(errorcode.Error("没有权限"))
+	// 	return
+	// }
+
+	gsql := "delete from usergroup where id=? and cuid=? or cuid=?"
+	_, err = db.Mconn.Update(gsql, id, uid, cache.SUPERID)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
-	}
-	for sharerows.Next() {
-		var readuser bool
-		var rid int64
-		var wid int64
-		var writeuser bool
-		sharerows.Scan(&readuser, &rid, &wid, &writeuser)
-		if !readuser {
-			if rid == int64(id32) {
-				hasshare = true
-				return
-			}
-		}
-		if !writeuser {
-			if wid == int64(id32) {
-				hasshare = true
-				return
-			}
-		}
 	}
 
-	if hasshare {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
-	// 判断接口是否有在使用
-	var hasrest bool
-	restrows, err := db.Mconn.GetRows("select readuser,edituser,rid,eid from  apiproject")
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	for restrows.Next() {
-		var readuser bool
-		var rid int64
-		var eid int64
-		var edituser bool
-		restrows.Scan(&readuser, &rid, &eid, &edituser)
-		if !readuser {
-			if rid == int64(id32) {
-				hasshare = true
-			}
-		}
-		if !edituser {
-			if eid == int64(id32) {
-				hasshare = true
-				return
-			}
-		}
-	}
-	if hasrest {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
-
-	gsql := "delete from usergroup where id=? and cuid=?"
-	_, err = db.Mconn.Update(gsql, id, cache.CacheNickNameUid[nickname])
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	// 增加日志
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
@@ -351,7 +378,8 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 		Action:   "delete",
 	}
 
-	delete(cache.CacheGidGroup, int64(id32))
+	delete(cache.CacheGroupGid, cache.CacheGidGroup[id64].Name)
+	delete(cache.CacheGidGroup, id64)
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -364,8 +392,9 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 
 	data := xmux.GetData(r).Data.(*model.Get_groups)
 	nickname := xmux.GetData(r).Get("nickname").(string)
+	uid := xmux.GetData(r).Get("uid").(int64)
 
-	gsql := "update usergroup set name=?,ids=? where id=? and cuid=?"
+	gsql := "update usergroup set name=?,ids=? where id=? and cuid=? or cuid=?"
 	ids := ""
 	for i, v := range data.Users {
 		if i == 0 {
@@ -374,7 +403,7 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 			ids = ids + "," + strconv.FormatInt(cache.CacheRealNameUid[v], 10)
 		}
 	}
-	_, err := db.Mconn.Update(gsql, data.Name, ids, data.Id, cache.CacheNickNameUid[nickname])
+	_, err := db.Mconn.Update(gsql, data.Name, ids, data.Id, cache.SUPERID, uid)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -388,8 +417,14 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 		Classify: "usergroup",
 		Action:   "update",
 	}
-
-	cache.CacheGidGroup[data.Id] = data.Name
+	ug := &cache.UG{
+		Gid:  data.Id,
+		Name: data.Name,
+		Uids: ids,
+	}
+	delete(cache.CacheGroupGid, cache.CacheGidGroup[data.Id].Name)
+	cache.CacheGidGroup[data.Id] = ug
+	cache.CacheGroupGid[data.Name] = ug
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return

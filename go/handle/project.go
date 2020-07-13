@@ -15,8 +15,8 @@ import (
 )
 
 func ProjectList(w http.ResponseWriter, r *http.Request) {
-
-	w.Write(project.GetList())
+	uid := xmux.GetData(r).Get("uid").(int64)
+	w.Write(project.GetList(uid))
 	return
 
 }

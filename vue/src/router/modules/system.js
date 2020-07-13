@@ -32,16 +32,7 @@ const system = {
         roles: ['admin']
       }
     },
-    {
-      path: 'usergroup',
-      component: () => import('@/views/system/UserGroup'),
-      name: 'usergroup',
-      meta: {
-        title: '用户组',
-        icon: 'user',
-        roles: ['admin']
-      }
-    },
+
     {
       path: 'rolegroup',
       component: () => import('@/views/system/roleGroup'),

@@ -2,6 +2,7 @@ package project
 
 import (
 	"encoding/json"
+	"itflow/cache"
 	"itflow/model"
 	"strconv"
 	"strings"
@@ -20,7 +21,7 @@ func (mp *MyProject) Marshal() []byte {
 }
 
 func (mp *MyProject) Get(uid int64) []byte {
-	pl, err := model.NewProjectList()
+	pl, err := model.NewProjectListCheckId(uid)
 	if err != nil {
 		mp.Code = 1
 		mp.Msg = err.Error()
@@ -28,7 +29,7 @@ func (mp *MyProject) Get(uid int64) []byte {
 	}
 
 	for _, p := range pl {
-		uids := strings.Split(p.Participant, ",")
+		uids := strings.Split(cache.CacheGidGroup[p.Gid].Uids, ",")
 		if len(uids) == 1 && uids[0] == "" {
 			continue
 		}

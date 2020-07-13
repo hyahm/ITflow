@@ -21,6 +21,7 @@ const setting = {
         roles: ['admin', 'status']
       }
     },
+
     {
       path: 'versionlist',
       component: () => import('@/views/setting/versionlist'),
