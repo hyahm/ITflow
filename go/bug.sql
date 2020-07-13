@@ -148,9 +148,8 @@ CREATE TABLE `email` (
   `email` varchar(50) NOT NULL,
   `password` varchar(50) DEFAULT '',
   `port` int(11) DEFAULT '25',
-  `createuser` tinyint(1) DEFAULT '0',
-  `createbug` tinyint(1) DEFAULT '0',
-  `passbug` tinyint(1) DEFAULT '0',
+  `enable` tinyint(1) NOT NULL DEFAULT '0',
+  `host` varchar(30) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
