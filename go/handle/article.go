@@ -256,10 +256,12 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 func BugShow(w http.ResponseWriter, r *http.Request) {
 	// 判断是否有权限访问这个bug
 	bid := r.FormValue("id")
-	sl := &bug.RespShowBug{}
+	sl := &bug.RespShowBug{
+		Comments: make([]*comment.Informations, 0),
+	}
 	cc, err := model.NewInformationsByBid(bid)
 	if err != nil {
-		sl.Comments = make([]*comment.Informations, 0)
+
 		sl.Code = 1
 		sl.Msg = err.Error()
 		w.Write(sl.Marshal())
