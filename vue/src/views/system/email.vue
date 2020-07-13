@@ -1,7 +1,7 @@
 <template>
   <div>
     <p class="warn-content">
-      选择邮件通知的项目，测试邮件是为了验证是否能正确收到邮件通知
+      设置并启用后 只有创建用户，创建bug，转交bug才会有邮件通知
     </p>
     <el-form ref="form" label-width="100px" class="form-container" style="margin-top: 40px;" prop="title">
       <!-- <el-switch
