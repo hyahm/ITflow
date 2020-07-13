@@ -6,6 +6,8 @@ import (
 	"itflow/model"
 	"strconv"
 	"strings"
+
+	"github.com/hyahm/golog"
 )
 
 type MyProject struct {
@@ -46,5 +48,6 @@ func (mp *MyProject) Get(uid int64) []byte {
 		}
 
 	}
+	golog.Infof("%+v", mp)
 	return mp.Marshal()
 }

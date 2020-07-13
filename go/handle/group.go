@@ -242,7 +242,7 @@ func GroupGet(w http.ResponseWriter, r *http.Request) {
 }
 
 func GroupAdd(w http.ResponseWriter, r *http.Request) {
-
+	golog.Info("add..................")
 	errorcode := &response.Response{}
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	data := xmux.GetData(r).Data.(*model.Get_groups)

@@ -33,6 +33,7 @@ func NewProjectListCheckId(uid int64) ([]*Project, error) {
 	ps := make([]*Project, 0)
 	rows, err := db.Mconn.GetRows("select id,name,gid from project")
 	if err != nil {
+		golog.Info()
 		return nil, err
 	}
 	for rows.Next() {

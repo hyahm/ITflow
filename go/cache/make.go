@@ -1,7 +1,7 @@
 package cache
 
 import (
-	"errors"
+	"database/sql"
 	"itflow/db"
 
 	"github.com/hyahm/golog"
@@ -177,9 +177,9 @@ func initCache() {
 		panic(err)
 	}
 
-	if checkdefaultcount != 1 {
-		panic(errors.New("defaultvalue表行数只能是1"))
-	}
+	// if checkdefaultcount != 1 {
+	// 	panic(errors.New("defaultvalue表行数只能是1"))
+	// }
 	importantrow, err := db.Mconn.GetRows("select id,name from importants")
 	if err != nil {
 		panic(err)
@@ -210,7 +210,10 @@ func initCache() {
 	var created, complete StatusId
 	err = db.Mconn.GetOne("select created, completed from defaultvalue").Scan(&created, &complete)
 	if err != nil {
-		panic(err)
+		if err != sql.ErrNoRows {
+			panic(err)
+		}
+
 	}
 	DefaultCreateSid = created
 	DefaultCompleteSid = complete

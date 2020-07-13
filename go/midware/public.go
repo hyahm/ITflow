@@ -47,6 +47,8 @@ func CheckToken(w http.ResponseWriter, r *http.Request) bool {
 	err = filter.Get(db.NICKNAME, db.ID).Scan(&nickname, &uid)
 	if err != nil {
 		golog.Error(err)
+		w.Write(errorcode.TokenNotFound())
+		return true
 	}
 	xmux.GetData(r).Set("nickname", nickname)
 	xmux.GetData(r).Set("uid", uid)

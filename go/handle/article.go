@@ -82,25 +82,12 @@ type userList struct {
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
-
 	ul := &userList{
 		Users: make([]string, 0),
 	}
 
-	getusersql := "select realname from user"
-	rows, err := db.Mconn.GetRows(getusersql)
-
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	for rows.Next() {
-		var realname string
-		rows.Scan(&realname)
-		ul.Users = append(ul.Users, realname)
+	for _, v := range cache.CacheUidRealName {
+		ul.Users = append(ul.Users, v)
 	}
 	send, _ := json.Marshal(ul)
 	w.Write(send)

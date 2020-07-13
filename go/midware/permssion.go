@@ -123,7 +123,7 @@ func checkPermssion(uid int64, pagename string) ([]byte, bool) {
 
 	// 管理员
 	if uid == cache.SUPERID {
-		return nil, true
+		return nil, false
 	}
 
 	rg, err := model.NewRoleGroup(uid)
