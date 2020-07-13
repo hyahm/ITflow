@@ -1,8 +1,8 @@
 package routegroup
 
 import (
-	"itflow/cache"
 	"itflow/handle"
+	"itflow/internal/email"
 	"itflow/midware"
 
 	"github.com/hyahm/xmux"
@@ -18,7 +18,7 @@ func init() {
 	Email.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	Email.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
-	Email.Pattern("/email/test").Post(handle.TestEmail).Bind(&cache.Email{}).AddMidware(midware.JsonToStruct)
-	Email.Pattern("/email/save").Post(handle.SaveEmail).Bind(&cache.Email{}).AddMidware(midware.JsonToStruct)
+	Email.Pattern("/email/test").Post(handle.TestEmail).Bind(&email.Email{}).AddMidware(midware.JsonToStruct)
+	Email.Pattern("/email/save").Post(handle.SaveEmail).Bind(&email.Email{}).AddMidware(midware.JsonToStruct)
 	Email.Pattern("/email/get").Post(handle.GetEmail)
 }

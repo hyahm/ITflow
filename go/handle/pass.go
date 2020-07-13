@@ -88,13 +88,15 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	idstr := make([]string, 0)
+	mails := make([]string, 0)
 	for _, v := range ub.SelectUsers {
-		var uid int64
-		if uid, ok = cache.CacheRealNameUid[v]; !ok {
+		var thisUid int64
+		if thisUid, ok = cache.CacheRealNameUid[v]; !ok {
 			w.Write(errorcode.ErrorNoPermission())
 			return
 		}
-		idstr = append(idstr, strconv.FormatInt(uid, 10))
+		idstr = append(idstr, strconv.FormatInt(thisUid, 10))
+		mails = append(mails, cache.CacheUidEmail[thisUid])
 	}
 
 	ul := strings.Join(idstr, ",")
@@ -115,6 +117,9 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if cache.CacheEmail.Enable {
+		go cache.CacheEmail.SendMail("转让bug", fmt.Sprintf("由%s 转交给你", cache.CacheUidRealName[uid]), mails...)
+	}
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
 		Username: nickname,

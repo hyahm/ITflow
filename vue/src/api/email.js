@@ -4,7 +4,7 @@ export function testEmail(data) {
   return request({
     url: '/email/test',
     method: 'post',
-    data: data
+    data
   })
 }
 
@@ -12,7 +12,7 @@ export function saveEmail(data) {
   return request({
     url: '/email/save',
     method: 'post',
-    data: data
+    data
   })
 }
 

@@ -10,7 +10,6 @@ import (
 	"itflow/internal/response"
 	"itflow/internal/role"
 	"itflow/internal/user"
-	"itflow/mail"
 	"itflow/model"
 	"net/http"
 	"strconv"
@@ -118,9 +117,9 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	// 邮件通知
 
-	if cache.CacheEmail.CreateUser {
+	if cache.CacheEmail.Enable {
 		content := fmt.Sprintf("你的用户名: %v;<br> 密码: %v", getuser.Email, getuser.Password)
-		mail.SendMail("创建用户成功", content, getuser.Email)
+		cache.CacheEmail.SendMail("创建用户成功", content, getuser.Email)
 	}
 
 	// 更新日志

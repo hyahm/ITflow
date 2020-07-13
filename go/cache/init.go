@@ -21,18 +21,6 @@ var (
 	CLASSIFY    = []string{"login", "user", "bug", "version", "project", "env", "statusgroup", "role", "status", "restfulproject", "api", "type", "usergroup", "header", "important", "level", "position"}
 )
 
-type Email struct {
-	CreateUser bool   `json:"createuser"`
-	CreateBug  bool   `json:"createbug"`
-	PassBug    bool   `json:"passbug"`
-	Id         int64  `json:"id"`
-	Port       int    `json:"port"`
-	EmailAddr  string `json:"emailaddr"`
-	Password   string `json:"password"`
-	To         string `json:"to"`
-	Code       int    `json:"code"`
-}
-
 // cached
 var (
 	CacheRidRole       map[int64]string
