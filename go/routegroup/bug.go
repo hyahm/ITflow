@@ -47,7 +47,7 @@ func init() {
 			"title": "sdfsdf",
 			"content": "<p>sdfajsdjfsdfsaf</p>",
 			"appversion": "v1.2",
-			"comment": null,
+			"comment": [],
 			"status": "need133",
 			"id": 2,
 			"code": 0

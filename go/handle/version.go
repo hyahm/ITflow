@@ -43,8 +43,8 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加缓存
-	cache.CacheVidName[errorcode.Id] = version_add.Name
-	cache.CacheVersionNameVid[version_add.Name] = errorcode.Id
+	cache.CacheVidVersion[cache.VersionId(errorcode.Id)] = version_add.Name
+	cache.CacheVersionVid[version_add.Name] = cache.VersionId(errorcode.Id)
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -125,8 +125,8 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 		Msg:      fmt.Sprintf("delete version id: %s", id),
 	}
 
-	delete(cache.CacheVersionNameVid, cache.CacheEidName[int64(vid)])
-	delete(cache.CacheVidName, int64(vid))
+	delete(cache.CacheVersionVid, cache.CacheVidVersion[cache.VersionId(vid)])
+	delete(cache.CacheVidVersion, cache.VersionId(vid))
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
@@ -166,9 +166,9 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 		Msg:      fmt.Sprintf("update version id %v to %v", data.Id, data.Name),
 	}
 
-	delete(cache.CacheVersionNameVid, data.Name)
-	cache.CacheVidName[int64(data.Id)] = data.Name
-	cache.CacheVersionNameVid[data.Name] = int64(data.Id)
+	delete(cache.CacheVersionVid, data.Name)
+	cache.CacheVidVersion[cache.VersionId(data.Id)] = data.Name
+	cache.CacheVersionVid[data.Name] = cache.VersionId(data.Id)
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)

@@ -6,7 +6,6 @@ import (
 	"itflow/cache"
 	"itflow/internal/assist"
 	"itflow/model"
-	"strings"
 )
 
 // 前端编辑时需要的数据结构
@@ -19,8 +18,8 @@ type RespEditBug struct {
 	Important   cache.Important `json:"important"`
 	Level       cache.Level     `json:"level"`
 	Projectname cache.Project   `json:"projectname"`
-	Envname     string          `json:"envname"`
-	Version     string          `json:"version"`
+	Envname     cache.Env       `json:"envname"`
+	Version     cache.Version   `json:"version"`
 	Code        int             `json:"code"`
 	Msg         string          `json:"message,omitempty"`
 }
@@ -37,13 +36,13 @@ func (reb *RespEditBug) ToBug() (*model.Bug, error) {
 	// 将获取的数据转为可以存表的数据
 	bug := &model.Bug{}
 	bug.ID = reb.Id
-	reb.Envname = strings.Trim(reb.Envname, " ")
+	reb.Envname = reb.Envname.Trim()
 	reb.Important = reb.Important.Trim()
 	bug.Content = reb.Content
 	bug.Title = reb.Title
 	reb.Level = reb.Level.Trim()
 	reb.Projectname = reb.Projectname.Trim()
-	reb.Version = strings.Trim(reb.Version, " ")
+	reb.Version = reb.Version.Trim()
 	if reb.Envname == "" || reb.Important == "" || reb.Level == "" ||
 		reb.Projectname == "" || reb.Version == "" {
 		return nil, errors.New("all name not by empty")
@@ -58,7 +57,7 @@ func (reb *RespEditBug) ToBug() (*model.Bug, error) {
 		return nil, errors.New("没有找到project key")
 	}
 	//
-	if bug.EnvId, ok = cache.CacheEnvNameEid[reb.Envname]; !ok {
+	if bug.EnvId, ok = cache.CacheEnvEid[reb.Envname]; !ok {
 		return nil, errors.New("没有找到env key")
 	}
 	//
@@ -66,7 +65,7 @@ func (reb *RespEditBug) ToBug() (*model.Bug, error) {
 	if bug.ImportanceId == 0 {
 		return nil, errors.New("没有找到important key")
 	}
-	if bug.VersionId, ok = cache.CacheVersionNameVid[reb.Version]; !ok {
+	if bug.VersionId, ok = cache.CacheVersionVid[reb.Version]; !ok {
 		return nil, errors.New("没有找到version key")
 	}
 

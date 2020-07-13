@@ -21,7 +21,7 @@ type ArticleList struct {
 	Dustbin     int             `json:"dustbin"`
 	Level       cache.Level     `json:"level"`
 	Projectname cache.Project   `json:"projectname"`
-	Env         string          `json:"env"`
+	Env         cache.Env       `json:"env"`
 	Handle      []string        `json:"handle"`
 }
 
@@ -46,13 +46,24 @@ type Bug struct {
 	Content      string
 	ImportanceId cache.ImportantId
 	CreateTime   int64
-	VersionId    int64
+	VersionId    cache.VersionId
 	OprateUsers  assist.Uid
 	LevelId      cache.LevelId
-	EnvId        int64
+	EnvId        cache.EnvId
 	ProjectId    cache.ProjectId
 	UpdateTime   int64
 	Dustbin      bool
+}
+
+func NewBugById(id interface{}) (*Bug, error) {
+	bug := &Bug{}
+
+	err := db.Mconn.GetOne("select id, uid,title,sid,content,iid,createtime,vid,spusers,lid,eid,pid,updatetime from bugs where dustbin=0 and id=?", id).Scan(
+		&bug.ID, &bug.Uid, &bug.Title, &bug.StatusId, &bug.Content, &bug.ImportanceId, &bug.CreateTime, &bug.VersionId, &bug.OprateUsers,
+		&bug.LevelId, &bug.EnvId, &bug.ProjectId, &bug.UpdateTime,
+	)
+	bug.Content = html.UnescapeString(bug.Content)
+	return bug, err
 }
 
 func GetCreatedCountByTime(start, end, statusid int64) (int, error) {

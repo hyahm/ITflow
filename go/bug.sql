@@ -91,7 +91,6 @@ CREATE TABLE `bugs` (
   `title` varchar(50) DEFAULT NULL,
   `sid` bigint(20) DEFAULT '0',
   `content` text,
-  `ownerid` bigint(20) DEFAULT '0',
   `iid` bigint(20) DEFAULT '0',
   `createtime` bigint(20) DEFAULT '0',
   `vid` bigint(20) DEFAULT '0',

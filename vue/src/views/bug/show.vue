@@ -13,24 +13,41 @@
       <!--</sticky>-->
     </div>
     <div class="components-container">
-      <code style="text-align: center">{{ bug.title }}</code>
+      <div>
+        <h1 style="text-align: center">{{ bug.title }}</h1>
+      </div>
 
       <el-card class="box-card" style="background-color: #8cbda4">
         <el-row>
-          <!--<el-col :span="5">-->
-          <!--<span>类型: {{ bug.selectclass }}</span>-->
-          <!--</el-col>-->
           <el-col :span="5">
-            <span>版本：{{ bug.appversion }}</span>
+            <span>项目名: {{ bug.projectname }}</span>
           </el-col>
           <el-col :span="5">
-            <span>状态：{{ bug.status }}</span>
+            <span>版本：{{ bug.version }}</span>
+          </el-col>
+          <el-col :span="5">
+            <span>级别：{{ bug.level }}</span>
+          </el-col>
+          <el-col :span="5">
+            <span>重要性：{{ bug.important }}</span>
           </el-col>
         </el-row>
 
       </el-card>
+      <div id="main">
+        <mavon-editor
+          style="width: 100%;min-height:10px"
+          :value="bug.content"
+          :box-shadow="false"
+          :subfield="false"
+          :toolbars-flag="false"
+          default-open="preview"
+          :editable="false"
+          :scroll-style="true"
+        />
 
-      <div id="tinymcecontent" class="placeholder-container" v-html="bug.content" />
+        <!-- <mavon-editor ref="md" v-model="bug.content" /> -->
+      </div>
       <div v-for="(cc, index) in bug.comment" :key="index" style="margin-bottom: 5px">
         <el-card class="box-card">
           <div>{{ cc.date | parseTime('{y}-{m}-{d} {h}:{i}') }}由{{ cc.user }}转交给{{ cc.passuser }}</div>
@@ -153,6 +170,7 @@ export default {
       if (id % 1 === 0) {
         this.temp.id = parseInt(id)
         showBug(id).then(resp => {
+          console.log(resp.data)
           if (resp.data.code === 0) {
             this.bug = resp.data
           } else {

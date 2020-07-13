@@ -98,7 +98,7 @@
 
         <el-form-item>
           <div id="main">
-            <mavon-editor ref="md" v-model="postForm.content" @imgAdd="imgAdd" />
+            <mavon-editor ref="md" v-model="postForm.content" :editable="false" :toolbars="null" @imgAdd="imgAdd" />
           </div>
           <!-- <div class="editor-container">
             <Tinymce ref="editor" v-model="postForm.content" />

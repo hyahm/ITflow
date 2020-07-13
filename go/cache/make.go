@@ -64,11 +64,11 @@ func initCache() {
 		panic(err)
 	}
 	for erows.Next() {
-		var id int64
-		var name string
+		var id EnvId
+		var name Env
 		erows.Scan(&id, &name)
-		CacheEidName[id] = name
-		CacheEnvNameEid[name] = id
+		CacheEidEnv[id] = name
+		CacheEnvEid[name] = id
 	}
 
 	headerrows, err := db.Mconn.GetRows("select id,name from header")
@@ -115,11 +115,11 @@ func initCache() {
 		panic(err)
 	}
 	for versionrows.Next() {
-		var vid int64
-		var role string
-		versionrows.Scan(&vid, &role)
-		CacheVersionNameVid[role] = vid
-		CacheVidName[vid] = role
+		var vid VersionId
+		var version Version
+		versionrows.Scan(&vid, &version)
+		CacheVersionVid[version] = vid
+		CacheVidVersion[vid] = version
 
 	}
 

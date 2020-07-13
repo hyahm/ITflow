@@ -21,7 +21,7 @@ func EnvList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 管理员
-	for k, v := range cache.CacheEidName {
+	for k, v := range cache.CacheEidEnv {
 		pr := &env.Env{
 			Id:      k,
 			EnvName: v,
@@ -59,8 +59,8 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 添加缓存
-	cache.CacheEidName[errorcode.Id] = envname
-	cache.CacheEnvNameEid[envname] = errorcode.Id
+	cache.CacheEidEnv[cache.EnvId(errorcode.Id)] = cache.Env(envname)
+	cache.CacheEnvEid[cache.Env(envname)] = cache.EnvId(errorcode.Id)
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -91,9 +91,9 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 更新缓存
-	delete(cache.CacheEnvNameEid, cache.CacheEidName[int64(er.Id)])
-	cache.CacheEidName[int64(er.Id)] = er.EnvName
-	cache.CacheEnvNameEid[er.EnvName] = int64(er.Id)
+	delete(cache.CacheEnvEid, cache.CacheEidEnv[cache.EnvId(er.Id)])
+	cache.CacheEidEnv[cache.EnvId(er.Id)] = er.EnvName
+	cache.CacheEnvEid[er.EnvName] = cache.EnvId(er.Id)
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -142,8 +142,8 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 		Action:   "delete",
 	}
 
-	delete(cache.CacheEnvNameEid, cache.CacheEidName[int64(eid)])
-	delete(cache.CacheEidName, int64(eid))
+	delete(cache.CacheEnvEid, cache.CacheEidEnv[cache.EnvId(eid)])
+	delete(cache.CacheEidEnv, cache.EnvId(eid))
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return

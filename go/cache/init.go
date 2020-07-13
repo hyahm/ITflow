@@ -35,20 +35,16 @@ type Email struct {
 
 // cached
 var (
-	CacheRidRole        map[int64]string
-	CacheRidInfo        map[int64]string
-	CacheRoleRid        map[string]int64
-	CacheEidName        map[int64]string
-	CacheEnvNameEid     map[string]int64
-	CacheUidRealName    map[int64]string
-	CacheVidName        map[int64]string
-	CacheVersionNameVid map[string]int64
-	CacheUidSgid        map[int64]int64
-	CacheUidNickName    map[int64]string
-	CacheRidGroup       map[int64]string
-	CacheUidFilter      map[int64]StoreStatusId
-	DefaultCreateSid    StatusId
-	DefaultCompleteSid  StatusId
+	CacheRidRole       map[int64]string
+	CacheRidInfo       map[int64]string
+	CacheRoleRid       map[string]int64
+	CacheUidRealName   map[int64]string
+	CacheUidSgid       map[int64]int64
+	CacheUidNickName   map[int64]string
+	CacheRidGroup      map[int64]string
+	CacheUidFilter     map[int64]StoreStatusId
+	DefaultCreateSid   StatusId
+	DefaultCompleteSid StatusId
 
 	CacheUidRid  map[int64]int64
 	CacheUidJid  map[int64]int64
@@ -106,17 +102,17 @@ func LoadConfig() {
 	CachePidProject = make(map[ProjectId]Project, 0)
 	CacheUidSgid = make(map[int64]int64, 0)
 	CacheUidRid = make(map[int64]int64, 0)
-	CacheEidName = make(map[int64]string, 0)
+	CacheEidEnv = make(map[EnvId]Env, 0)
 	CacheUidRealName = make(map[int64]string, 0)
 	CacheUidNickName = make(map[int64]string, 0)
-	CacheVidName = make(map[int64]string, 0)
+	CacheVidVersion = make(map[VersionId]Version, 0)
 	CacheGidGroup = make(map[int64]string, 0)
 	CacheNickNameUid = make(map[string]int64, 0)
 	CacheStatusSid = make(map[Status]StatusId, 0)
 	CacheRealNameUid = make(map[string]int64, 0)
 	CacheProjectPid = make(map[Project]ProjectId, 0)
-	CacheVersionNameVid = make(map[string]int64, 0)
-	CacheEnvNameEid = make(map[string]int64, 0)
+	CacheVersionVid = make(map[Version]VersionId, 0)
+	CacheEnvEid = make(map[Env]EnvId, 0)
 	CacheLidLevel = make(map[LevelId]Level, 0)
 	CacheJidJobname = make(map[int64]string, 0)
 	CacheJobnameJid = make(map[string]int64, 0)

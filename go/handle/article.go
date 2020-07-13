@@ -2,12 +2,12 @@ package handle
 
 import (
 	"encoding/json"
-	"html"
 	"io"
 	"io/ioutil"
 	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/bug"
+	"itflow/internal/comment"
 	"itflow/internal/project"
 	"itflow/internal/response"
 	"itflow/model"
@@ -45,16 +45,16 @@ type articledetail struct {
 }
 
 type envList struct {
-	EnvList []string `json:"envlist"`
-	Code    int      `json:"code"`
+	EnvList []cache.Env `json:"envlist"`
+	Code    int         `json:"code"`
 }
 
 func GetEnv(w http.ResponseWriter, r *http.Request) {
 	el := &envList{
-		EnvList: make([]string, 0),
+		EnvList: make([]cache.Env, 0),
 	}
 
-	for _, v := range cache.CacheEidName {
+	for _, v := range cache.CacheEidEnv {
 		el.EnvList = append(el.EnvList, v)
 	}
 
@@ -119,17 +119,17 @@ func GetProjectUser(w http.ResponseWriter, r *http.Request) {
 }
 
 type versionList struct {
-	VersionList []string `json:"versionlist"`
-	Code        int      `json:"code"`
+	VersionList []cache.Version `json:"versionlist"`
+	Code        int             `json:"code"`
 }
 
 func GetVersion(w http.ResponseWriter, r *http.Request) {
 
 	vl := &versionList{
-		VersionList: make([]string, 0),
+		VersionList: make([]cache.Version, 0),
 	}
 
-	for _, v := range cache.CacheVidName {
+	for _, v := range cache.CacheVidVersion {
 		vl.VersionList = append(vl.VersionList, v)
 	}
 	send, _ := json.Marshal(vl)
@@ -254,20 +254,32 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 }
 
 func BugShow(w http.ResponseWriter, r *http.Request) {
+	// 判断是否有权限访问这个bug
 	bid := r.FormValue("id")
-	sl := &bug.RespEditBug{}
-	errorcode := &response.Response{}
-	model.NewInformationsByBid(bid)
-	getlistsql := "select b.id,title,content,s.name,v.name as name from bugs as b inner join status as s inner join version as v on b.id=? and b.sid=s.id and b.vid=v.id"
-
-	err := db.Mconn.GetOne(getlistsql, bid).Scan(&sl.Id, &sl.Title, &sl.Content, &sl.Status, &sl.Version)
+	sl := &bug.RespShowBug{}
+	cc, err := model.NewInformationsByBid(bid)
 	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		sl.Comments = make([]*comment.Informations, 0)
+		sl.Code = 1
+		sl.Msg = err.Error()
+		w.Write(sl.Marshal())
 		return
 	}
+	sl.Comments = make([]*comment.Informations, len(cc))
+	for i, v := range cc {
+		sl.Comments[i].Date = v.Time
+		sl.Comments[i].Info = v.Info
+		sl.Comments[i].User = cache.CacheUidRealName[v.Uid]
+	}
 
-	sl.Content = html.UnescapeString(sl.Content)
+	bug, err := model.NewBugById(bid)
+	sl.Important = bug.ImportanceId.Name()
+	sl.Content = bug.Content
+	sl.Level = bug.LevelId.Name()
+	sl.Envname = bug.EnvId.Name()
+	sl.Title = bug.Title
+	sl.Projectname = bug.ProjectId.Name()
+
 	send, _ := json.Marshal(sl)
 	w.Write(send)
 	return

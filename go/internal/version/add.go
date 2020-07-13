@@ -4,7 +4,7 @@ import "itflow/cache"
 
 type RespVersion struct {
 	Id      int64         `json:"id"`
-	Name    string        `json:"name"`
+	Name    cache.Version `json:"name"`
 	Project cache.Project `json:"project"`
 	RunEnv  string        `json:"runenv"`
 	Url     string        `json:"url"`

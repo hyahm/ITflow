@@ -282,7 +282,7 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 		var sid cache.StatusId
 		var lid cache.LevelId
 		var pid cache.ProjectId
-		var eid int64
+		var eid cache.EnvId
 		var userlist string
 		rows.Scan(&one.ID, &one.Date, &iid, &sid, &one.Title, &lid, &pid, &eid, &userlist)
 		// 如果不存在这么办， 添加修改的时候需要判断
@@ -290,7 +290,7 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 		one.Status = cache.CacheSidStatus[sid]
 		one.Level = cache.CacheLidLevel[lid]
 		one.Projectname = cache.CachePidProject[pid]
-		one.Env = cache.CacheEidName[eid]
+		one.Env = cache.CacheEidEnv[eid]
 		// 显示realname
 
 		//如果是我的任务
