@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"itflow/cache"
 	"itflow/model"
+
+	"github.com/hyahm/golog"
 )
 
 type ResProjectList struct {
@@ -18,6 +20,7 @@ func (rpl *ResProjectList) Marshal() []byte {
 }
 
 func GetList(uid int64) []byte {
+	// 项目列表， 只要跟自己有关的都可以看到
 	rpl := &ResProjectList{
 		ProjectList: make([]*ReqProject, 0),
 	}
@@ -27,19 +30,17 @@ func GetList(uid int64) []byte {
 		rpl.Msg = err.Error()
 		return rpl.Marshal()
 	}
-
+	golog.Info(ps)
 	for _, p := range ps {
 		rp := &ReqProject{
 			ProjectName: p.Name,
 		}
 		rp.Id = p.Id
-		rp.GroupName = cache.CacheGidGroup[p.Gid].Name
-		// 防止空数据错误， 正常环境是不会出现这个问题的
-		// pl := strings.Split(p.Gid, ",")
-		// if len(pl) == 1 && pl[0] == "" {
-		// 	rpl.ProjectList = append(rpl.ProjectList, rp)
-		// 	continue
-		// }
+		ug, ok := cache.CacheUGidUserGroup[p.Gid]
+		if !ok {
+			continue
+		}
+		rp.GroupName = ug.Name
 
 		rpl.ProjectList = append(rpl.ProjectList, rp)
 	}

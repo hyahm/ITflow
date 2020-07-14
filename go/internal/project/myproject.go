@@ -31,11 +31,12 @@ func (mp *MyProject) Get(uid int64) []byte {
 	}
 
 	for _, p := range pl {
-		uids := strings.Split(cache.CacheGidGroup[p.Gid].Uids, ",")
-		if len(uids) == 1 && uids[0] == "" {
+		uids, ok := cache.CacheUGidUserGroup[p.Gid]
+		if !ok {
 			continue
 		}
-		for _, v := range uids {
+
+		for _, v := range strings.Split(uids.Uids, ",") {
 			uid64, err := strconv.ParseInt(v, 10, 64)
 			if err != nil {
 				continue

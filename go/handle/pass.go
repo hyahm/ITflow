@@ -35,8 +35,8 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("not found project"))
 		return
 	}
-	var gid int64
-	err := db.Mconn.GetOne("select gid from project where id=?", pid).Scan(&gid)
+	var ugid int64
+	err := db.Mconn.GetOne("select ugid from project where id=?", pid).Scan(&ugid)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -45,7 +45,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 
 	// 判断这个bug是不是自己的任务，只有自己的任务才可以转交
 	var havePerm bool
-	for _, v := range strings.Split(cache.CacheGidGroup[gid].Uids, ",") {
+	for _, v := range strings.Split(cache.CacheUGidUserGroup[ugid].Uids, ",") {
 		permuid, err := strconv.ParseInt(v, 10, 64)
 		if err != nil {
 			continue

@@ -196,14 +196,12 @@ export default {
     confirm() {
       if (this.form.id <= 0) {
         addVersion(this.form).then(response => {
+          console.log(response.data)
           if (response.data.code === 0) {
-            var row = this.form
-            row.id = response.data.id
-            row.date = response.data.updatetime
-            row.url = response.data.url
-            row.bakurl = response.data.bakurl
-            row.project = response.data.project
-            this.list.unshift(row)
+            this.form.id = response.data.id
+            this.form.date = response.data.updatetime
+
+            this.list.unshift(this.form)
             this.$message.success('添加成功')
           } else {
             this.$message.error(response.data.message)
@@ -244,10 +242,6 @@ export default {
         type: 'warning'
       }).then(() => {
         removeVersion(row.id).then(resp => {
-          if (resp === undefined) {
-            return
-          }
-          // if (resp.data === null) {
           if (resp.data.code === 0) {
             const l = this.list.length
             for (let i = 0; i < l; i++) {

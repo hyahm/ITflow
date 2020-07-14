@@ -1,7 +1,7 @@
 <template>
   <div class="group">
     <p class="warn-content">
-      共享文件和文档权限控制组
+      只有创建才能删除， 管理员和创建者可以查看编辑
     </p>
     <el-table
       :data="list"
@@ -97,14 +97,17 @@ export default {
       getUsers().then(resp => {
         if (resp.data.code === 0) {
           this.users = resp.data.users
+        } else {
+          this.$message.error(resp.data.message)
         }
       })
     },
     getgroup() {
       getGroup().then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
-          this.list = resp.data.grouplist
+          this.list = resp.data.usergrouplist
+        } else {
+          this.$message.error(resp.data.message)
         }
       })
     },

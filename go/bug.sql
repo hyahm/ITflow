@@ -432,10 +432,11 @@ DROP TABLE IF EXISTS `project`;
 CREATE TABLE `project` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL DEFAULT '',
-  `gid` bigint(20) NOT NULL DEFAULT 0,
+  `ugid` bigint(20) NOT NULL DEFAULT '0',
+  `uid` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -680,7 +681,7 @@ CREATE TABLE `usergroup` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL DEFAULT '',
   `ids` varchar(200) DEFAULT '',
-  `cuid` bigint(20) DEFAULT '0',
+  `uid` bigint(20) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;

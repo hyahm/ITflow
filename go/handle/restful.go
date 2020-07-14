@@ -41,12 +41,12 @@ func RestList(w http.ResponseWriter, r *http.Request) {
 		if tr.Readuser {
 			tr.ReadName = cache.CacheUidRealName[rid]
 		} else {
-			tr.ReadName = cache.CacheGidGroup[rid].Name
+			tr.ReadName = cache.CacheUGidUserGroup[rid].Name
 		}
 		if tr.Edituser {
 			tr.EditName = cache.CacheUidRealName[eid]
 		} else {
-			tr.EditName = cache.CacheGidGroup[eid].Name
+			tr.EditName = cache.CacheUGidUserGroup[eid].Name
 		}
 		// 如果是创建者，直接是有权限的，添加进去
 		if oid == cache.CacheNickNameUid[nickname] {
@@ -145,7 +145,7 @@ func RestUpdate(w http.ResponseWriter, r *http.Request) {
 	if tl.Readuser {
 		rid = cache.CacheRealNameUid[tl.ReadName]
 	} else {
-		for k, v := range cache.CacheGidGroup {
+		for k, v := range cache.CacheUGidUserGroup {
 			if v.Name == tl.ReadName {
 				rid = k
 			}
@@ -155,7 +155,7 @@ func RestUpdate(w http.ResponseWriter, r *http.Request) {
 	if tl.Edituser {
 		eid = cache.CacheRealNameUid[tl.EditName]
 	} else {
-		for k, v := range cache.CacheGidGroup {
+		for k, v := range cache.CacheUGidUserGroup {
 			if v.Name == tl.EditName {
 				eid = k
 			}
@@ -200,7 +200,7 @@ func RestAdd(w http.ResponseWriter, r *http.Request) {
 	if dr.Readuser {
 		rid = cache.CacheRealNameUid[dr.ReadName]
 	} else {
-		for k, v := range cache.CacheGidGroup {
+		for k, v := range cache.CacheUGidUserGroup {
 			if v.Name == dr.ReadName {
 				rid = k
 			}
@@ -209,7 +209,7 @@ func RestAdd(w http.ResponseWriter, r *http.Request) {
 	if dr.Edituser {
 		eid = cache.CacheRealNameUid[dr.EditName]
 	} else {
-		for k, v := range cache.CacheGidGroup {
+		for k, v := range cache.CacheUGidUserGroup {
 			if v.Name == dr.EditName {
 				eid = k
 			}

@@ -328,9 +328,12 @@ export default {
     handleFilter() {
       this.listLoading = true
       searchMyTasks(this.listQuery).then(resp => {
-        this.list = resp.data.articlelist
-        this.total = resp.data.total
-        this.listQuery.page = resp.data.page
+        console.log(resp.data)
+        if (resp.data.code === 0) {
+          this.list = resp.data.articlelist
+          this.total = resp.data.total
+          this.listQuery.page = resp.data.page
+        }
       })
       this.listLoading = false
     },

@@ -22,7 +22,7 @@ func (rp *ReqProject) checkValid() error {
 	if rp.ProjectName == "" {
 		return ProjectNameIsEmpty
 	}
-	if len(rp.GroupName) == 0 {
+	if rp.GroupName == "" {
 		return ParticipantIsEmpty
 	}
 	return nil
@@ -36,23 +36,15 @@ func (rp *ReqProject) Add(userid int64) ([]byte, error) {
 		golog.Error(err)
 		return resp.ErrorE(err), err
 	}
-	// uids := make([]string, 0)
-	// needAdd := true
-	// for _, v := range cache.CacheGidGroup[rp.Gid].Uids {
-	// 	// 获取的真实用户名
-	// 	if uid, ok := cache.CacheRealNameUid[v.]; ok {
-	// 		if uid == userid {
-	// 			needAdd = false
-	// 		}
-	// 		uids = append(uids, strconv.FormatInt(uid, 10))
-	// 	}
-	// }
-	// if needAdd {
-	// 	uids = append(uids, strconv.FormatInt(userid, 10))
-	// }
+	golog.Infof("%+v", rp)
+	ug, ok := cache.CacheUserGroupUGid[rp.GroupName]
+	if !ok {
+		return resp.ErrorE(ParticipantIsEmpty), ParticipantIsEmpty
+	}
 	project := &model.Project{
 		Name: rp.ProjectName,
-		Gid:  cache.CacheGroupGid[rp.GroupName].Gid,
+		Gid:  ug.Ugid,
+		Uid:  userid,
 	}
 	err = project.Insert()
 	if err != nil {

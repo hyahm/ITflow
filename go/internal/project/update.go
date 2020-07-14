@@ -26,7 +26,7 @@ func (rp *ReqProject) Update(userid int64) ([]byte, error) {
 	project := &model.Project{
 		Id:   rp.Id,
 		Name: rp.ProjectName,
-		Gid:  cache.CacheGroupGid[rp.GroupName].Gid,
+		Gid:  cache.CacheUserGroupUGid[rp.GroupName].Ugid,
 	}
 	golog.Info("update")
 	err = project.Update()

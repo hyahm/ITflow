@@ -29,12 +29,11 @@
       </el-table-column>
 
       <el-table-column
-        label="参与者"
+        label="用户组"
         width="800"
       >
-
         <template slot-scope="scope">
-          <span style="margin-left: 10px">{{ scope.row.selectuser }}</span>
+          <span style="margin-left: 10px">{{ scope.row.groupname }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="200">
@@ -46,7 +45,7 @@
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.row.selectuser)"
+            @click="handleDelete(scope.row.groupname)"
           >删除</el-button>
         </template>
       </el-table-column>
@@ -59,9 +58,9 @@
         </el-form-item>
 
         <el-form-item style="display: inline-block;width: 300px" label="参与者：">
-          <el-select v-model="form.selectuser" multiple placeholder="参与者">
+          <el-select v-model="form.groupname" placeholder="参与者">
             <el-option
-              v-for="(item, index) in users"
+              v-for="(item, index) in usergroups"
               :key="index"
               :label="item"
               :value="item"
@@ -79,7 +78,7 @@
 </template>
 
 <script>
-import { getUsers } from '@/api/get'
+import { getUserGroupNames } from '@/api/group'
 import { getProjectName, addProjectName, updateProjectName, deleteProjectName } from '@/api/project'
 export default {
   name: 'Addproject',
@@ -88,33 +87,31 @@ export default {
       dialogFormVisible: false,
       form: {
         projectname: '',
-        selectuser: [],
+        groupname: '',
         id: -1
       },
-      users: [],
+      usergroups: [],
       formLabelWidth: '120px',
       tableData: []
     }
   },
   created() {
-    this.getuser()
-    this.getprojectname()
+    this.getusergroup()
+    this.getproject()
   },
   methods: {
-    getuser() {
-      getUsers().then(resp => {
+    getusergroup() {
+      getUserGroupNames().then(resp => {
         if (resp.data.code === 0) {
-          if (resp.data.users !== null) {
-            this.users = resp.data.users
-          } else {
-            this.$message.error(resp.data.message)
-          }
+          this.usergroups = resp.data.usergroupnames
+        } else {
+          this.$message.error(resp.data.message)
         }
       }).catch(err => {
         this.$message.error(err)
       })
     },
-    getprojectname() {
+    getproject() {
       getProjectName().then(resp => {
         console.log(resp.data)
         if (resp.data.code === 0) {
@@ -127,7 +124,7 @@ export default {
     addProject() {
       this.form.id = -1
       this.form.projectname = ''
-      this.form.selectuser = []
+      this.form.groupname = ''
       this.dialogFormVisible = true
     },
     handleDelete(id) {
@@ -159,9 +156,10 @@ export default {
       if (this.form.projectname === '') {
         this.$message.success('至少选择一个名称')
       }
-      if (this.form.selectuser.length === 0) {
-        this.$message.success('至少选择一个参与者')
+      if (this.form.groupname === '') {
+        this.$message.success('请选择用户组')
       }
+      console.log(this.form)
       if (this.form.id <= 0) {
         addProjectName(this.form).then(resp => {
           if (resp.data.code === 0) {

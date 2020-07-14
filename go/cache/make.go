@@ -151,9 +151,9 @@ func initCache() {
 	for grouprows.Next() {
 		ug := &UG{}
 
-		grouprows.Scan(&ug.Gid, &ug.Name, &ug.Uids)
-		CacheGidGroup[ug.Gid] = ug
-		CacheGroupGid[ug.Name] = ug
+		grouprows.Scan(&ug.Ugid, &ug.Name, &ug.Uids)
+		CacheUGidUserGroup[ug.Ugid] = ug
+		CacheUserGroupUGid[ug.Name] = ug
 	}
 
 	typerows, err := db.Mconn.GetRows("select id,name from types")

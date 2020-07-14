@@ -7,6 +7,7 @@ import (
 	"itflow/internal/datalog"
 	"itflow/internal/response"
 	"itflow/internal/status"
+	"itflow/internal/usergroup"
 	"itflow/model"
 	"net/http"
 	"strconv"
@@ -189,15 +190,30 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func GroupGet(w http.ResponseWriter, r *http.Request) {
+func GroupNamesGet(w http.ResponseWriter, r *http.Request) {
 
+	data := &usergroup.RespUserGroupName{
+		UserGroupNames: make([]string, 0),
+	}
+	for _, v := range cache.CacheUGidUserGroup {
+		data.UserGroupNames = append(data.UserGroupNames, v.Name)
+	}
+	send, _ := json.Marshal(data)
+	w.Write(send)
+	return
+
+}
+
+func UserGroupGet(w http.ResponseWriter, r *http.Request) {
+	// 可以获取所有用户组
 	errorcode := &response.Response{}
 
-	data := &model.Send_groups{
-		GroupList: make([]*model.Get_groups, 0),
+	data := &usergroup.RespUserGroupList{
+		UserGroupList: make([]*usergroup.RespUserGroup, 0),
 	}
 	uid := xmux.GetData(r).Get("uid").(int64)
 	if cache.SUPERID == uid {
+		golog.Info("1111111111111111111")
 		gsql := "select id,name,ids from usergroup"
 		rows, err := db.Mconn.GetRows(gsql)
 		if err != nil {
@@ -206,17 +222,22 @@ func GroupGet(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for rows.Next() {
-			onegroup := &model.Get_groups{}
+			golog.Info("loop")
+			onegroup := &usergroup.RespUserGroup{}
 			var users string
 			rows.Scan(&onegroup.Id, &onegroup.Name, &users)
 			for _, v := range strings.Split(users, ",") {
-				uid, _ := strconv.Atoi(v)
-				onegroup.Users = append(onegroup.Users, cache.CacheUidRealName[int64(uid)])
+				uid, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					continue
+				}
+				onegroup.Users = append(onegroup.Users, cache.CacheUidRealName[uid])
 			}
-			data.GroupList = append(data.GroupList, onegroup)
+
+			data.UserGroupList = append(data.UserGroupList, onegroup)
 		}
 	} else {
-		gsql := "select id,name,ids from usergroup where cuid=?"
+		gsql := "select id,name,ids from usergroup where uid=?"
 		rows, err := db.Mconn.GetRows(gsql, uid)
 		if err != nil {
 			golog.Error(err)
@@ -224,14 +245,17 @@ func GroupGet(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for rows.Next() {
-			onegroup := &model.Get_groups{}
+			onegroup := &usergroup.RespUserGroup{}
 			var users string
 			rows.Scan(&onegroup.Id, &onegroup.Name, &users)
 			for _, v := range strings.Split(users, ",") {
-				uid, _ := strconv.Atoi(v)
-				onegroup.Users = append(onegroup.Users, cache.CacheUidRealName[int64(uid)])
+				uid, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					continue
+				}
+				onegroup.Users = append(onegroup.Users, cache.CacheUidRealName[uid])
 			}
-			data.GroupList = append(data.GroupList, onegroup)
+			data.UserGroupList = append(data.UserGroupList, onegroup)
 		}
 	}
 
@@ -245,7 +269,8 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 	golog.Info("add..................")
 	errorcode := &response.Response{}
 	nickname := xmux.GetData(r).Get("nickname").(string)
-	data := xmux.GetData(r).Data.(*model.Get_groups)
+	uid := xmux.GetData(r).Get("uid").(int64)
+	data := xmux.GetData(r).Data.(*usergroup.RespUserGroup)
 
 	ids := make([]string, 0)
 	for _, v := range data.Users {
@@ -257,9 +282,13 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 		}
 		ids = append(ids, strconv.FormatInt(uid, 10))
 	}
-	gsql := "insert usergroup(name,ids,cuid) values(?,?,?)"
+	if _, ok := cache.CacheUserGroupUGid[data.Name]; ok {
+		w.Write(errorcode.Errorf("%s 重复", data.Name))
+		return
+	}
+	gsql := "insert usergroup(name,ids,uid) values(?,?,?)"
 	var err error
-	errorcode.Id, err = db.Mconn.Insert(gsql, data.Name, strings.Join(ids, ","), cache.CacheNickNameUid[nickname])
+	errorcode.Id, err = db.Mconn.Insert(gsql, data.Name, strings.Join(ids, ","), uid)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -274,11 +303,16 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 		Action:   "add",
 	}
 	ug := &cache.UG{}
-	ug.Gid = errorcode.Id
+	ug.Ugid = errorcode.Id
 	ug.Name = data.Name
 	ug.Uids = strings.Join(ids, ",")
-	cache.CacheGidGroup[errorcode.Id] = ug
-	cache.CacheGroupGid[ug.Name] = ug
+
+	if ug, ok := cache.CacheUGidUserGroup[errorcode.Id]; ok {
+		delete(cache.CacheUserGroupUGid, ug.Name)
+	}
+
+	cache.CacheUGidUserGroup[errorcode.Id] = ug
+	cache.CacheUserGroupUGid[ug.Name] = ug
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -362,8 +396,8 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	gsql := "delete from usergroup where id=? and cuid=? or cuid=?"
-	_, err = db.Mconn.Update(gsql, id, uid, cache.SUPERID)
+	gsql := "delete from usergroup where id=? and uid=?"
+	_, err = db.Mconn.Update(gsql, id, uid)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -377,9 +411,11 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 		Classify: "usergroup",
 		Action:   "delete",
 	}
+	if ug, ok := cache.CacheUGidUserGroup[id64]; ok {
+		delete(cache.CacheUserGroupUGid, ug.Name)
+	}
 
-	delete(cache.CacheGroupGid, cache.CacheGidGroup[id64].Name)
-	delete(cache.CacheGidGroup, id64)
+	delete(cache.CacheUGidUserGroup, id64)
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -390,26 +426,30 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := xmux.GetData(r).Data.(*model.Get_groups)
+	data := xmux.GetData(r).Data.(*usergroup.RespUpdateUserGroup)
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	uid := xmux.GetData(r).Get("uid").(int64)
 
-	gsql := "update usergroup set name=?,ids=? where id=? and cuid=? or cuid=?"
-	ids := ""
-	for i, v := range data.Users {
-		if i == 0 {
-			ids = strconv.FormatInt(cache.CacheRealNameUid[v], 10)
-		} else {
-			ids = ids + "," + strconv.FormatInt(cache.CacheRealNameUid[v], 10)
+	ids := make([]string, 0)
+	for _, v := range data.Users {
+		userid, ok := cache.CacheRealNameUid[v]
+		if !ok {
+			continue
 		}
+		ids = append(ids, strconv.FormatInt(userid, 10))
+
 	}
-	_, err := db.Mconn.Update(gsql, data.Name, ids, data.Id, cache.SUPERID, uid)
+	usergroup := &model.UserGroup{
+		Id:   data.Id,
+		Ids:  strings.Join(ids, ","),
+		Name: data.Name,
+	}
+	err := usergroup.Update(uid)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-
 	// 增加日志
 	xmux.GetData(r).End = &datalog.AddLog{
 		Ip:       r.RemoteAddr,
@@ -418,13 +458,16 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 		Action:   "update",
 	}
 	ug := &cache.UG{
-		Gid:  data.Id,
+		Ugid: data.Id,
 		Name: data.Name,
-		Uids: ids,
+		Uids: strings.Join(ids, ","),
 	}
-	delete(cache.CacheGroupGid, cache.CacheGidGroup[data.Id].Name)
-	cache.CacheGidGroup[data.Id] = ug
-	cache.CacheGroupGid[data.Name] = ug
+	if thisUg, ok := cache.CacheUGidUserGroup[data.Id]; ok {
+		delete(cache.CacheUserGroupUGid, thisUg.Name)
+	}
+
+	cache.CacheUGidUserGroup[data.Id] = ug
+	cache.CacheUserGroupUGid[data.Name] = ug
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return

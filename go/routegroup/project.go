@@ -17,7 +17,7 @@ func init() {
 	Project.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
 	Project.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	Project.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
-	Project.Pattern("/project/list").Post(handle.ProjectList).ApiDescribe("获取所有列表")
+	Project.Pattern("/project/list").Post(handle.ProjectList).ApiDescribe("获取所有列表").ApiSupplement("只有跟项目有关的参与者才能看到项目")
 
 	Project.Pattern("/project/add").Post(handle.AddProject).Bind(&project.ReqProject{}).
 		AddMidware(midware.JsonToStruct).End(midware.EndLog).

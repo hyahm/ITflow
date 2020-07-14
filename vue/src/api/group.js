@@ -63,6 +63,13 @@ export function getGroup() {
   })
 }
 
+export function getUserGroupNames() {
+  return request({
+    url: '/groupnames/get',
+    method: 'post'
+  })
+}
+
 export function getPermStatus() {
   return request({
     url: '/get/permstatus',

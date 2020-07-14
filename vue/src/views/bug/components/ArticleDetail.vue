@@ -98,7 +98,7 @@
 
         <el-form-item>
           <div id="main">
-            <mavon-editor ref="md" v-model="postForm.content" :editable="false" :toolbars="null" @imgAdd="imgAdd" />
+            <mavon-editor ref="md" v-model="postForm.content" @imgAdd="imgAdd" />
           </div>
           <!-- <div class="editor-container">
             <Tinymce ref="editor" v-model="postForm.content" />
@@ -117,7 +117,7 @@ import Sticky from '@/components/Sticky' // 粘性header组件
 import { validateURL } from '@/utils/validate'
 import { fetchBug, createBug } from '@/api/bugs'
 import { uploadImg } from '@/api/uploadimg'
-import { getEnv, getMyProject, getVersion, getLevels, getImportants, getProjectUser } from '@/api/get'
+import { getEnv, getMyProject, getLevels, getImportants, getProjectUser } from '@/api/get'
 
 const defaultForm = {
   // status: 'draft',
@@ -185,7 +185,7 @@ export default {
   created() {
     this.getimportants()
     this.getproject()
-    this.getversion()
+    // this.getversion()
     this.getlevels()
     this.getenv()
     if (this.isEdit) {
@@ -251,17 +251,17 @@ export default {
         }
       })
     },
-    getversion() {
-      getVersion().then(resp => {
-        if (resp.data.code === 0) {
-          this.versions = resp.data.versionlist
-        } else {
-          this.$message.error(resp.data.message)
-        }
-      }).catch(err => {
-        this.$message.error(err)
-      })
-    },
+    // getversion() {
+    //   getVersion().then(resp => {
+    //     if (resp.data.code === 0) {
+    //       this.versions = resp.data.versionlist
+    //     } else {
+    //       this.$message.error(resp.data.message)
+    //     }
+    //   }).catch(err => {
+    //     this.$message.error(err)
+    //   })
+    // },
 
     fetchData(id) {
       fetchBug(id).then(resp => {
