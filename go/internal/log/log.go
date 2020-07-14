@@ -71,7 +71,7 @@ func (sl *Search_log) GetPagingLimitAndPage() (int, int) {
 		// if count%limit == 0 {
 
 		start := (sl.Page - 1) * sl.Limit
-		if sl.Count-start < sl.Limit {
+		if sl.Limit*sl.Page > sl.Count {
 			return start, sl.Count - start
 		} else {
 			return start, sl.Limit

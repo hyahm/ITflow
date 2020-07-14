@@ -23,9 +23,7 @@ type BugList struct {
 
 func (pl *BugList) GetPagingLimitAndPage() (int, int) {
 	// 都小于1了
-	golog.Info(pl.Page)
-	golog.Info(pl.Limit)
-	golog.Info(pl.Count)
+
 	if pl.Limit == 0 {
 		return 0, 0
 	}
