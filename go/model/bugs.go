@@ -58,7 +58,7 @@ type Bug struct {
 func NewBugById(id interface{}) (*Bug, error) {
 	bug := &Bug{}
 
-	err := db.Mconn.GetOne("select id, uid,title,sid,content,iid,createtime,vid,spusers,lid,eid,pid,updatetime from bugs where dustbin=0 and id=?", id).Scan(
+	err := db.Mconn.GetOne("select id, uid,title,sid,content,iid,createtime,vid,spusers,lid,eid,pid,updatetime from bugs where dustbin=true and id=?", id).Scan(
 		&bug.ID, &bug.Uid, &bug.Title, &bug.StatusId, &bug.Content, &bug.ImportanceId, &bug.CreateTime, &bug.VersionId, &bug.OprateUsers,
 		&bug.LevelId, &bug.EnvId, &bug.ProjectId, &bug.UpdateTime,
 	)
@@ -69,19 +69,19 @@ func NewBugById(id interface{}) (*Bug, error) {
 func GetCreatedCountByTime(start, end, statusid int64) (int, error) {
 	var count int
 	db.Mconn.OpenDebug()
-	err := db.Mconn.GetOne("select count(id) from bugs where dustbin=1 and createtime between ? and ? and sid=?", start, end, statusid).Scan(&count)
+	err := db.Mconn.GetOne("select count(id) from bugs where dustbin=true and createtime between ? and ? and sid=?", start, end, statusid).Scan(&count)
 	golog.Info(db.Mconn.GetSql())
 	return count, err
 }
 
 func GetCompletedCountByTime(start, end, statusid int64) (int, error) {
 	var count int
-	err := db.Mconn.GetOne("select count(id) from bugs where dustbin=1 and updatetime between ? and ? and sid=?", start, end, statusid).Scan(&count)
+	err := db.Mconn.GetOne("select count(id) from bugs where dustbin=true and updatetime between ? and ? and sid=?", start, end, statusid).Scan(&count)
 	return count, err
 }
 
 func (bug *Bug) Resume(id interface{}) error {
-	getlistsql := "update bugs set dustbin=0 where id=?"
+	getlistsql := "update bugs set dustbin=true where id=?"
 
 	_, err := db.Mconn.Update(getlistsql, id)
 
@@ -89,7 +89,7 @@ func (bug *Bug) Resume(id interface{}) error {
 }
 
 func (bug *Bug) CreateBug() (err error) {
-	insertsql := "insert into bugs(uid,title,sid,content,iid,createtime,lid,pid,eid,spusers,vid) values(?,?,?,?,?,?,?,?,?,?,?)"
+	insertsql := "insert into bugs(uid,title,sid,content,iid,createtime,lid,pid,eid,spusers,vid,dustbin) values(?,?,?,?,?,?,?,?,?,?,?,true)"
 	bug.ID, err = db.Mconn.Insert(insertsql,
 		bug.Uid, bug.Title, bug.StatusId, html.EscapeString(bug.Content),
 		bug.ImportanceId, bug.CreateTime, bug.LevelId,

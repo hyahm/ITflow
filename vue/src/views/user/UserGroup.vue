@@ -47,7 +47,8 @@
       </el-table-column>
     </el-table>
     <el-button style="margin-top: 10px;margin-left: 10px" type="success" @click="handleAdd">添加组</el-button>
-    <el-dialog :visible.sync="dialogFormVisible" title="平台管理">
+
+    <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" title="平台管理">
       <el-form :model="form">
         <el-form-item label="组名">
           <el-input v-model="form.name" auto-complete="off" />
@@ -120,6 +121,7 @@ export default {
       this.dialogFormVisible = true
     },
     confirm() {
+      console.log(this.form)
       if (this.form.id > 0) {
         updateGroup(this.form).then(resp => {
           if (resp.data.code === 0) {

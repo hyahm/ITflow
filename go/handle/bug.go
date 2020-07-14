@@ -248,8 +248,8 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetData(r).Get("uid").(int64)
 	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
 	// mybug.GetUsefulCondition(uid)
-	countsql := "select count(id) from bugs where dustbin=0 and uid=? "
-	searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=0 and uid=? "
+	countsql := "select count(id) from bugs where dustbin=true and uid=? "
+	searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=true and uid=? "
 	sch, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
 	if err != nil {
 		if err == search.ErrorNoStatus {
@@ -303,7 +303,8 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 	}
 
 	nickname := xmux.GetData(r).Get("nickname").(string)
-	if uid != cache.CacheNickNameUid[nickname] && uid != cache.SUPERID {
+	thisUid := xmux.GetData(r).Get("uid").(int64)
+	if uid != thisUid && uid != cache.SUPERID {
 		golog.Debug("没有权限")
 		w.Write(errorcode.Error("没有权限"))
 		return

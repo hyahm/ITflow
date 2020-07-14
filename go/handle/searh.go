@@ -25,8 +25,8 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetData(r).Get("uid").(int64)
 	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
 	// mybug.GetUsefulCondition(uid)
-	countsql := "select count(id) from bugs where dustbin=0  "
-	searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=0  "
+	countsql := "select count(id) from bugs where dustbin=true  "
+	searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=true  "
 
 	sch, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
 	if err != nil {
@@ -53,19 +53,12 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 }
 
 func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
-	// 搜索的条件，
-	// page: 1,
-	// limit: 10,
-	// level: '',
-	// project: '',
-	// title: '',
-	// showstatus: []
 
 	uid := xmux.GetData(r).Get("uid").(int64)
 	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
 	// mybug.GetUsefulCondition(uid)
-	countsql := fmt.Sprintf("select count(id) from bugs where dustbin=0 and uid=%d ", uid)
-	searchsql := fmt.Sprintf("select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=0 and uid=%d ", uid)
+	countsql := fmt.Sprintf("select count(id) from bugs where dustbin=true and uid=%d ", uid)
+	searchsql := fmt.Sprintf("select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=true and uid=%d ", uid)
 
 	sch, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
 	if err != nil {
@@ -93,8 +86,8 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetData(r).Get("uid").(int64)
 	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
-	countsql := "select spusers from bugs where dustbin=0 "
-	searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=0 "
+	countsql := "select spusers from bugs where dustbin=true "
+	searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=true "
 	sch, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
 	if err != nil {
 		if err == search.ErrorNoStatus {
@@ -125,8 +118,8 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetData(r).Get("uid").(int64)
 	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
 	// mybug.GetUsefulCondition(uid)
-	countsql := "select count(id) from bugs where dustbin=1 "
-	searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=1 "
+	countsql := "select count(id) from bugs where dustbin=false "
+	searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=false "
 	sch, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
 	if err != nil {
 		if err == search.ErrorNoStatus {

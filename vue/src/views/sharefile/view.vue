@@ -66,7 +66,7 @@
       </el-table-column>
     </el-table>
     <!--// 创建文件名-->
-    <el-dialog :visible.sync="dialogFormVisible" title="文件夹名">
+    <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" title="文件夹名">
       <el-form>
         <el-form-item label="名称">
           <el-input v-model="form.name" auto-complete="off" />

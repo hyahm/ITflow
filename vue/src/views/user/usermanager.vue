@@ -102,6 +102,7 @@
     </el-table>
 
     <el-dialog
+      :close-on-click-modal="false"
       :visible.sync="dialogVisible"
       :before-close="handleClose"
       title="提示"

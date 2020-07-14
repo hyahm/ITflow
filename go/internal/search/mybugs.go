@@ -22,7 +22,7 @@ type ReqMyBugFilter struct {
 
 func (rmf *ReqMyBugFilter) GetUsefulCondition(uid int64, countsql, searchsql string) (*search.BugList, error) {
 	// 搜索所有跟bug相关的处理方法
-
+	golog.Info(rmf.Limit)
 	if rmf.Level != "" {
 		// 判断这个值是否存在
 

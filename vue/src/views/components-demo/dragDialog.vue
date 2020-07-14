@@ -1,7 +1,7 @@
 <template>
   <div class="components-container">
     <el-button type="primary" @click="dialogTableVisible = true">open a Drag Dialog</el-button>
-    <el-dialog v-el-drag-dialog title="Shipping address" :visible.sync="dialogTableVisible" @dragDialog="handleDrag">
+    <el-dialog v-el-drag-dialog :close-on-click-modal="false" title="Shipping address" :visible.sync="dialogTableVisible" @dragDialog="handleDrag">
       <el-select ref="select" v-model="value" placeholder="请选择">
         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>

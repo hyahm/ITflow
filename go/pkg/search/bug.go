@@ -23,6 +23,9 @@ type BugList struct {
 
 func (pl *BugList) GetPagingLimitAndPage() (int, int) {
 	// 都小于1了
+	golog.Info(pl.Page)
+	golog.Info(pl.Limit)
+	golog.Info(pl.Count)
 	if pl.Limit == 0 {
 		return 0, 0
 	}
@@ -40,7 +43,7 @@ func (pl *BugList) GetPagingLimitAndPage() (int, int) {
 			return (pl.Page - 1) * pl.Limit, pl.Count % pl.Limit
 		}
 	} else {
-		if pl.Count%pl.Limit == 0 {
+		if pl.Limit*pl.Page <= pl.Count {
 			return (pl.Page - 1) * pl.Limit, pl.Limit
 		} else {
 			return (pl.Page - 1) * pl.Limit, pl.Count % pl.Limit
@@ -57,6 +60,9 @@ func (pl *BugList) rows() (*sql.Rows, error) {
 	}
 	// 增加显示的状态
 	start, end := pl.GetPagingLimitAndPage()
+	golog.Info(start)
+	golog.Info(pl.Page)
+	golog.Info(end)
 	pl.ListSql += " order by id desc limit ?,? "
 	var rows *sql.Rows
 	rows, err = db.Mconn.GetRows(pl.ListSql, start, end)

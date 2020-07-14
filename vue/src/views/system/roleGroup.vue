@@ -31,7 +31,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-button :close-on-click-modal="false" style="margin: 20px" type="success" size="mini" @click="handleAdd">添加角色组</el-button>
+    <el-button style="margin: 20px" type="success" size="mini" @click="handleAdd">添加角色组</el-button>
     <el-dialog
       :visible.sync="dialogVisible"
       :before-close="handleClose"

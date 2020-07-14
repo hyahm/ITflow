@@ -4,7 +4,7 @@
       upload
     </el-button>
     <!-- action="https://httpbin.org/post" -->
-    <el-dialog :visible.sync="dialogVisible">
+    <el-dialog :close-on-click-modal="false" :visible.sync="dialogVisible">
       <el-upload
         :multiple="true"
         :file-list="fileList"

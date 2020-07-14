@@ -99,7 +99,7 @@ CREATE TABLE `bugs` (
   `eid` bigint(20) DEFAULT '0',
   `pid` bigint(20) DEFAULT '0',
   `updatetime` bigint(20) DEFAULT '0',
-  `dustbin` tinyint(1) DEFAULT '0',
+  `dustbin` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
