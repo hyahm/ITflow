@@ -283,6 +283,7 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 		ids = append(ids, strconv.FormatInt(uid, 10))
 	}
 	if _, ok := cache.CacheUserGroupUGid[data.Name]; ok {
+		errorcode.Code = 1
 		w.Write(errorcode.Errorf("%s 重复", data.Name))
 		return
 	}
