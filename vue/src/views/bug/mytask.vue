@@ -233,7 +233,13 @@ export default {
       statuslength: 0
     }
   },
-
+  activated() {
+    this.getstatus()
+    this.getmystatus()
+    this.getlevels()
+    this.getpname()
+    this.getspuser()
+  },
   created() {
     this.getstatus()
     this.getmystatus()

@@ -121,6 +121,11 @@ export default {
       groups: null
     }
   },
+  activated() {
+    this.getrolegroups()
+    this.getstatusgroups()
+    this.getpositions()
+  },
   created() {
     this.getrolegroups()
     this.getpositions()

@@ -71,6 +71,9 @@ export default {
       }
     }
   },
+  activated() {
+    this.getimportant()
+  },
   created() {
     this.getimportant()
   },

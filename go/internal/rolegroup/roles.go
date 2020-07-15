@@ -85,7 +85,8 @@ func (reqrg *ReqRoleGroup) Add(uid int64) []byte {
 		golog.Error(err)
 		return errrocode.ErrorE(err)
 	}
-	errrocode.Id = rg.ID
+	cache.CacheRidRole[rg.ID] = rg.Name
+	cache.CacheRoleRid[rg.Name] = rg.ID
 	return errrocode.Success()
 }
 
@@ -137,6 +138,8 @@ func (reqrg *ReqRoleGroup) Update(uid int64) []byte {
 		}
 
 	}
-
+	delete(cache.CacheRoleRid, cache.CacheRidRole[rg.ID])
+	cache.CacheRidRole[rg.ID] = rg.Name
+	cache.CacheRoleRid[rg.Name] = rg.ID
 	return errrocode.Success()
 }

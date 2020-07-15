@@ -83,6 +83,9 @@ export default {
 
     }
   },
+  activated() {
+    this.getstatus()
+  },
   created() {
     this.getstatus()
     this.getlist()

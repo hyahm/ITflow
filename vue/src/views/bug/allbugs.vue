@@ -226,7 +226,9 @@ export default {
     }
   },
   activated() {
-    this.getList()
+    this.getstatus()
+    this.getmystatus()
+    this.getlevels()
     this.getprojectname()
   },
   created() {

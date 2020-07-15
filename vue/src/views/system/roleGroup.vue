@@ -88,6 +88,7 @@ export default {
       templateperm: []
     }
   },
+
   created() {
     // this.getroles()
     this.getlist()
@@ -124,6 +125,8 @@ export default {
       })
     },
     handleAdd() {
+      this.form.id = -1
+      this.form.name = ''
       this.form.rolelist = this.templateperm
       this.dialogVisible = true
     },

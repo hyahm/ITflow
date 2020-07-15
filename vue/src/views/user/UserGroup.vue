@@ -89,6 +89,9 @@ export default {
       users: []
     }
   },
+  activated() {
+    this.getuser()
+  },
   mounted() {
     this.getgroup()
     this.getuser()

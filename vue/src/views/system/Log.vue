@@ -118,6 +118,9 @@ export default {
       value2: ''
     }
   },
+  activated() {
+    this.classifylist()
+  },
   created() {
     this.handleFilter()
     this.classifylist()

@@ -182,6 +182,12 @@ export default {
       envnames: []
     }
   },
+  activated() {
+    this.getimportants()
+    this.getproject()
+    this.getenv()
+    this.getlevels()
+  },
   created() {
     this.getimportants()
     this.getproject()

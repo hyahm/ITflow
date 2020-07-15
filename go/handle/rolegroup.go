@@ -124,7 +124,7 @@ func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if count > 0 {
-		w.Write(errorcode.Error("没有用户"))
+		w.Write(errorcode.Error("有用户在使用， 无法删除/rolegroup/get"))
 		return
 	}
 	isql := "delete from  rolegroup where id = ?"

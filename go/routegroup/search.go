@@ -12,10 +12,10 @@ var Search *xmux.GroupRoute
 
 func init() {
 	Search = xmux.NewGroupRoute().ApiCreateGroup("search", "搜索相关接口", "搜索")
-	Bug.ApiCodeField("code").ApiCodeMsg("0", "成功")
-	Bug.ApiCodeField("code").ApiCodeMsg("20", "token过期")
-	Bug.ApiCodeField("code").ApiCodeMsg("1", "其他错误,请查看返回的msg")
-	Bug.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
+	Search.ApiCodeField("code").ApiCodeMsg("0", "成功")
+	Search.ApiCodeField("code").ApiCodeMsg("20", "token过期")
+	Search.ApiCodeField("code").ApiCodeMsg("1", "其他错误,请查看返回的msg")
+	Search.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
 	Search.Pattern("/search/allbugs").Post(handle.SearchAllBugs).Bind(&search.ReqMyBugFilter{}).AddMidware(midware.JsonToStruct).
 		ApiDescribe("所有所有bug")

@@ -143,6 +143,10 @@ export default {
       }
     }
   },
+  activated() {
+    this.getproject()
+    this.getversionlist()
+  },
   created() {
     this.getversionlist()
     this.getproject()

@@ -122,6 +122,9 @@ export default {
       }
     }
   },
+  activated() {
+    this.gethypos()
+  },
   created() {
     this.getlist()
     this.gethypos()

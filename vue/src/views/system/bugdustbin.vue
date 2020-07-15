@@ -164,6 +164,11 @@ export default {
       statuslength: 0
     }
   },
+  activated() {
+    this.getpname()
+    this.getlevels()
+    this.getstatus()
+  },
   created() {
     this.getpname()
     this.getlevels()

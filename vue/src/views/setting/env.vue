@@ -70,6 +70,9 @@ export default {
       tableData: []
     }
   },
+  activated() {
+    this.getenvname()
+  },
   created() {
     this.getenvname()
   },

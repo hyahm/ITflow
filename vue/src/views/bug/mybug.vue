@@ -175,13 +175,15 @@ export default {
     this.getpname()
     this.getlevels()
     this.handleFilter()
-  },
-  activated() {
-    this.getpname()
-  },
-  created() {
     this.getmystatus()
   },
+  activated() {
+    this.getmystatus()
+    this.getpname()
+    this.getstatus()
+    this.getlevels()
+  },
+
   methods: {
     getlevels() {
       getLevels().then(resp => {

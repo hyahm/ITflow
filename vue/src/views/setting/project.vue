@@ -95,6 +95,10 @@ export default {
       tableData: []
     }
   },
+  activated() {
+    this.getproject()
+    this.getusergroup()
+  },
   created() {
     this.getusergroup()
     this.getproject()
