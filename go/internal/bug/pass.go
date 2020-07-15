@@ -12,4 +12,5 @@ type PassBug struct {
 	Status      cache.Status  `json:"status"  type:"string" need:"是" default:"" information:"转交后的状态"`
 	User        string        `json:"user"  type:"string" need:"是" default:"" information:"处理人"`
 	ProjectName cache.Project `json:"projectname"  type:"string" need:"是" default:"" information:"项目名"`
+	Code        int           `json:"code"  type:"int" need:"是" default:"" information:"错误码"`
 }

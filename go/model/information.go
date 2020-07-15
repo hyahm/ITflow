@@ -16,6 +16,7 @@ type Information struct {
 
 func NewInformationsByBid(bid interface{}) ([]*Information, error) {
 	infors := make([]*Information, 0)
+	golog.Info(bid)
 	getinfosql := "select id, bid,uid,info,time from informations where bid=?"
 	rows, err := db.Mconn.GetRows(getinfosql, bid)
 	if err != nil {

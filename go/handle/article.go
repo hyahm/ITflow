@@ -256,9 +256,12 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 	}
 	sl.Comments = make([]*comment.Informations, len(cc))
 	for i, v := range cc {
-		sl.Comments[i].Date = v.Time
-		sl.Comments[i].Info = v.Info
-		sl.Comments[i].User = cache.CacheUidRealName[v.Uid]
+		ct := &comment.Informations{
+			Date: v.Time,
+			Info: v.Info,
+			User: cache.CacheUidRealName[v.Uid],
+		}
+		sl.Comments[i] = ct
 	}
 
 	bug, err := model.NewBugById(bid)

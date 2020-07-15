@@ -374,8 +374,9 @@ export default {
         if (resp.data.code === 0) {
           this.users = resp.data.name
           for (var i = 0; i < this.users.length; i++) {
-            for (var j = 0; j < row.handle.selectusers.length; j++) {
-              if (row.temp.selectusers[j] === this.users[i]) {
+            console.log(row.handle)
+            for (var j = 0; j < row.handle.length; j++) {
+              if (this.temp.selectusers[j] === this.users[i]) {
                 this.temp.selectusers.push(this.users[i])
               }
             }

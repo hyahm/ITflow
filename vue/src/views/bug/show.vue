@@ -48,11 +48,10 @@
 
         <!-- <mavon-editor ref="md" v-model="bug.content" /> -->
       </div>
-      <div v-for="(cc, index) in bug.comment" :key="index" style="margin-bottom: 5px">
+      <div v-for="(cc, index) in bug.comments" :key="index" style="margin-bottom: 5px">
         <el-card class="box-card">
-          <div>{{ cc.date | parseTime('{y}-{m}-{d} {h}:{i}') }}由{{ cc.user }}转交给{{ cc.passuser }}</div>
-          <div>转交原因：</div>
-          <div>{{ cc.info }}</div>
+          <p>{{ cc.date | parseTime('{y}-{m}-{d} {h}:{i}') }}由{{ cc.user }}转交给{{ cc.passuser }}</p>
+          <span>转交原因：{{ cc.info }}</span>
         </el-card>
       </div>
     <!--<el-tooltip placement="top" content="tooltip">-->
@@ -111,7 +110,7 @@ export default {
         title: '',
         appversion: '',
         status: '',
-        comment: []
+        comments: []
       },
       statusOptions: [],
       dialogFormVisible: false,
