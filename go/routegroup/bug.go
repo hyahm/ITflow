@@ -10,8 +10,10 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-func InitBug() *xmux.GroupRoute {
-	Bug := xmux.NewGroupRoute().ApiCreateGroup("bug", "bug相关接口", "bug相关")
+var Bug *xmux.GroupRoute
+
+func init() {
+	Bug = xmux.NewGroupRoute().ApiCreateGroup("bug", "bug相关接口", "bug相关")
 	Bug.ApiCodeField("code").ApiCodeMsg("0", "成功")
 	Bug.ApiCodeField("code").ApiCodeMsg("20", "token过期")
 	Bug.ApiCodeField("code").ApiCodeMsg("1", "其他错误,请查看返回的msg")
@@ -57,5 +59,4 @@ func InitBug() *xmux.GroupRoute {
 
 	// Bug.Pattern("/get/thisrole").Get(handle.GetThisRoles)
 	Bug.Pattern("/get/group").Post(handle.GetGroup)
-	return Bug
 }

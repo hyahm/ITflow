@@ -6,13 +6,13 @@ import (
 	"itflow/internal/user"
 	"itflow/midware"
 
-	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
 
-func InitUser() *xmux.GroupRoute {
-	golog.Info(3333333)
-	User := xmux.NewGroupRoute()
+var User *xmux.GroupRoute
+
+func init() {
+	User = xmux.NewGroupRoute()
 	User.ApiCreateGroup("user", "用户相关的", "user")
 	User.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 	User.ApiCodeField("code").ApiCodeMsg("0", "成功")
@@ -45,5 +45,4 @@ func InitUser() *xmux.GroupRoute {
 
 	User.Pattern("/get/user").Post(handle.GetUser)
 	User.Pattern("/get/project/user").Get(handle.GetProjectUser)
-	return User
 }
