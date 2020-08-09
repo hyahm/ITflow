@@ -23,14 +23,6 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 
 	data := xmux.GetData(r).Data.(*status.StatusGroup)
 
-	// // 重新排序
-	// ids := make([]string, 0)
-	// for _, v := range data.StatusList {
-	// 	ids = append(ids, fmt.Sprintf("%d", cache.CacheStatusSid[v]))
-	// }
-
-	// ss := strings.Join(ids, ",")
-
 	isql := "insert into statusgroup(name,sids) values(?,?)"
 	var err error
 	errorcode.Id, err = db.Mconn.Insert(isql, data.Name, data.StatusList.ToStore())
@@ -61,18 +53,6 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 
 	data := xmux.GetData(r).Data.(*status.StatusGroup)
 
-	// ssids := make([]string, 0)
-	// for _, v := range data.StatusList {
-	// 	// 没找到就是key
-	// 	var sid int64
-	// 	var ok bool
-	// 	if sid, ok = cache.CacheStatusSid[v]; !ok {
-	// 		w.Write(errorcode.Error("没有找到status"))
-	// 		return
-	// 	}
-	// 	ssids = append(ssids, strconv.FormatInt(sid, 10))
-	// }
-	// ss := strings.Join(ssids, ",")
 	isql := "update statusgroup set name =?,sids=? where id = ?"
 	_, err := db.Mconn.Update(isql, data.Name, data.StatusList.ToStore(), data.Id)
 	if err != nil {
@@ -125,15 +105,6 @@ func BugGroupList(w http.ResponseWriter, r *http.Request) {
 		one := &department{}
 		rows.Scan(&one.Id, &one.Name, &ids)
 		one.BugstatusList = ids.ToShow()
-		// for _, v := range strings.Split(ids, ",") {
-		// 	id, err := strconv.Atoi(v)
-		// 	if err != nil {
-		// 		log.Println(err)
-		// 		continue
-		// 	}
-
-		// 	one.BugstatusList = append(one.BugstatusList, cache.CacheSidStatus[int64(id)])
-		// }
 		data.DepartmentList = append(data.DepartmentList, one)
 	}
 	send, _ := json.Marshal(data)
@@ -213,7 +184,6 @@ func UserGroupGet(w http.ResponseWriter, r *http.Request) {
 	}
 	uid := xmux.GetData(r).Get("uid").(int64)
 	if cache.SUPERID == uid {
-		golog.Info("1111111111111111111")
 		gsql := "select id,name,ids from usergroup"
 		rows, err := db.Mconn.GetRows(gsql)
 		if err != nil {
@@ -222,7 +192,6 @@ func UserGroupGet(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for rows.Next() {
-			golog.Info("loop")
 			onegroup := &usergroup.RespUserGroup{}
 			var users string
 			rows.Scan(&onegroup.Id, &onegroup.Name, &users)
@@ -424,12 +393,10 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 }
 
 func GroupUpdate(w http.ResponseWriter, r *http.Request) {
-
 	errorcode := &response.Response{}
-
 	data := xmux.GetData(r).Data.(*usergroup.RespUpdateUserGroup)
+	golog.Infof("%+v", *data)
 	nickname := xmux.GetData(r).Get("nickname").(string)
-	uid := xmux.GetData(r).Get("uid").(int64)
 
 	ids := make([]string, 0)
 	for _, v := range data.Users {
@@ -440,12 +407,12 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 		ids = append(ids, strconv.FormatInt(userid, 10))
 
 	}
-	usergroup := &model.UserGroup{
+	usergroup := &model.UserGroups{
 		Id:   data.Id,
 		Ids:  strings.Join(ids, ","),
 		Name: data.Name,
 	}
-	err := usergroup.Update(uid)
+	err := usergroup.Update()
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

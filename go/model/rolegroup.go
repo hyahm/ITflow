@@ -1,6 +1,8 @@
 package model
 
 import (
+	"database/sql"
+	"errors"
 	"itflow/cache"
 	"itflow/db"
 	"strconv"
@@ -51,4 +53,17 @@ func (rg *RoleGroup) CheckPagePerm(name string) bool {
 		}
 	}
 	return false
+}
+
+func CheckRoleNameInGroup(name string, rid *int64) error {
+	err := db.Mconn.GetOne("select id from rolegroup where name=?",
+		strings.Trim(name, " ")).Scan(rid)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors.New("不存在此角色组")
+		}
+		return err
+	}
+
+	return nil
 }

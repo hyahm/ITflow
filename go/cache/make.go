@@ -133,16 +133,7 @@ func initCache() {
 		deprows.Scan(&pid, &name)
 		CacheSgidGroup[pid] = name
 	}
-	rgrows, err := db.Mconn.GetRows("select id,name from rolegroup")
-	if err != nil {
-		panic(err)
-	}
-	for rgrows.Next() {
-		var id int64
-		var name string
-		rgrows.Scan(&id, &name)
-		CacheRidGroup[id] = name
-	}
+
 	grouprows, err := db.Mconn.GetRows("select id,name,ids from usergroup")
 	if err != nil {
 		panic(err)

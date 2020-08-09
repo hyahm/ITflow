@@ -108,9 +108,9 @@
       title="提示"
       width="30%"
     >
-      <el-form ref="postForm" class="form-container" style="padding: 20px" />
+      <el-form ref="postForm" />
       <!--<el-button type="success" round @click="HandlerAddGroup">添加部门</el-button>-->
-      <el-form ref="postForm" class="form-container" style="padding: 20px">
+      <el-form ref="postForm">
         <el-form-item label="昵称">
           <el-input v-model="form.nickname" />
         </el-form-item>

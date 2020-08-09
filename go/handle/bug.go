@@ -140,21 +140,15 @@ func UpdateRoles(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	sl := xmux.GetData(r).Data.(*role.Role)
-
-	var rid int64 // 这个是修改后的rid
-	for k, v := range cache.CacheRidGroup {
-		if v == sl.Name {
-			rid = k
-			break
-		}
-	}
-	if rid == 0 {
-		golog.Debug("不存在此权限")
-		w.Write(errorcode.Error("不存在此权限"))
+	var rid int64
+	err := model.CheckRoleNameInGroup(sl.Name, &rid)
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
-	_, err := db.Mconn.Update("update user set rid=? where id=?", rid, sl.Id)
+	_, err = db.Mconn.Update("update user set rid=? where id=?", rid, sl.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

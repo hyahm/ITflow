@@ -26,6 +26,7 @@ func init() {
 
 	UserGroup.Pattern("/group/del").Get(handle.GroupDel).End(midware.EndLog).ApiDescribe("删除用户组，只有创建者和admin才能操作")
 
-	UserGroup.Pattern("/group/update").Post(handle.GroupUpdate).Bind(&usergroup.RespUpdateUserGroup{}).AddMidware(midware.JsonToStruct).
+	UserGroup.Pattern("/group/update").Post(handle.GroupUpdate).Bind(&usergroup.RespUpdateUserGroup{}).
+		AddMidware(midware.JsonToStruct).AddMidware(midware.CheckUser).
 		End(midware.EndLog).ApiDescribe("编辑用户组，只有创建者和admin才能操作")
 }

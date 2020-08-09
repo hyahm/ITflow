@@ -27,6 +27,6 @@ func init() {
 	Important.Pattern("/important/update").Post(handle.ImportantUpdate).Bind(&model.Importants{}).AddMidware(midware.JsonToStruct).
 		End(midware.EndLog)
 
-	Important.Pattern("/get/importants").Post(handle.GetImportants).DelMidware(midware.CheckImportantPermssion)
+	Important.Pattern("/get/importants").Post(handle.GetImportants)
 
 }

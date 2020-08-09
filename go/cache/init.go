@@ -29,13 +29,13 @@ type UG struct {
 
 // cached
 var (
-	CacheRidRole       map[int64]string
-	CacheRidInfo       map[int64]string
-	CacheRoleRid       map[string]int64
-	CacheUidRealName   map[int64]string
-	CacheUidSgid       map[int64]int64
-	CacheUidNickName   map[int64]string
-	CacheRidGroup      map[int64]string
+	CacheRidRole     map[int64]string
+	CacheRidInfo     map[int64]string
+	CacheRoleRid     map[string]int64
+	CacheUidRealName map[int64]string
+	CacheUidSgid     map[int64]int64
+	CacheUidNickName map[int64]string
+
 	CacheUidFilter     map[int64]StoreStatusId
 	DefaultCreateSid   StatusId
 	DefaultCompleteSid StatusId
@@ -88,7 +88,7 @@ func LoadConfig() {
 		}
 	}
 	CacheSidStatus = make(map[StatusId]Status, 0)
-	CacheRidGroup = make(map[int64]string, 0)
+
 	CacheRidInfo = make(map[int64]string, 0)
 	CacheRidRole = make(map[int64]string, 0)
 	CacheIidImportant = make(map[ImportantId]Important, 0)

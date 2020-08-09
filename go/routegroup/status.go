@@ -49,7 +49,7 @@ func init() {
 		ApiReqStruct(&bug.ReqStatus{}).ApiRequestTemplate(`{"id": 0, "name": "普通"}`).
 		ApiResStruct(&bug.ResponeStatus{}).ApiResponseTemplate(`{"id": 8,"code": 0}`)
 
-	Status.Pattern("/get/status").Post(handle.GetStatus).DelMidware(midware.CheckStatusPermssion)
+	Status.Pattern("/get/status").Post(handle.GetStatus)
 
 	Status.Pattern("/status/remove").Get(handle.StatusRemove).
 		End(midware.EndLog).
@@ -61,6 +61,6 @@ func init() {
 		ApiReqStruct(&bug.ReqStatus{}).ApiRequestTemplate(`{"id": 0, "name": "普通"}`).
 		ApiResStruct(&bug.ResponeStatus{}).ApiResponseTemplate(`{"code": 0}`)
 
-	Status.Pattern("/status/show").Post(handle.ShowStatus).DelMidware(midware.CheckStatusPermssion).
+	Status.Pattern("/status/show").Post(handle.ShowStatus).
 		ApiDescribe("查询可以查看的状态")
 }

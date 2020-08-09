@@ -55,7 +55,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	var sgid int64
 	var hassggroup bool
-	var hasrolegroup bool
+
 	for k, v := range cache.CacheSgidGroup {
 		if v == getuser.StatusGroup {
 			sgid = k
@@ -65,15 +65,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var rid int64
-	for k, v := range cache.CacheRidGroup {
-		if v == getuser.RoleGroup {
-			rid = k
-			hasrolegroup = true
-			break
-		}
+	err := model.CheckRoleNameInGroup(getuser.RoleGroup, &rid)
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
 	}
-
-	if !hasrolegroup || !hassggroup {
+	if !hassggroup {
 		w.Write(errorcode.Error("没有找到权限"))
 		return
 	}
@@ -98,7 +96,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		Roleid:     rid,
 		Jobid:      jid,
 	}
-	err := user.Create()
+	err = user.Create()
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -255,10 +253,11 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 
 	uls := &user.UserList{}
 
-	// 0是系统管理员， 1是管理层， 2是普通用户
-	//switch level {
-	//case 0:
-	getallsql := "select id,createtime,realname,nickname,email,disable,rid,bugsid,jid from user where id<>?"
+	getallsql := `select u.id,createtime,realname,nickname,email,disable,r.name,s.name,j.name from 
+	project.user as u join project.rolegroup as r 
+	join project.statusgroup as s 
+	join project.jobs as j 
+	on u.rid = r.id and u.bugsid = s.id and u.jid = j.id and u.id<>?`
 	adminrows, err := db.Mconn.GetRows(getallsql, cache.SUPERID)
 	if err != nil {
 		golog.Error(err)
@@ -267,13 +266,12 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 	}
 	for adminrows.Next() {
 		ul := &user.User{}
-		var rid int64
-		var jid int64
-		var bugsid int64
-		adminrows.Scan(&ul.Id, &ul.Createtime, &ul.Realname, &ul.Nickname, &ul.Email, &ul.Disable, &rid, &bugsid, &jid)
-		ul.StatusGroup = cache.CacheSgidGroup[bugsid]
-		ul.RoleGroup = cache.CacheRidGroup[rid]
-		ul.Position = cache.CacheJidJobname[jid]
+		err = adminrows.Scan(&ul.Id, &ul.Createtime, &ul.Realname, &ul.Nickname, &ul.Email,
+			&ul.Disable, &ul.RoleGroup, &ul.StatusGroup, &ul.Position)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
 		uls.Userlist = append(uls.Userlist, ul)
 	}
 
@@ -297,24 +295,16 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 	// 0是系统管理员， 1是管理层， 2是普通用户
 	//switch level {
 	//case 0:
-	var hasrolegroup bool
+
 	var hasstatusgroup bool
 	var rid int64
 	var bsid int64
-	for k, v := range cache.CacheRidGroup {
-		if v == uls.RoleGroup {
-			rid = k
-			hasrolegroup = true
-			break
-		}
-	}
 
-	for k, v := range cache.CacheRidGroup {
-		if v == uls.RoleGroup {
-			rid = k
-			hasrolegroup = true
-			break
-		}
+	err := model.CheckRoleNameInGroup(uls.RoleGroup, &rid)
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
 	}
 
 	for k, v := range cache.CacheSgidGroup {
@@ -328,13 +318,13 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("没有找到职位"))
 		return
 	}
-	if !hasrolegroup || !hasstatusgroup {
+	if !hasstatusgroup {
 		w.Write(errorcode.Error("没有找到status"))
 		return
 	}
 
 	getallsql := "update user set realname=?,nickname=?,email=?,rid=?,bugsid=?,jid=? where id=?"
-	_, err := db.Mconn.Update(getallsql,
+	_, err = db.Mconn.Update(getallsql,
 		uls.Realname, uls.Nickname, uls.Email, rid, bsid, cache.CacheJobnameJid[uls.Position],
 		uls.Id,
 	)

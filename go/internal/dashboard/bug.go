@@ -7,8 +7,6 @@ import (
 	"itflow/model"
 	"log"
 	"time"
-
-	"github.com/hyahm/golog"
 )
 
 type BugCount struct {
@@ -26,16 +24,12 @@ func GetCount() []byte {
 		Created:   make([]int, SHOWDAY),
 		Completed: make([]int, SHOWDAY),
 	}
-	golog.Info(start)
-	golog.Info(end)
 	count := 0
 	for i := SHOWDAY - 1; i >= 0; i-- {
 		if cache.DefaultCreateSid > 0 {
-			golog.Info("create")
 			bc.Created[count], _ = model.GetCreatedCountByTime(start[i], end[i], cache.DefaultCreateSid.ToInt64())
 		}
 		if cache.DefaultCompleteSid > 0 {
-			golog.Info("complete")
 			bc.Completed[count], _ = model.GetCompletedCountByTime(start[i], end[i], cache.DefaultCompleteSid.ToInt64())
 		}
 		count++

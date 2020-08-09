@@ -68,7 +68,7 @@ func (reqrg *ReqRoleGroup) Add(uid int64) []byte {
 				golog.Info(err)
 				return errrocode.ErrorE(err)
 			}
-
+			errrocode.Id = perm.Id
 			pernids = append(pernids, strconv.FormatInt(perm.Id, 10))
 		} else {
 			golog.Info(v.Name)

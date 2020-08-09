@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"itflow/db"
 	"strings"
 
@@ -31,11 +32,23 @@ func (perm *Perm) Insert() error {
 }
 
 func (perm *Perm) Update(ids string) error {
-
+	db.Mconn.OpenDebug()
+	golog.Debug(ids)
+	var err error
+	if strings.Index(ids, ",") > 0 {
+		if strings.Count(ids, ",") == 1 {
+			_, err = db.Mconn.Update("update perm set find=?, remove=?,revise=?, increase=? where rid=? and id=?",
+				perm.Find, perm.Remove, perm.Revise, perm.Increase, perm.Rid, ids)
+		} else {
+			_, err = db.Mconn.Update("update perm set find=?, remove=?,revise=?, increase=? where rid=? and id in (?)",
+				perm.Find, perm.Remove, perm.Revise, perm.Increase, perm.Rid, ids)
+		}
+	} else {
+		return errors.New("data errror")
+	}
 	// 更新的时候 rid 也是固定的， 不需要修改
-	effect, err := db.Mconn.UpdateIn("update perm set find=?, remove=?,revise=?, increase=? where rid=? and id in (?)",
-		perm.Find, perm.Remove, perm.Revise, perm.Increase, perm.Rid, strings.Split(ids, ","))
-	golog.Info(effect)
+
+	golog.Info(db.Mconn.GetSql())
 	return err
 }
 

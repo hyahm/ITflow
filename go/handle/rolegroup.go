@@ -10,7 +10,6 @@ import (
 	"itflow/internal/rolegroup"
 	"itflow/model"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/hyahm/golog"
@@ -73,34 +72,30 @@ func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 
 func GetRoleGroupName(w http.ResponseWriter, r *http.Request) {
 
-	// errorcode := &response.Response{}
+	errorcode := &response.Response{}
 
-	// s := "select name from rolegroup"
-	// rows, err := db.Mconn.GetRows(s)
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(errorcode.ErrorE(err))
-	// 	return
-	// }
+	s := "select name from rolegroup"
+	rows, err := db.Mconn.GetRows(s)
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
 	resp := &struct {
 		Code     int      `json:"code"`
 		RoleList []string `json:"rolelist"`
 	}{
 		RoleList: make([]string, 0),
 	}
-	// for rows.Next() {
-	// 	var name string
-	// 	rows.Scan(&name)
-	// 	resp.RoleList = append(resp.RoleList, name)
+	for rows.Next() {
+		var name string
+		rows.Scan(&name)
+		resp.RoleList = append(resp.RoleList, name)
 
-	// }
-	for _, v := range cache.CacheRidGroup {
-		resp.RoleList = append(resp.RoleList, v)
 	}
+
 	send, _ := json.Marshal(resp)
-	golog.Info(string(send))
 	w.Write(send)
-	return
 }
 
 func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
@@ -108,15 +103,10 @@ func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	id := r.FormValue("id")
-	id32, err := strconv.Atoi(id)
-	if err != nil {
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	ssql := "select count(id) from user where rid=?"
 	var count int
-	err = db.Mconn.GetOne(ssql, id).Scan(&count)
+	err := db.Mconn.GetOne(ssql, id).Scan(&count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -124,7 +114,7 @@ func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if count > 0 {
-		w.Write(errorcode.Error("有用户在使用， 无法删除/rolegroup/get"))
+		w.Write(errorcode.Error("有用户在使用， 无法删除"))
 		return
 	}
 	isql := "delete from  rolegroup where id = ?"
@@ -144,7 +134,7 @@ func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 删除缓存
-	delete(cache.CacheRidGroup, int64(id32))
+
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -186,15 +176,3 @@ func RoleTemplate(w http.ResponseWriter, r *http.Request) {
 	return
 
 }
-
-// func GetRoleGroup(w http.ResponseWriter, r *http.Request) {
-
-// 	rl := &rolegroup.Roles{}
-// 	for _, v := range cache.CacheRidGroup {
-// 		rl.Roles = append(rl.Roles, v)
-// 	}
-// 	send, _ := json.Marshal(rl)
-// 	w.Write(send)
-// 	return
-
-// }

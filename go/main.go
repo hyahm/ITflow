@@ -16,6 +16,9 @@ import (
 func main() {
 	// 初始化配置文件
 	goconfig.InitConf("bug.ini", goconfig.INI)
+	if goconfig.ReadBool("debug", false) {
+		golog.Level = golog.ALL
+	}
 	//初始化mysql
 	db.InitMysql()
 	// // 初始化redis
