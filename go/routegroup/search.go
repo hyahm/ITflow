@@ -8,6 +8,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+// Search 搜索相关
 var Search *xmux.GroupRoute
 
 func init() {

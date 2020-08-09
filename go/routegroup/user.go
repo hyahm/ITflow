@@ -9,6 +9,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+// User 用户操作
 var User *xmux.GroupRoute
 
 func init() {

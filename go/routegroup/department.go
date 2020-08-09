@@ -8,6 +8,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+// Department 部门路由组
 var Department *xmux.GroupRoute
 
 func init() {

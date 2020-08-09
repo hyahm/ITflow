@@ -8,6 +8,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+// Email 邮件相关路由组
 var Email *xmux.GroupRoute
 
 func init() {

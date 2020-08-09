@@ -8,6 +8,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+// DefaultValue 默认值
 var DefaultValue *xmux.GroupRoute
 
 func init() {

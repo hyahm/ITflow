@@ -8,6 +8,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+// Version  bug版本
 var Version *xmux.GroupRoute
 
 func init() {

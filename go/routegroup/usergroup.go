@@ -8,6 +8,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+// UserGroup 用户组
 var UserGroup *xmux.GroupRoute
 
 func init() {
@@ -17,9 +18,9 @@ func init() {
 	UserGroup.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	UserGroup.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
-	UserGroup.Pattern("/group/get").Post(handle.UserGroupGet).ApiResponseTemplate(`"grouplist":[],"code":0`).ApiDescribe("获取自己创建的用户组")
+	UserGroup.Pattern("/group/get").Post(handle.UserGroupGet).ApiResponseTemplate(`{"grouplist":["aa"],"code":0}`).ApiDescribe("获取自己创建的用户组")
 
-	UserGroup.Pattern("/groupnames/get").Post(handle.GroupNamesGet).ApiResponseTemplate(`"groupnames":[],"code":0`).ApiDescribe("获取自己创建的用户组")
+	UserGroup.Pattern("/groupnames/get").Post(handle.GroupNamesGet).ApiResponseTemplate(`{"groupnames":["bb"],"code":0}`).ApiDescribe("获取自己创建的用户组")
 
 	UserGroup.Pattern("/group/add").Post(handle.GroupAdd).Bind(&usergroup.RespUserGroup{}).AddMidware(midware.JsonToStruct).
 		End(midware.EndLog)

@@ -8,6 +8,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+// Level bug级别路由
 var Level *xmux.GroupRoute
 
 func init() {

@@ -10,6 +10,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+// Bug bug相关操作的路由组
 var Bug *xmux.GroupRoute
 
 func init() {
@@ -25,7 +26,7 @@ func init() {
 		AddMidware(midware.JsonToStruct).End(midware.EndLog).
 		ApiDescribe("创建或更新bug").
 		ApiRequestTemplate(`{"title":"metu","content":"<p>反反复复</p>","id":1,"selectuser":["sdfsadf"],"projectname":"123","level":"2","envname":"axi","important":"一般ee","version":"V 1.5"}`).
-		ApiResponseTemplate(`{id: 20, code: 0, message: "success"}`)
+		ApiResponseTemplate(`{"id": 20, "code": 0, "message": "success"}`)
 
 	Bug.Pattern("/bug/edit").Get(handle.BugEdit).
 		End(midware.EndLog).

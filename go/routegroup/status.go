@@ -8,6 +8,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+// Status 状态路由组
 var Status *xmux.GroupRoute
 
 func init() {

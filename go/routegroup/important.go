@@ -8,6 +8,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+// Important 重要性路由
 var Important *xmux.GroupRoute
 
 func init() {

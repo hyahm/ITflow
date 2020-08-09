@@ -8,6 +8,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+// Position 职位路由
 var Position *xmux.GroupRoute
 
 func init() {

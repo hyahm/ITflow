@@ -19,19 +19,19 @@ func main() {
 	if goconfig.ReadBool("debug", false) {
 		golog.Level = golog.ALL
 	}
-	//初始化mysql
+	// //初始化mysql
 	db.InitMysql()
-	// // 初始化redis
+	// // // 初始化redis
 	db.InitCacheTable()
 
-	// // 初始化缓存（后面会使用redis）
+	// // // 初始化缓存（后面会使用redis）
 	cache.LoadConfig()
 
-	// // 初始化日志
+	// // // 初始化日志
 	golog.InitLogger(goconfig.ReadString("log.path", ""),
 		goconfig.ReadInt64("log.size", 0),
 		goconfig.ReadBool("log.everyday", false))
-	////
+	// ////
 	signalChan := make(chan os.Signal)
 
 	go func() {

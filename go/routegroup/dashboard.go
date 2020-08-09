@@ -6,6 +6,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+// DashBoard 主页上的
 var DashBoard *xmux.GroupRoute
 
 func init() {

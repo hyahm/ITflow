@@ -10,6 +10,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+// Api 废弃
 var Api *xmux.GroupRoute
 
 func init() {

@@ -8,6 +8,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+// Log 日志路由
 var Log *xmux.GroupRoute
 
 func init() {

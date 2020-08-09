@@ -9,11 +9,11 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+// RoleGroup 角色组路由
 var RoleGroup *xmux.GroupRoute
 
 func init() {
 	RoleGroup = xmux.NewGroupRoute().
-		// AddMidware(midware.CheckRoleGroupPermssion).
 		ApiCreateGroup("rolegroup", "角色组相关", "rolegroup").ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxx")
 	RoleGroup.ApiCodeField("code").ApiCodeMsg("0", "成功")
 	RoleGroup.ApiCodeField("code").ApiCodeMsg("20", "token过期")

@@ -8,6 +8,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+// Share 废弃
 var Share *xmux.GroupRoute
 
 func init() {

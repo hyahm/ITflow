@@ -8,6 +8,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+// UserManager 用户管理
 var UserManager *xmux.GroupRoute
 
 func init() {
