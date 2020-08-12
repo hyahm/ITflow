@@ -5,7 +5,6 @@ import (
 	"io"
 	"io/ioutil"
 	"itflow/cache"
-	"itflow/db"
 	"itflow/internal/bug"
 	"itflow/internal/comment"
 	"itflow/internal/project"
@@ -193,7 +192,13 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 	url := &uploadimage{}
 	golog.Info("uploading header image")
 	errorcode := &response.Response{}
-
+	// body, err := ioutil.ReadAll(r.Body)
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
+	// golog.Info(string(body))
 	image, header, err := r.FormFile("upload")
 	if err != nil {
 		golog.Error(err)
@@ -225,14 +230,14 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 
 	url.FileName = filename
 	url.Uploaded = 1
-	uploadimg := "update user set headimg = ? where nickname=?"
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	_, err = db.Mconn.Update(uploadimg, url.Url, nickname)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	// uploadimg := "update user set headimg = ? where nickname=?"
+	// nickname := xmux.GetData(r).Get("nickname").(string)
+	// _, err = db.Mconn.Update(uploadimg, url.Url, nickname)
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
 	s, _ := json.Marshal(url)
 
 	w.Write(s)

@@ -2,6 +2,7 @@ package httpserver
 
 import (
 	"fmt"
+	"itflow/handle"
 	"itflow/midware"
 	"itflow/routegroup"
 	"net/http"
@@ -19,38 +20,38 @@ func RunHttp() {
 	router.AddMidware(midware.CheckToken) // 所有的请求头优先检查token是否有效， 登录除外
 
 	router.AddGroup(routegroup.User)
-	// router.AddGroup(routegroup.Bug)
-	// router.AddGroup(routegroup.Search)
-	// router.AddGroup(routegroup.DashBoard)
-	// router.AddGroup(routegroup.Version)
-	// router.AddGroup(routegroup.Admin)
-	// router.AddGroup(routegroup.Project)
-	// router.AddGroup(routegroup.Env)
-	// router.AddGroup(routegroup.StatusGroup)
-	// router.AddGroup(routegroup.UserManager)
+	router.AddGroup(routegroup.Bug)
+	router.AddGroup(routegroup.Search)
+	router.AddGroup(routegroup.DashBoard)
+	router.AddGroup(routegroup.Version)
+	router.AddGroup(routegroup.Admin)
+	router.AddGroup(routegroup.Project)
+	router.AddGroup(routegroup.Env)
+	router.AddGroup(routegroup.StatusGroup)
+	router.AddGroup(routegroup.UserManager)
 
-	// router.AddGroup(routegroup.RoleGroup)
+	router.AddGroup(routegroup.RoleGroup)
 
-	// router.AddGroup(routegroup.Department)
-	// router.AddGroup(routegroup.Position)
-	// router.AddGroup(routegroup.Status)
+	router.AddGroup(routegroup.Department)
+	router.AddGroup(routegroup.Position)
+	router.AddGroup(routegroup.Status)
 
-	// router.AddGroup(routegroup.Type)
-	// router.AddGroup(routegroup.Level)
-	// router.AddGroup(routegroup.Important)
-	// router.AddGroup(routegroup.Log)
-	// router.AddGroup(routegroup.UserGroup)
-	// router.AddGroup(routegroup.DefaultValue)
+	router.AddGroup(routegroup.Type)
+	router.AddGroup(routegroup.Level)
+	router.AddGroup(routegroup.Important)
+	router.AddGroup(routegroup.Log)
+	router.AddGroup(routegroup.UserGroup)
+	router.AddGroup(routegroup.DefaultValue)
 
-	// router.AddGroup(routegroup.Email)
-	// router.AddGroup(routegroup.Share)
-	// router.AddGroup(routegroup.Api)
+	router.AddGroup(routegroup.Email)
+	router.AddGroup(routegroup.Share)
+	router.AddGroup(routegroup.Api)
 
-	// router.Pattern("/uploadimg").Post(handle.UploadImgs).DelMidware(midware.CheckToken)
-	// router.Pattern("/upload/headimg").Post(handle.UploadHeadImg)
-	// router.Pattern("/showimg/{imgname}").Get(handle.ShowImg).SetHeader("Content-Type", "image/png").DelMidware(midware.CheckToken)
+	router.Pattern("/uploadimg").Post(handle.UploadImgs).DelMidware(midware.CheckToken)
+	router.Pattern("/upload/headimg").Post(handle.UploadHeadImg)
+	router.Pattern("/showimg/{imgname}").Get(handle.ShowImg).SetHeader("Content-Type", "image/png").DelMidware(midware.CheckToken)
 
-	// router.Pattern("/get/expire/{token}").Get(handle.GetExpire).DelMidware(midware.CheckToken)
+	router.Pattern("/get/expire/{token}").Get(handle.GetExpire).DelMidware(midware.CheckToken)
 	// 生产环境中， 这个要么注释， 要么
 	if goconfig.ReadBool("debug", false) {
 		doc := xmux.ShowApi("/docs", router).DelMidware(midware.CheckToken)
