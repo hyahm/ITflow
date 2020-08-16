@@ -2,7 +2,6 @@ package handle
 
 import (
 	"encoding/json"
-	"itflow/internal/datalog"
 	"itflow/internal/user"
 	"net/http"
 
@@ -22,14 +21,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: login.Username,
-		Classify: "login",
-		Action:   "login",
-	}
 	send, _ := json.Marshal(resp)
-	golog.Info(string(send))
+
 	golog.Info("login success")
 	w.Write(send)
 	return
@@ -39,12 +32,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 func LoginOut(w http.ResponseWriter, r *http.Request) {
 
 	// 检查token 是否存在
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "loginout",
-	}
 
 }
 

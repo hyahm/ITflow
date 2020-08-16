@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"itflow/cache"
 	"itflow/db"
-	"itflow/internal/datalog"
 	"itflow/internal/env"
 	"itflow/internal/response"
 	"net/http"
@@ -49,14 +48,6 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "env",
-		Action:   "add",
-	}
 
 	// 添加缓存
 	cache.CacheEidEnv[cache.EnvId(errorcode.Id)] = cache.Env(envname)
@@ -82,13 +73,6 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "bug",
-		Action:   "update",
-	}
 
 	// 更新缓存
 	delete(cache.CacheEnvEid, cache.CacheEidEnv[cache.EnvId(er.Id)])
@@ -132,14 +116,6 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
-	}
-	// 增加日志
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "env",
-		Action:   "delete",
 	}
 
 	delete(cache.CacheEnvEid, cache.CacheEidEnv[cache.EnvId(eid)])

@@ -6,7 +6,6 @@ import (
 	"itflow/cache"
 	"itflow/db"
 	"itflow/encrypt"
-	"itflow/internal/datalog"
 	"itflow/internal/response"
 	"itflow/internal/role"
 	"itflow/internal/user"
@@ -120,14 +119,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		go cache.CacheEmail.SendMail("创建用户成功", content, getuser.Email)
 	}
 
-	// 更新日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "setting",
-		Action:   "createuser",
-	}
-
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -186,13 +177,6 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "setting",
-		Action:   "deluser",
-	}
 
 	delete(cache.CacheNickNameUid, cache.CacheUidNickName[int64(id32)])
 	delete(cache.CacheRealNameUid, cache.CacheUidRealName[int64(id32)])
@@ -212,7 +196,6 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 func DisableUser(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	nickname := xmux.GetData(r).Get("nickname").(string)
 
 	id := r.FormValue("id")
 	var err error
@@ -227,13 +210,6 @@ func DisableUser(w http.ResponseWriter, r *http.Request) {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
-	}
-
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "setting",
-		Action:   "disableuser",
 	}
 
 	send, _ := json.Marshal(errorcode)
@@ -332,13 +308,6 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
-	}
-
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "setting",
-		Action:   "updateuser",
 	}
 
 	//更新缓存

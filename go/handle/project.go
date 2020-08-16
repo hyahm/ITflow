@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"itflow/cache"
 	"itflow/db"
-	"itflow/internal/datalog"
 	"itflow/internal/project"
 	"itflow/internal/response"
 	"net/http"
@@ -30,15 +29,7 @@ func AddProject(w http.ResponseWriter, r *http.Request) {
 		w.Write(send)
 		return
 	}
-	nickname := xmux.GetData(r).Get("nickname").(string)
 	w.Write(send)
-
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "project",
-		Action:   "add",
-	}
 
 }
 
@@ -50,15 +41,8 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 		w.Write(send)
 		return
 	}
-	nickname := xmux.GetData(r).Get("nickname").(string)
 	w.Write(send)
 
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "project",
-		Action:   "update",
-	}
 }
 
 func DeleteProject(w http.ResponseWriter, r *http.Request) {
@@ -93,13 +77,6 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
-	}
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "project",
-		Action:   "delete",
 	}
 
 	// 更新缓存

@@ -34,13 +34,9 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "version",
-		Action:   "add",
-		Msg:      fmt.Sprintf("add version id: %s", version_add.Name),
-	}
+	go datalog.InsertLog("version",
+		fmt.Sprintf("add version id: %s", version_add.Name),
+		r.RemoteAddr, nickname, "add")
 
 	// 增加缓存
 	cache.CacheVidVersion[cache.VersionId(errorcode.Id)] = version_add.Name
@@ -116,14 +112,6 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "version",
-		Action:   "delete",
-		Msg:      fmt.Sprintf("delete version id: %s", id),
-	}
 
 	delete(cache.CacheVersionVid, cache.CacheVidVersion[cache.VersionId(vid)])
 	delete(cache.CacheVidVersion, cache.VersionId(vid))
@@ -155,15 +143,6 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
-	}
-
-	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "version",
-		Action:   "update",
-		Msg:      fmt.Sprintf("update version id %v to %v", data.Id, data.Name),
 	}
 
 	delete(cache.CacheVersionVid, data.Name)

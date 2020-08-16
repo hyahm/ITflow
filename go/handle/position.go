@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"itflow/cache"
 	"itflow/db"
-	"itflow/internal/datalog"
 	"itflow/internal/response"
 	"itflow/model"
 	network "itflow/model"
@@ -67,15 +66,6 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 增加日志
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "positioin",
-		Action:   "add",
-	}
-
 	//更新缓存
 	cache.CacheJobnameJid[data.Name] = errorcode.Id
 	cache.CacheJidJobname[errorcode.Id] = data.Name
@@ -130,15 +120,6 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 增加日志
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "positioin",
-		Action:   "delete",
-	}
-
 	// 删除缓存
 	delete(cache.CacheJobnameJid, cache.CacheJidJobname[int64(id32)])
 	delete(cache.CacheJidJobname, int64(id32))
@@ -169,15 +150,6 @@ func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
-	}
-
-	// 增加日志
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "position",
-		Action:   "update",
 	}
 
 	// 更新缓存

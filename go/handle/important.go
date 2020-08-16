@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"itflow/cache"
 	"itflow/db"
-	"itflow/internal/datalog"
 	"itflow/internal/response"
 	"itflow/model"
 	network "itflow/model"
@@ -47,13 +46,6 @@ func ImportantAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "important",
-		Action:   "add",
-	}
 
 	//更新缓存
 	cache.CacheImportantIid[data.Name] = cache.ImportantId(errorcode.Id)
@@ -104,13 +96,6 @@ func ImportantDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "important",
-		Action:   "delete",
-	}
 
 	// 删除缓存
 	delete(cache.CacheImportantIid, cache.CacheIidImportant[cache.ImportantId(id32)])
@@ -136,13 +121,6 @@ func ImportantUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "important",
-		Action:   "update",
-	}
 
 	// 删除strings key
 	delete(cache.CacheImportantIid, cache.CacheIidImportant[data.Id])

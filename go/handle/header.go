@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"itflow/cache"
 	"itflow/db"
-	"itflow/internal/datalog"
 	"itflow/internal/response"
 	"itflow/model"
 	network "itflow/model"
@@ -88,12 +87,6 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "header",
-		Action:   "add",
-	}
 
 	// 添加缓存
 	cache.CacheHidHeader[errorcode.Id] = data.Name
@@ -160,12 +153,6 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "header",
-		Action:   "delete",
-	}
 
 	// 删除缓存
 	delete(cache.CacheHeaderHid, cache.CacheHidHeader[int64(id32)])
@@ -257,13 +244,6 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "header",
-		Action:   "update",
-	}
 
 	delete(cache.CacheHeaderHid, cache.CacheHidHeader[data.Id])
 	cache.CacheHidHeader[data.Id] = data.Name

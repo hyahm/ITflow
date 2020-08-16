@@ -120,13 +120,9 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 	if cache.CacheEmail.Enable {
 		go cache.CacheEmail.SendMail("转让bug", fmt.Sprintf("由%s 转交给你", cache.CacheUidRealName[uid]), mails...)
 	}
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "bug",
-		Action:   "pass",
-		Msg:      fmt.Sprintf("bug id: %v", ub.Id),
-	}
+
+	go datalog.InsertLog("bug", fmt.Sprintf("bug id: %v", ub.Id),
+		r.RemoteAddr, nickname, "pass")
 
 	send, _ := json.Marshal(ub)
 	w.Write(send)

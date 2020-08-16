@@ -45,16 +45,16 @@ func RunHttp() {
 
 	router.AddGroup(routegroup.Email)
 	router.AddGroup(routegroup.Share)
-	router.AddGroup(routegroup.Api)
+	// router.AddGroup(routegroup.Api)
 
-	router.Pattern("/uploadimg").Post(handle.UploadImgs).DelMidware(midware.CheckToken)
-	router.Pattern("/upload/headimg").Post(handle.UploadHeadImg)
-	router.Pattern("/showimg/{imgname}").Get(handle.ShowImg).SetHeader("Content-Type", "image/png").DelMidware(midware.CheckToken)
+	router.Post("/uploadimg", handle.UploadImgs).DelMidware(midware.CheckToken)
+	router.Post("/upload/headimg", handle.UploadHeadImg)
+	router.Get("/showimg/{imgname}", handle.ShowImg).SetHeader("Content-Type", "image/png").DelMidware(midware.CheckToken)
 
-	router.Pattern("/get/expire/{token}").Get(handle.GetExpire).DelMidware(midware.CheckToken)
+	router.Get("/get/expire/{token}", handle.GetExpire).DelMidware(midware.CheckToken)
 	// 生产环境中， 这个要么注释， 要么
 	if goconfig.ReadBool("debug", false) {
-		doc := xmux.ShowApi("/docs", router).DelMidware(midware.CheckToken)
+		doc := router.ShowApi("/docs").DelMidware(midware.CheckToken)
 		router.AddGroup(doc)
 	}
 

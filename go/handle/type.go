@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"itflow/cache"
 	"itflow/db"
-	"itflow/internal/datalog"
 	"itflow/internal/response"
 	"itflow/model"
 	"net/http"
@@ -167,14 +166,6 @@ func TypeUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 
 	}
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "type",
-		Action:   "update",
-	}
 
 	delete(cache.CacheNameTid, cache.CacheTidName[data.Id])
 	cache.CacheTidName[data.Id] = data.Name
@@ -257,14 +248,7 @@ func TypeAdd(w http.ResponseWriter, r *http.Request) {
 
 	cache.CacheTidName[send.Id] = data.Name
 	cache.CacheNameTid[data.Name] = send.Id
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "type",
-		Action:   "delete",
-		Msg:      fmt.Sprintf("delete type: %s", data.Types),
-	}
+
 	s, _ := json.Marshal(send)
 	w.Write(s)
 	return
@@ -281,7 +265,6 @@ func TypeDel(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	nickname := xmux.GetData(r).Get("nickname").(string)
 	var t int
 	err = db.Mconn.GetOne("select type from types where id=?", id).Scan(&t)
 	if t == 0 {
@@ -295,14 +278,6 @@ func TypeDel(w http.ResponseWriter, r *http.Request) {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
-	}
-	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "type",
-		Action:   "delete",
-		Msg:      fmt.Sprintf("delete type id: %s", id),
 	}
 
 	delete(cache.CacheNameTid, cache.CacheTidName[int64(id32)])

@@ -22,47 +22,42 @@ func init() {
 	Api.ApiCodeField("code").ApiCodeMsg("其他错误", "请查看返回的msg")
 
 	Api.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
-	Api.Pattern("/rest/list").Post(handle.RestList)
+	Api.Post("/rest/list", handle.RestList)
 
-	Api.Pattern("/rest/update").Post(handle.RestUpdate).Bind(&model.Data_restful{}).AddMidware(midware.JsonToStruct).
-		End(midware.EndLog)
+	Api.Post("/rest/update", handle.RestUpdate).Bind(&model.Data_restful{}).AddMidware(midware.JsonToStruct)
 
-	Api.Pattern("/rest/add").Post(handle.RestAdd).Bind(&model.Data_restful{}).AddMidware(midware.JsonToStruct).
-		End(midware.EndLog)
+	Api.Post("/rest/add", handle.RestAdd).Bind(&model.Data_restful{}).AddMidware(midware.JsonToStruct)
 
-	Api.Pattern("/rest/delete").Get(handle.RestDel).End(midware.EndLog)
+	Api.Get("/rest/delete", handle.RestDel)
 
-	Api.Pattern("/api/list").Get(handle.ApiList)
+	Api.Get("/api/list", handle.ApiList)
 
-	Api.Pattern("/api/update").Post(handle.ApiUpdate).Bind(&model.Get_apilist{}).AddMidware(midware.JsonToStruct).
-		End(midware.EndLog)
+	Api.Post("/api/update", handle.ApiUpdate).Bind(&model.Get_apilist{}).AddMidware(midware.JsonToStruct)
 
-	Api.Pattern("/api/add").Post(handle.ApiAdd).Bind(&model.Get_apilist{}).AddMidware(midware.JsonToStruct).
-		End(midware.EndLog)
+	Api.Post("/api/add", handle.ApiAdd).Bind(&model.Get_apilist{}).AddMidware(midware.JsonToStruct)
 
-	Api.Pattern("/api/delete").Get(handle.ApiDel).End(midware.EndLog)
+	Api.Get("/api/delete", handle.ApiDel)
 
-	Api.Pattern("/api/one").Get(handle.ApiOne)
+	Api.Get("/api/one", handle.ApiOne)
 
-	Api.Pattern("/edit/one").Get(handle.EditOne)
+	Api.Get("/edit/one", handle.EditOne)
 
-	Api.Pattern("/api/resp").Post(handle.ApiResp).Bind(&restful.Resp{}).AddMidware(midware.JsonToStruct)
+	Api.Post("/api/resp", handle.ApiResp).Bind(&restful.Resp{}).AddMidware(midware.JsonToStruct)
 
-	Api.Pattern("/header/list").Post(handle.HeaderList)
+	Api.Post("/header/list", handle.HeaderList)
 
-	Api.Pattern("/header/add").Post(handle.HeaderAdd).Bind(&model.Data_header{}).AddMidware(midware.JsonToStruct).
-		End(midware.EndLog)
+	Api.Post("/header/add", handle.HeaderAdd).Bind(&model.Data_header{}).AddMidware(midware.JsonToStruct)
 
-	Api.Pattern("/header/del").Get(handle.HeaderDel).End(midware.EndLog)
+	Api.Get("/header/del", handle.HeaderDel)
 
-	Api.Pattern("/header/update").Post(handle.HeaderUpdate).Bind(&model.Data_header{}).AddMidware(midware.JsonToStruct).
-		End(midware.EndLog)
+	Api.Post("/header/update", handle.HeaderUpdate).
+		Bind(&model.Data_header{}).AddMidware(midware.JsonToStruct)
 
-	Api.Pattern("/header/get").Post(handle.HeaderGet)
+	Api.Post("/header/get", handle.HeaderGet)
 
 	//---------------------------------------------------------
 
-	// Api.Pattern("/default/important").Post(handle.DefaultImportant)
+	// Api.Pattern("/default/important",handle.DefaultImportant)
 
-	// Api.Pattern("/default/level").Post(handle.DefaultLevel)
+	// Api.Pattern("/default/level",handle.DefaultLevel)
 }

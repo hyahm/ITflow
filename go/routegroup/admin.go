@@ -17,13 +17,13 @@ func init() {
 	Admin.ApiCodeField("code").ApiCodeMsg("20", "token过期")
 	Admin.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
 	Admin.ApiCodeField("code").ApiCodeMsg("其他错误", "请查看返回的msg")
-	Admin.Pattern("/dashboard/usercount").Post(handle.UserCount)
+	Admin.Post("/dashboard/usercount", handle.UserCount)
 
 	Admin.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
-	Admin.Pattern("/admin/reset").Get(handle.Reset)
+	Admin.Get("/admin/reset", handle.Reset)
 
-	Admin.Pattern("/info/update").Post(handle.UpdateInfo).Bind(&user.UserInfo{}).
-		AddMidware(midware.JsonToStruct).End(midware.EndLog)
+	Admin.Post("/info/update", handle.UpdateInfo).Bind(&user.UserInfo{}).
+		AddMidware(midware.JsonToStruct)
 
 }

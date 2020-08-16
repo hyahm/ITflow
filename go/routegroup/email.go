@@ -19,7 +19,7 @@ func init() {
 	Email.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	Email.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
-	Email.Pattern("/email/test").Post(handle.TestEmail).Bind(&email.Email{}).AddMidware(midware.JsonToStruct)
-	Email.Pattern("/email/save").Post(handle.SaveEmail).Bind(&email.Email{}).AddMidware(midware.JsonToStruct)
-	Email.Pattern("/email/get").Post(handle.GetEmail)
+	Email.Post("/email/test", handle.TestEmail).Bind(&email.Email{}).AddMidware(midware.JsonToStruct)
+	Email.Post("/email/save", handle.SaveEmail).Bind(&email.Email{}).AddMidware(midware.JsonToStruct)
+	Email.Post("/email/get", handle.GetEmail)
 }

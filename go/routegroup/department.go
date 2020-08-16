@@ -20,11 +20,11 @@ func init() {
 	Department.ApiCodeField("code").ApiCodeMsg("其他错误", "请查看返回的msg")
 	Department.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
-	Department.Pattern("/department/add").Post(handle.AddBugGroup).Bind(&status.StatusGroup{}).AddMidware(midware.JsonToStruct).
-		End(midware.EndLog)
+	Department.Post("/department/add", handle.AddBugGroup).
+		Bind(&status.StatusGroup{}).AddMidware(midware.JsonToStruct)
 
-	Department.Pattern("/department/edit").Post(handle.EditBugGroup).Bind(&status.StatusGroup{}).AddMidware(midware.JsonToStruct).
-		End(midware.EndLog)
-	Department.Pattern("/department/list").Post(handle.BugGroupList)
-	Department.Pattern("/department/remove").Get(handle.BugGroupDel).End(midware.EndLog)
+	Department.Post("/department/edit", handle.EditBugGroup).
+		Bind(&status.StatusGroup{}).AddMidware(midware.JsonToStruct)
+	Department.Post("/department/list", handle.BugGroupList)
+	Department.Get("/department/remove", handle.BugGroupDel)
 }

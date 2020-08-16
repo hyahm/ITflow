@@ -174,12 +174,9 @@ func RestUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "rest",
-		Action:   "update",
-	}
+	go datalog.InsertLog("rest",
+		nickname+"修改了用户信息",
+		r.RemoteAddr, nickname, "update")
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
@@ -224,13 +221,6 @@ func RestAdd(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "rest",
-		Action:   "add",
-	}
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
@@ -258,13 +248,6 @@ func RestDel(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
-	}
-	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "rest",
-		Action:   "delete",
 	}
 
 	send, _ := json.Marshal(errorcode)
@@ -493,13 +476,6 @@ func ApiUpdate(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorNoPermission())
 		return
 	}
-	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "api",
-		Action:   "update",
-	}
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
@@ -578,13 +554,6 @@ func ApiAdd(w http.ResponseWriter, r *http.Request) {
 
 	// 增加日志
 
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "api",
-		Action:   "add",
-	}
-
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -638,13 +607,6 @@ func ApiDel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "api",
-		Action:   "delete",
-	}
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)

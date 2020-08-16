@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"itflow/cache"
 	"itflow/db"
-	"itflow/internal/datalog"
 	"itflow/internal/response"
 	"itflow/internal/status"
 	"net/http"
@@ -42,13 +41,6 @@ func AddStatusGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip: r.RemoteAddr,
-
-		Classify: "statusgroup",
-	}
-
 	// 添加缓存
 	cache.CacheSgidGroup[errorcode.Id] = data.Name
 	send, _ := json.Marshal(errorcode)
@@ -74,14 +66,6 @@ func EditStatusGroup(w http.ResponseWriter, r *http.Request) {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
-	}
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "buggroup",
-		Action:   "update",
 	}
 
 	cache.CacheSgidGroup[data.Id] = data.Name
@@ -155,15 +139,6 @@ func DeleteStatusGroup(w http.ResponseWriter, r *http.Request) {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
-	}
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	golog.Info(nickname)
-	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "buggroup",
-		Action:   "delete",
 	}
 
 	//更新缓存

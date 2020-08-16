@@ -122,12 +122,9 @@ func UpdateInfo(w http.ResponseWriter, r *http.Request) {
 
 	cache.CacheUidNickName[int64(uid)] = sl.NickName
 
-	err = insertlog("updateinfo", nickname+"修改了用户信息", r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	go datalog.InsertLog("updateinfo",
+		nickname+"修改了用户信息",
+		r.RemoteAddr, nickname, "update")
 
 	send, _ := json.Marshal(sl)
 	w.Write(send)
@@ -197,13 +194,6 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
-	}
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "status",
-		Action:   "change",
 	}
 
 	send, _ := json.Marshal(param)
@@ -296,7 +286,6 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	nickname := xmux.GetData(r).Get("nickname").(string)
 	thisUid := xmux.GetData(r).Get("uid").(int64)
 	if uid != thisUid && uid != cache.SUPERID {
 		golog.Debug("没有权限")
@@ -308,12 +297,6 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
-	}
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "bug",
-		Action:   "close",
 	}
 
 	send, _ := json.Marshal(errorcode)

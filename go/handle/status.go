@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"itflow/cache"
 	"itflow/db"
-	"itflow/internal/datalog"
 	"itflow/internal/response"
 	"itflow/internal/status"
 	network "itflow/model"
@@ -35,14 +34,6 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 		golog.Error(err)
 		w.Write(errorcode.ConnectMysqlFail())
 		return
-	}
-
-	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: xmux.GetData(r).Get("nickname").(string),
-		Classify: "status",
-		Action:   "add",
 	}
 
 	// 更新缓存
@@ -108,14 +99,6 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 	}
 	// 默认值
 
-	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: xmux.GetData(r).Get("nickname").(string),
-		Classify: "status",
-		Action:   "delete",
-	}
-
 	// 更新缓存
 	// 获取status的索引
 
@@ -138,14 +121,6 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
-	}
-
-	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: xmux.GetData(r).Get("nickname").(string),
-		Classify: "status",
-		Action:   "update",
 	}
 
 	// 更新缓存

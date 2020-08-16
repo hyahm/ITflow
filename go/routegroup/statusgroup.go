@@ -19,16 +19,16 @@ func init() {
 	StatusGroup.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
 	StatusGroup.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	StatusGroup.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
-	StatusGroup.Pattern("/statusgroup/add").Post(handle.AddStatusGroup).Bind(&status.StatusGroup{}).
-		AddMidware(midware.JsonToStruct).End(midware.EndLog)
+	StatusGroup.Post("/statusgroup/add", handle.AddStatusGroup).Bind(&status.StatusGroup{}).
+		AddMidware(midware.JsonToStruct)
 
-	StatusGroup.Pattern("/statusgroup/edit").Post(handle.EditStatusGroup).Bind(&status.StatusGroup{}).
-		AddMidware(midware.JsonToStruct).End(midware.EndLog).
+	StatusGroup.Post("/statusgroup/edit", handle.EditStatusGroup).Bind(&status.StatusGroup{}).
+		AddMidware(midware.JsonToStruct).
 		ApiDescribe("编辑statusgroup").ApiReqStruct(&status.StatusGroup{}).
 		ApiSupplement("如果没有状态组名，就删除")
 
-	StatusGroup.Pattern("/statusgroup/list").Post(handle.StatusGroupList)
+	StatusGroup.Post("/statusgroup/list", handle.StatusGroupList)
 
-	StatusGroup.Pattern("/statusgroup/remove").Get(handle.DeleteStatusGroup).End(midware.EndLog)
-	StatusGroup.Pattern("/statusgroup/name").Post(handle.GetStatusGroupName)
+	StatusGroup.Get("/statusgroup/remove", handle.DeleteStatusGroup)
+	StatusGroup.Post("/statusgroup/name", handle.GetStatusGroupName)
 }

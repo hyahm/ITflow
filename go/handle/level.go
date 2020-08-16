@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"itflow/cache"
 	"itflow/db"
-	"itflow/internal/datalog"
 	"itflow/internal/response"
 	"itflow/model"
 	network "itflow/model"
@@ -47,13 +46,6 @@ func LevelAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 增加日志
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "level",
-		Action:   "add",
-	}
 
 	//更新缓存
 	cache.CacheLidLevel[cache.LevelId(errorcode.Id)] = data.Name
@@ -103,15 +95,6 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 增加日志
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "level",
-		Action:   "delete",
-	}
-
 	// 删除缓存
 	delete(cache.CacheLevelLid, cache.CacheLidLevel[cache.LevelId(id64)])
 	delete(cache.CacheLidLevel, cache.LevelId(id64))
@@ -136,13 +119,6 @@ func LevelUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 增加日志
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "level",
-		Action:   "update",
-	}
 
 	// 删除strings key
 	delete(cache.CacheLevelLid, data.OldName)

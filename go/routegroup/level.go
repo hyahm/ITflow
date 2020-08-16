@@ -19,15 +19,14 @@ func init() {
 	Level.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	Level.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
-	Level.Pattern("/level/get").Post(handle.LevelGet)
+	Level.Post("/level/get", handle.LevelGet)
 
-	Level.Pattern("/level/add").Post(handle.LevelAdd).Bind(&model.Data_level{}).AddMidware(midware.JsonToStruct).
-		End(midware.EndLog)
+	Level.Post("/level/add", handle.LevelAdd).
+		Bind(&model.Data_level{}).AddMidware(midware.JsonToStruct)
 
-	Level.Pattern("/level/del").Get(handle.LevelDel).End(midware.EndLog)
+	Level.Get("/level/del", handle.LevelDel)
 
-	Level.Pattern("/level/update").Post(handle.LevelUpdate).Bind(&model.Update_level{}).AddMidware(midware.JsonToStruct).
-		End(midware.EndLog)
-
-	Level.Pattern("/get/levels").Post(handle.GetLevels)
+	Level.Post("/level/update", handle.LevelUpdate).
+		Bind(&model.Update_level{}).AddMidware(midware.JsonToStruct)
+	Level.Post("/get/levels", handle.GetLevels)
 }

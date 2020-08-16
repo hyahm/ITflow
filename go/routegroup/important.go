@@ -18,16 +18,16 @@ func init() {
 	Important.ApiCodeField("code").ApiCodeMsg("1", "其他错误,请查看返回的msg")
 	Important.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
-	Important.Pattern("/important/get").Post(handle.ImportantGet)
+	Important.Post("/important/get", handle.ImportantGet)
 
-	Important.Pattern("/important/add").Post(handle.ImportantAdd).Bind(&model.Data_importants{}).AddMidware(midware.JsonToStruct).
-		End(midware.EndLog)
+	Important.Post("/important/add", handle.ImportantAdd).
+		Bind(&model.Data_importants{}).AddMidware(midware.JsonToStruct)
 
-	Important.Pattern("/important/del").Get(handle.ImportantDel).End(midware.EndLog)
+	Important.Get("/important/del", handle.ImportantDel)
 
-	Important.Pattern("/important/update").Post(handle.ImportantUpdate).Bind(&model.Importants{}).AddMidware(midware.JsonToStruct).
-		End(midware.EndLog)
+	Important.Post("/important/update", handle.ImportantUpdate).
+		Bind(&model.Importants{}).AddMidware(midware.JsonToStruct)
 
-	Important.Pattern("/get/importants").Post(handle.GetImportants)
+	Important.Post("/get/importants", handle.GetImportants)
 
 }

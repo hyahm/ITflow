@@ -18,18 +18,19 @@ func init() {
 	Project.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
 	Project.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	Project.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
-	Project.Pattern("/project/list").Post(handle.ProjectList).ApiDescribe("获取所有列表").ApiSupplement("只有跟项目有关的参与者才能看到项目")
+	Project.Post("/project/list", handle.ProjectList).ApiDescribe("获取所有列表").ApiSupplement("只有跟项目有关的参与者才能看到项目")
 
-	Project.Pattern("/project/add").Post(handle.AddProject).Bind(&project.ReqProject{}).
-		AddMidware(midware.JsonToStruct).End(midware.EndLog).
+	Project.Post("/project/add", handle.AddProject).Bind(&project.ReqProject{}).
+		AddMidware(midware.JsonToStruct).
 		ApiDescribe("增加项目")
 
-	Project.Pattern("/project/update").Post(handle.UpdateProject).Bind(&project.ReqProject{}).AddMidware(midware.JsonToStruct).
-		End(midware.EndLog).ApiDescribe("修改项目")
+	Project.Post("/project/update", handle.UpdateProject).
+		Bind(&project.ReqProject{}).AddMidware(midware.JsonToStruct).
+		ApiDescribe("修改项目")
 
-	Project.Pattern("/project/delete").Get(handle.DeleteProject).End(midware.EndLog).
+	Project.Get("/project/delete", handle.DeleteProject).
 		ApiDescribe("删除项目")
 
-	Project.Pattern("/get/project").Post(handle.GetProject).ApiDescribe("获取所有项目名")
-	Project.Pattern("/get/myproject").Post(handle.GetMyProject).ApiDescribe("获取自己权限的项目名")
+	Project.Post("/get/project", handle.GetProject).ApiDescribe("获取所有项目名")
+	Project.Post("/get/myproject", handle.GetMyProject).ApiDescribe("获取自己权限的项目名")
 }

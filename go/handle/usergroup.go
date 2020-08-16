@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"itflow/cache"
 	"itflow/db"
-	"itflow/internal/datalog"
 	"itflow/internal/response"
 	"itflow/internal/status"
 	"itflow/internal/usergroup"
@@ -32,13 +31,6 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip: r.RemoteAddr,
-
-		Classify: "statusgroup",
-	}
-
 	// 添加缓存
 	cache.CacheSgidGroup[errorcode.Id] = data.Name
 	send, _ := json.Marshal(errorcode)
@@ -59,15 +51,6 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
-	}
-	golog.Info(db.Mconn.GetSql())
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "buggroup",
-		Action:   "update",
 	}
 
 	cache.CacheSgidGroup[data.Id] = data.Name
@@ -143,14 +126,6 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
-	}
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "buggroup",
-		Action:   "delete",
 	}
 
 	//更新缓存
@@ -237,7 +212,6 @@ func UserGroupGet(w http.ResponseWriter, r *http.Request) {
 func GroupAdd(w http.ResponseWriter, r *http.Request) {
 	golog.Info("add..................")
 	errorcode := &response.Response{}
-	nickname := xmux.GetData(r).Get("nickname").(string)
 	uid := xmux.GetData(r).Get("uid").(int64)
 	data := xmux.GetData(r).Data.(*usergroup.RespUserGroup)
 
@@ -265,13 +239,6 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "usergroup",
-		Action:   "add",
-	}
 	ug := &cache.UG{}
 	ug.Ugid = errorcode.Id
 	ug.Name = data.Name
@@ -292,7 +259,6 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 func GroupDel(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	nickname := xmux.GetData(r).Get("nickname").(string)
 	uid := xmux.GetData(r).Get("uid").(int64)
 	id := r.FormValue("id")
 	id64, err := strconv.ParseInt(id, 10, 64)
@@ -374,13 +340,6 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "usergroup",
-		Action:   "delete",
-	}
 	if ug, ok := cache.CacheUGidUserGroup[id64]; ok {
 		delete(cache.CacheUserGroupUGid, ug.Name)
 	}
@@ -396,7 +355,6 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 	data := xmux.GetData(r).Data.(*usergroup.RespUpdateUserGroup)
 	golog.Infof("%+v", *data)
-	nickname := xmux.GetData(r).Get("nickname").(string)
 
 	ids := make([]string, 0)
 	for _, v := range data.Users {
@@ -418,13 +376,7 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	// 增加日志
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "usergroup",
-		Action:   "update",
-	}
+
 	ug := &cache.UG{
 		Ugid: data.Id,
 		Name: data.Name,

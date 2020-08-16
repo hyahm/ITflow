@@ -20,17 +20,16 @@ func init() {
 	Position.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 
 	Position.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
-	Position.Pattern("/position/list").Post(handle.PositionGet)
+	Position.Post("/position/list", handle.PositionGet)
 
-	Position.Pattern("/position/add").Post(handle.PositionAdd).Bind(&model.Data_jobs{}).AddMidware(midware.JsonToStruct).
-		End(midware.EndLog)
+	Position.Post("/position/add", handle.PositionAdd).Bind(&model.Data_jobs{}).AddMidware(midware.JsonToStruct)
 
-	Position.Pattern("/position/del").Get(handle.PositionDel).End(midware.EndLog)
+	Position.Get("/position/del", handle.PositionDel)
 
-	Position.Pattern("/position/update").Post(handle.PositionUpdate).Bind(&model.Update_jobs{}).AddMidware(midware.JsonToStruct).
-		End(midware.EndLog)
+	Position.Post("/position/update", handle.PositionUpdate).
+		Bind(&model.Update_jobs{}).AddMidware(midware.JsonToStruct)
 
-	Position.Pattern("/get/hypos").Post(handle.GetHypos)
+	Position.Post("/get/hypos", handle.GetHypos)
 
-	Position.Pattern("/get/positions").Post(handle.GetPositions)
+	Position.Post("/get/positions", handle.GetPositions)
 }

@@ -20,7 +20,7 @@ func init() {
 	Status.ApiCodeField("code").ApiCodeMsg("20", "token过期")
 	Status.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 
-	Status.Pattern("/status/list").Post(handle.StatusList).
+	Status.Post("/status/list", handle.StatusList).
 		ApiResStruct(&bug.ListStatus{}).ApiDescribe("获取bugstatus状态列表").
 		ApiResponseTemplate(`{
 			"statuslist": [
@@ -44,24 +44,22 @@ func init() {
 			"code": 0
 		}`)
 
-	Status.Pattern("/status/add").Post(handle.StatusAdd).Bind(&bug.ReqStatus{}).
-		End(midware.EndLog).AddMidware(midware.JsonToStruct).
+	Status.Post("/status/add", handle.StatusAdd).Bind(&bug.ReqStatus{}).
+		AddMidware(midware.JsonToStruct).
 		ApiDescribe("添加bug 状态").
 		ApiReqStruct(&bug.ReqStatus{}).ApiRequestTemplate(`{"id": 0, "name": "普通"}`).
 		ApiResStruct(&bug.ResponeStatus{}).ApiResponseTemplate(`{"id": 8,"code": 0}`)
 
-	Status.Pattern("/get/status").Post(handle.GetStatus)
+	Status.Post("/get/status", handle.GetStatus)
 
-	Status.Pattern("/status/remove").Get(handle.StatusRemove).
-		End(midware.EndLog).
+	Status.Get("/status/remove", handle.StatusRemove).
 		ApiDescribe("删除bug 状态").ApiSupplement("当此状态有bug在使用时， 无法删除")
 
-	Status.Pattern("/status/update").Post(handle.StatusUpdate).Bind(&bug.ReqStatus{}).AddMidware(midware.JsonToStruct).
-		End(midware.EndLog).
+	Status.Post("/status/update", handle.StatusUpdate).Bind(&bug.ReqStatus{}).AddMidware(midware.JsonToStruct).
 		ApiDescribe("修改状态").
 		ApiReqStruct(&bug.ReqStatus{}).ApiRequestTemplate(`{"id": 0, "name": "普通"}`).
 		ApiResStruct(&bug.ResponeStatus{}).ApiResponseTemplate(`{"code": 0}`)
 
-	Status.Pattern("/status/show").Post(handle.ShowStatus).
+	Status.Post("/status/show", handle.ShowStatus).
 		ApiDescribe("查询可以查看的状态")
 }

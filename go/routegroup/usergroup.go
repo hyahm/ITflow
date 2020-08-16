@@ -18,16 +18,14 @@ func init() {
 	UserGroup.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	UserGroup.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
-	UserGroup.Pattern("/group/get").Post(handle.UserGroupGet).ApiResponseTemplate(`{"grouplist":["aa"],"code":0}`).ApiDescribe("获取自己创建的用户组")
+	UserGroup.Post("/group/get", handle.UserGroupGet).ApiResponseTemplate(`{"grouplist":["aa"],"code":0}`).ApiDescribe("获取自己创建的用户组")
 
-	UserGroup.Pattern("/groupnames/get").Post(handle.GroupNamesGet).ApiResponseTemplate(`{"groupnames":["bb"],"code":0}`).ApiDescribe("获取自己创建的用户组")
+	UserGroup.Post("/groupnames/get", handle.GroupNamesGet).ApiResponseTemplate(`{"groupnames":["bb"],"code":0}`).ApiDescribe("获取自己创建的用户组")
 
-	UserGroup.Pattern("/group/add").Post(handle.GroupAdd).Bind(&usergroup.RespUserGroup{}).AddMidware(midware.JsonToStruct).
-		End(midware.EndLog)
+	UserGroup.Post("/group/add", handle.GroupAdd).Bind(&usergroup.RespUserGroup{}).AddMidware(midware.JsonToStruct)
+	UserGroup.Get("/group/del", handle.GroupDel).ApiDescribe("删除用户组，只有创建者和admin才能操作")
 
-	UserGroup.Pattern("/group/del").Get(handle.GroupDel).End(midware.EndLog).ApiDescribe("删除用户组，只有创建者和admin才能操作")
-
-	UserGroup.Pattern("/group/update").Post(handle.GroupUpdate).Bind(&usergroup.RespUpdateUserGroup{}).
+	UserGroup.Post("/group/update", handle.GroupUpdate).Bind(&usergroup.RespUpdateUserGroup{}).
 		AddMidware(midware.JsonToStruct).AddMidware(midware.CheckUser).
-		End(midware.EndLog).ApiDescribe("编辑用户组，只有创建者和admin才能操作")
+		ApiDescribe("编辑用户组，只有创建者和admin才能操作")
 }

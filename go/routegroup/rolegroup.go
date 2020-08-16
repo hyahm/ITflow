@@ -21,21 +21,21 @@ func init() {
 	RoleGroup.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	RoleGroup.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
-	RoleGroup.Pattern("/rolegroup/add").Post(handle.AddRoleGroup).Bind(&rolegroup.ReqRoleGroup{}).
-		AddMidware(midware.JsonToStruct).End(midware.EndLog).
+	RoleGroup.Post("/rolegroup/add", handle.AddRoleGroup).Bind(&rolegroup.ReqRoleGroup{}).
+		AddMidware(midware.JsonToStruct).
 		ApiDescribe("添加角色组").ApiReqStruct(&rolegroup.ReqRoleGroup{}).ApiResStruct(&response.Response{})
 
-	RoleGroup.Pattern("/rolegroup/edit").Post(handle.EditRoleGroup).Bind(&rolegroup.ReqRoleGroup{}).
-		AddMidware(midware.JsonToStruct).End(midware.EndLog).
+	RoleGroup.Post("/rolegroup/edit", handle.EditRoleGroup).Bind(&rolegroup.ReqRoleGroup{}).
+		AddMidware(midware.JsonToStruct).
 		ApiDescribe("修改角色组").ApiReqStruct(&rolegroup.ReqRoleGroup{}).ApiResStruct(&response.Response{})
 
-	RoleGroup.Pattern("/rolegroup/list").Post(handle.RoleGroupList)
-	RoleGroup.Pattern("/rolegroup/get").Post(handle.GetRoleGroupName)
+	RoleGroup.Post("/rolegroup/list", handle.RoleGroupList)
+	RoleGroup.Post("/rolegroup/get", handle.GetRoleGroupName)
 
-	RoleGroup.Pattern("/rolegroup/remove").Get(handle.RoleGroupDel).End(midware.EndLog)
+	RoleGroup.Get("/rolegroup/remove", handle.RoleGroupDel)
 
-	RoleGroup.Pattern("/roles/get").Get(handle.GetRoles)
+	RoleGroup.Get("/roles/get", handle.GetRoles)
 
-	RoleGroup.Pattern("/rolegroup/template").Post(handle.RoleTemplate)
+	RoleGroup.Post("/rolegroup/template", handle.RoleTemplate)
 	// RoleGroup.Pattern("/rolegroup/name").Get(handle.GetRoleGroup)
 }

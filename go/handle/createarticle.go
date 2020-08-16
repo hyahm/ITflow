@@ -65,12 +65,8 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 	bug.StatusId = createdId
 	bug.Uid = xmux.GetData(r).Get("uid").(int64)
 	//
-	xmux.GetData(r).End = &datalog.AddLog{
-		Ip:       r.RemoteAddr,
-		Username: nickname,
-		Classify: "bug",
-		Action:   "create",
-	}
+	go datalog.InsertLog("bug", nickname+"create bug: "+data.Title, r.RemoteAddr, nickname, "create")
+
 	if data.Id <= 0 {
 		// 插入bug
 		bug.CreateTime = time.Now().Unix()
@@ -103,7 +99,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
-		xmux.GetData(r).End.(*datalog.AddLog).Action = "update"
+		go datalog.InsertLog("bug", nickname+fmt.Sprintf(" update bug id: %d", data.Id), r.RemoteAddr, nickname, "update")
 
 	}
 

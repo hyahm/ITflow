@@ -20,12 +20,12 @@ func init() {
 
 	Env.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
-	Env.Pattern("/env/list").Post(handle.EnvList)
+	Env.Post("/env/list", handle.EnvList)
 
-	Env.Pattern("/env/add").Get(handle.AddEnv).End(midware.EndLog)
+	Env.Get("/env/add", handle.AddEnv)
 
-	Env.Pattern("/env/update").Post(handle.UpdateEnv).Bind(&env.Env{}).
-		AddMidware(midware.JsonToStruct).End(midware.EndLog)
-	Env.Pattern("/get/env").Post(handle.GetEnv)
-	Env.Pattern("/env/delete").Get(handle.DeleteEnv).End(midware.EndLog)
+	Env.Post("/env/update", handle.UpdateEnv).Bind(&env.Env{}).
+		AddMidware(midware.JsonToStruct)
+	Env.Post("/get/env", handle.GetEnv)
+	Env.Get("/env/delete", handle.DeleteEnv)
 }
