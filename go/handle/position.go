@@ -32,7 +32,7 @@ func PositionGet(w http.ResponseWriter, r *http.Request) {
 		var jid int64
 		one := &network.Table_jobs{}
 		rows.Scan(&one.Id, &one.Name, &one.Level, &jid)
-		one.Hypo = cache.CacheJidJobname[jid]
+		one.HypoName = cache.CacheJidJobname[jid]
 		data.Positions = append(data.Positions, one)
 	}
 
@@ -52,6 +52,7 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 	var hid int64
 	var ok bool
 	var err error
+	golog.Info("start add position")
 	if data.Hyponame != "" {
 		if hid, ok = cache.CacheJobnameJid[data.Hyponame]; !ok {
 			w.Write(errorcode.ErrorE(err))
@@ -69,7 +70,10 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 	//更新缓存
 	cache.CacheJobnameJid[data.Name] = errorcode.Id
 	cache.CacheJidJobname[errorcode.Id] = data.Name
-	send, _ := json.Marshal(errorcode)
+	send, err := json.Marshal(errorcode)
+	if err != nil {
+		golog.Error(err)
+	}
 	w.Write(send)
 	return
 
@@ -132,14 +136,14 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-
 	data := xmux.GetData(r).Data.(*model.Update_jobs)
 
 	var hid int64
 	var ok bool
+	golog.Infof("%+v", *data)
 	// 不存在这个职位的hypo，直接返回参数错误
-	if data.Hypo != "" {
-		if hid, ok = cache.CacheJobnameJid[data.Hypo]; !ok {
+	if data.Hyponame != "" {
+		if hid, ok = cache.CacheJobnameJid[data.Hyponame]; !ok {
 			w.Write(errorcode.Error("没有职位"))
 			return
 		}
@@ -163,34 +167,43 @@ func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type hypos struct {
-	Hypos []string `json:"hypos"`
-	Code  int      `json:"code"`
+type Hypo struct {
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+type RespHypos struct {
+	Hypos []*Hypo `json:"hypos"`
+	Code  int     `json:"code"`
 }
 
 func GetHypos(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	nickname := xmux.GetData(r).Get("nickname").(string)
-	data := &hypos{
-		Hypos: make([]string, 0),
+	data := &RespHypos{
+		Hypos: make([]*Hypo, 0),
 	}
 	// 管理员
 	if cache.CacheNickNameUid[nickname] != cache.SUPERID {
 		w.Write(errorcode.ErrorNoPermission())
 		return
 	}
-
-	rows, err := db.Mconn.GetRows("select name  from jobs where level=1")
+	jid := r.FormValue("id")
+	rows, err := db.Mconn.GetRows("select id,name from jobs where level=1 and id<>?", jid)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	for rows.Next() {
-		var name string
-		rows.Scan(&name)
-		data.Hypos = append(data.Hypos, name)
+		hn := &Hypo{}
+		err = rows.Scan(&hn.Id, &hn.Name)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		data.Hypos = append(data.Hypos, hn)
 	}
 	send, _ := json.Marshal(data)
 	w.Write(send)

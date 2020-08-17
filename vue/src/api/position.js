@@ -38,9 +38,10 @@ export function updatePosition(data) {
   })
 }
 
-export function getHypos() {
+export function getHypos(id) {
   return request({
     url: '/get/hypos',
-    method: 'post'
+    method: 'get',
+    params: { id }
   })
 }

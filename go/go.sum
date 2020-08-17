@@ -46,6 +46,8 @@ github.com/hyahm/xmux v0.0.0-20200815124609-86e761fd724f h1:NM2VOtSWUE/UtNdJXMnp
 github.com/hyahm/xmux v0.0.0-20200815124609-86e761fd724f/go.mod h1:I9u+BNGEFGPQQ+PXoCh1BG93s0NHugPAQwr9bxWWuBM=
 github.com/hyahm/xmux v0.0.0-20200816023432-562ee632cc67 h1:gW3KhWBEv07p0UTFAz45AJZZM0fI0ELIVARztoOgdr0=
 github.com/hyahm/xmux v0.0.0-20200816023432-562ee632cc67/go.mod h1:I9u+BNGEFGPQQ+PXoCh1BG93s0NHugPAQwr9bxWWuBM=
+github.com/hyahm/xmux v0.0.0-20200817090937-90aef5b9d018 h1:kifS0DtkL7DZPiMq/hYaRpFneAltZquOXb1xzNNvQQU=
+github.com/hyahm/xmux v0.0.0-20200817090937-90aef5b9d018/go.mod h1:UoEQtjCaA8OzZJPtmiflvZ+cFMlmZo7o7WSQ/VdkDmE=
 github.com/json-iterator/go v1.1.6/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
 github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7VTCxuUUipMqKk8s4w=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=

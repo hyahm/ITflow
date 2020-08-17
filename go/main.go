@@ -28,9 +28,12 @@ func main() {
 	cache.LoadConfig()
 
 	// // // 初始化日志
-	golog.InitLogger(goconfig.ReadString("log.path", ""),
-		goconfig.ReadInt64("log.size", 0),
-		goconfig.ReadBool("log.everyday", false))
+	if !goconfig.ReadBool("debug", false) {
+		golog.InitLogger(goconfig.ReadString("log.path", ""),
+			goconfig.ReadInt64("log.size", 0),
+			goconfig.ReadBool("log.everyday", false))
+	}
+
 	// ////
 	signalChan := make(chan os.Signal)
 

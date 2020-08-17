@@ -11,7 +11,6 @@ import (
 	"itflow/internal/response"
 	"itflow/internal/search"
 	"itflow/model"
-	"itflow/pkg/pager"
 	"net/http"
 	"strconv"
 	"strings"
@@ -187,7 +186,7 @@ func managertotal(basesql string, params *bug.BugManager) (string, []interface{}
 func managersearch(basesql string, count int, params *bug.BugManager) (*sql.Rows, error) {
 	searchsql, args := managertotal(basesql, params)
 
-	start, end := pager.GetPagingLimitAndPage(count, params.Page, params.Limit)
+	start, end := xmux.GetLimit(count, params.Page, params.Limit)
 
 	args = append(args, start)
 	args = append(args, end)
@@ -261,7 +260,7 @@ func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool
 	}
 
 	// 获取查询的总个数
-	start, end := pager.GetPagingLimitAndPage(al.Count, searchparam.Page, searchparam.Limit)
+	start, end := xmux.GetLimit(al.Count, searchparam.Page, searchparam.Limit)
 
 	rows, err := db.Mconn.GetRows(bugsql+" limit ?,?", cache.CacheNickNameUid[nickname], start, end)
 	if err != nil {

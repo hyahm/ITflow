@@ -37,7 +37,7 @@
         width="180"
       >
         <template slot-scope="scope">
-          <span>{{ scope.row.hypo }}</span>
+          <span>{{ scope.row.hyponame }}</span>
         </template>
       </el-table-column>
       <el-table-column width="200" label="操作">
@@ -72,12 +72,12 @@
       <el-form style="margin-top: 10px">
         <!--从属于哪个管理者-->
         <el-form-item label="从属于">
-          <el-select v-model="form.hypo" clearable placeholder="Select">
+          <el-select v-model="form.hyponame" clearable placeholder="Select">
             <el-option
               v-for="(hypo, index) in manager"
               :key="index"
-              :label="hypo"
-              :value="hypo"
+              :label="hypo.name"
+              :value="hypo.name"
             />
           </el-select>
         </el-form-item>
@@ -118,20 +118,19 @@ export default {
         id: -1,
         name: '',
         level: 0,
-        hypo: ''
+        hyponame: ''
       }
     }
   },
-  activated() {
-    this.gethypos()
-  },
   created() {
     this.getlist()
-    this.gethypos()
   },
   methods: {
-    gethypos() {
-      getHypos().then(resp => {
+    changeHypo(e) {
+      console.log(e)
+    },
+    gethypos(id) {
+      getHypos(id).then(resp => {
         if (resp.data.code === 0) {
           this.manager = resp.data.hypos
         } else {
@@ -143,6 +142,7 @@ export default {
       PositionsList().then(resp => {
         if (resp.data.code === 0) {
           this.tableData = resp.data.positions
+          console.log(this.tableData)
         } else {
           this.$message.error(resp.data.message)
         }
@@ -155,12 +155,15 @@ export default {
             this.tableData.push({
               id: resp.data.id,
               name: this.form.name,
-              hypo: this.form.hypo,
+              hyponame: this.form.hyponame,
               level: this.form.level
             })
 
             if (this.form.level === 1) {
-              this.manager.push(this.form.name)
+              this.manager.push({
+                'id': this.form.id,
+                'name': this.form.hyponame
+              })
             }
           } else {
             this.$message.error(resp.data.message)
@@ -234,13 +237,14 @@ export default {
       this.dialogFormVisible = true
       this.form.id = -1
       this.form.level = 0
-      this.form.hypo = ''
+      this.form.hyponame = ''
       this.form.name = ''
     },
     handleUpdate(row) {
       this.form = row
       this.changeName = row.name
       this.dialogFormVisible = true
+      this.gethypos(row.id)
     }
   }
 }

@@ -7,7 +7,6 @@ import (
 	"itflow/db"
 	"itflow/internal/log"
 	"itflow/internal/response"
-	"itflow/pkg/pager"
 	"net/http"
 
 	"github.com/hyahm/golog"
@@ -61,8 +60,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		w.Write(listlog.NoRows())
 		return
 	}
-
-	start, end := alllog.GetPagingLimitAndPage()
+	start, end := xmux.GetLimit(alllog.Count, alllog.Page, alllog.Limit)
 	rows, err := db.Mconn.GetRows(basesql+endsql+" order by id desc limit ?,?", start, end)
 	if err != nil {
 		golog.Error(err)
@@ -108,7 +106,7 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	start, end := pager.GetPagingLimitAndPage(count, sl.Page, sl.Limit)
+	start, end := xmux.GetLimit(count, sl.Page, sl.Limit)
 	alllog := &log.Loglist{
 		Count: count,
 	}

@@ -8,7 +8,7 @@ require (
 	github.com/hyahm/goconfig v0.0.0-20200814144712-bd712352a305
 	github.com/hyahm/golog v0.0.0-20200806030423-4f17fcb54e88
 	github.com/hyahm/gomysql v0.0.0-20200710014644-ba03e2cee0ee
-	github.com/hyahm/xmux v0.0.0-20200816023432-562ee632cc67
+	github.com/hyahm/xmux v0.0.0-20200817090937-90aef5b9d018
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )

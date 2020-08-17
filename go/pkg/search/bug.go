@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 type BugList struct {
@@ -21,35 +22,6 @@ type BugList struct {
 	Count    int
 }
 
-func (pl *BugList) GetPagingLimitAndPage() (int, int) {
-	// 都小于1了
-
-	if pl.Limit == 0 {
-		return 0, 0
-	}
-	if pl.Page < 1 {
-		pl.Page = 1
-	}
-	// 超出了，返回最大的页码
-	if pl.Page*pl.Limit > pl.Count+pl.Limit {
-
-		if pl.Count%pl.Limit == 0 {
-			pl.Page = pl.Count / pl.Limit
-			return (pl.Page - 1) * pl.Limit, pl.Limit
-		} else {
-			pl.Page = pl.Count/pl.Limit + 1
-			return (pl.Page - 1) * pl.Limit, pl.Count % pl.Limit
-		}
-	} else {
-		if pl.Limit*pl.Page <= pl.Count {
-			return (pl.Page - 1) * pl.Limit, pl.Limit
-		} else {
-			return (pl.Page - 1) * pl.Limit, pl.Count % pl.Limit
-		}
-
-	}
-}
-
 func (pl *BugList) rows() (*sql.Rows, error) {
 	err := db.Mconn.GetOne(pl.CountSql).Scan(&pl.Count)
 	if err != nil {
@@ -57,7 +29,7 @@ func (pl *BugList) rows() (*sql.Rows, error) {
 		return nil, err
 	}
 	// 增加显示的状态
-	start, end := pl.GetPagingLimitAndPage()
+	start, end := xmux.GetLimit(pl.Count, pl.Page, pl.Limit)
 	golog.Info(start)
 	golog.Info(pl.Page)
 	golog.Info(end)
@@ -169,7 +141,7 @@ func (pl *BugList) GetMyTasks() []byte {
 		send, _ := json.Marshal(al)
 		return send
 	}
-	start, end := pl.GetPagingLimitAndPage()
+	start, end := xmux.GetLimit(pl.Count, pl.Page, pl.Limit)
 	var timer int
 	for rows.Next() {
 		one := &model.ArticleList{}

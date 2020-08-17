@@ -1,10 +1,10 @@
 package model
 
 type Table_jobs struct {
-	Id    int64  `json:"id"`
-	Name  string `json:"name"`
-	Level int    `json:"level"`
-	Hypo  string `json:"hypo"`
+	Id       int64  `json:"id"`
+	Name     string `json:"name"`
+	Level    int    `json:"level"`
+	HypoName string `json:"hyponame"`
 }
 
 type Data_jobs struct {
@@ -21,8 +21,8 @@ type List_jobs struct {
 }
 
 type Update_jobs struct {
-	Id    int64  `json:"id"`
-	Name  string `json:"name"`
-	Level int    `json:"level"`
-	Hypo  string `json:"hypo"`
+	Id       int64  `json:"id"`
+	Name     string `json:"name"`
+	Level    int    `json:"level"`
+	Hyponame string `json:"hyponame"`
 }

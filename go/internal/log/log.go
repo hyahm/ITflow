@@ -48,34 +48,3 @@ type LogRow struct {
 	Ip       string `json:"ip"`
 	UserName string `json:"username"`
 }
-
-func (sl *Search_log) GetPagingLimitAndPage() (int, int) {
-	// 都小于1了
-	if sl.Limit == 0 {
-		return 0, 0
-	}
-	if sl.Page < 1 {
-		sl.Page = 1
-	}
-	// 超出了，返回最大的页码
-	if sl.Page*sl.Limit > sl.Count+sl.Limit {
-
-		if sl.Count%sl.Limit == 0 {
-			sl.Page = sl.Count / sl.Limit
-			return ((sl.Count / sl.Limit) - 1) * sl.Limit, sl.Limit
-		} else {
-			sl.Page = sl.Count/sl.Limit + 1
-			return (sl.Count/sl.Limit + 1) * sl.Limit, sl.Count % sl.Limit
-		}
-	} else {
-		// if count%limit == 0 {
-
-		start := (sl.Page - 1) * sl.Limit
-		if sl.Limit*sl.Page > sl.Count {
-			return start, sl.Count - start
-		} else {
-			return start, sl.Limit
-		}
-
-	}
-}
