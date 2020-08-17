@@ -47,10 +47,8 @@ var (
 
 	CacheSgidGroup map[int64]string
 
-	CacheJidJobname map[int64]string
-	CacheJobnameJid map[string]int64
-	CacheHidHeader  map[int64]string
-	CacheHeaderHid  map[string]int64
+	CacheHidHeader map[int64]string
+	CacheHeaderHid map[string]int64
 
 	CacheNickNameUid map[string]int64
 	CacheRealNameUid map[string]int64
@@ -110,8 +108,6 @@ func LoadConfig() {
 	CacheVersionVid = make(map[Version]VersionId, 0)
 	CacheEnvEid = make(map[Env]EnvId, 0)
 	CacheLidLevel = make(map[LevelId]Level, 0)
-	CacheJidJobname = make(map[int64]string, 0)
-	CacheJobnameJid = make(map[string]int64, 0)
 	CacheLevelLid = make(map[Level]LevelId, 0)
 	CacheSgidGroup = make(map[int64]string, 0)
 	CacheUidFilter = make(map[int64]StoreStatusId, 0)

@@ -47,18 +47,6 @@ func initCache() {
 		CacheProjectPid[name] = id
 	}
 
-	jobrows, err := db.Mconn.GetRows("select id,name from jobs")
-	if err != nil {
-		panic(err)
-	}
-	for jobrows.Next() {
-		var id int64
-		var name string
-		jobrows.Scan(&id, &name)
-		CacheJidJobname[id] = name
-		CacheJobnameJid[name] = id
-	}
-
 	erows, err := db.Mconn.GetRows("select id,envname from environment")
 	if err != nil {
 		panic(err)
