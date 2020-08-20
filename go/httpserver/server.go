@@ -37,7 +37,7 @@ func RunHttp() {
 	router.AddGroup(routegroup.Status)   // 已完成
 
 	router.AddGroup(routegroup.Type)
-	router.AddGroup(routegroup.Level)
+	router.AddGroup(routegroup.Level)        // 已完成
 	router.AddGroup(routegroup.Important)    // 已完成
 	router.AddGroup(routegroup.Log)          // 后面处理
 	router.AddGroup(routegroup.UserGroup)    // 已完成

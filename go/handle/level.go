@@ -6,7 +6,6 @@ import (
 	"itflow/db"
 	"itflow/internal/response"
 	"itflow/model"
-	network "itflow/model"
 	"net/http"
 	"strconv"
 
@@ -16,18 +15,27 @@ import (
 
 func LevelGet(w http.ResponseWriter, r *http.Request) {
 
-	data := &network.List_levels{
-		Levels: make([]*network.Table_level, 0),
+	data := &model.List_levels{
+		Levels: make([]*model.Table_level, 0),
 	}
-	for k, v := range cache.CacheLidLevel {
-		one := &network.Table_level{}
-		one.Id = k
-		one.Name = v
-		data.Levels = append(data.Levels, one)
+	rows, err := db.Mconn.GetRows("select id,name from level")
+	if err != nil {
+		golog.Error(err)
+		w.Write(data.ErrorE(err))
+		return
 	}
 
-	send, _ := json.Marshal(data)
-	w.Write(send)
+	for rows.Next() {
+		level := &model.Table_level{}
+		err = rows.Scan(&level.Id, &level.Name)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		data.Levels = append(data.Levels, level)
+	}
+
+	w.Write(data.Marshal())
 	return
 
 }
@@ -44,12 +52,6 @@ func LevelAdd(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-
-	// 增加日志
-
-	//更新缓存
-	cache.CacheLidLevel[cache.LevelId(errorcode.Id)] = data.Name
-	cache.CacheLevelLid[data.Name] = cache.LevelId(errorcode.Id)
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
@@ -107,23 +109,14 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 func LevelUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-
 	data := xmux.GetData(r).Data.(*model.Update_level)
-
 	gsql := "update level set name=? where id=?"
-
 	_, err := db.Mconn.Update(gsql, data.Name, data.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	// 增加日志
-
-	// 删除strings key
-	delete(cache.CacheLevelLid, data.OldName)
-	cache.CacheLidLevel[data.Id] = data.Name
-	cache.CacheLevelLid[data.Name] = data.Id
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
@@ -132,20 +125,50 @@ func LevelUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 type levelslist struct {
-	Levels []cache.Level `json:"levels"`
-	Code   int           `json:"code"`
+	Levels []string `json:"levels"`
+	Code   int      `json:"code"`
+	Msg    string   `json:"msg"`
+}
+
+func (ll *levelslist) Marshal() []byte {
+	send, err := json.Marshal(ll)
+	if err != nil {
+		golog.Error(err)
+	}
+	return send
+}
+func (ll *levelslist) Error(msg string) []byte {
+	ll.Code = 1
+	ll.Msg = msg
+	return ll.Marshal()
+
+}
+func (ll *levelslist) ErrorE(err error) []byte {
+	return ll.Error(err.Error())
 }
 
 func GetLevels(w http.ResponseWriter, r *http.Request) {
 
 	data := &levelslist{
-		Levels: make([]cache.Level, 0),
+		Levels: make([]string, 0),
 	}
-	for _, v := range cache.CacheLidLevel {
-		data.Levels = append(data.Levels, v)
+	rows, err := db.Mconn.GetRows("select name from level")
+	if err != nil {
+		golog.Error(err)
+		w.Write(data.ErrorE(err))
+		return
 	}
-	send, _ := json.Marshal(data)
-	w.Write(send)
+
+	for rows.Next() {
+		var name string
+		err = rows.Scan(&name)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		data.Levels = append(data.Levels, name)
+	}
+	w.Write(data.Marshal())
 	return
 
 }

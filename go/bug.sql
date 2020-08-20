@@ -337,7 +337,6 @@ CREATE TABLE `level` (
 
 LOCK TABLES `level` WRITE;
 /*!40000 ALTER TABLE `level` DISABLE KEYS */;
-INSERT INTO `level` VALUES (2,'2'),(1,'3'),(4,'优'),(5,'良');
 /*!40000 ALTER TABLE `level` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -510,7 +509,7 @@ CREATE TABLE `roles` (
   `name` varchar(30) NOT NULL DEFAULT '',
   `info` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `role` (`role`)
+  UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
