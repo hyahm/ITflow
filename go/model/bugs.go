@@ -54,7 +54,7 @@ func (al *AllArticleList) ErrorE(err error) []byte {
 type Bug struct {
 	ID           int64
 	Uid          int64
-	StatusId     cache.StatusId // sid
+	StatusId     int64 // sid
 	Title        string
 	Content      string
 	ImportanceId cache.ImportantId

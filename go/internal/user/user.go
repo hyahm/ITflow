@@ -94,7 +94,7 @@ func (ui *UserInfo) GetUserInfo(uid int64) error {
 	if uid == cache.SUPERID {
 		ui.Roles = append(ui.Roles, "admin")
 	} else {
-		permids := "select role from roles where id in (select permids from rolegroup where id=(select rid from user where id=?))"
+		permids := "select name from roles where id in (select permids from rolegroup where id=(select rid from user where id=?))"
 		rows, err := db.Mconn.GetRows(permids, uid)
 
 		if err != nil {
@@ -130,7 +130,7 @@ func (ui *UserInfo) Update() error {
 	if ui.Uid == cache.SUPERID {
 		ui.Roles = append(ui.Roles, ui.NickName)
 	} else {
-		getrole := "select role from roles where id in (select rolelist from rolegroup where id=?)"
+		getrole := "select name from roles where id in (select rolelist from rolegroup where id=?)"
 		rows, err := db.Mconn.GetRows(getrole, rid)
 		if err != nil {
 			golog.Error(err)

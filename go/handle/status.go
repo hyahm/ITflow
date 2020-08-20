@@ -36,9 +36,6 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 更新缓存
-	cache.CacheSidStatus[cache.StatusId(errorcode.Id)] = s.Name
-	cache.CacheStatusSid[s.Name] = cache.StatusId(errorcode.Id)
-
 	w.Write(errorcode.Success())
 	return
 
@@ -55,7 +52,7 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	if cache.DefaultCreateSid.ToInt64() == sid {
+	if cache.DefaultCreateSid == sid {
 		w.Write(errorcode.Error("this status is set to default, can not remove. you can change to other status and delete"))
 		return
 
@@ -123,10 +120,6 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 更新缓存
-
-	delete(cache.CacheStatusSid, cache.CacheSidStatus[s.Id])
-	cache.CacheSidStatus[s.Id] = s.Name
-	cache.CacheStatusSid[s.Name] = s.Id
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)

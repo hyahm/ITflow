@@ -27,10 +27,10 @@ func GetCount() []byte {
 	count := 0
 	for i := SHOWDAY - 1; i >= 0; i-- {
 		if cache.DefaultCreateSid > 0 {
-			bc.Created[count], _ = model.GetCreatedCountByTime(start[i], end[i], cache.DefaultCreateSid.ToInt64())
+			bc.Created[count], _ = model.GetCreatedCountByTime(start[i], end[i], cache.DefaultCreateSid)
 		}
 		if cache.DefaultCompleteSid > 0 {
-			bc.Completed[count], _ = model.GetCompletedCountByTime(start[i], end[i], cache.DefaultCompleteSid.ToInt64())
+			bc.Completed[count], _ = model.GetCompletedCountByTime(start[i], end[i], cache.DefaultCompleteSid)
 		}
 		count++
 	}

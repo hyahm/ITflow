@@ -507,7 +507,7 @@ DROP TABLE IF EXISTS `roles`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `roles` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `role` varchar(30) NOT NULL DEFAULT '',
+  `name` varchar(30) NOT NULL DEFAULT '',
   `info` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `role` (`role`)

@@ -22,26 +22,26 @@ func RunHttp() {
 	router.AddGroup(routegroup.User)
 	router.AddGroup(routegroup.Bug)
 	router.AddGroup(routegroup.Search)
-	router.AddGroup(routegroup.DashBoard)
+	router.AddGroup(routegroup.DashBoard) // 后续
 	router.AddGroup(routegroup.Version)
-	router.AddGroup(routegroup.Admin)
+	router.AddGroup(routegroup.Admin) // 已完成
 	router.AddGroup(routegroup.Project)
 	router.AddGroup(routegroup.Env)
-	router.AddGroup(routegroup.StatusGroup)
+	router.AddGroup(routegroup.StatusGroup) // 已完成
 	router.AddGroup(routegroup.UserManager)
 
 	router.AddGroup(routegroup.RoleGroup)
 
 	router.AddGroup(routegroup.Department)
 	router.AddGroup(routegroup.Position)
-	router.AddGroup(routegroup.Status)
+	router.AddGroup(routegroup.Status) // 已完成
 
 	router.AddGroup(routegroup.Type)
 	router.AddGroup(routegroup.Level)
 	router.AddGroup(routegroup.Important)
-	router.AddGroup(routegroup.Log)
-	router.AddGroup(routegroup.UserGroup)
-	router.AddGroup(routegroup.DefaultValue)
+	router.AddGroup(routegroup.Log)          // 后面处理
+	router.AddGroup(routegroup.UserGroup)    // 已完成
+	router.AddGroup(routegroup.DefaultValue) // 已完成
 
 	router.AddGroup(routegroup.Email)
 	router.AddGroup(routegroup.Share)

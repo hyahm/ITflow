@@ -58,7 +58,7 @@ func (user *User) CheckHaveAdminUser() error {
 
 func (user *User) UpdateAdminPassword(password string) error {
 	// 修改密码
-	_, err := db.Mconn.Update("update user set password=? where rid=?", password, goconfig.ReadInt("adminid", 1))
+	_, err := db.Mconn.Update("update user set password=? where id=?", password, cache.SUPERID)
 	return err
 
 }

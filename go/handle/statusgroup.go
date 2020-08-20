@@ -2,8 +2,6 @@ package handle
 
 import (
 	"encoding/json"
-	"fmt"
-	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/response"
 	"itflow/internal/status"
@@ -11,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/gomysql"
 	"github.com/hyahm/xmux"
 )
 
@@ -20,27 +19,21 @@ func AddStatusGroup(w http.ResponseWriter, r *http.Request) {
 
 	data := xmux.GetData(r).Data.(*status.StatusGroup)
 
-	if data.Name == "" {
-		w.Write(errorcode.Error("名称不能为空"))
+	golog.Infof("%+v", *data)
+	sids, err := data.GetIds()
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	// 重新排序
-	ids := make([]string, 0)
-	for _, v := range data.StatusList {
-		ids = append(ids, fmt.Sprintf("%d", cache.CacheStatusSid[v]))
-	}
-
-	ss := strings.Join(ids, ",")
-	var err error
 	isql := "insert into statusgroup(name,sids) values(?,?)"
-	errorcode.Id, err = db.Mconn.Insert(isql, data.Name, ss)
+	errorcode.Id, err = db.Mconn.Insert(isql, data.Name, sids)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
-	// 添加缓存
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -57,9 +50,14 @@ func EditStatusGroup(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("名称不能为空"))
 		return
 	}
-
+	sids, err := data.GetIds()
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
 	isql := "update statusgroup set name =?,sids=? where id = ?"
-	_, err := db.Mconn.Update(isql, data.Name, data.StatusList.ToStore(), data.Id)
+	_, err = db.Mconn.Update(isql, data.Name, sids, data.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -85,19 +83,36 @@ func StatusGroupList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for rows.Next() {
-		var ids cache.StoreStatusId
+		var ids string
 		one := &department{}
-		rows.Scan(&one.Id, &one.Name, &ids)
-		one.BugstatusList = ids.ToShow()
-		// for _, v := range strings.Split(ids, ",") {
-		// 	id, err := strconv.Atoi(v)
-		// 	if err != nil {
-		// 		log.Println(err)
-		// 		continue
-		// 	}
 
-		// 	one.BugstatusList = append(one.BugstatusList, cache.CacheSidStatus[cache.StatusId(id)])
-		// }
+		err = rows.Scan(&one.Id, &one.Name, &ids)
+		if err != nil {
+			golog.Error()
+			continue
+		}
+
+		idrows, err := db.Mconn.GetRowsIn("select name from status where id in (?)",
+			(gomysql.InArgs)(strings.Split(ids, ",")).ToInArgs())
+		if err != nil {
+			golog.Error(err)
+			w.Write(errorcode.ErrorE(err))
+			return
+		}
+
+		for idrows.Next() {
+			var name string
+			err = idrows.Scan(&name)
+			if err != nil {
+				golog.Error()
+				continue
+			}
+			if name != "" {
+				one.BugstatusList = append(one.BugstatusList, name)
+			}
+
+		}
+
 		data.DepartmentList = append(data.DepartmentList, one)
 	}
 	send, _ := json.Marshal(data)

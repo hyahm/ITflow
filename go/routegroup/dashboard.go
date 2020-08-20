@@ -16,7 +16,8 @@ func init() {
 		ApiCodeField("code").ApiCodeMsg("1", "其他错误,请查看返回的msg").
 		ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 	DashBoard.Post("/dashboard/bugcount", handle.BugCount).
-		ApiDescribe("计算7天的创建和完成的bug数量")
+		ApiDescribe("计算7天的创建和完成的bug数量(待测试)")
 
-	DashBoard.Post("/dashboard/projectcount", handle.ProjectCount).ApiDescribe("总任务和总完成的任务数")
+	DashBoard.Post("/dashboard/projectcount", handle.ProjectCount).ApiDescribe("总任务和总完成的任务数(待测试)")
+	DashBoard.Post("/dashboard/usercount", handle.UserCount).ApiDescribe("用户总数（已完成）")
 }

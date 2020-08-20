@@ -4,8 +4,10 @@ import (
 	"errors"
 	"itflow/cache"
 	"itflow/db"
+	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/gomysql"
 )
 
 type RespUpdateUserGroup struct {
@@ -28,4 +30,24 @@ func (ug *RespUpdateUserGroup) CheckUser(uid int64) error {
 		return errors.New("没有权限")
 	}
 	return nil
+}
+
+func (ug *RespUpdateUserGroup) GetIds() (string, error) {
+	rows, err := db.Mconn.GetRowsIn("select id from user where realname in (?)",
+		(gomysql.InArgs)(ug.Users).ToInArgs())
+	if err != nil {
+		golog.Error(err)
+		return "", err
+	}
+	ids := make([]string, 0)
+	for rows.Next() {
+		var id string
+		err = rows.Scan(&id)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		ids = append(ids, id)
+	}
+	return strings.Join(ids, ","), nil
 }

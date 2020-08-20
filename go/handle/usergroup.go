@@ -1,17 +1,17 @@
 package handle
 
 import (
+	"database/sql"
 	"encoding/json"
-	"fmt"
 	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/response"
-	"itflow/internal/status"
 	"itflow/internal/usergroup"
 	"net/http"
 	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/gomysql"
 	"github.com/hyahm/xmux"
 )
 
@@ -19,16 +19,16 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := xmux.GetData(r).Data.(*status.StatusGroup)
+	// data := xmux.GetData(r).Data.(*status.StatusGroup)
 
-	isql := "insert into statusgroup(name,sids) values(?,?)"
-	var err error
-	errorcode.Id, err = db.Mconn.Insert(isql, data.Name, data.StatusList.ToStore())
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	// isql := "insert into statusgroup(name,sids) values(?,?)"
+	// var err error
+	// errorcode.Id, err = db.Mconn.Insert(isql, data.Name, data.StatusList.ToStore())
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
 
 	// 添加缓存
 	send, _ := json.Marshal(errorcode)
@@ -41,15 +41,15 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := xmux.GetData(r).Data.(*status.StatusGroup)
+	// data := xmux.GetData(r).Data.(*status.StatusGroup)
 
-	isql := "update statusgroup set name =?,sids=? where id = ?"
-	_, err := db.Mconn.Update(isql, data.Name, data.StatusList.ToStore(), data.Id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	// isql := "update statusgroup set name =?,sids=? where id = ?"
+	// _, err := db.Mconn.Update(isql, data.Name, data.StatusList.ToStore(), data.Id)
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
@@ -58,9 +58,9 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 }
 
 type department struct {
-	Id            int64            `json:"id"`
-	Name          string           `json:"name"`
-	BugstatusList cache.StatusList `json:"bugstatuslist"`
+	Id            int64    `json:"id"`
+	Name          string   `json:"name"`
+	BugstatusList []string `json:"bugstatuslist"`
 }
 
 type departmentList struct {
@@ -81,10 +81,29 @@ func BugGroupList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for rows.Next() {
-		var ids cache.StoreStatusId
+		var ids string
 		one := &department{}
 		rows.Scan(&one.Id, &one.Name, &ids)
-		one.BugstatusList = ids.ToShow()
+		idrows, err := db.Mconn.GetRowsIn("select name from status where id in (?)", strings.Split(ids, ","))
+		if err != nil {
+			golog.Error(err)
+			w.Write(errorcode.ErrorE(err))
+			return
+		}
+
+		for idrows.Next() {
+			var name string
+			err = idrows.Scan(&name)
+			if err != nil {
+				golog.Error()
+				continue
+			}
+			if name != "" {
+				one.BugstatusList = append(one.BugstatusList, name)
+			}
+
+		}
+
 		data.DepartmentList = append(data.DepartmentList, one)
 	}
 	send, _ := json.Marshal(data)
@@ -143,65 +162,53 @@ func GroupNamesGet(w http.ResponseWriter, r *http.Request) {
 
 func UserGroupGet(w http.ResponseWriter, r *http.Request) {
 	// 可以获取所有用户组
-	errorcode := &response.Response{}
 
 	data := &usergroup.RespUserGroupList{
 		UserGroupList: make([]*usergroup.RespUserGroup, 0),
 	}
 	uid := xmux.GetData(r).Get("uid").(int64)
+	var rows *sql.Rows
+	var err error
 	if cache.SUPERID == uid {
 		gsql := "select id,name,ifnull(ids,'') from usergroup"
-		rows, err := db.Mconn.GetRows(gsql)
+		rows, err = db.Mconn.GetRows(gsql)
 		if err != nil {
 			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
+			w.Write(data.ErrorE(err))
 			return
 		}
-		realname := new(string)
-		for rows.Next() {
-			onegroup := &usergroup.RespUserGroup{
-				Users: make([]string, 0),
-			}
-			var users string
-			rows.Scan(&onegroup.Id, &onegroup.Name, &users)
-			namerows, err := db.Mconn.GetRows(fmt.Sprintf("select realname from user where id in ('%s')", users))
+	} else {
+		gsql := "select id,name,ids from usergroup where uid=?"
+		rows, err = db.Mconn.GetRows(gsql, uid)
+		if err != nil {
+			golog.Error(err)
+			w.Write(data.ErrorE(err))
+			return
+		}
+	}
+	realname := new(string)
+	for rows.Next() {
+		onegroup := &usergroup.RespUserGroup{
+			Users: make([]string, 0),
+		}
+		var users string
+		rows.Scan(&onegroup.Id, &onegroup.Name, &users)
+		namerows, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
+			(gomysql.InArgs)(strings.Split(users, ",")).ToInArgs())
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+
+		for namerows.Next() {
+			err = namerows.Scan(realname)
 			if err != nil {
 				golog.Error(err)
 				continue
 			}
-
-			for namerows.Next() {
-				err = namerows.Scan(realname)
-				if err != nil {
-					golog.Error(err)
-					continue
-				}
-				onegroup.Users = append(onegroup.Users, *realname)
-			}
-
-			data.UserGroupList = append(data.UserGroupList, onegroup)
+			onegroup.Users = append(onegroup.Users, *realname)
 		}
-	} else {
-		gsql := "select id,name,ids from usergroup where uid=?"
-		rows, err := db.Mconn.GetRows(gsql, uid)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-		for rows.Next() {
-			onegroup := &usergroup.RespUserGroup{}
-			var users string
-			rows.Scan(&onegroup.Id, &onegroup.Name, &users)
-			// for _, v := range strings.Split(users, ",") {
-			// uid, err := strconv.ParseInt(v, 10, 64)
-			// if err != nil {
-			// 	continue
-			// }
-			// onegroup.Users = append(onegroup.Users, cache.CacheUidRealName[uid])
-			// }
-			data.UserGroupList = append(data.UserGroupList, onegroup)
-		}
+		data.UserGroupList = append(data.UserGroupList, onegroup)
 	}
 
 	send, _ := json.Marshal(data)
@@ -353,77 +360,21 @@ func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 	uid := xmux.GetData(r).Get("uid").(int64)
 	data := xmux.GetData(r).Data.(*usergroup.RespUpdateUserGroup)
-	// insert into usergroup(name, ids, uid) values('', (select id from user where realname in ('')), 1)
-	// ids := make([]string, 0)
-	// ulen := len(data.Users)
-	// if ulen == 0 {
-
-	// } else if ulen == 1 {
-	// 	var id string
-	// err := db.Mconn.GetOne("select id from user where realname=?", data.Users[0]).Scan(&id)
-	// 	if err != nil {
-	// 		golog.Error(err)
-	// 		w.Write(errorcode.ErrorE(err))
-	// 		return
-	// 	}
-	// 	ids = append(ids, id)
-	// } else {
-	db.Mconn.OpenDebug()
-	idrows, err := db.Mconn.GetRowsIn("select id from user where realname in (?)", data.Users)
-	golog.Info(db.Mconn.GetSql())
+	golog.Infof("%+v", *data)
+	ids, err := data.GetIds()
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	ids := make([]string, 0)
-	for idrows.Next() {
-		var id string
-		err = idrows.Scan(&id)
-		if err != nil {
-			golog.Error(err)
-			continue
-		}
-		ids = append(ids, id)
-	}
-	// }
-
 	golog.Info(ids)
 	updatesql := "update usergroup set name=?, ids=?, uid=? where id=?"
-	_, err = db.Mconn.Update(updatesql, data.Name, strings.Join(ids, ","), uid, data.Id)
+	_, err = db.Mconn.Update(updatesql, data.Name, ids, uid, data.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	// for _, v := range data.Users {
-	// 	userid, ok := cache.CacheRealNameUid[v]
-	// 	if !ok {
-	// 		continue
-	// 	}
-	// 	ids = append(ids, strconv.FormatInt(userid, 10))
-
-	// }
-	// usergroup := &model.UserGroups{
-	// 	Id:   data.Id,
-	// 	Ids:  strings.Join(ids, ","),
-	// 	Name: data.Name,
-	// }
-	// err := usergroup.Update()
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(errorcode.ErrorE(err))
-	// 	return
-	// }
-
-	// ug := &cache.UG{
-	// 	Ugid: data.Id,
-	// 	Name: data.Name,
-	// 	Uids: strings.Join(ids, ","),
-	// }
-	// if thisUg, ok := cache.CacheUGidUserGroup[data.Id]; ok {
-	// 	delete(cache.CacheUserGroupUGid, thisUg.Name)
-	// }
 
 	w.Write(errorcode.Success())
 	return

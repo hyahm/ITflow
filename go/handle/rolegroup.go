@@ -34,6 +34,7 @@ func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 			RoleList: make([]*rolegroup.PermRole, 0),
 		}
 		rows.Scan(&one.Id, &one.Name, &permids)
+
 		for _, v := range strings.Split(permids, ",") {
 			perm, err := model.NewPerm(v)
 			if err != nil {
@@ -50,7 +51,7 @@ func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 				Update: perm.Revise,
 				Remove: perm.Remove,
 			}
-			err = db.Mconn.GetOne("select name,info from role where id=?", v).Scan(&rp.Name, &rp.Info)
+			err = db.Mconn.GetOne("select name,info from roles where ?", v).Scan(&rp.Name, &rp.Info)
 			if err != nil {
 				golog.Error(err)
 				continue
@@ -157,7 +158,7 @@ func AddRoleGroup(w http.ResponseWriter, r *http.Request) {
 func RoleTemplate(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 	data := make([]*rolegroup.PermRole, 0)
-	rows, err := db.Mconn.GetRows("select role, info from roles")
+	rows, err := db.Mconn.GetRows("select name, info from roles")
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -174,6 +175,7 @@ func RoleTemplate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	send, _ := json.Marshal(data)
+	golog.Info(string(send))
 	w.Write(send)
 	return
 

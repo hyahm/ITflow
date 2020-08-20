@@ -34,11 +34,14 @@ func (rg *RoleGroup) Insert() error {
 	return err
 }
 
-func (rg *RoleGroup) Update() error {
-	_, err := db.Mconn.Update("update rolegroup set name=? where id=?", rg.Name, rg.ID)
+func (rg *RoleGroup) Update() (err error) {
+	rg.ID, err = db.Mconn.Update("update rolegroup set name=? where id=?", rg.Name, rg.ID)
+	if err != nil {
+		return
+	}
 	// 查询到permids
 	err = db.Mconn.GetOne("select permids from rolegroup where id=?", rg.ID).Scan(&rg.Permids)
-	return err
+	return
 }
 
 func CheckRoleNameInGroup(name string, rid *int64) error {

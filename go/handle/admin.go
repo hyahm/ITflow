@@ -1,6 +1,8 @@
 package handle
 
 import (
+	"itflow/cache"
+	"itflow/encrypt"
 	"itflow/internal/response"
 	"itflow/model"
 	"net/http"
@@ -19,7 +21,9 @@ func Reset(w http.ResponseWriter, r *http.Request) {
 	password := r.FormValue("password")
 	user := model.User{}
 
-	err := user.UpdateAdminPassword(password)
+	enpassword := encrypt.PwdEncrypt(password, cache.Salt)
+
+	err := user.UpdateAdminPassword(enpassword)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

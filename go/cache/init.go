@@ -35,10 +35,9 @@ var (
 	// CacheUidRealName map[int64]string
 	// CacheUidSgid     map[int64]int64
 	// CacheUidNickName map[int64]string
-
 	// CacheUidFilter     map[int64]StoreStatusId
-	DefaultCreateSid   StatusId
-	DefaultCompleteSid StatusId
+	DefaultCreateSid   int64
+	DefaultCompleteSid int64
 
 	// CacheUidRid  map[int64]int64
 	// CacheUidJid  map[int64]int64

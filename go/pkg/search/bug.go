@@ -83,7 +83,6 @@ func (pl *BugList) GetMyBugs() []byte {
 		al.Al = append(al.Al, one)
 
 	}
-	golog.Info(pl.Count)
 	al.Count = pl.Count
 	al.Page = pl.Page
 	return al.Marshal()

@@ -128,7 +128,6 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateInfo(w http.ResponseWriter, r *http.Request) {
-
 	errorcode := &response.Response{}
 	sl := xmux.GetData(r).Data.(*user.UserInfo)
 	uid := xmux.GetData(r).Get("uid").(int64)

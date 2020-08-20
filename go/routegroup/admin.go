@@ -13,17 +13,12 @@ var Admin *xmux.GroupRoute
 
 func init() {
 	Admin = xmux.NewGroupRoute().ApiCreateGroup("amdin", "管理员", "admin")
-	Admin.ApiCodeField("code").ApiCodeMsg("0", "成功")
-	Admin.ApiCodeField("code").ApiCodeMsg("20", "token过期")
-	Admin.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
-	Admin.ApiCodeField("code").ApiCodeMsg("其他错误", "请查看返回的msg")
-	Admin.Post("/dashboard/usercount", handle.UserCount)
 
-	Admin.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
-
-	Admin.Get("/admin/reset", handle.Reset)
+	Admin.Get("/admin/reset", handle.Reset).ApiDescribe("修改管理员密码，只能本地使用(已完成)").ApiSupplement(`
+	curl http://127.0.0.1:10001/admin/reset?password=123
+	`).DelMidware(midware.CheckToken)
 
 	Admin.Post("/info/update", handle.UpdateInfo).Bind(&user.UserInfo{}).
-		AddMidware(midware.JsonToStruct)
+		AddMidware(midware.JsonToStruct).ApiDescribe("只做保留，没有用到")
 
 }

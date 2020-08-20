@@ -10,7 +10,7 @@ type Role struct {
 
 func AllRole() ([]*Role, error) {
 	rs := make([]*Role, 0)
-	rows, err := db.Mconn.GetRows("select role,info from roles")
+	rows, err := db.Mconn.GetRows("select name,info from roles")
 	if err != nil {
 		return nil, err
 	}
