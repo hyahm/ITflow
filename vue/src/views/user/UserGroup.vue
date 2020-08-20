@@ -166,6 +166,7 @@ export default {
       this.dialogFormVisible = false
     },
     handleUpdate(row) {
+      console.log(row)
       this.dialogFormVisible = true
       this.form.id = row.id
       this.form.users = row.users

@@ -151,11 +151,22 @@ func GroupNamesGet(w http.ResponseWriter, r *http.Request) {
 	data := &usergroup.RespUserGroupName{
 		UserGroupNames: make([]string, 0),
 	}
-	// for _, v := range cache.CacheUGidUserGroup {
-	// 	data.UserGroupNames = append(data.UserGroupNames, v.Name)
-	// }
-	send, _ := json.Marshal(data)
-	w.Write(send)
+	rows, err := db.Mconn.GetRows("select name from usergroup")
+	if err != nil {
+		golog.Error(err)
+		w.Write(data.ErrorE(err))
+		return
+	}
+	for rows.Next() {
+		var name string
+		err = rows.Scan(&name)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		data.UserGroupNames = append(data.UserGroupNames, name)
+	}
+	w.Write(data.Marshal())
 	return
 
 }

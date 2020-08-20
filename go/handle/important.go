@@ -6,7 +6,6 @@ import (
 	"itflow/db"
 	"itflow/internal/response"
 	"itflow/model"
-	network "itflow/model"
 	"net/http"
 	"strconv"
 
@@ -16,17 +15,26 @@ import (
 
 func ImportantGet(w http.ResponseWriter, r *http.Request) {
 
-	data := &network.List_importants{}
-
-	for k, v := range cache.CacheIidImportant {
-		one := &network.Importants{}
-		one.Id = k
-		one.Name = v
-		data.ImportantList = append(data.ImportantList, one)
+	data := &model.List_importants{
+		ImportantList: make([]*model.Importants, 0),
 	}
 
-	send, _ := json.Marshal(data)
-	w.Write(send)
+	rows, err := db.Mconn.GetRows("select id,name from importants")
+	if err != nil {
+		golog.Error(err)
+		w.Write(data.ErrorE(err))
+		return
+	}
+	for rows.Next() {
+		im := &model.Importants{}
+		err = rows.Scan(&im.Id, &im.Name)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		data.ImportantList = append(data.ImportantList, im)
+	}
+	w.Write(data.Marshal())
 	return
 
 }
@@ -48,8 +56,6 @@ func ImportantAdd(w http.ResponseWriter, r *http.Request) {
 	// 增加日志
 
 	//更新缓存
-	cache.CacheImportantIid[data.Name] = cache.ImportantId(errorcode.Id)
-	cache.CacheIidImportant[cache.ImportantId(errorcode.Id)] = data.Name
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -123,11 +129,7 @@ func ImportantUpdate(w http.ResponseWriter, r *http.Request) {
 	// 增加日志
 
 	// 删除strings key
-	delete(cache.CacheImportantIid, cache.CacheIidImportant[data.Id])
-	cache.CacheIidImportant[data.Id] = data.Name
-	cache.CacheImportantIid[data.Name] = data.Id
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
+	w.Write(errorcode.Success())
 	return
 
 }

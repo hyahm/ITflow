@@ -20,16 +20,23 @@ func EnvList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 管理员
-	for k, v := range cache.CacheEidEnv {
-		pr := &env.Env{
-			Id:      k,
-			EnvName: v,
+	rows, err := db.Mconn.GetRows("select id,name from environment")
+	if err != nil {
+		golog.Error(err)
+		w.Write(el.ErrorE(err))
+		return
+	}
+	for rows.Next() {
+		e := &env.Env{}
+		err = rows.Scan(&e.Id, &e.EnvName)
+		if err != nil {
+			golog.Error(err)
+			continue
 		}
-		el.Elist = append(el.Elist, pr)
+		el.Elist = append(el.Elist, e)
 	}
 
-	send, _ := json.Marshal(el)
-	w.Write(send)
+	w.Write(el.Marshal())
 	return
 
 }
@@ -50,8 +57,6 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 添加缓存
-	cache.CacheEidEnv[cache.EnvId(errorcode.Id)] = cache.Env(envname)
-	cache.CacheEnvEid[cache.Env(envname)] = cache.EnvId(errorcode.Id)
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -75,9 +80,6 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 	// 增加日志
 
 	// 更新缓存
-	delete(cache.CacheEnvEid, cache.CacheEidEnv[cache.EnvId(er.Id)])
-	cache.CacheEidEnv[cache.EnvId(er.Id)] = er.EnvName
-	cache.CacheEnvEid[er.EnvName] = cache.EnvId(er.Id)
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return

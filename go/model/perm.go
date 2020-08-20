@@ -1,11 +1,11 @@
 package model
 
 import (
-	"errors"
 	"itflow/db"
 	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/gomysql"
 )
 
 // `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -32,22 +32,11 @@ func (perm *Perm) Insert() error {
 }
 
 func (perm *Perm) Update(ids string) error {
-	db.Mconn.OpenDebug()
-	golog.Debug(ids)
 	var err error
-	if strings.Index(ids, ",") > 0 {
-		if strings.Count(ids, ",") == 1 {
-			_, err = db.Mconn.Update("update perm set find=?, remove=?,revise=?, increase=? where rid=? and id=?",
-				perm.Find, perm.Remove, perm.Revise, perm.Increase, perm.Rid, ids)
-		} else {
-			_, err = db.Mconn.Update("update perm set find=?, remove=?,revise=?, increase=? where rid=? and id in (?)",
-				perm.Find, perm.Remove, perm.Revise, perm.Increase, perm.Rid, ids)
-		}
-	} else {
-		return errors.New("data errror")
-	}
-	// 更新的时候 rid 也是固定的， 不需要修改
-
+	db.Mconn.OpenDebug()
+	_, err = db.Mconn.UpdateIn("update perm set find=?, remove=?,revise=?, increase=? where rid=? and id in (?)",
+		perm.Find, perm.Remove, perm.Revise, perm.Increase, perm.Rid,
+		(gomysql.InArgs)(strings.Split(ids, ",")).ToInArgs())
 	golog.Info(db.Mconn.GetSql())
 	return err
 }

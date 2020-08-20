@@ -5,6 +5,7 @@ type Table_jobs struct {
 	Name     string `json:"name"`
 	Level    int    `json:"level"`
 	HypoName string `json:"hyponame"`
+	Hid      int64  // 临时变量
 }
 
 type Data_jobs struct {

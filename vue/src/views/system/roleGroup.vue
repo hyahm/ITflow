@@ -72,6 +72,7 @@
 <script>
 
 import { roleList, addRole, editRole, removeRole, getPermTemplate } from '@/api/role'
+import { deepClone } from '@/utils'
 export default {
   name: 'RoleGroup',
   data() {
@@ -119,6 +120,7 @@ export default {
       roleList().then(resp => {
         if (resp.data.code === 0) {
           this.list = resp.data.rolelist
+          console.log(this.list)
         } else {
           this.$message.error(resp.data.message)
         }
@@ -127,7 +129,7 @@ export default {
     handleAdd() {
       this.form.id = -1
       this.form.name = ''
-      this.form.rolelist = this.templateperm
+      this.form.rolelist = deepClone(this.templateperm)
       this.dialogVisible = true
     },
     handleRemove(id) {

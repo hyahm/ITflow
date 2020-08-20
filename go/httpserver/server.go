@@ -19,26 +19,26 @@ func RunHttp() {
 	router.SetHeader("Access-Control-Allow-Headers", "Content-Type,Access-Token,X-Token,smail")
 	router.AddMidware(midware.CheckToken) // 所有的请求头优先检查token是否有效， 登录除外
 
-	router.AddGroup(routegroup.User)
+	router.AddGroup(routegroup.User) // 已完成
 	router.AddGroup(routegroup.Bug)
 	router.AddGroup(routegroup.Search)
-	router.AddGroup(routegroup.DashBoard) // 后续
-	router.AddGroup(routegroup.Version)
-	router.AddGroup(routegroup.Admin) // 已完成
-	router.AddGroup(routegroup.Project)
-	router.AddGroup(routegroup.Env)
+	router.AddGroup(routegroup.DashBoard)   // 后续
+	router.AddGroup(routegroup.Version)     // 已完成
+	router.AddGroup(routegroup.Admin)       // 已完成
+	router.AddGroup(routegroup.Project)     // 已完成
+	router.AddGroup(routegroup.Env)         // 已完成
 	router.AddGroup(routegroup.StatusGroup) // 已完成
 	router.AddGroup(routegroup.UserManager)
 
-	router.AddGroup(routegroup.RoleGroup)
+	router.AddGroup(routegroup.RoleGroup) // 已完成
 
 	router.AddGroup(routegroup.Department)
-	router.AddGroup(routegroup.Position)
-	router.AddGroup(routegroup.Status) // 已完成
+	router.AddGroup(routegroup.Position) // 已完成
+	router.AddGroup(routegroup.Status)   // 已完成
 
 	router.AddGroup(routegroup.Type)
 	router.AddGroup(routegroup.Level)
-	router.AddGroup(routegroup.Important)
+	router.AddGroup(routegroup.Important)    // 已完成
 	router.AddGroup(routegroup.Log)          // 后面处理
 	router.AddGroup(routegroup.UserGroup)    // 已完成
 	router.AddGroup(routegroup.DefaultValue) // 已完成

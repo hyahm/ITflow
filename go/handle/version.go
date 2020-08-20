@@ -39,8 +39,6 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 		r.RemoteAddr, nickname, "add")
 
 	// 增加缓存
-	cache.CacheVidVersion[cache.VersionId(errorcode.Id)] = version_add.Name
-	cache.CacheVersionVid[version_add.Name] = cache.VersionId(errorcode.Id)
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return

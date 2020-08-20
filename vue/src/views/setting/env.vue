@@ -92,25 +92,37 @@ export default {
     },
     handleAdd() {
       this.form.id = -1
+      this.form.envname = ''
       this.dialogFormVisible = true
     },
     handleDelete(id) {
-      deleteEnvName(id).then(resp => {
-        if (resp === undefined) {
-          return
-        }
-        if (resp.data.code === 0) {
-          const fl = this.tableData.length
-          for (let i = 0; i < fl; i++) {
-            if (this.tableData[i].id === id) {
-              this.tableData.splice(i, 1)
-              break
-            }
+      this.$confirm('此操作将关闭bug, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteEnvName(id).then(resp => {
+          if (resp === undefined) {
+            return
           }
-          this.$message.success('删除成功')
-          return
-        }
-        this.$message.error('删除失败')
+          if (resp.data.code === 0) {
+            const fl = this.tableData.length
+            for (let i = 0; i < fl; i++) {
+              if (this.tableData[i].id === id) {
+                this.tableData.splice(i, 1)
+                break
+              }
+            }
+            this.$message.success('删除成功')
+            return
+          }
+          this.$message.error('删除失败')
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
       })
     },
     updatep(row) {

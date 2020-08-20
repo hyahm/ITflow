@@ -35,7 +35,8 @@ func (rg *RoleGroup) Insert() error {
 }
 
 func (rg *RoleGroup) Update() (err error) {
-	rg.ID, err = db.Mconn.Update("update rolegroup set name=? where id=?", rg.Name, rg.ID)
+	golog.Infof("%+v", rg)
+	_, err = db.Mconn.Update("update rolegroup set name=? where id=?", rg.Name, rg.ID)
 	if err != nil {
 		return
 	}

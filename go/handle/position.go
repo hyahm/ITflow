@@ -7,7 +7,6 @@ import (
 	"itflow/db"
 	"itflow/internal/response"
 	"itflow/model"
-	network "itflow/model"
 	"net/http"
 
 	"github.com/hyahm/golog"
@@ -18,23 +17,29 @@ func PositionGet(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := &network.List_jobs{
-		Positions: make([]*network.Table_jobs, 0),
+	data := &model.List_jobs{
+		Positions: make([]*model.Table_jobs, 0),
 	}
 
-	rows, err := db.Mconn.GetRows("select j.id,j.name,j.level,s.hypo from jobs as j join jobs as s ")
+	rows, err := db.Mconn.GetRows("select id,name,level,hypo from jobs")
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	x := make(map[int64]string)
 	for rows.Next() {
-		var jid int64
-		one := &network.Table_jobs{}
-		rows.Scan(&one.Id, &one.Name, &one.Level, &jid)
+		one := &model.Table_jobs{}
+		rows.Scan(&one.Id, &one.Name, &one.Level, &one.Hid)
+		x[one.Id] = one.Name
 		data.Positions = append(data.Positions, one)
 	}
 
+	for i := range data.Positions {
+		if data.Positions[i].Hid > 0 {
+			data.Positions[i].HypoName = x[data.Positions[i].Hid]
+		}
+	}
 	send, _ := json.Marshal(data)
 	w.Write(send)
 	return
@@ -52,7 +57,7 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 	var err error
 	golog.Info("start add position")
 	if data.Hyponame != "" {
-		err := db.Mconn.GetOne("select id from jobs where name=?", data.Hyponame).Scan(hid)
+		err = db.Mconn.GetOne("select id from jobs where name=?", data.Hyponame).Scan(&hid)
 		if err != nil {
 			if err != sql.ErrNoRows {
 				golog.Error(err)
@@ -95,7 +100,8 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if count > 0 {
-		w.Write(errorcode.ErrorNoPermission())
+		golog.Error("有用户使用了此职位")
+		w.Write(errorcode.Error("有用户使用了此职位"))
 		return
 	}
 	// 是否被所属使用
@@ -107,7 +113,8 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if count > 0 {
-		w.Write(errorcode.Error("没有职位"))
+		golog.Error("此管理者还管理者其他员工")
+		w.Write(errorcode.Error("此管理者还管理者其他员工"))
 		return
 	}
 	gsql := "delete from jobs where id=?"
@@ -134,7 +141,7 @@ func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 	golog.Infof("%+v", *data)
 	// 不存在这个职位的hypo，直接返回参数错误
 	if data.Hyponame != "" {
-		err := db.Mconn.GetOne("select id from jobs where name=?", data.Hyponame).Scan(hid)
+		err := db.Mconn.GetOne("select id from jobs where name=?", data.Hyponame).Scan(&hid)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				w.Write(errorcode.Error("没有找到职位"))
@@ -215,25 +222,25 @@ func GetPositions(w http.ResponseWriter, r *http.Request) {
 
 	data := &positions{}
 	uid := xmux.GetData(r).Get("uid").(int64)
-	if uid == cache.SUPERID {
+	if uid != cache.SUPERID {
+		errorcode.Msg = "暂时只能管理员才能添加用户"
+		w.Write(errorcode.Success())
+		return
+	}
+	rows, err := db.Mconn.GetRows("select name from jobs")
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+
+	for rows.Next() {
 		var name string
-		err := db.Mconn.GetOne("select name from jobs").Scan(&name)
+		err = rows.Scan(&name)
 		if err != nil {
 			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
+			continue
 		}
-
-		data.Positions = append(data.Positions, name)
-	} else {
-		var name string
-		err := db.Mconn.GetOne("select j.name from jobs as j join user as u on hypo=? and j.uid=u.id").Scan(&name)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-
 		data.Positions = append(data.Positions, name)
 	}
 

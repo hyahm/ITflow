@@ -44,6 +44,9 @@ func (reqrg *ReqRoleGroup) Add(uid int64) []byte {
 		golog.Error("no perm")
 		return errrocode.Error("no perm")
 	}
+	if reqrg.Name == "" {
+		return errrocode.Error("名称不能为空")
+	}
 	// 过滤
 	pernids := make([]string, 0)
 	// 确保每个info 没漏掉， 应该要加个判断的
@@ -56,7 +59,6 @@ func (reqrg *ReqRoleGroup) Add(uid int64) []byte {
 		}
 
 		if rid, ok := cache.CacheRoleRid[v.Info]; ok {
-			golog.Info(("111111111111111111111"))
 			perm := &model.Perm{
 				Find:     v.Select,
 				Remove:   v.Remove,
@@ -110,6 +112,7 @@ func (reqrg *ReqRoleGroup) Update(uid int64) []byte {
 
 	// 更新 perm 表的值
 	for _, v := range reqrg.RoleList {
+		golog.Infof("%+v", v)
 		// 不管有没有效， 全部插入
 		if !v.Select {
 			v.Remove = false
@@ -139,8 +142,5 @@ func (reqrg *ReqRoleGroup) Update(uid int64) []byte {
 		}
 
 	}
-	delete(cache.CacheRoleRid, cache.CacheRidRole[rg.ID])
-	cache.CacheRidRole[rg.ID] = rg.Name
-	cache.CacheRoleRid[rg.Name] = rg.ID
 	return errrocode.Success()
 }

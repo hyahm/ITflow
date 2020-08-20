@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"encoding/json"
 	"itflow/db"
 	"itflow/internal/project"
 	"itflow/internal/response"
@@ -48,13 +47,8 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	id := r.FormValue("id")
-	// pid, err := strconv.Atoi(id)
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(errorcode.ErrorE(err))
-	// 	return
-	// }
-	// 是否有bug使用
+	golog.Info(id)
+	// 判断有没有bug在使用这个
 	var count int
 	err := db.Mconn.GetOne("select count(id) from bugs where pid=?", id).Scan(&count)
 	if err != nil {
@@ -70,15 +64,14 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 
 	getaritclesql := "delete from project where id=?"
 
-	_, err = db.Mconn.Insert(getaritclesql, id)
+	_, err = db.Mconn.Delete(getaritclesql, id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
+	w.Write(errorcode.Success())
 	return
 
 }

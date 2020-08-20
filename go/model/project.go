@@ -16,7 +16,7 @@ type Project struct {
 }
 
 func (p *Project) Insert(groupname string) error {
-	pid, err := db.Mconn.Insert("insert into project(name,ugid,uid) values(?,(select ifnull(min(id),0) from usergroup where name=?),10)", p.Name, groupname, p.Uid)
+	pid, err := db.Mconn.Insert("insert into project(name,ugid,uid) values(?,(select ifnull(min(id),0) from usergroup where name=?),?)", p.Name, groupname, p.Uid)
 	p.Id = cache.ProjectId(pid)
 	return err
 }

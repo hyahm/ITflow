@@ -221,10 +221,10 @@ export default {
                 break
               }
             }
-            this.$message.success('删除成功')
+            this.$message.success(resp.data.msg)
             return
           }
-          this.$message.error('操作失败')
+          this.$message.error(resp.data.msg)
         })
       }).catch(() => {
         this.$message({

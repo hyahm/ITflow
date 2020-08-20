@@ -45,7 +45,7 @@
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.row.groupname)"
+            @click="handleDelete(scope.row.id)"
           >删除</el-button>
         </template>
       </el-table-column>
@@ -80,6 +80,7 @@
 <script>
 import { getUserGroupNames } from '@/api/group'
 import { getProjectName, addProjectName, updateProjectName, deleteProjectName } from '@/api/project'
+import { deepClone } from '@/utils'
 export default {
   name: 'Addproject',
   data() {
@@ -117,7 +118,6 @@ export default {
     },
     getproject() {
       getProjectName().then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.tableData = resp.data.projectlist
         } else {
@@ -126,29 +126,41 @@ export default {
       })
     },
     addProject() {
+      console.log(this.tableData)
       this.form.id = -1
       this.form.projectname = ''
       this.form.groupname = ''
       this.dialogFormVisible = true
     },
     handleDelete(id) {
-      deleteProjectName(id).then(resp => {
-        if (resp === undefined) {
-          return
-        }
-        if (resp.data.code === 0) {
-          const fl = this.tableData.length
-          for (let i = 0; i < fl; i++) {
-            if (this.tableData[i].id === id) {
-              this.tableData.splice(i, 1)
-              break
-            }
+      this.$confirm('此操作将关闭bug, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteProjectName(id).then(resp => {
+          if (resp === undefined) {
+            return
           }
-          this.$message.success('删除成功')
-          return
-        } else {
-          this.$message.error(resp.data.message)
-        }
+          if (resp.data.code === 0) {
+            const fl = this.tableData.length
+            for (let i = 0; i < fl; i++) {
+              if (this.tableData[i].id === id) {
+                this.tableData.splice(i, 1)
+                break
+              }
+            }
+            this.$message.success('删除成功')
+            return
+          } else {
+            this.$message.error(resp.data.message)
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
       })
     },
     updatep(row) {
@@ -168,10 +180,10 @@ export default {
         addProjectName(this.form).then(resp => {
           if (resp.data.code === 0) {
             this.form.id = resp.data.id
-            this.tableData.push(this.form)
+            this.tableData.push(deepClone(this.form))
             this.$message.success('添加成功')
           } else {
-            this.$message.error('添加错误')
+            this.$message.error(resp.data.msg)
           }
         })
       } else {
