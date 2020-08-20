@@ -510,7 +510,7 @@ CREATE TABLE `roles` (
   `name` varchar(30) NOT NULL DEFAULT '',
   `info` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `role` (`role`)
+  UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
