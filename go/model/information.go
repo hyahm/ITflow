@@ -2,6 +2,7 @@ package model
 
 import (
 	"itflow/db"
+	"itflow/internal/comment"
 
 	"github.com/hyahm/golog"
 )
@@ -14,21 +15,20 @@ type Information struct {
 	Time int64
 }
 
-func NewInformationsByBid(bid interface{}) ([]*Information, error) {
-	infors := make([]*Information, 0)
-	golog.Info(bid)
-	getinfosql := "select id, bid,uid,info,time from informations where bid=?"
+func NewInformationsByBid(bid interface{}, cms []*comment.Informations) error {
+	// sl.Comments = make([]*comment.Informations, len(cc))
+	getinfosql := "select u.realname,info,time from informations as i join user as u on bid=? and u.id=i.uid"
 	rows, err := db.Mconn.GetRows(getinfosql, bid)
 	if err != nil {
 		golog.Error(err)
-		return infors, err
+		return err
 	}
 	for rows.Next() {
-		im := &Information{}
+		im := &comment.Informations{}
 		// var uid int64
-		rows.Scan(&im.ID, &im.Bid, &im.Uid, &im.Info, &im.Time)
+		rows.Scan(&im.User, &im.Info, &im.Date)
 		// im.User = cache.CacheUidRealName[uid]
-		infors = append(infors, im)
+		cms = append(cms, im)
 	}
-	return infors, nil
+	return nil
 }

@@ -2,7 +2,7 @@ package project
 
 import (
 	"encoding/json"
-	"itflow/cache"
+	"itflow/db"
 	"itflow/model"
 
 	"github.com/hyahm/golog"
@@ -36,11 +36,15 @@ func GetList(uid int64) []byte {
 			ProjectName: p.Name,
 		}
 		rp.Id = p.Id
-		ug, ok := cache.CacheUGidUserGroup[p.Gid]
-		if !ok {
+		err = db.Mconn.GetOne("select name from usergroup where id=?", p.Gid).Scan(&rp.GroupName)
+		if err != nil {
+			golog.Error(err)
 			continue
 		}
-		rp.GroupName = ug.Name
+		// ug, ok := cache.CacheUGidUserGroup[p.Gid]
+		// if !ok {
+		// 	continue
+		// }
 
 		rpl.ProjectList = append(rpl.ProjectList, rp)
 	}

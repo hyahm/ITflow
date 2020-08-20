@@ -5,8 +5,6 @@ import (
 	"itflow/midware"
 	"itflow/model"
 
-	"itflow/internal/restful"
-
 	"github.com/hyahm/xmux"
 )
 
@@ -22,27 +20,27 @@ func init() {
 	Api.ApiCodeField("code").ApiCodeMsg("其他错误", "请查看返回的msg")
 
 	Api.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
-	Api.Post("/rest/list", handle.RestList)
+	// Api.Post("/rest/list", handle.RestList)
 
-	Api.Post("/rest/update", handle.RestUpdate).Bind(&model.Data_restful{}).AddMidware(midware.JsonToStruct)
+	// Api.Post("/rest/update", handle.RestUpdate).Bind(&model.Data_restful{}).AddMidware(midware.JsonToStruct)
 
-	Api.Post("/rest/add", handle.RestAdd).Bind(&model.Data_restful{}).AddMidware(midware.JsonToStruct)
+	// Api.Post("/rest/add", handle.RestAdd).Bind(&model.Data_restful{}).AddMidware(midware.JsonToStruct)
 
-	Api.Get("/rest/delete", handle.RestDel)
+	// Api.Get("/rest/delete", handle.RestDel)
 
-	Api.Get("/api/list", handle.ApiList)
+	// Api.Get("/api/list", handle.ApiList)
 
-	Api.Post("/api/update", handle.ApiUpdate).Bind(&model.Get_apilist{}).AddMidware(midware.JsonToStruct)
+	// Api.Post("/api/update", handle.ApiUpdate).Bind(&model.Get_apilist{}).AddMidware(midware.JsonToStruct)
 
-	Api.Post("/api/add", handle.ApiAdd).Bind(&model.Get_apilist{}).AddMidware(midware.JsonToStruct)
+	// Api.Post("/api/add", handle.ApiAdd).Bind(&model.Get_apilist{}).AddMidware(midware.JsonToStruct)
 
-	Api.Get("/api/delete", handle.ApiDel)
+	// Api.Get("/api/delete", handle.ApiDel)
 
-	Api.Get("/api/one", handle.ApiOne)
+	// Api.Get("/api/one", handle.ApiOne)
 
-	Api.Get("/edit/one", handle.EditOne)
+	// Api.Get("/edit/one", handle.EditOne)
 
-	Api.Post("/api/resp", handle.ApiResp).Bind(&restful.Resp{}).AddMidware(midware.JsonToStruct)
+	// Api.Post("/api/resp", handle.ApiResp).Bind(&restful.Resp{}).AddMidware(midware.JsonToStruct)
 
 	Api.Post("/header/list", handle.HeaderList)
 
@@ -53,7 +51,7 @@ func init() {
 	Api.Post("/header/update", handle.HeaderUpdate).
 		Bind(&model.Data_header{}).AddMidware(midware.JsonToStruct)
 
-	Api.Post("/header/get", handle.HeaderGet)
+	// Api.Post("/header/get", handle.HeaderGet)
 
 	//---------------------------------------------------------
 

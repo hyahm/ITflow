@@ -18,7 +18,9 @@ func init() {
 	UserGroup.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	UserGroup.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
-	UserGroup.Post("/group/get", handle.UserGroupGet).ApiResponseTemplate(`{"grouplist":["aa"],"code":0}`).ApiDescribe("获取自己创建的用户组")
+	UserGroup.Post("/group/get", handle.UserGroupGet).
+		ApiResponseTemplate(`{"grouplist":["aa"],"code":0}`).
+		ApiDescribe("获取自己创建的用户组")
 
 	UserGroup.Post("/groupnames/get", handle.GroupNamesGet).ApiResponseTemplate(`{"groupnames":["bb"],"code":0}`).ApiDescribe("获取自己创建的用户组")
 
@@ -27,5 +29,5 @@ func init() {
 
 	UserGroup.Post("/group/update", handle.GroupUpdate).Bind(&usergroup.RespUpdateUserGroup{}).
 		AddMidware(midware.JsonToStruct).AddMidware(midware.CheckUser).
-		ApiDescribe("编辑用户组，只有创建者和admin才能操作")
+		ApiDescribe("编辑用户组，只有创建者和admin才能操作").ApiRequestTemplate(`{"id":7,"name":"aa","users":["admin","cander"]}`)
 }

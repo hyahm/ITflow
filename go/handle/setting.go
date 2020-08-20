@@ -2,17 +2,15 @@ package handle
 
 import (
 	"encoding/json"
-	"fmt"
 	"itflow/cache"
 	"itflow/db"
 	"itflow/encrypt"
 	"itflow/internal/response"
 	"itflow/internal/role"
 	"itflow/internal/user"
-	"itflow/model"
 	"net/http"
-	"strconv"
 	"strings"
+	"time"
 
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
@@ -21,106 +19,124 @@ import (
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	nickname := xmux.GetData(r).Get("nickname").(string)
+	// nickname := xmux.GetData(r).Get("nickname").(string)
 	uid := xmux.GetData(r).Get("uid").(int64)
+
+	if uid != cache.SUPERID {
+		w.Write(errorcode.Error("没有权限创建用户"))
+		return
+	}
+	// id` bigint NOT NULL AUTO_INCREMENT,
+	// `nickname` varchar(30) NOT NULL,
+	// `password` varchar(40) NOT NULL,
+	// `email` varchar(50) NOT NULL,
+	// `headimg` varchar(100) DEFAULT '',
+	// `createtime` bigint DEFAULT '0',
+	// `createuid` bigint DEFAULT '0',
+	// `realname` varchar(30) NOT NULL,
+	// `showstatus` varchar(200) DEFAULT '',
+	// `disable` tinyint(1) DEFAULT '0',
+	// `bugsid` bigint DEFAULT '0',
+	// `rid` bigint DEFAULT '0',
+	// `jid` bigint DEFAULT '0',
+
+	createTime := time.Now().Unix()
 	getuser := xmux.GetData(r).Data.(*user.GetAddUser)
-	// 验证组和职位不能为空
-	if getuser.StatusGroup == "" || getuser.RoleGroup == "" || getuser.Position == "" {
-		w.Write(errorcode.Error("验证组和职位不能为空"))
-		return
-	}
-	//1，先要验证nickname 是否有重复的
-	if _, ok := cache.CacheNickNameUid[getuser.Nickname]; ok {
-		w.Write(errorcode.Error("nickname 重复"))
-		return
-	}
-
-	//验证邮箱 是否有重复的
-	var hasemail bool
-	for _, v := range cache.CacheUidEmail {
-		if v == getuser.Email {
-			hasemail = true
-		}
-	}
-	if hasemail {
-		w.Write(errorcode.Error("email 重复"))
-		return
-	}
-
-	ids := make([]string, 0)
-	for k := range cache.CacheSidStatus {
-		ids = append(ids, strconv.FormatInt(k.ToInt64(), 10))
-	}
-
-	var sgid int64
-	var hassggroup bool
-
-	for k, v := range cache.CacheSgidGroup {
-		if v == getuser.StatusGroup {
-			sgid = k
-			hassggroup = true
-			break
-		}
-	}
-
-	var rid int64
-	err := model.CheckRoleNameInGroup(getuser.RoleGroup, &rid)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	if !hassggroup {
-		w.Write(errorcode.Error("没有找到权限"))
-		return
-	}
-	// 获取级别,如果这个职位不存在，就返回错误
-	var jid int64
-	var ok bool
-	if jid, ok = cache.CacheJobnameJid[getuser.Position]; !ok {
-		w.Write(errorcode.Error("职位不存在"))
-		return
-	}
-
-	// 增加用户
 	enpassword := encrypt.PwdEncrypt(getuser.Password, cache.Salt)
-	user := model.User{
-		NickName:   getuser.Nickname,
-		RealName:   getuser.RealName,
-		Password:   enpassword,
-		Email:      getuser.Email,
-		CreateId:   uid,
-		ShowStatus: cache.StoreLevelId(strings.Join(ids, ",")),
-		BugGroupId: sgid,
-		Roleid:     rid,
-		Jobid:      jid,
-	}
-	err = user.Create()
+	var err error
+	errorcode.Id, err = db.Mconn.Insert(`insert into user(nickname, password, email, createtime, createuid, realname, bugsid, rid, jid) values(
+		?,?,?,?,?,?, 
+		(select id from statusgroup where name=?),  
+		(select id from rolegroup where name=?),
+		(select id from jobs where name=?))`, getuser.Nickname,
+		enpassword, getuser.Email, createTime,
+		uid, getuser.RealName, getuser.StatusGroup, getuser.RoleGroup, getuser.Position)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	//更新缓存
+	// // 验证组和职位不能为空
+	// if getuser.StatusGroup == "" || getuser.RoleGroup == "" || getuser.Position == "" {
+	// 	w.Write(errorcode.Error("验证组和职位不能为空"))
+	// 	return
+	// }
+	// //1，先要验证nickname 是否有重复的
+	// if _, ok := cache.CacheNickNameUid[getuser.Nickname]; ok {
+	// 	w.Write(errorcode.Error("nickname 重复"))
+	// 	return
+	// }
 
-	cache.CacheUidSgid[errorcode.Id] = sgid
-	cache.CacheUidNickName[errorcode.Id] = getuser.Nickname
-	cache.CacheUidRealName[errorcode.Id] = getuser.RealName
-	cache.CacheNickNameUid[getuser.Nickname] = errorcode.Id
-	cache.CacheRealNameUid[getuser.RealName] = errorcode.Id
-	cache.CacheUidRid[errorcode.Id] = rid
-	cache.CacheUidRid[errorcode.Id] = jid
-	cache.CacheUidEmail[cache.CacheNickNameUid[nickname]] = getuser.Email
+	// //验证邮箱 是否有重复的
+	// var hasemail bool
+	// for _, v := range cache.CacheUidEmail {
+	// 	if v == getuser.Email {
+	// 		hasemail = true
+	// 	}
+	// }
+	// if hasemail {
+	// 	w.Write(errorcode.Error("email 重复"))
+	// 	return
+	// }
 
-	// 邮件通知
+	// ids := make([]string, 0)
+	// for k := range cache.CacheSidStatus {
+	// 	ids = append(ids, strconv.FormatInt(k.ToInt64(), 10))
+	// }
 
-	if cache.CacheEmail.Enable {
-		content := fmt.Sprintf("你的用户名: %v;<br> 密码: %v", getuser.Email, getuser.Password)
-		go cache.CacheEmail.SendMail("创建用户成功", content, getuser.Email)
-	}
+	// var sgid int64
+	// var hassggroup bool
 
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
+	// for k, v := range cache.CacheSgidGroup {
+	// 	if v == getuser.StatusGroup {
+	// 		sgid = k
+	// 		hassggroup = true
+	// 		break
+	// 	}
+	// }
+
+	// var rid int64
+	// err := model.CheckRoleNameInGroup(getuser.RoleGroup, &rid)
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
+	// if !hassggroup {
+	// 	w.Write(errorcode.Error("没有找到权限"))
+	// 	return
+	// }
+	// // 获取级别,如果这个职位不存在，就返回错误
+	// var jid int64
+	// var ok bool
+	// if jid, ok = cache.CacheJobnameJid[getuser.Position]; !ok {
+	// 	w.Write(errorcode.Error("职位不存在"))
+	// 	return
+	// }
+
+	// // 增加用户
+
+	// user := model.User{
+	// 	NickName:   getuser.Nickname,
+	// 	RealName:   getuser.RealName,
+	// 	Password:   enpassword,
+	// 	Email:      getuser.Email,
+	// 	CreateId:   uid,
+	// 	ShowStatus: cache.StoreLevelId(strings.Join(ids, ",")),
+	// 	BugGroupId: sgid,
+	// 	Roleid:     rid,
+	// 	Jobid:      jid,
+	// }
+	// err = user.Create()
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
+	// //更新缓存
+
+	// send, _ := json.Marshal(errorcode)
+	w.Write(errorcode.Success())
 	return
 
 }
@@ -130,14 +146,9 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	id := r.FormValue("id")
-	id32, err := strconv.Atoi(id)
-	if err != nil {
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	// 判断是否有bug
 	var count int
-	err = db.Mconn.GetOne("select count(id) from bugs where uid=?", id).Scan(&count)
+	err := db.Mconn.GetOne("select count(id) from bugs where uid=?", id).Scan(&count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -178,15 +189,6 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	delete(cache.CacheNickNameUid, cache.CacheUidNickName[int64(id32)])
-	delete(cache.CacheRealNameUid, cache.CacheUidRealName[int64(id32)])
-	delete(cache.CacheUidEmail, int64(id32))
-	delete(cache.CacheUidRealName, int64(id32))
-	delete(cache.CacheUidNickName, int64(id32))
-	delete(cache.CacheUidFilter, int64(id32))
-	delete(cache.CacheUidSgid, int64(id32))
-	delete(cache.CacheUidRid, int64(id32))
-	delete(cache.CacheUidJid, int64(id32))
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -230,9 +232,9 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 	uls := &user.UserList{}
 
 	getallsql := `select u.id,createtime,realname,nickname,email,disable,r.name,s.name,j.name from 
-	project.user as u join project.rolegroup as r 
-	join project.statusgroup as s 
-	join project.jobs as j 
+	user as u join rolegroup as r 
+	join statusgroup as s 
+	join jobs as j 
 	on u.rid = r.id and u.bugsid = s.id and u.jid = j.id and u.id<>?`
 	adminrows, err := db.Mconn.GetRows(getallsql, cache.SUPERID)
 	if err != nil {
@@ -260,8 +262,8 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 func UserUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	if cache.SUPERID != cache.CacheNickNameUid[nickname] {
+	uid := xmux.GetData(r).Get("uid").(int64)
+	if cache.SUPERID != uid {
 		w.Write(errorcode.ErrorNoPermission())
 		return
 	}
@@ -272,36 +274,41 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 	//switch level {
 	//case 0:
 
-	var hasstatusgroup bool
-	var rid int64
-	var bsid int64
+	// var hasstatusgroup bool
+	// var rid int64
+	// var bsid int64
 
-	err := model.CheckRoleNameInGroup(uls.RoleGroup, &rid)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	// err := model.CheckRoleNameInGroup(uls.RoleGroup, &rid)
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
 
-	for k, v := range cache.CacheSgidGroup {
-		if v == uls.StatusGroup {
-			bsid = k
-			hasstatusgroup = true
-			break
-		}
-	}
-	if _, ok := cache.CacheJobnameJid[uls.Position]; !ok {
-		w.Write(errorcode.Error("没有找到职位"))
-		return
-	}
-	if !hasstatusgroup {
-		w.Write(errorcode.Error("没有找到status"))
-		return
-	}
-
-	getallsql := "update user set realname=?,nickname=?,email=?,rid=?,bugsid=?,jid=? where id=?"
-	_, err = db.Mconn.Update(getallsql,
-		uls.Realname, uls.Nickname, uls.Email, rid, bsid, cache.CacheJobnameJid[uls.Position],
+	// for k, v := range cache.CacheSgidGroup {
+	// 	if v == uls.StatusGroup {
+	// 		bsid = k
+	// 		hasstatusgroup = true
+	// 		break
+	// 	}
+	// }
+	// if _, ok := cache.CacheJobnameJid[uls.Position]; !ok {
+	// 	w.Write(errorcode.Error("没有找到职位"))
+	// 	return
+	// }
+	// if !hasstatusgroup {
+	// 	w.Write(errorcode.Error("没有找到status"))
+	// 	return
+	// }
+	getallsql := `update user set 
+	 realname=?,	nickname=?,	email=?,
+	 rid=(select coalesce(min(id),0) from rolegroup where name=?),
+	 bugsid=(select coalesce(min(id),0) from statusgroup where name=?), 
+	 jid=(select coalesce(min(id),0) from jobs where name=?) 
+	 where id=?`
+	// getallsql := "update user set realname=?,nickname=?,email=?,rid=?,bugsid=?,jid=?  where id=?"
+	_, err := db.Mconn.Update(getallsql,
+		uls.Realname, uls.Nickname, uls.Email, uls.RoleGroup, uls.StatusGroup, uls.Position,
 		uls.Id,
 	)
 	if err != nil {
@@ -310,18 +317,6 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//更新缓存
-	delete(cache.CacheNickNameUid, cache.CacheUidNickName[int64(uls.Id)])
-	delete(cache.CacheRealNameUid, cache.CacheUidNickName[int64(uls.Id)])
-	cache.CacheRealNameUid[uls.Realname] = int64(uls.Id)
-	cache.CacheUidSgid[int64(uls.Id)] = bsid
-	cache.CacheUidNickName[int64(uls.Id)] = uls.Nickname
-	cache.CacheUidRealName[int64(uls.Id)] = uls.Realname
-	cache.CacheNickNameUid[uls.Nickname] = int64(uls.Id)
-	cache.CacheRealNameUid[uls.Realname] = int64(uls.Id)
-	cache.CacheUidRid[int64(uls.Id)] = rid
-	cache.CacheUidRid[int64(uls.Id)] = cache.CacheJobnameJid[uls.Position]
-	cache.CacheUidEmail[cache.CacheNickNameUid[nickname]] = uls.Email
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -333,8 +328,7 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 
 	getuser := xmux.GetData(r).Data.(*user.ChangePasswod)
 
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	uid := cache.CacheNickNameUid[nickname]
+	uid := xmux.GetData(r).Get("uid").(int64)
 
 	getaritclesql := "select count(id) from user where id=? and password=?"
 	oldpassword := encrypt.PwdEncrypt(getuser.Oldpassword, cache.Salt)

@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"itflow/cache"
+	"itflow/db"
 	"itflow/internal/bug"
 	"itflow/internal/comment"
 	"itflow/internal/project"
@@ -77,6 +78,21 @@ type nickreal struct {
 type userList struct {
 	Users []string `json:"users"`
 	Code  int      `json:"code"`
+	Msg   string   `json:"msg"`
+}
+
+func (ul *userList) Marshal() []byte {
+	send, err := json.Marshal(ul)
+	if err != nil {
+		golog.Error(err)
+	}
+	return send
+}
+
+func (ul *userList) ErrorE(err error) []byte {
+	ul.Code = 1
+	ul.Msg = err.Error()
+	return ul.Marshal()
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
@@ -84,9 +100,21 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	ul := &userList{
 		Users: make([]string, 0),
 	}
-
-	for _, v := range cache.CacheUidRealName {
-		ul.Users = append(ul.Users, v)
+	rows, err := db.Mconn.GetRows("select realname from user")
+	if err != nil {
+		golog.Error(err)
+		w.Write(ul.ErrorE(err))
+		return
+	}
+	for rows.Next() {
+		realname := new(string)
+		// var realname string
+		err = rows.Scan(realname)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		ul.Users = append(ul.Users, *realname)
 	}
 	send, _ := json.Marshal(ul)
 	w.Write(send)
@@ -251,31 +279,26 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 	sl := &bug.RespShowBug{
 		Comments: make([]*comment.Informations, 0),
 	}
-	cc, err := model.NewInformationsByBid(bid)
-	if err != nil {
+	err := db.Mconn.GetOne(`select b.id,b.content,i.name, l.name, e.name, b.title,p.name from bugs as b 
+	join importants as i 
+	join version as v 
+	join level as l 
+	join environment as e 
+	join project as p 
+	join user as u 
+	join statusgroup as s 
+	on b.id=1 
+	and b.uid=u.id and i.id=b.iid and b.sid=s.id and b.vid=v.id and b.lid=l.id and b.eid=e.id and b.pid=p.id`).Scan(
+		&sl.Id, &sl.Content, &sl.Important, &sl.Level,
+	)
 
+	err = model.NewInformationsByBid(bid, sl.Comments)
+	if err != nil {
 		sl.Code = 1
 		sl.Msg = err.Error()
 		w.Write(sl.Marshal())
 		return
 	}
-	sl.Comments = make([]*comment.Informations, len(cc))
-	for i, v := range cc {
-		ct := &comment.Informations{
-			Date: v.Time,
-			Info: v.Info,
-			User: cache.CacheUidRealName[v.Uid],
-		}
-		sl.Comments[i] = ct
-	}
-
-	bug, err := model.NewBugById(bid)
-	sl.Important = bug.ImportanceId.Name()
-	sl.Content = bug.Content
-	sl.Level = bug.LevelId.Name()
-	sl.Envname = bug.EnvId.Name()
-	sl.Title = bug.Title
-	sl.Projectname = bug.ProjectId.Name()
 
 	send, _ := json.Marshal(sl)
 	w.Write(send)

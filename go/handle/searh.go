@@ -2,18 +2,13 @@ package handle
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/bug"
-	"itflow/internal/response"
 	"itflow/internal/search"
 	"itflow/model"
 	"net/http"
-	"strconv"
-	"strings"
 
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
@@ -86,7 +81,14 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetData(r).Get("uid").(int64)
 	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
 	countsql := "select spusers from bugs where dustbin=true "
-	searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=true "
+	searchsql := `select id,createtime,iid,sid,title,lid,pid,eid,spusers,u.realname from bugs as b 
+	join importants as i 
+	join statusgroup as s 
+	join level as l 
+	join project as p 
+	join environment as e  
+	join user as u 
+	on dustbin=true and b.iid = i.id and b.sid = s.id and b.lid = l.id and b.pid=p.id and b.eid = e.id and b.uid=u.id`
 	sch, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
 	if err != nil {
 		if err == search.ErrorNoStatus {
@@ -177,7 +179,7 @@ func managertotal(basesql string, params *bug.BugManager) (string, []interface{}
 	}
 	if params.Author != "" {
 		basesql = basesql + " and uid=? "
-		args = append(args, cache.CacheNickNameUid[params.Author])
+		// args = append(args, cache.CacheNickNameUid[params.Author])
 	}
 
 	return basesql, args
@@ -197,128 +199,127 @@ func managersearch(basesql string, count int, params *bug.BugManager) (*sql.Rows
 
 func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool) (*model.AllArticleList, []byte) {
 
-	errorcode := &response.Response{}
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	searchparam := &bug.SearchParam{} // 接收的参数
-	searchq, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		golog.Error(err)
-		return nil, errorcode.ErrorE(err)
-	}
+	// 	errorcode := &response.Response{}
+	// 	nickname := xmux.GetData(r).Get("nickname").(string)
+	// 	searchparam := &bug.SearchParam{} // 接收的参数
+	// 	searchq, err := ioutil.ReadAll(r.Body)
+	// 	if err != nil {
+	// 		golog.Error(err)
+	// 		return nil, errorcode.ErrorE(err)
+	// 	}
 
-	err = json.Unmarshal(searchq, searchparam)
-	if err != nil {
-		golog.Error(err)
-		return nil, errorcode.ErrorE(err)
-	}
-	al := &model.AllArticleList{}
-	// 获取状态
-	showstatus := cache.CacheUidFilter[cache.CacheNickNameUid[nickname]]
+	// 	err = json.Unmarshal(searchq, searchparam)
+	// 	if err != nil {
+	// 		golog.Error(err)
+	// 		return nil, errorcode.ErrorE(err)
+	// 	}
+	// 	al := &model.AllArticleList{}
+	// 	// 获取状态
+	// 	// showstatus := cache.CacheUidFilter[cache.CacheNickNameUid[nickname]]
 
-	//更新缓存
-	cache.CacheUidFilter[cache.CacheNickNameUid[nickname]] = showstatus
+	// 	//更新缓存
 
-	// 第二步， 检查level
-	if searchparam.Level != "" {
-		// 判断这个值是否存在
-		if lid, ok := cache.CacheLevelLid[searchparam.Level]; ok {
-			bugsql += fmt.Sprintf("and lid=%d ", lid)
-			countbasesql += fmt.Sprintf("and lid=%d ", lid)
-		} else {
-			golog.Error(err)
-			return nil, errorcode.Error("没有搜索到")
-		}
-	}
-	// 第三步， 检查Title
-	if searchparam.Title != "" {
+	// 	// 第二步， 检查level
+	// 	if searchparam.Level != "" {
+	// 		// 判断这个值是否存在
+	// 		if lid, ok := cache.CacheLevelLid[searchparam.Level]; ok {
+	// 			bugsql += fmt.Sprintf("and lid=%d ", lid)
+	// 			countbasesql += fmt.Sprintf("and lid=%d ", lid)
+	// 		} else {
+	// 			golog.Error(err)
+	// 			return nil, errorcode.Error("没有搜索到")
+	// 		}
+	// 	}
+	// 	// 第三步， 检查Title
+	// 	if searchparam.Title != "" {
 
-		bugsql += fmt.Sprintf("and title like '%s' ", searchparam.Title)
-		countbasesql += fmt.Sprintf("and title like '%s' ", searchparam.Title)
+	// 		bugsql += fmt.Sprintf("and title like '%s' ", searchparam.Title)
+	// 		countbasesql += fmt.Sprintf("and title like '%s' ", searchparam.Title)
 
-	}
-	// 第四步， 检查Project
-	if searchparam.Project != "" {
-		// 判断这个值是否存在
-		if pid, ok := cache.CacheProjectPid[searchparam.Project]; ok {
-			bugsql += fmt.Sprintf("and pid=%d ", pid)
-			countbasesql += fmt.Sprintf("and pid=%d ", pid)
-		} else {
-			golog.Error(err)
-			return nil, errorcode.Error("没有搜索到")
-		}
-	}
+	// 	}
+	// 	// 第四步， 检查Project
+	// 	if searchparam.Project != "" {
+	// 		// 判断这个值是否存在
+	// 		if pid, ok := cache.CacheProjectPid[searchparam.Project]; ok {
+	// 			bugsql += fmt.Sprintf("and pid=%d ", pid)
+	// 			countbasesql += fmt.Sprintf("and pid=%d ", pid)
+	// 		} else {
+	// 			golog.Error(err)
+	// 			return nil, errorcode.Error("没有搜索到")
+	// 		}
+	// 	}
 
-	if showstatus != "" {
-		countbasesql += fmt.Sprintf("and sid in (%s)", showstatus)
-		bugsql += fmt.Sprintf("and sid in (%s) ", showstatus)
-	}
+	// 	if showstatus != "" {
+	// 		countbasesql += fmt.Sprintf("and sid in (%s)", showstatus)
+	// 		bugsql += fmt.Sprintf("and sid in (%s) ", showstatus)
+	// 	}
 
-	err = db.Mconn.GetOne(countbasesql, cache.CacheNickNameUid[nickname]).Scan(&al.Count)
-	if err != nil {
-		golog.Error(err)
-		return nil, errorcode.ErrorE(err)
-	}
+	// 	err = db.Mconn.GetOne(countbasesql, cache.CacheNickNameUid[nickname]).Scan(&al.Count)
+	// 	if err != nil {
+	// 		golog.Error(err)
+	// 		return nil, errorcode.ErrorE(err)
+	// 	}
 
-	// 获取查询的总个数
-	start, end := xmux.GetLimit(al.Count, searchparam.Page, searchparam.Limit)
+	// 	// 获取查询的总个数
+	// 	start, end := xmux.GetLimit(al.Count, searchparam.Page, searchparam.Limit)
 
-	rows, err := db.Mconn.GetRows(bugsql+" limit ?,?", cache.CacheNickNameUid[nickname], start, end)
-	if err != nil {
-		golog.Error(err)
-		return nil, errorcode.ErrorE(err)
-	}
+	// 	rows, err := db.Mconn.GetRows(bugsql+" limit ?,?", cache.CacheNickNameUid[nickname], start, end)
+	// 	if err != nil {
+	// 		golog.Error(err)
+	// 		return nil, errorcode.ErrorE(err)
+	// 	}
 
-	for rows.Next() {
-		one := &model.ArticleList{}
-		var iid cache.ImportantId
-		var sid cache.StatusId
-		var lid cache.LevelId
-		var pid cache.ProjectId
-		var eid cache.EnvId
-		var userlist string
-		rows.Scan(&one.ID, &one.Date, &iid, &sid, &one.Title, &lid, &pid, &eid, &userlist)
-		// 如果不存在这么办， 添加修改的时候需要判断
-		one.Importance = cache.CacheIidImportant[iid]
-		one.Status = cache.CacheSidStatus[sid]
-		one.Level = cache.CacheLidLevel[lid]
-		one.Projectname = cache.CachePidProject[pid]
-		one.Env = cache.CacheEidEnv[eid]
-		// 显示realname
+	// 	for rows.Next() {
+	// 		one := &model.ArticleList{}
+	// 		var iid cache.ImportantId
+	// 		var sid cache.StatusId
+	// 		var lid cache.LevelId
+	// 		var pid cache.ProjectId
+	// 		var eid cache.EnvId
+	// 		var userlist string
+	// 		rows.Scan(&one.ID, &one.Date, &iid, &sid, &one.Title, &lid, &pid, &eid, &userlist)
+	// 		// 如果不存在这么办， 添加修改的时候需要判断
+	// 		one.Importance = cache.CacheIidImportant[iid]
+	// 		one.Status = cache.CacheSidStatus[sid]
+	// 		one.Level = cache.CacheLidLevel[lid]
+	// 		one.Projectname = cache.CachePidProject[pid]
+	// 		one.Env = cache.CacheEidEnv[eid]
+	// 		// 显示realname
 
-		//如果是我的任务
+	// 		//如果是我的任务
 
-		for _, v := range strings.Split(userlist, ",") {
-			//判断用户是否存在，不存在就 删吗 ， 先不删
-			userid32, _ := strconv.Atoi(v)
-			if realname, ok := cache.CacheUidRealName[int64(userid32)]; ok {
-				one.Handle = append(one.Handle, realname)
-			}
-		}
+	// 		for _, v := range strings.Split(userlist, ",") {
+	// 			//判断用户是否存在，不存在就 删吗 ， 先不删
+	// 			// userid32, _ := strconv.Atoi(v)
+	// 			// if realname, ok := cache.CacheUidRealName[int64(userid32)]; ok {
+	// 			// 	one.Handle = append(one.Handle, realname)
+	// 			// }
+	// 		}
 
-		if mytask {
-			// 判断是否是自己的任务，先要过滤查询条件，然后查询spusers
-			var ismytask bool
-			for _, v := range strings.Split(userlist, ",") {
-				if v == strconv.FormatInt(cache.CacheNickNameUid[nickname], 10) {
-					ismytask = true
-					break
-				}
-			}
-			if ismytask {
-				for _, v := range strings.Split(userlist, ",") {
-					//判断用户是否存在，不存在就 删吗 ， 先不删
-					userid32, _ := strconv.Atoi(v)
-					if realname, ok := cache.CacheUidRealName[int64(userid32)]; ok {
-						one.Handle = append(one.Handle, realname)
-					}
-				}
-			} else {
-				continue
-			}
-		}
+	// 		if mytask {
+	// 			// 判断是否是自己的任务，先要过滤查询条件，然后查询spusers
+	// 			var ismytask bool
+	// 			for _, v := range strings.Split(userlist, ",") {
+	// 				if v == strconv.FormatInt(cache.CacheNickNameUid[nickname], 10) {
+	// 					ismytask = true
+	// 					break
+	// 				}
+	// 			}
+	// 			if ismytask {
+	// 				for _, v := range strings.Split(userlist, ",") {
+	// 					//判断用户是否存在，不存在就 删吗 ， 先不删
+	// 					// userid32, _ := strconv.Atoi(v)
+	// 					// if realname, ok := cache.CacheUidRealName[int64(userid32)]; ok {
+	// 					// 	one.Handle = append(one.Handle, realname)
+	// 					// }
+	// 				}
+	// 			} else {
+	// 				continue
+	// 			}
+	// 		}
 
-		one.Author = cache.CacheUidRealName[cache.CacheNickNameUid[nickname]]
-		al.Al = append(al.Al, one)
-	}
-	return al, nil
+	// 		one.Author = cache.CacheUidRealName[cache.CacheNickNameUid[nickname]]
+	// 		al.Al = append(al.Al, one)
+	// 	}
+	return nil, nil
 }

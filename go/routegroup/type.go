@@ -1,10 +1,6 @@
 package routegroup
 
 import (
-	"itflow/handle"
-	"itflow/midware"
-	"itflow/model"
-
 	"github.com/hyahm/xmux"
 )
 
@@ -19,11 +15,11 @@ func init() {
 	Type.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
 	Type.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	Type.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
-	Type.Post("/type/list", handle.TypeList)
-	Type.Post("/type/update", handle.TypeUpdate).Bind(&model.Data_types{}).AddMidware(midware.JsonToStruct)
+	// Type.Post("/type/list", handle.TypeList)
+	// Type.Post("/type/update", handle.TypeUpdate).Bind(&model.Data_types{}).AddMidware(midware.JsonToStruct)
 
-	Type.Post("/type/add", handle.TypeAdd).Bind(&model.Data_types{}).AddMidware(midware.JsonToStruct)
-	Type.Get("/type/delete", handle.TypeDel)
-	Type.Get("/type/get", handle.GetType)
+	// Type.Post("/type/add", handle.TypeAdd).Bind(&model.Data_types{}).AddMidware(midware.JsonToStruct)
+	// Type.Get("/type/delete", handle.TypeDel)
+	// Type.Get("/type/get", handle.GetType)
 
 }

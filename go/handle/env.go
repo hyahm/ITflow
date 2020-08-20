@@ -40,7 +40,7 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 
 	envname := r.FormValue("name")
 
-	getaritclesql := "insert into environment(envname) values(?)"
+	getaritclesql := "insert into environment(name) values(?)"
 	var err error
 	errorcode.Id, err = db.Mconn.Insert(getaritclesql, envname)
 	if err != nil {
@@ -64,7 +64,7 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 
 	er := xmux.GetData(r).Data.(*env.Env)
 
-	getaritclesql := "update environment set envname=? where id=?"
+	getaritclesql := "update environment set name=? where id=?"
 
 	_, err := db.Mconn.Update(getaritclesql, er.EnvName, er.Id)
 	if err != nil {

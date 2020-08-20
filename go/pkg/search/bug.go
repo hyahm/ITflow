@@ -3,7 +3,7 @@ package search
 import (
 	"database/sql"
 	"encoding/json"
-	"itflow/cache"
+	"fmt"
 	"itflow/db"
 	"itflow/model"
 	"strconv"
@@ -45,7 +45,6 @@ func (pl *BugList) rows() (*sql.Rows, error) {
 }
 
 func (pl *BugList) GetMyBugs() []byte {
-
 	// 获取所有数据的行
 
 	al := &model.AllArticleList{
@@ -60,30 +59,27 @@ func (pl *BugList) GetMyBugs() []byte {
 	}
 	for rows.Next() {
 		one := &model.ArticleList{}
-		var iid cache.ImportantId
-		var sid cache.StatusId
-		var lid cache.LevelId
-		var pid cache.ProjectId
-		var eid cache.EnvId
+
 		var userlist string
-		rows.Scan(&one.ID, &one.Date, &iid, &sid, &one.Title, &lid, &pid, &eid, &userlist)
+		rows.Scan(&one.ID, &one.Date, &one.Importance, &one.Status, &one.Title, &one.Level,
+			&one.Projectname, &one.Env, &userlist, &one.Author)
 		// 如果不存在这么办， 添加修改的时候需要判断
 
-		for _, v := range strings.Split(userlist, ",") {
-			//判断用户是否存在，不存在就 删吗 ， 先不删
-			userid64, _ := strconv.ParseInt(v, 10, 64)
-			if realname, ok := cache.CacheUidRealName[userid64]; ok {
-				one.Handle = append(one.Handle, realname)
+		rows, err := db.Mconn.GetRows(fmt.Sprintf("select realname from user where id in ('%s')", userlist))
+		if err != nil {
+			golog.Error(err)
+			return al.ErrorE(err)
+		}
+		for rows.Next() {
+			realname := new(string)
+			err = rows.Scan(realname)
+			if err != nil {
+				golog.Error(err)
+				continue
 			}
+			one.Handle = append(one.Handle, *realname)
 		}
 
-		// }
-		one.Importance = cache.CacheIidImportant[iid]
-		one.Status = cache.CacheSidStatus[sid]
-		one.Level = cache.CacheLidLevel[lid]
-		one.Projectname = cache.CachePidProject[pid]
-		one.Env = cache.CacheEidEnv[eid]
-		one.Author = cache.CacheUidRealName[pl.Uid]
 		al.Al = append(al.Al, one)
 
 	}
@@ -145,41 +141,19 @@ func (pl *BugList) GetMyTasks() []byte {
 	var timer int
 	for rows.Next() {
 		one := &model.ArticleList{}
-		var iid cache.ImportantId
-		var sid cache.StatusId
-		var lid cache.LevelId
-		var pid cache.ProjectId
-		var eid cache.EnvId
+
 		var userlist string
-		rows.Scan(&one.ID, &one.Date, &iid, &sid, &one.Title, &lid, &pid, &eid, &userlist)
-		// 如果不存在这么办， 添加修改的时候需要判断
-		one.Importance = cache.CacheIidImportant[iid]
-		one.Status = cache.CacheSidStatus[sid]
-		one.Level = cache.CacheLidLevel[lid]
-		one.Projectname = cache.CachePidProject[pid]
-		one.Env = cache.CacheEidEnv[eid]
-		// 显示realname
-
-		//如果是我的任务
-
-		// for _, v := range strings.Split(userlist, ",") {
-		// 	//判断用户是否存在，不存在就 删吗 ， 先不删
-		// 	userid32, _ := strconv.Atoi(v)
-		// 	if realname, ok := cache.CacheUidRealName[int64(userid32)]; ok {
-		// 		one.Handle = append(one.Handle, realname)
-		// 	}
-		// }
+		rows.Scan(&one.ID, &one.Date, &one.Importance, &one.Status, &one.Title, &one.Level, &one.Projectname, &one.Env, &userlist, &one.Author)
 
 		var isMyTask bool
+
 		for _, v := range strings.Split(userlist, ",") {
-			//判断用户是否存在，不存在就 删吗 ， 先不删
+			//判断用户是否存在，不存在就 删吗 ，
 			userid64, _ := strconv.ParseInt(v, 10, 64)
 			if userid64 == pl.Uid {
 				isMyTask = true
 			}
-			if realname, ok := cache.CacheUidRealName[userid64]; ok {
-				one.Handle = append(one.Handle, realname)
-			}
+
 		}
 
 		// }
@@ -189,14 +163,22 @@ func (pl *BugList) GetMyTasks() []byte {
 				break
 			}
 			if timer >= start && timer < end {
-				one.Importance = cache.CacheIidImportant[iid]
-				one.Status = cache.CacheSidStatus[sid]
-				one.Level = cache.CacheLidLevel[lid]
-				one.Projectname = cache.CachePidProject[pid]
-				one.Env = cache.CacheEidEnv[eid]
-				one.Author = cache.CacheUidRealName[pl.Uid]
-				al.Al = append(al.Al, one)
+				rows, err := db.Mconn.GetRows(fmt.Sprintf("select realname from user where id in ('%s')", userlist))
+				if err != nil {
+					golog.Error(err)
+					return al.ErrorE(err)
+				}
+				for rows.Next() {
+					realname := new(string)
+					err = rows.Scan(realname)
+					if err != nil {
+						golog.Error(err)
+						continue
+					}
+					one.Handle = append(one.Handle, *realname)
+				}
 			}
+
 			timer++
 		}
 

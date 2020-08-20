@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"itflow/cache"
+	"itflow/db"
 	"itflow/pkg/search"
 
 	"github.com/hyahm/golog"
@@ -50,19 +51,14 @@ func (rmf *ReqMyBugFilter) GetUsefulCondition(uid int64, countsql, searchsql str
 		}
 	}
 	// 获取此用户能看到的状态
-	statuslist := cache.CacheUidFilter[uid].ToShow()
-
-	if len(statuslist) == 0 {
-		// 没选择状态，返回空数组
-		golog.Info("没选择状态，返回空数组")
-		return nil, ErrorNoStatus
-	} else if len(statuslist) == 1 {
-		countsql += fmt.Sprintf("and sid=%s", cache.CacheUidFilter[uid])
-		searchsql += fmt.Sprintf("and sid=%s", cache.CacheUidFilter[uid])
-	} else {
-		countsql += fmt.Sprintf("and sid in (%s)", cache.CacheUidFilter[uid])
-		searchsql += fmt.Sprintf("and sid in (%s) ", cache.CacheUidFilter[uid])
+	var statuslist string
+	err := db.Mconn.GetOne("select showstatus from user where id=?", uid).Scan(&statuslist)
+	if err != nil {
+		return nil, err
 	}
+	insql := fmt.Sprintf("and sid in ('%s')", statuslist)
+	countsql += insql
+	searchsql += insql
 
 	sb := &search.BugList{
 		CountSql: countsql,

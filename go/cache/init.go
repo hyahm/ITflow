@@ -29,36 +29,36 @@ type UG struct {
 
 // cached
 var (
-	CacheRidRole     map[int64]string
-	CacheRidInfo     map[int64]string
-	CacheRoleRid     map[string]int64
-	CacheUidRealName map[int64]string
-	CacheUidSgid     map[int64]int64
-	CacheUidNickName map[int64]string
+	CacheRidRole map[int64]string
+	// CacheRidInfo     map[int64]string
+	CacheRoleRid map[string]int64
+	// CacheUidRealName map[int64]string
+	// CacheUidSgid     map[int64]int64
+	// CacheUidNickName map[int64]string
 
-	CacheUidFilter     map[int64]StoreStatusId
+	// CacheUidFilter     map[int64]StoreStatusId
 	DefaultCreateSid   StatusId
 	DefaultCompleteSid StatusId
 
-	CacheUidRid  map[int64]int64
-	CacheUidJid  map[int64]int64
-	CacheTidName map[int64]string
-	CacheNameTid map[string]int64
+	// CacheUidRid  map[int64]int64
+	// CacheUidJid  map[int64]int64
+	// CacheTidName map[int64]string
+	// CacheNameTid map[string]int64
 
-	CacheSgidGroup map[int64]string
+	// CacheSgidGroup map[int64]string
 
-	CacheHidHeader map[int64]string
-	CacheHeaderHid map[string]int64
+	// CacheHidHeader map[int64]string
+	// CacheHeaderHid map[string]int64
 
-	CacheNickNameUid map[string]int64
-	CacheRealNameUid map[string]int64
-	CacheUidEmail    map[int64]string
-	CacheEmail       *Email
+	// CacheNickNameUid map[string]int64
+	// CacheRealNameUid map[string]int64
+	// CacheUidEmail    map[int64]string
+	CacheEmail *Email
 
-	CacheUGidUserGroup map[int64]*UG // 用户组Id
-	CacheUserGroupUGid map[string]*UG
-	DEADLINE           time.Duration
-	SUPERID            int64
+	// CacheUGidUserGroup map[int64]*UG // 用户组Id
+	// CacheUserGroupUGid map[string]*UG
+	DEADLINE time.Duration
+	SUPERID  int64
 )
 
 func LoadConfig() {
@@ -85,39 +85,39 @@ func LoadConfig() {
 			ShareDir = ShareDir[:len(ShareDir)-1]
 		}
 	}
-	CacheSidStatus = make(map[StatusId]Status, 0)
+	// CacheSidStatus = make(map[StatusId]Status, 0)
 
-	CacheRidInfo = make(map[int64]string, 0)
+	// CacheRidInfo = make(map[int64]string, 0)
 	CacheRidRole = make(map[int64]string, 0)
-	CacheIidImportant = make(map[ImportantId]Important, 0)
+	// CacheIidImportant = make(map[ImportantId]Important, 0)
 	CacheRoleRid = make(map[string]int64, 0)
-	CacheImportantIid = make(map[Important]ImportantId, 0)
-	CachePidProject = make(map[ProjectId]Project, 0)
-	CacheUidSgid = make(map[int64]int64, 0)
-	CacheUidRid = make(map[int64]int64, 0)
-	CacheEidEnv = make(map[EnvId]Env, 0)
-	CacheUidRealName = make(map[int64]string, 0)
-	CacheUidNickName = make(map[int64]string, 0)
-	CacheVidVersion = make(map[VersionId]Version, 0)
-	CacheUGidUserGroup = make(map[int64]*UG, 0)
-	CacheUserGroupUGid = make(map[string]*UG, 0)
-	CacheNickNameUid = make(map[string]int64, 0)
-	CacheStatusSid = make(map[Status]StatusId, 0)
-	CacheRealNameUid = make(map[string]int64, 0)
-	CacheProjectPid = make(map[Project]ProjectId, 0)
-	CacheVersionVid = make(map[Version]VersionId, 0)
-	CacheEnvEid = make(map[Env]EnvId, 0)
-	CacheLidLevel = make(map[LevelId]Level, 0)
-	CacheLevelLid = make(map[Level]LevelId, 0)
-	CacheSgidGroup = make(map[int64]string, 0)
-	CacheUidFilter = make(map[int64]StoreStatusId, 0)
-	CacheUidJid = make(map[int64]int64, 0)
-	CacheUidEmail = make(map[int64]string, 0)
+	// CacheImportantIid = make(map[Important]ImportantId, 0)
+	// CachePidProject = make(map[ProjectId]Project, 0)
+	// CacheUidSgid = make(map[int64]int64, 0)
+	// CacheUidRid = make(map[int64]int64, 0)
+	// CacheEidEnv = make(map[EnvId]Env, 0)
+	// CacheUidRealName = make(map[int64]string, 0)
+	// CacheUidNickName = make(map[int64]string, 0)
+	// CacheVidVersion = make(map[VersionId]Version, 0)
+	// CacheUGidUserGroup = make(map[int64]*UG, 0)
+	// CacheUserGroupUGid = make(map[string]*UG, 0)
+	// CacheNickNameUid = make(map[string]int64, 0)
+	// CacheStatusSid = make(map[Status]StatusId, 0)
+	// CacheRealNameUid = make(map[string]int64, 0)
+	// CacheProjectPid = make(map[Project]ProjectId, 0)
+	// CacheVersionVid = make(map[Version]VersionId, 0)
+	// CacheEnvEid = make(map[Env]EnvId, 0)
+	// CacheLidLevel = make(map[LevelId]Level, 0)
+	// CacheLevelLid = make(map[Level]LevelId, 0)
+	// CacheSgidGroup = make(map[int64]string, 0)
+	// CacheUidFilter = make(map[int64]StoreStatusId, 0)
+	// CacheUidJid = make(map[int64]int64, 0)
+	// CacheUidEmail = make(map[int64]string, 0)
 
-	CacheHidHeader = make(map[int64]string, 0)
-	CacheTidName = make(map[int64]string, 0)
-	CacheHeaderHid = make(map[string]int64, 0)
-	CacheNameTid = make(map[string]int64, 0)
+	// CacheHidHeader = make(map[int64]string, 0)
+	// CacheTidName = make(map[int64]string, 0)
+	// CacheHeaderHid = make(map[string]int64, 0)
+	// CacheNameTid = make(map[string]int64, 0)
 	CacheEmail = &Email{}
 
 	golog.Info("cookie过期时间为：", goconfig.ReadDuration("expiration", 120*time.Minute))
@@ -125,22 +125,4 @@ func LoadConfig() {
 	// 添加一个admin 用户的权限，默认全是1
 	cacheemail()
 
-}
-
-func addXieGang(path string) string {
-	l := len(path)
-	// 如果是windows
-	if runtime.GOOS == "windows" {
-		if path[l-1:] != "\\" {
-			return path + "\\"
-
-		}
-
-	} else {
-		if path[l-1:] != "/" {
-			return path + "/"
-
-		}
-	}
-	return path
 }

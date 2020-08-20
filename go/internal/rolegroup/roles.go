@@ -2,6 +2,7 @@ package rolegroup
 
 import (
 	"itflow/cache"
+	"itflow/db"
 	"itflow/internal/response"
 	"itflow/model"
 	"strconv"
@@ -54,6 +55,8 @@ func (reqrg *ReqRoleGroup) Add(uid int64) []byte {
 			v.Update = false
 			v.Add = false
 		}
+
+		db.Mconn.GetOne("")
 		if rid, ok := cache.CacheRoleRid[v.Name]; ok {
 			perm := &model.Perm{
 				Find:     v.Select,

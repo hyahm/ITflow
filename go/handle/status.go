@@ -9,7 +9,6 @@ import (
 	network "itflow/model"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"itflow/internal/bug"
 
@@ -78,18 +77,18 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 
 	//如果状态组存在也无法删除
 
-	var hasgroup bool
-	for _, ids := range cache.CacheSgidGroup {
-		for _, v := range strings.Split(ids, ",") {
-			if v == id {
-				hasgroup = true
-				break
-			}
-		}
-		if hasgroup {
-			w.Write(errorcode.Error("还有group"))
-		}
-	}
+	// var hasgroup bool
+	// for _, ids := range cache.CacheSgidGroup {
+	// 	for _, v := range strings.Split(ids, ",") {
+	// 		if v == id {
+	// 			hasgroup = true
+	// 			break
+	// 		}
+	// 	}
+	// 	if hasgroup {
+	// 		w.Write(errorcode.Error("还有group"))
+	// 	}
+	// }
 
 	_, err = db.Mconn.Update("delete from  status where id=?", sid)
 	if err != nil {
@@ -137,9 +136,9 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 func StatusGroupName(w http.ResponseWriter, r *http.Request) {
 
 	sl := &network.List_StatusName{}
-	for _, v := range cache.CacheSgidGroup {
-		sl.StatusList = append(sl.StatusList, v)
-	}
+	// for _, v := range cache.CacheSgidGroup {
+	// 	sl.StatusList = append(sl.StatusList, v)
+	// }
 
 	send, _ := json.Marshal(sl)
 	w.Write(send)

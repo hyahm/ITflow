@@ -132,6 +132,7 @@ CREATE TABLE `defaultvalue` (
 --
 
 LOCK TABLES `defaultvalue` WRITE;
+insert into defaultvalue(created, completed) values(0,0);
 /*!40000 ALTER TABLE `defaultvalue` DISABLE KEYS */;
 /*!40000 ALTER TABLE `defaultvalue` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -173,9 +174,9 @@ DROP TABLE IF EXISTS `environment`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `environment` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `envname` varchar(30) NOT NULL DEFAULT '',
+  `name` varchar(30) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `envname` (`envname`)
+  UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

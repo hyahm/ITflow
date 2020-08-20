@@ -7,8 +7,6 @@ import (
 	"itflow/db"
 	"itflow/encrypt"
 	"itflow/internal/response"
-	"itflow/model"
-	"strconv"
 	"strings"
 	"time"
 
@@ -82,6 +80,7 @@ type UserInfo struct {
 	Msg      string   `json:"message,omitempty" type:"string" need:"否" default:"" information:"错误信息"`
 	Realname string   `json:"realname,omitempty" type:"string" need:"否" default:"" information:"真实姓名"`
 	Email    string   `json:"email,omitempty" type:"string" need:"否" default:"" information:"邮箱地址"`
+	Uid      int64    `json:"uid,omitempty" type:"int" need:"否" default:"" information:"用户id"`
 }
 
 func (ui *UserInfo) GetUserInfo(uid int64) error {
@@ -95,24 +94,21 @@ func (ui *UserInfo) GetUserInfo(uid int64) error {
 	if uid == cache.SUPERID {
 		ui.Roles = append(ui.Roles, "admin")
 	} else {
-		var pids string
-		permids := "select permids from rolegroup where id=(select rid from user where id=?)"
-		err := db.Mconn.GetOne(permids, uid).Scan(&pids)
+		permids := "select role from roles where id in (select permids from rolegroup where id=(select rid from user where id=?))"
+		rows, err := db.Mconn.GetRows(permids, uid)
+
 		if err != nil {
 			golog.Error(err)
 			return err
 		}
-
-		for _, v := range strings.Split(pids, ",") {
-			perm, err := model.NewPerm(v)
+		for rows.Next() {
+			role := new(string)
+			err = rows.Scan(role)
 			if err != nil {
 				golog.Error(err)
-				return err
+				continue
 			}
-			if perm.Find {
-				ui.Roles = append(ui.Roles, cache.CacheRidRole[perm.Rid])
-			}
-
+			ui.Roles = append(ui.Roles, *role)
 		}
 	}
 	if len(ui.Roles) == 0 {
@@ -131,21 +127,25 @@ func (ui *UserInfo) Update() error {
 	}
 
 	// 管理员
-	if cache.CacheNickNameUid[ui.NickName] == cache.SUPERID {
+	if ui.Uid == cache.SUPERID {
 		ui.Roles = append(ui.Roles, ui.NickName)
 	} else {
-		var rl string
-		getrole := "select rolelist from rolegroup where id=?"
-		err := db.Mconn.GetOne(getrole, rid).Scan(&rl)
+		getrole := "select role from roles where id in (select rolelist from rolegroup where id=?)"
+		rows, err := db.Mconn.GetRows(getrole, rid)
 		if err != nil {
 			golog.Error(err)
 			return err
 		}
-
-		for _, v := range strings.Split(rl, ",") {
-			id, _ := strconv.Atoi(v)
-			ui.Roles = append(ui.Roles, cache.CacheRidRole[int64(id)])
+		for rows.Next() {
+			role := new(string)
+			err = rows.Scan(role)
+			if err != nil {
+				golog.Error(err)
+				continue
+			}
+			ui.Roles = append(ui.Roles, *role)
 		}
+
 	}
 
 	return nil

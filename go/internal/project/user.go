@@ -2,48 +2,35 @@ package project
 
 import (
 	"itflow/cache"
+	"itflow/db"
 	"itflow/model"
-	"strconv"
-	"strings"
+
+	"github.com/hyahm/golog"
 )
 
 // 通过project 获取用户
 
 func GetUsersByProjectName(userid int64, name cache.Project) []byte {
-	// 获取所属用户和所属版本
+	// 根据项目组获取所属用户和所属版本
 	resp := &MyProject{
 		Name: make([]string, 0),
 	}
-	id, ok := cache.CacheProjectPid[name]
-	if !ok {
-		resp.Code = 1
-		resp.Msg = "没找到用户"
-		return resp.Marshal()
-	}
-	p, err := model.NewProjectById(id)
+	namessql := "select realname from user where in in (select ids from usergroup where id = (select ugid from project where name=?))"
+	rows, err := db.Mconn.GetRows(namessql, name)
 	if err != nil {
-		resp.Code = 1
-		resp.Msg = err.Error()
-		return resp.Marshal()
+		golog.Error(err)
+		return resp.ErrorE(err)
 	}
-	uids := strings.Split(cache.CacheUGidUserGroup[p.Gid].Uids, ",")
-	var perm bool
-	for _, u := range uids {
-		uid, err := strconv.ParseInt(u, 10, 64)
+	for rows.Next() {
+		name := new(string)
+		err = rows.Scan(name)
 		if err != nil {
+			golog.Error(err)
 			continue
 		}
-		if uid == userid {
-			perm = true
-		}
-		resp.Name = append(resp.Name, cache.CacheUidRealName[uid])
+		resp.Name = append(resp.Name, *name)
 	}
-	if !perm {
-		resp.Name = make([]string, 0)
-		resp.Code = 1
-		resp.Msg = "你没有此项目权限"
-		return resp.Marshal()
-	}
+
 	version := &model.Version{}
 	ps, err := version.GetProjectNameByPid(name.Id())
 	if err != nil {

@@ -2,7 +2,7 @@ package project
 
 import (
 	"encoding/json"
-	"itflow/cache"
+	"itflow/db"
 	"itflow/model"
 	"strconv"
 	"strings"
@@ -18,8 +18,21 @@ type MyProject struct {
 }
 
 func (mp *MyProject) Marshal() []byte {
-	send, _ := json.Marshal(mp)
+	send, err := json.Marshal(mp)
+	if err != nil {
+		golog.Error(err)
+	}
 	return send
+}
+
+func (mp *MyProject) Error(msg string) []byte {
+	mp.Code = 1
+	mp.Msg = msg
+	return mp.Marshal()
+}
+
+func (mp *MyProject) ErrorE(err error) []byte {
+	return mp.Error(err.Error())
 }
 
 func (mp *MyProject) Get(uid int64) []byte {
@@ -31,12 +44,14 @@ func (mp *MyProject) Get(uid int64) []byte {
 	}
 
 	for _, p := range pl {
-		uids, ok := cache.CacheUGidUserGroup[p.Gid]
-		if !ok {
+		var uids string
+		err = db.Mconn.GetOne("select ids from usergroup where id=?", p.Gid).Scan(&uids)
+		if err != nil {
+			golog.Error(err)
 			continue
 		}
 
-		for _, v := range strings.Split(uids.Uids, ",") {
+		for _, v := range strings.Split(uids, ",") {
 			uid64, err := strconv.ParseInt(v, 10, 64)
 			if err != nil {
 				continue

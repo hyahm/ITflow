@@ -3,7 +3,6 @@ package handle
 import (
 	"database/sql"
 	"encoding/json"
-	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/response"
 	"itflow/internal/rolegroup"
@@ -45,19 +44,23 @@ func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 				w.Write(data.ErrorE(err))
 				return
 			}
-			if name, ok := cache.CacheRidRole[perm.Rid]; ok {
-				if info, infook := cache.CacheRidInfo[perm.Rid]; infook {
-					one.RoleList = append(one.RoleList, &rolegroup.PermRole{
-						Add:    perm.Increase,
-						Select: perm.Find,
-						Update: perm.Revise,
-						Remove: perm.Remove,
-						Name:   name,
-						Info:   info,
-					})
-				}
-
+			rp := &rolegroup.PermRole{
+				Add:    perm.Increase,
+				Select: perm.Find,
+				Update: perm.Revise,
+				Remove: perm.Remove,
 			}
+			err = db.Mconn.GetOne("select name,info from role where id=?", v).Scan(&rp.Name, &rp.Info)
+			if err != nil {
+				golog.Error(err)
+				continue
+			}
+			// if name, ok := cache.CacheRidRole[perm.Rid]; ok {
+			// if info, infook := cache.CacheRidInfo[perm.Rid]; infook {
+			one.RoleList = append(one.RoleList, rp)
+			// }
+
+			// }
 			// 最好清除无效的数据
 
 		}
@@ -152,14 +155,22 @@ func AddRoleGroup(w http.ResponseWriter, r *http.Request) {
 }
 
 func RoleTemplate(w http.ResponseWriter, r *http.Request) {
-
+	errorcode := &response.Response{}
 	data := make([]*rolegroup.PermRole, 0)
-
-	for rid, info := range cache.CacheRidInfo {
-		data = append(data, &rolegroup.PermRole{
-			Info: info,
-			Name: cache.CacheRidRole[rid],
-		})
+	rows, err := db.Mconn.GetRows("select role, info from roles")
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	for rows.Next() {
+		role := &rolegroup.PermRole{}
+		err = rows.Scan(&role.Info, &role.Name)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		data = append(data, role)
 	}
 
 	send, _ := json.Marshal(data)

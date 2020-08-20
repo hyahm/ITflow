@@ -2,10 +2,10 @@ package handle
 
 import (
 	"encoding/json"
+	"fmt"
 	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/bug"
-	"itflow/internal/datalog"
 	"itflow/internal/response"
 	"itflow/internal/role"
 	"itflow/internal/search"
@@ -13,6 +13,7 @@ import (
 	"itflow/internal/user"
 	"itflow/model"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/hyahm/golog"
@@ -21,8 +22,27 @@ import (
 )
 
 type statusList struct {
-	StatusList []cache.Status `json:"statuslist"`
-	Code       int            `json:"code"`
+	StatusList []string `json:"statuslist"`
+	Code       int      `json:"code"`
+	Msg        string   `json:"msg"`
+}
+
+func (sl *statusList) Marshal() []byte {
+	send, err := json.Marshal(sl)
+	if err != nil {
+		golog.Error(err)
+	}
+	return send
+}
+
+func (sl *statusList) Error(msg string) []byte {
+	sl.Code = 1
+	sl.Msg = msg
+	return sl.Marshal()
+}
+
+func (sl *statusList) ErrorE(err error) []byte {
+	return sl.Error(err.Error())
 }
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
@@ -33,42 +53,57 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 }
 
 func ShowStatus(w http.ResponseWriter, r *http.Request) {
-
+	// 获取显示的状态名
 	// sl := xmux.GetData(r).Data.(*status.Status)
 	sl := &status.Status{
-		CheckStatus: make([]cache.Status, 0),
+		CheckStatus: make([]string, 0),
 	}
 	uid := xmux.GetData(r).Get("uid").(int64)
+	rows, err := db.Mconn.GetRows(`select s.name from user as u join status as s on u.id=? and s.id in (u.showstatus)`, uid)
+	if err != nil {
+		golog.Error(err)
+		w.Write(sl.ErrorE(err))
+		return
+	}
+	for rows.Next() {
+		statusname := new(string)
+		err = rows.Scan(statusname)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		sl.CheckStatus = append(sl.CheckStatus, *statusname)
+	}
 
-	sl.CheckStatus = cache.CacheUidFilter[uid].ToShow()
-
-	// 遍历出每一个status id
-	// for _, v := range strings.Split(cache.CacheUidFilter[uid], ",") {
-	// 	sid, _ := strconv.Atoi(v)
-	// 	//判断这个id是否存在
-	// 	if value := cache.CacheSidStatus[cache.StatusId(sid)]; value.ToString() != "" {
-	// 		sl.CheckStatus = append(sl.CheckStatus, value)
-	// 	}
-	// }
 	send, _ := json.Marshal(sl)
 	w.Write(send)
 	return
 }
 
 func GetPermStatus(w http.ResponseWriter, r *http.Request) {
-
+	// 获取可以改变的状态
+	sl := &statusList{
+		StatusList: make([]string, 0),
+	}
 	uid := xmux.GetData(r).Get("uid").(int64)
+	rows, err := db.Mconn.GetRows(`select name from status where id in (select s.sids from user as u join statusgroup  as s on u.id=? and u.bugsid=s.id )`, uid)
+	if err != nil {
+		golog.Error(err)
+		w.Write(sl.ErrorE(err))
+		return
+	}
 
-	sl := &statusList{}
-	//如果是管理员的话,所有的都可以
-	sl.StatusList = cache.CacheUidFilter[uid].ToShow()
-	// if  == cache.SUPERID {
-	// 	for _, v := range cache.CacheSidStatus {
-	// 		sl.StatusList = append(sl.StatusList, v.ToString())
-	// 	}
-	// }
-	send, _ := json.Marshal(sl)
-	w.Write(send)
+	for rows.Next() {
+		statusname := new(string)
+		err = rows.Scan(statusname)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		sl.StatusList = append(sl.StatusList, *statusname)
+	}
+
+	w.Write(sl.Marshal())
 	return
 
 }
@@ -95,36 +130,15 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
 func UpdateInfo(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-
 	sl := xmux.GetData(r).Data.(*user.UserInfo)
-	nickname := xmux.GetData(r).Get("nickname").(string)
-
-	uid := cache.CacheNickNameUid[nickname]
+	uid := xmux.GetData(r).Get("uid").(int64)
 	// 修改用户信息
 	_, err := db.Mconn.Update("update user set email=?,realname=?,nickname=? where id=?", sl.Email, sl.Realname, sl.NickName, uid)
-
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	oldrealname := cache.CacheUidRealName[int64(uid)]
-	oldnickname := cache.CacheUidNickName[int64(uid)]
-	// 更新缓存
-	delete(cache.CacheNickNameUid, oldnickname)
-	delete(cache.CacheRealNameUid, oldrealname)
-	delete(cache.CacheUidEmail, uid)
-	cache.CacheNickNameUid[sl.NickName] = int64(uid)
-	cache.CacheRealNameUid[sl.Realname] = int64(uid)
-	cache.CacheUidEmail[uid] = sl.Email
-
-	cache.CacheUidRealName[int64(uid)] = sl.Realname
-
-	cache.CacheUidNickName[int64(uid)] = sl.NickName
-
-	go datalog.InsertLog("updateinfo",
-		nickname+"修改了用户信息",
-		r.RemoteAddr, nickname, "update")
 
 	send, _ := json.Marshal(sl)
 	w.Write(send)
@@ -208,21 +222,29 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 
 	param := xmux.GetData(r).Data.(*status.Status)
 
-	showstatus := param.CheckStatus.ToStore()
-	//
-
-	uid := xmux.GetData(r).Get("uid").(int64)
-	user := &model.User{}
-	err := user.UpdateShowStatus(showstatus, uid)
+	rows, err := db.Mconn.GetRows(fmt.Sprintf("select id from status where name in ('%s')", strings.Join(param.CheckStatus, ",")))
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	//更新缓存
-	cache.CacheUidFilter[uid] = showstatus
-	send, _ := json.Marshal(param)
-	w.Write(send)
+
+	sids := make([]string, 0)
+	for rows.Next() {
+		sid := new(string)
+		err = rows.Scan(sid)
+		sids = append(sids, *sid)
+	}
+
+	uid := xmux.GetData(r).Get("uid").(int64)
+	user := &model.User{}
+	err = user.UpdateShowStatus(strings.Join(sids, ","), uid)
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	w.Write(errorcode.Success())
 	return
 }
 
@@ -233,7 +255,15 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
 	// mybug.GetUsefulCondition(uid)
 	countsql := "select count(id) from bugs where dustbin=true and uid=? "
-	searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=true and uid=? "
+	// searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs join  on dustbin=true and uid=? "
+	searchsql := `select b.id,b.createtime,i.name,s.name,title,l.name,p.name,e.name,spusers,u.realname from bugs as b 
+	join importants as i 
+	join statusgroup as s 
+	join level as l 
+	join project as p 
+	join environment as e  
+	join user as u 
+	on dustbin=true and b.iid = i.id and b.sid = s.id and b.lid = l.id and b.pid=p.id and b.eid = e.id and b.uid=u.id and uid=?`
 	sch, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
 	if err != nil {
 		if err == search.ErrorNoStatus {

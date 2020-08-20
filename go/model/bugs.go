@@ -30,12 +30,25 @@ type AllArticleList struct {
 	Code  int            `json:"code"`
 	Count int            `json:"total"`
 	Page  int            `json:"page"`
-	Msg   string         `json:"message"`
+	Msg   string         `json:"msg"`
 }
 
 func (al *AllArticleList) Marshal() []byte {
-	send, _ := json.Marshal(al)
+	send, err := json.Marshal(al)
+	if err != nil {
+		golog.Error(err)
+	}
 	return send
+}
+
+func (al *AllArticleList) Error(msg string) []byte {
+	al.Code = 1
+	al.Msg = msg
+	return al.Marshal()
+}
+
+func (al *AllArticleList) ErrorE(err error) []byte {
+	return al.Error(err.Error())
 }
 
 type Bug struct {

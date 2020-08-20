@@ -3,9 +3,7 @@ package model
 import (
 	"database/sql"
 	"errors"
-	"itflow/cache"
 	"itflow/db"
-	"strconv"
 	"strings"
 
 	"github.com/hyahm/golog"
@@ -19,10 +17,9 @@ type RoleGroup struct {
 }
 
 func NewRoleGroup(uid int64) (*RoleGroup, error) {
-	// 通过nickname 来获取rid
-	rid := cache.CacheUidRid[uid]
+	// 通过uid 来获取rid
 	rg := &RoleGroup{}
-	err := db.Mconn.GetOne("select name, permids from rolegroup where id=?", rid).Scan(&rg.Name, &rg.Permids)
+	err := db.Mconn.GetOne("select r.name, r.permids from rolegroup as r join user as u on u.id=? and u.rid=r.id", uid).Scan(&rg.Name, &rg.Permids)
 	if err != nil {
 		golog.Error(err)
 		return nil, err
@@ -42,17 +39,6 @@ func (rg *RoleGroup) Update() error {
 	// 查询到permids
 	err = db.Mconn.GetOne("select permids from rolegroup where id=?", rg.ID).Scan(&rg.Permids)
 	return err
-}
-
-func (rg *RoleGroup) CheckPagePerm(name string) bool {
-	pl := strings.Split(rg.Permids, ",")
-	for _, v := range pl {
-		id, _ := strconv.ParseInt(v, 10, 64)
-		if cache.CacheRidRole[id] == name {
-			return true
-		}
-	}
-	return false
 }
 
 func CheckRoleNameInGroup(name string, rid *int64) error {

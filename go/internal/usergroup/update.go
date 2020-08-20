@@ -12,12 +12,10 @@ type RespUpdateUserGroup struct {
 	Id    int64    `json:"id"`
 	Name  string   `json:"name"`
 	Users []string `json:"users"`
-	Code  int      `json:"code"`
 }
 
 func (ug *RespUpdateUserGroup) CheckUser(uid int64) error {
 	var dbUid int64
-	golog.Infof("%+v", *ug)
 	err := db.Mconn.GetOne("select uid from usergroup where id=?", ug.Id).Scan(&dbUid)
 	if err != nil {
 		golog.Error(err)

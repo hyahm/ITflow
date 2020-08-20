@@ -2,12 +2,10 @@ package handle
 
 import (
 	"encoding/json"
-	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/project"
 	"itflow/internal/response"
 	"net/http"
-	"strconv"
 
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
@@ -50,15 +48,15 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	id := r.FormValue("id")
-	pid, err := strconv.Atoi(id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	// pid, err := strconv.Atoi(id)
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
 	// 是否有bug使用
 	var count int
-	err = db.Mconn.GetOne("select count(id) from bugs where pid=?", id).Scan(&count)
+	err := db.Mconn.GetOne("select count(id) from bugs where pid=?", id).Scan(&count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -78,10 +76,6 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-
-	// 更新缓存
-	delete(cache.CacheProjectPid, cache.CachePidProject[cache.ProjectId(pid)])
-	delete(cache.CachePidProject, cache.ProjectId(pid))
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)

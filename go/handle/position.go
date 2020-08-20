@@ -172,12 +172,13 @@ type RespHypos struct {
 func GetHypos(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	nickname := xmux.GetData(r).Get("nickname").(string)
+	// nickname := xmux.GetData(r).Get("nickname").(string)
+	uid := xmux.GetData(r).Get("uid").(int64)
 	data := &RespHypos{
 		Hypos: make([]*Hypo, 0),
 	}
 	// 管理员
-	if cache.CacheNickNameUid[nickname] != cache.SUPERID {
+	if uid != cache.SUPERID {
 		w.Write(errorcode.ErrorNoPermission())
 		return
 	}
@@ -213,8 +214,8 @@ func GetPositions(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	data := &positions{}
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	if cache.CacheNickNameUid[nickname] == cache.SUPERID {
+	uid := xmux.GetData(r).Get("uid").(int64)
+	if uid == cache.SUPERID {
 		var name string
 		err := db.Mconn.GetOne("select name from jobs").Scan(&name)
 		if err != nil {
@@ -226,7 +227,7 @@ func GetPositions(w http.ResponseWriter, r *http.Request) {
 		data.Positions = append(data.Positions, name)
 	} else {
 		var name string
-		err := db.Mconn.GetOne("select name from jobs where hypo=?", cache.CacheUidJid[cache.CacheNickNameUid[nickname]]).Scan(&name)
+		err := db.Mconn.GetOne("select j.name from jobs as j join user as u on hypo=? and j.uid=u.id").Scan(&name)
 		if err != nil {
 			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))

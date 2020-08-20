@@ -1,8 +1,7 @@
 package handle
 
 import (
-	"encoding/json"
-	"itflow/cache"
+	"itflow/db"
 	"itflow/internal/response"
 	"net/http"
 
@@ -17,10 +16,15 @@ func DefaultStatus(w http.ResponseWriter, r *http.Request) {
 
 	sl := &defaults.RespDefaultStatus{}
 	//如果是管理员的话,所有的都可以
-	sl.Created = cache.DefaultCreateSid.Name()
-	sl.Completed = cache.DefaultCompleteSid.Name()
-	send, _ := json.Marshal(sl)
-	w.Write(send)
+
+	err := db.Mconn.GetOne("select s.name from defaultvalue as d join status as s on created=s.id ").Scan(&sl.Created)
+	err = db.Mconn.GetOne("select s.name from defaultvalue as d join status as s on completed=s.id ").Scan(&sl.Completed)
+	if err != nil {
+		golog.Error(err)
+		w.Write(sl.ErrorE(err))
+		return
+	}
+	w.Write(sl.Marshal())
 	return
 
 }
@@ -30,8 +34,8 @@ func DefaultSave(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	sl := xmux.GetData(r).Data.(*defaults.ReqDefaultValue)
-
-	err := sl.Save()
+	golog.Info(sl)
+	err := sl.Update()
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

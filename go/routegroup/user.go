@@ -38,11 +38,12 @@ func init() {
 		ApiResponseTemplate(`{"roles": ["admin"], "code": 0, "avatar":"http://xxxx/aaaa.png", "nickname": "admin"}`)
 
 	User.Post("/user/create", handle.CreateUser).Bind(&user.GetAddUser{}).
-		AddMidware(midware.JsonToStruct)
+		AddMidware(midware.JsonToStruct).ApiDescribe("添加用户").
+		ApiRequestTemplate(`{"nickname":"cander","email":"yifan@uupoweremail.com","password":"123456","repassword":"123456","realname":"cander","rolegroup":"all","statusgroup":"aaa","level":2,"position":"aaaaa"}`)
 
 	User.Post("/password/update", handle.ChangePassword).Bind(&user.ChangePasswod{}).
 		AddMidware(midware.JsonToStruct)
 
-	User.Post("/get/user", handle.GetUser)
+	User.Post("/get/user", handle.GetUser).ApiDescribe("获取所有用户的真实名")
 	User.Get("/get/project/user", handle.GetProjectUser)
 }

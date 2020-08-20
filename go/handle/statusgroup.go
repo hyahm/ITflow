@@ -8,7 +8,6 @@ import (
 	"itflow/internal/response"
 	"itflow/internal/status"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/hyahm/golog"
@@ -42,7 +41,6 @@ func AddStatusGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 添加缓存
-	cache.CacheSgidGroup[errorcode.Id] = data.Name
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -68,7 +66,6 @@ func EditStatusGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cache.CacheSgidGroup[data.Id] = data.Name
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -114,15 +111,10 @@ func DeleteStatusGroup(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	id := r.FormValue("id")
-	id32, err := strconv.Atoi(id)
-	if err != nil {
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 
 	ssql := "select count(id) from user where bugsid=?"
 	var count int
-	err = db.Mconn.GetOne(ssql, id).Scan(&count)
+	err := db.Mconn.GetOne(ssql, id).Scan(&count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -142,7 +134,6 @@ func DeleteStatusGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//更新缓存
-	delete(cache.CacheSgidGroup, int64(id32))
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return

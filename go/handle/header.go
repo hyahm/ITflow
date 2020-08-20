@@ -9,7 +9,6 @@ import (
 	"itflow/model"
 	network "itflow/model"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/hyahm/golog"
@@ -59,9 +58,9 @@ func HeaderList(w http.ResponseWriter, r *http.Request) {
 func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	nickname := xmux.GetData(r).Get("nickname").(string)
+	uid := xmux.GetData(r).Get("uid").(int64)
 	// 管理员
-	if cache.CacheNickNameUid[nickname] != cache.SUPERID {
+	if uid != cache.SUPERID {
 		w.Write(errorcode.Error("没有权限"))
 		return
 	}
@@ -89,8 +88,6 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 	// 增加日志
 
 	// 添加缓存
-	cache.CacheHidHeader[errorcode.Id] = data.Name
-	cache.CacheHeaderHid[data.Name] = errorcode.Id
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -100,21 +97,16 @@ func HeaderAdd(w http.ResponseWriter, r *http.Request) {
 func HeaderDel(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	nickname := xmux.GetData(r).Get("nickname").(string)
+	uid := xmux.GetData(r).Get("uid").(int64)
 	id := r.FormValue("id")
-	id32, err := strconv.Atoi(id)
-	if err != nil {
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	// 管理员
-	if cache.CacheNickNameUid[nickname] != cache.SUPERID {
+	if uid != cache.SUPERID {
 		w.Write(errorcode.Error("没有权限"))
 		return
 	}
 	// 查看这个header 是否有文档在用
 	var count int
-	err = db.Mconn.GetOne(" select count(id) from apilist where hid=?", id).Scan(&count)
+	err := db.Mconn.GetOne(" select count(id) from apilist where hid=?", id).Scan(&count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -155,8 +147,6 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 	// 增加日志
 
 	// 删除缓存
-	delete(cache.CacheHeaderHid, cache.CacheHidHeader[int64(id32)])
-	delete(cache.CacheHidHeader, int64(id32))
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -166,10 +156,10 @@ func HeaderDel(w http.ResponseWriter, r *http.Request) {
 func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	nickname := xmux.GetData(r).Get("nickname").(string)
+	uid := xmux.GetData(r).Get("uid").(int64)
 	data := xmux.GetData(r).Data.(*model.Data_header)
 	// 管理员
-	if cache.CacheNickNameUid[nickname] != cache.SUPERID {
+	if uid != cache.SUPERID {
 		w.Write(errorcode.Error("没有权限"))
 		return
 	}
@@ -219,7 +209,6 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 				w.Write(errorcode.ErrorE(err))
 				return
 			}
-			cache.CacheHidHeader[hl.Id] = data.Name
 			errorcode.HeaderList = append(errorcode.HeaderList, hl)
 		}
 
@@ -245,9 +234,6 @@ func HeaderUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	// 增加日志
 
-	delete(cache.CacheHeaderHid, cache.CacheHidHeader[data.Id])
-	cache.CacheHidHeader[data.Id] = data.Name
-	cache.CacheHeaderHid[data.Name] = data.Id
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
@@ -259,15 +245,15 @@ type headerstruct struct {
 	Code    int      `json:"code"`
 }
 
-func HeaderGet(w http.ResponseWriter, r *http.Request) {
+// func HeaderGet(w http.ResponseWriter, r *http.Request) {
 
-	data := &headerstruct{}
+// 	data := &headerstruct{}
 
-	for _, v := range cache.CacheHidHeader {
-		data.Headers = append(data.Headers, v)
-	}
-	send, _ := json.Marshal(data)
-	w.Write(send)
-	return
+// 	for _, v := range cache.CacheHidHeader {
+// 		data.Headers = append(data.Headers, v)
+// 	}
+// 	send, _ := json.Marshal(data)
+// 	w.Write(send)
+// 	return
 
-}
+// }

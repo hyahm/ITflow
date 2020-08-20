@@ -9,7 +9,6 @@ import (
 	"itflow/internal/response"
 	"itflow/internal/version"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/hyahm/golog"
@@ -23,11 +22,12 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 	version_add := xmux.GetData(r).Data.(*version.RespVersion)
 
 	nickname := xmux.GetData(r).Get("nickname").(string)
-	uid := cache.CacheNickNameUid[nickname]
+	uid := xmux.GetData(r).Get("uid").(int64)
 	add_version_sql := "insert into version(pid,name,urlone,urltwo,createtime,createuid) values(?,?,?,?,?,?)"
 	var err error
 	errorcode.UpdateTime = time.Now().Unix()
-	errorcode.Id, err = db.Mconn.Insert(add_version_sql, version_add.Project.Id(), version_add.Name, version_add.Url, version_add.BakUrl, errorcode.UpdateTime, uid)
+	errorcode.Id, err = db.Mconn.Insert(add_version_sql, version_add.Project.Id(),
+		version_add.Name, version_add.Url, version_add.BakUrl, errorcode.UpdateTime, uid)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -106,15 +106,12 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	vid, err := strconv.Atoi(id)
-	if err != nil {
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	// vid, err := strconv.Atoi(id)
+	// if err != nil {
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
 	// 增加日志
-
-	delete(cache.CacheVersionVid, cache.CacheVidVersion[cache.VersionId(vid)])
-	delete(cache.CacheVidVersion, cache.VersionId(vid))
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
@@ -135,8 +132,7 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 
 	data := xmux.GetData(r).Data.(*version.RespVersion)
 
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	uid := cache.CacheNickNameUid[nickname]
+	uid := xmux.GetData(r).Get("uid").(int64)
 	versionsql := "update version set pid=?,name=?,urlone=?,urltwo=?,createuid=? where id=?"
 	_, err := db.Mconn.Update(versionsql, data.Project.Id(), data.Name, data.Url, data.BakUrl, uid, data.Id)
 	if err != nil {

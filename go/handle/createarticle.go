@@ -9,8 +9,6 @@ import (
 	"itflow/internal/project"
 	"itflow/internal/response"
 	"net/http"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/hyahm/xmux"
@@ -76,17 +74,17 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
-		if cache.CacheEmail.Enable {
-			emails := make([]string, 0)
-			for _, v := range strings.Split(string(bug.OprateUsers), ",") {
-				thisUid, err := strconv.ParseInt(v, 10, 64)
-				if err != nil {
-					continue
-				}
-				emails = append(emails, cache.CacheUidEmail[thisUid])
-			}
-			cache.CacheEmail.SendMail("创建bug", fmt.Sprintf("由%s创建bug： title： %s", cache.CacheUidRealName[bug.Uid], bug.Title), emails...)
-		}
+		// if cache.CacheEmail.Enable {
+		// 	emails := make([]string, 0)
+		// 	for _, v := range strings.Split(string(bug.OprateUsers), ",") {
+		// 		thisUid, err := strconv.ParseInt(v, 10, 64)
+		// 		if err != nil {
+		// 			continue
+		// 		}
+		// 		emails = append(emails, cache.CacheUidEmail[thisUid])
+		// 	}
+		// 	cache.CacheEmail.SendMail("创建bug", fmt.Sprintf("由%s创建bug： title： %s", cache.CacheUidRealName[bug.Uid], bug.Title), emails...)
+		// }
 
 		errorcode.Id = bug.ID
 

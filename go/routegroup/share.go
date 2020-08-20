@@ -1,10 +1,6 @@
 package routegroup
 
 import (
-	"itflow/handle"
-	"itflow/midware"
-	"itflow/model"
-
 	"github.com/hyahm/xmux"
 )
 
@@ -18,11 +14,11 @@ func init() {
 	Share.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
 	Share.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	Share.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
-	Share.Get("/share/list", handle.ShareList)
-	Share.Post("/share/upload", handle.ShareUpload)
-	Share.Post("/share/mkdir", handle.ShareMkdir).Bind(&model.Data_sharefile{}).AddMidware(midware.JsonToStruct)
-	Share.Get("/share/remove", handle.ShareRemove)
-	Share.Post("/share/rename", handle.ShareRename).Bind(&model.Data_sharefile{}).AddMidware(midware.JsonToStruct)
-	//router.HandleFunc("/share/down", handle.ShareDownload)
-	Share.Get("/share/down", handle.ShareShow)
+	// Share.Get("/share/list", handle.ShareList)
+	// Share.Post("/share/upload", handle.ShareUpload)
+	// Share.Post("/share/mkdir", handle.ShareMkdir).Bind(&model.Data_sharefile{}).AddMidware(midware.JsonToStruct)
+	// Share.Get("/share/remove", handle.ShareRemove)
+	// Share.Post("/share/rename", handle.ShareRename).Bind(&model.Data_sharefile{}).AddMidware(midware.JsonToStruct)
+	// //router.HandleFunc("/share/down", handle.ShareDownload)
+	// Share.Get("/share/down", handle.ShareShow)
 }
