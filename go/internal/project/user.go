@@ -3,9 +3,10 @@ package project
 import (
 	"itflow/cache"
 	"itflow/db"
-	"itflow/model"
+	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/gomysql"
 )
 
 // 通过project 获取用户
@@ -13,32 +14,45 @@ import (
 func GetUsersByProjectName(userid int64, name cache.Project) []byte {
 	// 根据项目组获取所属用户和所属版本
 	resp := &MyProject{
-		Name: make([]string, 0),
+		Name:     make([]string, 0),
+		Versions: make([]string, 0),
 	}
-	namessql := "select realname from user where in in (select ids from usergroup where id = (select ugid from project where name=?))"
-	rows, err := db.Mconn.GetRows(namessql, name)
+	var ids string
+	err := db.Mconn.GetOne("select ids from usergroup where id = (select ugid from project where name=?)",
+		name).Scan(&ids)
 	if err != nil {
 		golog.Error(err)
 		return resp.ErrorE(err)
 	}
+	namessql := "select realname from user where id in (?)"
+	rows, err := db.Mconn.GetRowsIn(namessql, (gomysql.InArgs)(strings.Split(ids, ",")).ToInArgs())
+	if err != nil {
+		golog.Error(err)
+		return resp.ErrorE(err)
+	}
+	n := new(string)
 	for rows.Next() {
-		name := new(string)
-		err = rows.Scan(name)
+		err = rows.Scan(n)
 		if err != nil {
 			golog.Error(err)
 			continue
 		}
-		resp.Name = append(resp.Name, *name)
+		resp.Name = append(resp.Name, *n)
 	}
 
-	version := &model.Version{}
-	ps, err := version.GetProjectNameByPid(name.Id())
+	vrows, err := db.Mconn.GetRows("select name from version where pid=(select id from project where name=?)", name)
 	if err != nil {
-		resp.Name = make([]string, 0)
-		resp.Code = 1
-		resp.Msg = err.Error()
-		return resp.Marshal()
+		golog.Error(err)
+		return resp.ErrorE(err)
 	}
-	resp.Versions = ps
+	for vrows.Next() {
+		err = vrows.Scan(n)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		resp.Versions = append(resp.Versions, *n)
+	}
+
 	return resp.Marshal()
 }

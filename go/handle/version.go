@@ -3,7 +3,6 @@ package handle
 import (
 	"encoding/json"
 	"fmt"
-	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/datalog"
 	"itflow/internal/response"
@@ -23,10 +22,10 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	uid := xmux.GetData(r).Get("uid").(int64)
-	add_version_sql := "insert into version(pid,name,urlone,urltwo,createtime,createuid) values(?,?,?,?,?,?)"
+	add_version_sql := "insert into version(pid,name,urlone,urltwo,createtime,createuid) values((select id from project where name=?),?,?,?,?,?)"
 	var err error
 	errorcode.UpdateTime = time.Now().Unix()
-	errorcode.Id, err = db.Mconn.Insert(add_version_sql, version_add.Project.Id(),
+	errorcode.Id, err = db.Mconn.Insert(add_version_sql, version_add.Project,
 		version_add.Name, version_add.Url, version_add.BakUrl, errorcode.UpdateTime, uid)
 	if err != nil {
 		golog.Error(err)
@@ -47,27 +46,31 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 
 func VersionList(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
-
 	al := &version.VersionList{
 		VersionList: make([]*version.RespVersion, 0),
 	}
 
-	get_version_sql := "select id,pid,name,urlone,urltwo,createtime from version order by id desc"
+	get_version_sql := `select v.id, ifnull(p.name,''), v.name, v.urlone, v.urltwo, v.createtime 
+	from version as v  
+	left join 
+	project as p  
+	on v.pid =p.id 
+	order by v.id desc;`
 
 	rows, err := db.Mconn.GetRows(get_version_sql)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		w.Write(al.ErrorE(err))
 		return
 	}
 
 	for rows.Next() {
-		var pid cache.ProjectId
 		rl := &version.RespVersion{}
-		rows.Scan(&rl.Id, &pid, &rl.Name, &rl.Url, &rl.BakUrl, &rl.Date)
-		rl.Project = pid.Name()
-		golog.Info(rl.Name)
+		err = rows.Scan(&rl.Id, &rl.Project, &rl.Name, &rl.Url, &rl.BakUrl, &rl.Date)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
 		al.VersionList = append(al.VersionList, rl)
 	}
 
@@ -131,17 +134,13 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 	data := xmux.GetData(r).Data.(*version.RespVersion)
 
 	uid := xmux.GetData(r).Get("uid").(int64)
-	versionsql := "update version set pid=?,name=?,urlone=?,urltwo=?,createuid=? where id=?"
-	_, err := db.Mconn.Update(versionsql, data.Project.Id(), data.Name, data.Url, data.BakUrl, uid, data.Id)
+	versionsql := "update version set pid=(select id from project where name=?),name=?,urlone=?,urltwo=?,createuid=? where id=?"
+	_, err := db.Mconn.Update(versionsql, data.Project, data.Name, data.Url, data.BakUrl, uid, data.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-
-	delete(cache.CacheVersionVid, data.Name)
-	cache.CacheVidVersion[cache.VersionId(data.Id)] = data.Name
-	cache.CacheVersionVid[data.Name] = cache.VersionId(data.Id)
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)

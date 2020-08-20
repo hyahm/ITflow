@@ -137,12 +137,44 @@ func ImportantUpdate(w http.ResponseWriter, r *http.Request) {
 type importantslist struct {
 	Importants []string `json:"importants"`
 	Code       int      `json:"code"`
+	Msg        string   `json:"msg"`
+}
+
+func (im *importantslist) Marshal() []byte {
+	send, err := json.Marshal(im)
+	if err != nil {
+		golog.Error(err)
+	}
+	return send
+}
+func (im *importantslist) Error(msg string) []byte {
+	im.Code = 1
+	im.Msg = msg
+	return im.Marshal()
+}
+func (im *importantslist) ErrorE(err error) []byte {
+	return im.Error(err.Error())
 }
 
 func GetImportants(w http.ResponseWriter, r *http.Request) {
-	data := &importantslist{}
-	for _, v := range cache.CacheIidImportant {
-		data.Importants = append(data.Importants, v.ToString())
+	data := &importantslist{
+		Importants: make([]string, 0),
+	}
+	rows, err := db.Mconn.GetRows("select name from importants")
+	if err != nil {
+		golog.Error(err)
+		w.Write(data.ErrorE(err))
+		return
+	}
+
+	for rows.Next() {
+		var name string
+		err = rows.Scan(&name)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		data.Importants = append(data.Importants, name)
 	}
 	send, _ := json.Marshal(data)
 	w.Write(send)

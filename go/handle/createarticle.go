@@ -49,11 +49,12 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 	nickname := xmux.GetData(r).Get("nickname").(string)
 	data := xmux.GetData(r).Data.(*bug.RespEditBug)
-	createdId := cache.DefaultCreateSid
-	if createdId == 0 {
-		w.Write([]byte("必须给定一个状态默认值"))
-		return
-	}
+	// createdId := cache.DefaultCreateSid
+	// if createdId == 0 {
+	// 	golog.Error("必须给定一个状态默认值")
+	// 	w.Write(errorcode.Error("必须给定一个状态默认值")
+	// 	return
+	// }
 
 	bug, err := data.ToBug()
 	if err != nil {
@@ -63,7 +64,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 	bug.StatusId = createdId
 	bug.Uid = xmux.GetData(r).Get("uid").(int64)
 	//
-	go datalog.InsertLog("bug", nickname+"create bug: "+data.Title, r.RemoteAddr, nickname, "create")
+	// go datalog.InsertLog("bug", nickname+"create bug: "+data.Title, r.RemoteAddr, nickname, "create")
 
 	if data.Id <= 0 {
 		// 插入bug

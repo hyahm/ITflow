@@ -165,7 +165,7 @@ func RoleTemplate(w http.ResponseWriter, r *http.Request) {
 	}
 	for rows.Next() {
 		role := &rolegroup.PermRole{}
-		err = rows.Scan(&role.Info, &role.Name)
+		err = rows.Scan(&role.Name, &role.Info)
 		if err != nil {
 			golog.Error(err)
 			continue

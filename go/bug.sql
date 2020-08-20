@@ -337,7 +337,6 @@ CREATE TABLE `level` (
 
 LOCK TABLES `level` WRITE;
 /*!40000 ALTER TABLE `level` DISABLE KEYS */;
-INSERT INTO `level` VALUES (2,'2'),(1,'3'),(4,'优'),(5,'良');
 /*!40000 ALTER TABLE `level` ENABLE KEYS */;
 UNLOCK TABLES;
 

@@ -45,5 +45,5 @@ func init() {
 		AddMidware(midware.JsonToStruct)
 
 	User.Post("/get/user", handle.GetUser).ApiDescribe("获取所有用户的真实名")
-	User.Get("/get/project/user", handle.GetProjectUser)
+	User.Get("/get/project/user", handle.GetProjectUser).ApiDescribe("根据项目获取关联用户和版本")
 }

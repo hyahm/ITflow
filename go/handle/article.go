@@ -45,21 +45,52 @@ type articledetail struct {
 }
 
 type envList struct {
-	EnvList []cache.Env `json:"envlist"`
-	Code    int         `json:"code"`
+	EnvList []string `json:"envlist"`
+	Code    int      `json:"code"`
+	Msg     string   `json:"msg"`
+}
+
+func (el *envList) Marshal() []byte {
+	send, err := json.Marshal(el)
+	if err != nil {
+		golog.Error(err)
+
+	}
+	return send
+}
+
+func (el *envList) Error(msg string) []byte {
+	el.Code = 1
+	el.Msg = msg
+	return el.Marshal()
+}
+func (el *envList) ErrorE(err error) []byte {
+	return el.Error(err.Error())
 }
 
 func GetEnv(w http.ResponseWriter, r *http.Request) {
 	el := &envList{
-		EnvList: make([]cache.Env, 0),
+		EnvList: make([]string, 0),
 	}
 
-	for _, v := range cache.CacheEidEnv {
-		el.EnvList = append(el.EnvList, v)
+	rows, err := db.Mconn.GetRows("select name from environment")
+	if err != nil {
+		golog.Error(err)
+		w.Write(el.ErrorE(err))
+		return
 	}
 
-	send, _ := json.Marshal(el)
-	w.Write(send)
+	for rows.Next() {
+		var name string
+		err = rows.Scan(&name)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		el.EnvList = append(el.EnvList, name)
+	}
+
+	w.Write(el.Marshal())
 	return
 
 }
@@ -220,13 +251,6 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 	url := &uploadimage{}
 	golog.Info("uploading header image")
 	errorcode := &response.Response{}
-	// body, err := ioutil.ReadAll(r.Body)
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(errorcode.ErrorE(err))
-	// 	return
-	// }
-	// golog.Info(string(body))
 	image, header, err := r.FormFile("upload")
 	if err != nil {
 		golog.Error(err)
@@ -258,14 +282,14 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 
 	url.FileName = filename
 	url.Uploaded = 1
-	// uploadimg := "update user set headimg = ? where nickname=?"
-	// nickname := xmux.GetData(r).Get("nickname").(string)
-	// _, err = db.Mconn.Update(uploadimg, url.Url, nickname)
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(errorcode.ErrorE(err))
-	// 	return
-	// }
+	uploadimg := "update user set headimg = ? where nickname=?"
+	nickname := xmux.GetData(r).Get("nickname").(string)
+	_, err = db.Mconn.Update(uploadimg, url.Url, nickname)
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
 	s, _ := json.Marshal(url)
 
 	w.Write(s)
