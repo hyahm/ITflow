@@ -2,7 +2,6 @@ package handle
 
 import (
 	"encoding/json"
-	"fmt"
 	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/bug"
@@ -17,6 +16,7 @@ import (
 	"time"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/gomysql"
 	"github.com/hyahm/xmux"
 	//"strconv"
 )
@@ -59,14 +59,23 @@ func ShowStatus(w http.ResponseWriter, r *http.Request) {
 		CheckStatus: make([]string, 0),
 	}
 	uid := xmux.GetData(r).Get("uid").(int64)
-	rows, err := db.Mconn.GetRows(`select s.name from user as u join status as s on u.id=? and s.id in (u.showstatus)`, uid)
+	var sids string
+	err := db.Mconn.GetOne("select showstatus from user where id=?", uid).Scan(&sids)
 	if err != nil {
 		golog.Error(err)
 		w.Write(sl.ErrorE(err))
 		return
 	}
+
+	rows, err := db.Mconn.GetRowsIn(`select name from status where id in (?)`,
+		(gomysql.InArgs)(strings.Split(sids, ",")).ToInArgs())
+	if err != nil {
+		golog.Error(err)
+		w.Write(sl.ErrorE(err))
+		return
+	}
+	statusname := new(string)
 	for rows.Next() {
-		statusname := new(string)
 		err = rows.Scan(statusname)
 		if err != nil {
 			golog.Error(err)
@@ -220,8 +229,9 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	param := xmux.GetData(r).Data.(*status.Status)
-
-	rows, err := db.Mconn.GetRows(fmt.Sprintf("select id from status where name in ('%s')", strings.Join(param.CheckStatus, ",")))
+	golog.Info(param.CheckStatus)
+	rows, err := db.Mconn.GetRowsIn("select id from status where name in (?)",
+		(gomysql.InArgs)(param.CheckStatus).ToInArgs())
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -248,40 +258,90 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetMyBugs(w http.ResponseWriter, r *http.Request) {
-
-	// errorcode := &response.Response{}
+	golog.Info("1111111111111111111111111")
 	uid := xmux.GetData(r).Get("uid").(int64)
 	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
+	golog.Infof("%+v", *mybug)
 	// mybug.GetUsefulCondition(uid)
-	countsql := "select count(id) from bugs where dustbin=true and uid=? "
-	// searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs join  on dustbin=true and uid=? "
-	searchsql := `select b.id,b.createtime,i.name,s.name,title,l.name,p.name,e.name,spusers,u.realname from bugs as b 
-	join importants as i 
-	join statusgroup as s 
-	join level as l 
-	join project as p 
-	join environment as e  
-	join user as u 
-	on dustbin=true and b.iid = i.id and b.sid = s.id and b.lid = l.id and b.pid=p.id and b.eid = e.id and b.uid=u.id and uid=?`
-	sch, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
+	al := &model.AllArticleList{
+		Al: make([]*model.ArticleList, 0),
+	}
+	countsql := "select count(id) from bugs where dustbin=true and uid=? and sid in (select id from status where name in (?))"
+	err := db.Mconn.GetOneIn(countsql, uid, (gomysql.InArgs)(mybug.ShowsStatus).ToInArgs()).Scan(&al.Count)
 	if err != nil {
-		if err == search.ErrorNoStatus {
-			al := &model.AllArticleList{
-				Al: make([]*model.ArticleList, 0),
-			}
-			w.Write(al.Marshal())
-			return
-		}
 		golog.Error(err)
-		al := &model.AllArticleList{
-			Al:   make([]*model.ArticleList, 0),
-			Code: 1,
-			Msg:  err.Error(),
-		}
-		w.Write(al.Marshal())
+		w.Write(al.ErrorE(err))
 		return
 	}
-	w.Write(sch.GetMyBugs())
+	start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
+	// searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs join  on dustbin=true and uid=? "
+	searchsql := `select b.id,b.createtime,i.name,s.name,title,l.name,p.name,e.name,spusers,u.realname from bugs as b
+	join importants as i
+	join status as s
+	join level as l
+	join project as p
+	join environment as e
+	join user as u
+	on dustbin=true and b.iid = i.id and b.sid = s.id and b.lid = l.id and b.pid=p.id and b.eid = e.id and b.uid=u.id and uid=? limit ?,?`
+	rows, err := db.Mconn.GetRows(searchsql, uid, start, end)
+	// sch, err := mybug.GetUsefulCondition(uid,
+	if err != nil {
+		golog.Error(err)
+		w.Write(al.ErrorE(err))
+		return
+	}
+
+	for rows.Next() {
+		bug := &model.ArticleList{
+			Handle: make([]string, 0),
+		}
+		var ids string
+		err = rows.Scan(&bug.ID,
+			&bug.Date, &bug.Importance, &bug.Status, &bug.Title, &bug.Level, &bug.Projectname,
+			&bug.Env, &ids, &bug.Author)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		realnames, err := db.Mconn.GetRows("select realname from user where id in (?)",
+			(gomysql.InArgs)(strings.Split(ids, ",")).ToInArgs())
+		if err != nil {
+			golog.Error(err)
+			w.Write(al.ErrorE(err))
+			return
+		}
+		for realnames.Next() {
+			var name string
+			err = realnames.Scan(&name)
+			if err != nil {
+				golog.Error(err)
+				continue
+			}
+			bug.Handle = append(bug.Handle, name)
+		}
+
+		al.Al = append(al.Al, bug)
+	}
+	golog.Info(string(al.Marshal()))
+	w.Write(al.Marshal())
+	// if err != nil {
+	// 	if err == search.ErrorNoStatus {
+	// 		al := &model.AllArticleList{
+	// 			Al: make([]*model.ArticleList, 0),
+	// 		}
+	// 		w.Write(al.Marshal())
+	// 		return
+	// 	}
+	// 	golog.Error(err)
+	// 	al := &model.AllArticleList{
+	// 		Al:   make([]*model.ArticleList, 0),
+	// 		Code: 1,
+	// 		Msg:  err.Error(),
+	// 	}
+	// 	w.Write(al.Marshal())
+	// 	return
+	// }
+	// w.Write(sch.GetMyBugs())
 
 }
 
@@ -337,7 +397,7 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 func BugEdit(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("id")
-	w.Write(bug.RespEditBugData(id))
+	w.Write(bug.BugById(id))
 	return
 
 }

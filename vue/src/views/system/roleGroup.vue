@@ -123,7 +123,7 @@ export default {
           this.list = resp.data.rolelist
           console.log(this.list)
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -150,7 +150,7 @@ export default {
               this.$message.success('删除成功')
               return
             } else {
-              this.$message.error(resp.data.message)
+              this.$message.error(resp.data.msg)
             }
           })
         })
@@ -177,7 +177,7 @@ export default {
             }
             this.$message.success('修改成功')
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
         })
       } else {
@@ -190,7 +190,7 @@ export default {
             })
             this.$message.success('添加成功')
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
         })
       }

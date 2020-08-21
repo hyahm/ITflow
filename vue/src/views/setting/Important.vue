@@ -85,7 +85,7 @@ export default {
             this.tableData = resp.data.importantlist
           }
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -111,7 +111,7 @@ export default {
               }
             }
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
         })
       }

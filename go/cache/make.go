@@ -1,6 +1,9 @@
 package cache
 
-import "itflow/db"
+import (
+	"database/sql"
+	"itflow/db"
+)
 
 func initCache() {
 
@@ -179,15 +182,11 @@ func initCache() {
 	// 	}
 
 	// 	//默认值
-	// 	var created, complete StatusId
-	// 	err = db.Mconn.GetOne("select created, completed from defaultvalue").Scan(&created, &complete)
-	// 	if err != nil {
-	// 		if err != sql.ErrNoRows {
-	// 			panic(err)
-	// 		}
+	err = db.Mconn.GetOne("select ifnull(min(created),0), ifnull(min(completed),0) from defaultvalue").Scan(&DefaultCreateSid, &DefaultCompleteSid)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			panic(err)
+		}
 
-	// 	}
-	// 	DefaultCreateSid = created
-	// 	DefaultCompleteSid = complete
-
+	}
 }

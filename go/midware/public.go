@@ -2,7 +2,6 @@ package midware
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"itflow/db"
 	"itflow/internal/response"
 	"net/http"
@@ -13,13 +12,7 @@ import (
 
 func JsonToStruct(w http.ResponseWriter, r *http.Request) bool {
 	resp := &response.Response{}
-	b, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		w.Write(resp.ErrorE(err))
-		return true
-	}
-	golog.Info(string(b))
-	err = json.Unmarshal(b, xmux.GetData(r).Data)
+	err := json.NewDecoder(r.Body).Decode(xmux.GetData(r).Data)
 	if err != nil {
 		golog.Error(err)
 		w.Write(resp.ErrorE(err))

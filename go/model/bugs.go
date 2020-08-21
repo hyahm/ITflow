@@ -11,18 +11,18 @@ import (
 )
 
 type ArticleList struct {
-	ID          int             `json:"id"`
-	Date        int64           `json:"date"`
-	Author      string          `json:"author"`
-	Importance  cache.Important `json:"important"`
-	Status      cache.Status    `json:"status"`
-	Title       string          `json:"title"`
-	Action      string          `json:"action"`
-	Dustbin     int             `json:"dustbin"`
-	Level       cache.Level     `json:"level"`
-	Projectname cache.Project   `json:"projectname"`
-	Env         cache.Env       `json:"env"`
-	Handle      []string        `json:"handle"`
+	ID          int      `json:"id"`
+	Date        int64    `json:"date"`
+	Author      string   `json:"author"`
+	Importance  string   `json:"important"`
+	Status      string   `json:"status"`
+	Title       string   `json:"title"`
+	Action      string   `json:"action"`
+	Dustbin     int      `json:"dustbin"`
+	Level       string   `json:"level"`
+	Projectname string   `json:"projectname"`
+	Env         string   `json:"env"`
+	Handle      []string `json:"handle"`
 }
 
 type AllArticleList struct {
@@ -118,16 +118,4 @@ func (bug *Bug) EditBug() (err error) {
 		bug.UpdateTime, bug.LevelId, bug.ProjectId, bug.EnvId, bug.OprateUsers, bug.VersionId, bug.ID)
 
 	return
-}
-
-func (bug *Bug) NewBugById(id interface{}) error {
-	alsql := "select iid,title,lid,pid,eid,spusers,vid,content from bugs where id=?"
-	err := db.Mconn.GetOne(alsql, id).Scan(&bug.ImportanceId, &bug.Title, &bug.LevelId, &bug.ProjectId,
-		&bug.EnvId, &bug.OprateUsers, &bug.VersionId, &bug.Content)
-	if err != nil {
-		golog.Error(err)
-		return err
-	}
-	bug.Content = html.UnescapeString(bug.Content)
-	return nil
 }

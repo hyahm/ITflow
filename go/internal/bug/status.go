@@ -19,7 +19,7 @@ type ListStatus struct {
 type ResponeStatus struct {
 	Id   int64  `json:"id" type:"int" need:"是" default:"0" information:"返回插入的id"`
 	Code int    `json:"code" type:"int" need:"是" default:"" information:"状态码"`
-	Msg  string `json:"message" type:"string" need:"否" default:"" information:"错误信息"`
+	Msg  string `json:"msg" type:"string" need:"否" default:"" information:"错误信息"`
 }
 
 func (rs *ResponeStatus) Success() []byte {

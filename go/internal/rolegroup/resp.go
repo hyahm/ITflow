@@ -5,7 +5,7 @@ import "encoding/json"
 type RespRoleGroup struct {
 	RoleList []*ReqRoleGroup `json:"rolelist" type:"array" need:"是" information:"角色组成员"`
 	Code     int             `json:"code" type:"array" need:"是"  information:"错误码"`
-	Msg      string          `json:"message,omitempty" type:"array" need:"否" information:"错误信息"`
+	Msg      string          `json:"msg,omitempty" type:"array" need:"否" information:"错误信息"`
 }
 
 func (rrg *RespRoleGroup) Marshal() []byte {

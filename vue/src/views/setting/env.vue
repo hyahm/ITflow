@@ -86,7 +86,7 @@ export default {
           }
           this.tableData = resp.data.envlist
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -142,7 +142,7 @@ export default {
             this.$message.success('添加成功')
             return
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
         })
       } else {
@@ -158,7 +158,7 @@ export default {
             this.$message.success('修改成功')
             return
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
         })
       }

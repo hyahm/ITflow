@@ -14,7 +14,7 @@ type MyProject struct {
 	Name     []string `json:"name"`
 	Versions []string `json:"versions"`
 	Code     int      `json:"code"`
-	Msg      string   `json:"message"`
+	Msg      string   `json:"msg"`
 }
 
 func (mp *MyProject) Marshal() []byte {

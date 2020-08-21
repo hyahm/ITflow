@@ -181,7 +181,7 @@ export default {
         if (resp.data.code === 0) {
           this.allStatus = resp.data.statuslist
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
       // 可以修改的权限
@@ -190,7 +190,7 @@ export default {
           this.showstatus = resp.data.statuslist
           this.statuslength = this.showstatus.length
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -199,7 +199,7 @@ export default {
         if (resp.data.code === 0) {
           this.levels = resp.data.levels
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -208,7 +208,7 @@ export default {
         if (resp.data.code === 0) {
           this.projectnames = resp.data.projectlist
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -221,7 +221,7 @@ export default {
           this.statuslength = this.showstatus.length
           this.handleFilter()
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -254,7 +254,7 @@ export default {
             }
           }
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     }

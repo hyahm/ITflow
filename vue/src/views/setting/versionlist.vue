@@ -158,7 +158,7 @@ export default {
         if (resp.data.code === 0) {
           this.projects = resp.data.name
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -177,7 +177,7 @@ export default {
           this.list = resp.data.versionlist
           this.total = resp.data.versionlist.length
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -229,7 +229,7 @@ export default {
             this.dialogFormVisible = false
             return
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
         })
       }

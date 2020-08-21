@@ -214,7 +214,7 @@ export default {
           this.postForm.version = ''
           this.postForm.selectuser = []
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
         //
       })
@@ -226,7 +226,7 @@ export default {
             this.importants = resp.data.importants
           }
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -235,7 +235,7 @@ export default {
         if (resp.data.code === 0) {
           this.levels = resp.data.levels
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -244,17 +244,16 @@ export default {
         if (resp.data.code === 0) {
           this.envnames = resp.data.envlist
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
     getproject() {
       getMyProject().then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.projectnames = resp.data.name
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -263,7 +262,7 @@ export default {
     //     if (resp.data.code === 0) {
     //       this.versions = resp.data.versionlist
     //     } else {
-    //       this.$message.error(resp.data.message)
+    //       this.$message.error(resp.data.msg)
     //     }
     //   }).catch(err => {
     //     this.$message.error(err)
@@ -283,7 +282,7 @@ export default {
           this.postForm.level = dd.level
           this.postForm.projectname = dd.projectname
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       }).catch(err => {
         console.log(err)
@@ -358,7 +357,9 @@ export default {
       }
       this.$refs.postForm.validate(valid => {
         if (valid) {
+          console.log(this.postForm)
           createBug(this.postForm).then(resp => {
+            console.log(resp.data)
             if (resp.data.code === 0) {
               if (this.postForm.id === -1) {
                 this.$notify({
@@ -375,7 +376,7 @@ export default {
                 })
               }
             } else {
-              this.$message.error(resp.data.message)
+              this.$message.error(resp.data.msg)
             }
           })
         }

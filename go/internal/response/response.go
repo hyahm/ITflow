@@ -24,7 +24,7 @@ type Response struct {
 	Id         int64                     `json:"id,omitempty" type:"int" need:"否" default:"" information:"返回的id，某些端口需要"`
 	AffectId   int64                     `json:"affectid,omitempty" type:"int" need:"否" default:"" information:"返回的行数，某些端口需要"`
 	Code       int                       `json:"code" type:"int" need:"是" default:"" information:"返回的状态码， 0为成功，非0失败"`
-	Msg        string                    `json:"message,omitempty" type:"string" need:"否" default:"" information:"错误信息， 状态码非肯定有"`
+	Msg        string                    `json:"msg,omitempty" type:"string" need:"否" default:"" information:"错误信息， 状态码非肯定有"`
 	Path       *Onefd                    `json:"path,omitempty" type:"object" need:"否" default:"" information:"返回路径，共享文件接口用到"`
 	Filename   string                    `json:"filename,omitempty" type:"string" need:"否" default:"" information:"文件名，共享文件接口用到"`
 	Data       []byte                    `json:"data,omitempty" type:"bytes" need:"否" default:"" information:"返回数据，某些接口用到"`

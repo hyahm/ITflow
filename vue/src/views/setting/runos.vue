@@ -79,7 +79,7 @@ export default {
           }
           this.tableData = resp.data.oslist
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -101,7 +101,7 @@ export default {
             }
           }
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -120,7 +120,7 @@ export default {
               osname: this.form.osname
             })
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
         })
       } else {
@@ -134,7 +134,7 @@ export default {
               }
             }
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
         })
       }

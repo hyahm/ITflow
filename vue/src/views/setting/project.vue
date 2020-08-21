@@ -110,7 +110,7 @@ export default {
         if (resp.data.code === 0) {
           this.usergroups = resp.data.usergroupnames
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       }).catch(err => {
         this.$message.error(err)
@@ -121,7 +121,7 @@ export default {
         if (resp.data.code === 0) {
           this.tableData = resp.data.projectlist
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -153,7 +153,7 @@ export default {
             this.$message.success('删除成功')
             return
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
         })
       }).catch(() => {
@@ -202,7 +202,7 @@ export default {
             }
             this.$message.success('更新成功')
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
         })
       }

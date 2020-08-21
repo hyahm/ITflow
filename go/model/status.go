@@ -2,6 +2,7 @@ package model
 
 import (
 	"itflow/db"
+	"strings"
 
 	"github.com/hyahm/golog"
 )
@@ -38,4 +39,13 @@ func (status *Status) List() ([]*Status, error) {
 		ss = append(ss, st)
 	}
 	return ss, nil
+}
+
+func GetMyStatusList(id interface{}) ([]string, error) {
+	var sids string
+	err := db.Mconn.GetOne("select showstatus from user where id=?", id).Scan(&sids)
+	if err != nil {
+		return nil, err
+	}
+	return strings.Split(sids, ","), nil
 }

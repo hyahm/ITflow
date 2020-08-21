@@ -13,7 +13,7 @@ type BugCount struct {
 	Created   []int  `json:"created"`
 	Completed []int  `json:"completed"`
 	Code      int    `json:"code"`
-	Msg       string `json:"message"`
+	Msg       string `json:"msg"`
 }
 
 const SHOWDAY = 7

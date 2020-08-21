@@ -173,7 +173,7 @@ export default {
           if (resp.data.code === 0) {
             this.bug = resp.data
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
         })
       }
@@ -198,7 +198,7 @@ export default {
             type: 'success'
           })
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
         this.dialogFormVisible = false
       })

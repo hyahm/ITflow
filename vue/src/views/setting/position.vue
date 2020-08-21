@@ -134,7 +134,7 @@ export default {
         if (resp.data.code === 0) {
           this.manager = resp.data.hypos
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -144,7 +144,7 @@ export default {
           this.tableData = resp.data.positions
           console.log(this.tableData)
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -166,7 +166,7 @@ export default {
               })
             }
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
         })
       } else {
@@ -186,7 +186,7 @@ export default {
               }
             }
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
         })
       }

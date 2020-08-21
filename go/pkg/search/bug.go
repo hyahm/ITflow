@@ -30,9 +30,6 @@ func (pl *BugList) rows() (*sql.Rows, error) {
 	}
 	// 增加显示的状态
 	start, end := xmux.GetLimit(pl.Count, pl.Page, pl.Limit)
-	golog.Info(start)
-	golog.Info(pl.Page)
-	golog.Info(end)
 	pl.ListSql += " order by id desc limit ?,? "
 	var rows *sql.Rows
 	rows, err = db.Mconn.GetRows(pl.ListSql, start, end)
@@ -113,7 +110,6 @@ func (pl *BugList) myTaskRows() (*sql.Rows, error) {
 
 	pl.ListSql += " order by id desc "
 	var rows *sql.Rows
-	golog.Info(pl.ListSql)
 	rows, err = db.Mconn.GetRows(pl.ListSql)
 
 	if err != nil {

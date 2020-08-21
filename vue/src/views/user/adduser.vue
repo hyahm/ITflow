@@ -139,7 +139,7 @@ export default {
             this.positions = resp.data.positions
           }
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -150,7 +150,7 @@ export default {
             this.statusgroups = resp.data.names
           }
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -161,7 +161,7 @@ export default {
             this.rolegroups = resp.data.rolelist
           }
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },

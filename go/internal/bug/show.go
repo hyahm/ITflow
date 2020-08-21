@@ -19,7 +19,7 @@ type RespShowBug struct {
 	Envname     cache.Env               `json:"envname"`
 	Version     string                  `json:"version"`
 	Code        int                     `json:"code"`
-	Msg         string                  `json:"message,omitempty"`
+	Msg         string                  `json:"msg,omitempty"`
 	Comments    []*comment.Informations `json:"comments,omitempty"`
 }
 

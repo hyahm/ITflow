@@ -2,15 +2,16 @@ package handle
 
 import (
 	"database/sql"
-	"fmt"
 	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/bug"
 	"itflow/internal/search"
 	"itflow/model"
 	"net/http"
+	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/gomysql"
 	"github.com/hyahm/xmux"
 )
 
@@ -50,30 +51,72 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 
 	uid := xmux.GetData(r).Get("uid").(int64)
 	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
-	// mybug.GetUsefulCondition(uid)
-	countsql := fmt.Sprintf("select count(id) from bugs where dustbin=true and uid=%d ", uid)
-	searchsql := fmt.Sprintf("select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs where dustbin=true and uid=%d ", uid)
-
-	sch, err := mybug.GetUsefulCondition(uid, countsql, searchsql)
+	al := &model.AllArticleList{
+		Al: make([]*model.ArticleList, 0),
+	}
+	statislist, err := model.GetMyStatusList(uid)
 	if err != nil {
-		if err == search.ErrorNoStatus {
-			al := &model.AllArticleList{
-				Al: make([]*model.ArticleList, 0),
-			}
-			w.Write(al.Marshal())
-			return
-		}
 		golog.Error(err)
-		al := &model.AllArticleList{
-			Al:   make([]*model.ArticleList, 0),
-			Code: 1,
-			Msg:  err.Error(),
-		}
-		w.Write(al.Marshal())
+		w.Write(al.ErrorE(err))
 		return
 	}
-	w.Write(sch.GetMyBugs())
-	return
+	countsql := "select count(id) from bugs where dustbin=true and uid=? and sid in (?)"
+	err = db.Mconn.GetOneIn(countsql, uid, (gomysql.InArgs)(statislist).ToInArgs()).Scan(&al.Count)
+	if err != nil {
+		golog.Error(err)
+		w.Write(al.ErrorE(err))
+		return
+	}
+	start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
+	// searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs join  on dustbin=true and uid=? "
+	searchsql := `select b.id,b.createtime,i.name,s.name,title,l.name,p.name,e.name,spusers,u.realname from bugs as b
+	join importants as i
+	join status as s
+	join level as l
+	join project as p
+	join environment as e
+	join user as u
+	on dustbin=true and b.iid = i.id and b.sid = s.id and b.lid = l.id and b.pid=p.id and b.eid = e.id and b.uid=u.id and b.uid=? limit ?,?`
+	rows, err := db.Mconn.GetRows(searchsql, uid, start, end)
+	// sch, err := mybug.GetUsefulCondition(uid,
+	if err != nil {
+		golog.Error(err)
+		w.Write(al.ErrorE(err))
+		return
+	}
+
+	for rows.Next() {
+		bug := &model.ArticleList{
+			Handle: make([]string, 0),
+		}
+		var ids string
+		err = rows.Scan(&bug.ID,
+			&bug.Date, &bug.Importance, &bug.Status, &bug.Title, &bug.Level, &bug.Projectname,
+			&bug.Env, &ids, &bug.Author)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		realnames, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
+			(gomysql.InArgs)(strings.Split(ids, ",")).ToInArgs())
+		if err != nil {
+			golog.Error(err)
+			w.Write(al.ErrorE(err))
+			return
+		}
+		for realnames.Next() {
+			var name string
+			err = realnames.Scan(&name)
+			if err != nil {
+				golog.Error(err)
+				continue
+			}
+			bug.Handle = append(bug.Handle, name)
+		}
+
+		al.Al = append(al.Al, bug)
+	}
+	w.Write(al.Marshal())
 
 }
 

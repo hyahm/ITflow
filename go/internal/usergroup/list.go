@@ -9,7 +9,7 @@ import (
 type RespUserGroupList struct {
 	UserGroupList []*RespUserGroup `json:"usergrouplist"`
 	Code          int              `json:"code"`
-	Msg           string           `json:"message,omitempty"`
+	Msg           string           `json:"msg,omitempty"`
 }
 
 func (rugl *RespUserGroupList) Marshal() []byte {

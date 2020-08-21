@@ -90,7 +90,7 @@ export default {
             }
           }
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -103,7 +103,7 @@ export default {
               name: this.form.name
             })
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
         })
       } else {
@@ -116,7 +116,7 @@ export default {
               }
             }
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
         })
       }

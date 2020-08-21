@@ -103,7 +103,7 @@ export default {
           this.port = resp.data.port
           this.id = resp.data.id
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -120,7 +120,7 @@ export default {
         if (resp.data.code === 0) {
           this.$message.success('发送成功')
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -139,7 +139,7 @@ export default {
           this.id = resp.data.id
           this.$message.success('保存成功')
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     }

@@ -11,7 +11,7 @@ import (
 type ResProjectList struct {
 	ProjectList []*ReqProject `json:"projectlist"`
 	Code        int           `json:"code"`
-	Msg         string        `json:"message"`
+	Msg         string        `json:"msg"`
 }
 
 func (rpl *ResProjectList) Marshal() []byte {

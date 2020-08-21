@@ -8,7 +8,7 @@ import (
 type RespStatusList struct {
 	StatusList []*model.Status `json:"statuslist"`
 	Code       int             `json:"code"`
-	Msg        string          `json:"message,omitempty"`
+	Msg        string          `json:"msg,omitempty"`
 }
 
 func (rsl *RespStatusList) Marshal() []byte {

@@ -102,7 +102,7 @@ export default {
         if (resp.data.code === 0) {
           this.users = resp.data.users
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -111,7 +111,7 @@ export default {
         if (resp.data.code === 0) {
           this.list = resp.data.usergrouplist
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -138,7 +138,7 @@ export default {
             this.$message.success('修改成功')
             return
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
         })
       } else {
@@ -152,7 +152,7 @@ export default {
             })
             this.$message.success('添加用户组成功')
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
         })
       }
@@ -194,7 +194,7 @@ export default {
             this.$message.success('删除成功')
             return
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
         })
       }).catch(() => {

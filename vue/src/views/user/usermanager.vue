@@ -223,14 +223,14 @@ export default {
         if (resp.data.code === 0) {
           this.statusgrouplist = resp.data.names
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
       getPositions().then(resp => {
         if (resp.data.code === 0) {
           this.positionlist = resp.data.positions
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -250,7 +250,7 @@ export default {
           this.$message.success('修改成功')
           return
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
       this.dialogVisible = false
@@ -263,7 +263,7 @@ export default {
         if (resp.data.code === 0) {
           this.userlist = resp.data.userlist
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       }).catch(err => {
         this.$message.error(err)
@@ -290,7 +290,7 @@ export default {
             this.$message.warning('删除成功')
             return
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
         })
       }).catch(() => {
@@ -311,7 +311,7 @@ export default {
             }
           }
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },

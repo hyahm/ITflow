@@ -152,7 +152,7 @@ export default {
           this.count = resp.data.count
           this.listQuery.page = resp.data.page
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     }

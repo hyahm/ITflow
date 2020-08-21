@@ -245,7 +245,7 @@ export default {
         if (resp.data.code === 0) {
           this.levels = resp.data.levels
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -267,7 +267,7 @@ export default {
           })
           this.listLoading = false
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -277,7 +277,7 @@ export default {
         if (resp.data.code === 0) {
           this.projectnames = resp.data.projectlist
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -309,7 +309,7 @@ export default {
           this.total = resp.data.total
           this.list = resp.data.articlelist
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
         this.listLoading = false
       })
@@ -325,7 +325,7 @@ export default {
             this.total = resp.data.total
             this.list = resp.data.articlelist
           } else {
-            this.$message.error(resp.data.message)
+            this.$message.error(resp.data.msg)
           }
           this.listLoading = false
         })
@@ -385,7 +385,7 @@ export default {
             this.statuslength = this.checkstatus.length
           }
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -396,7 +396,7 @@ export default {
             this.allstatus = resp.data.statuslist
           }
         } else {
-          this.$message.error(resp.data.message)
+          this.$message.error(resp.data.msg)
         }
       })
     }
