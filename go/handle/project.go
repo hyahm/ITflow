@@ -33,12 +33,16 @@ func AddProject(w http.ResponseWriter, r *http.Request) {
 func UpdateProject(w http.ResponseWriter, r *http.Request) {
 	data := xmux.GetData(r).Data.(*project.ReqProject)
 	uid := xmux.GetData(r).Get("uid").(int64)
-	send, err := data.Update(uid)
+	errorcode := &response.Response{}
+	_, err := db.Mconn.Update("update project set name=?, ugid=(select ifnull(min(id),0) from usergroup where name=?) where id=? and uid=?",
+		data.ProjectName, data.GroupName, data.Id, uid)
+
 	if err != nil {
-		w.Write(send)
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	w.Write(send)
+	w.Write(errorcode.Success())
 
 }
 

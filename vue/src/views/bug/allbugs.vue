@@ -18,7 +18,7 @@
           <i class="el-icon-caret-bottom el-icon--right" />
         </el-button>
         <el-dropdown-menu slot="dropdown" class="no-border">
-          <el-checkbox-group v-model="checkstatus" style="padding-left: 15px;" @change="HandleChange">
+          <el-checkbox-group v-model="listQuery.status" style="padding-left: 15px;" @change="HandleChange">
             <el-checkbox v-for="(status, index) in allstatus" :key="index" :label="status">
               {{ status }}
             </el-checkbox>
@@ -149,14 +149,14 @@ export default {
     waves
   },
   filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
-    },
+    // statusFilter(status) {
+    //   const statusMap = {
+    //     published: 'success',
+    //     draft: 'info',
+    //     deleted: 'danger'
+    //   }
+    //   return statusMap[status]
+    // },
     typeFilter(type) {
       return calendarTypeKeyValue[type]
     }
@@ -250,13 +250,13 @@ export default {
       })
     },
     HandleChange() {
+      console.log(this.listQuery.status)
       const data = {
         checkstatus: this.checkstatus
       }
       statusFilter(data).then(resp => {
+        console.log(resp.data)
         if (resp.data.code === 0) {
-          this.checkstatus = resp.data.checkstatus
-          this.statuslength = this.checkstatus.length
           this.listLoading = true
           searchAllBugs(this.listQuery).then(resp => {
             if (resp.data.code === 0) {
@@ -380,10 +380,8 @@ export default {
       // 过滤的状态
       showStatus().then(resp => {
         if (resp.data.code === 0) {
-          if (resp.data.checkstatus !== null) {
-            this.checkstatus = resp.data.checkstatus
-            this.statuslength = this.checkstatus.length
-          }
+          this.checkstatus = resp.data.checkstatus
+          this.statuslength = this.checkstatus.length
         } else {
           this.$message.error(resp.data.msg)
         }
@@ -391,10 +389,9 @@ export default {
     },
     getstatus() {
       getStatus().then(resp => {
+        console.log(resp.data)
         if (resp.data.code === 0) {
-          if (resp.data.statuslist != null) {
-            this.allstatus = resp.data.statuslist
-          }
+          this.allstatus = resp.data.statuslist
         } else {
           this.$message.error(resp.data.msg)
         }

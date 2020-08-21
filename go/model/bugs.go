@@ -94,7 +94,7 @@ func GetCompletedCountByTime(start, end, statusid int64) (int, error) {
 }
 
 func (bug *Bug) Resume(id interface{}) error {
-	getlistsql := "update bugs set dustbin=true where id=?"
+	getlistsql := "update bugs set dustbin=false where id=?"
 
 	_, err := db.Mconn.Update(getlistsql, id)
 

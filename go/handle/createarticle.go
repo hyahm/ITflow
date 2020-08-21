@@ -115,13 +115,13 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 		// update
 		updatesql := `update bugs set title=?,content=?,
 			iid=(select ifnull(min(id),0) from importants where name=?),
-			updatetime,
+			updatetime=?,
 			vid=(select ifnull(min(id),0) from version where name=?),
-			spusers,
+			spusers=?,
 			lid=(select ifnull(min(id),0) from level where name=?),
 			eid=(select ifnull(min(id),0) from environment where name=?),
 			pid=(select ifnull(min(id),0) from project where name=?) 
-		where uid=? and id=?		`
+		where uid=? and id=?`
 
 		_, err = db.Mconn.Update(updatesql, data.Title,
 			html.EscapeString(data.Content), data.Important,

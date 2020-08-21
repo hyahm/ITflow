@@ -219,6 +219,21 @@ export default {
         //
       })
     },
+
+    editProject(name) {
+      // 选择不用项目会显示不同的用户
+      this.users = []
+      getProjectUser(name).then(resp => {
+        console.log(resp.data)
+        if (resp.data.code === 0) {
+          this.users = resp.data.name
+          this.versions = resp.data.versions
+        } else {
+          this.$message.error(resp.data.msg)
+        }
+        //
+      })
+    },
     getimportants() {
       getImportants().then(resp => {
         if (resp.data.code === 0) {
@@ -257,22 +272,12 @@ export default {
         }
       })
     },
-    // getversion() {
-    //   getVersion().then(resp => {
-    //     if (resp.data.code === 0) {
-    //       this.versions = resp.data.versionlist
-    //     } else {
-    //       this.$message.error(resp.data.msg)
-    //     }
-    //   }).catch(err => {
-    //     this.$message.error(err)
-    //   })
-    // },
 
     fetchData(id) {
       fetchBug(id).then(resp => {
         if (resp.data.code === 0) {
           const dd = resp.data
+          this.editProject(dd.projectname)
           this.postForm.title = dd.title
           this.postForm.content = dd.content
           this.postForm.important = dd.important
@@ -281,6 +286,7 @@ export default {
           this.postForm.envname = dd.envname
           this.postForm.level = dd.level
           this.postForm.projectname = dd.projectname
+          // 第一次获取数据， 请求到当前项目关联的版本和用户
         } else {
           this.$message.error(resp.data.msg)
         }

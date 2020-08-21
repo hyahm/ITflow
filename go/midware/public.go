@@ -2,21 +2,40 @@ package midware
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"itflow/db"
 	"itflow/internal/response"
 	"net/http"
 
+	"github.com/hyahm/goconfig"
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
 
 func JsonToStruct(w http.ResponseWriter, r *http.Request) bool {
 	resp := &response.Response{}
-	err := json.NewDecoder(r.Body).Decode(xmux.GetData(r).Data)
-	if err != nil {
-		golog.Error(err)
-		w.Write(resp.ErrorE(err))
-		return true
+	if goconfig.ReadBool("debug", false) {
+		b, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			golog.Error(err)
+			w.Write(resp.ErrorE(err))
+			return true
+		}
+		golog.Info(string(b))
+		err = json.Unmarshal(b, xmux.GetData(r).Data)
+		if err != nil {
+			golog.Error(err)
+			w.Write(resp.ErrorE(err))
+			return true
+		}
+	} else {
+		err := json.NewDecoder(r.Body).Decode(xmux.GetData(r).Data)
+		if err != nil {
+			golog.Error(err)
+			w.Write(resp.ErrorE(err))
+			return true
+		}
+
 	}
 	return false
 }
