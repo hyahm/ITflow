@@ -243,7 +243,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 	join user as u
 	on dustbin=false and b.iid = i.id and b.sid = s.id and b.lid = l.id and b.pid=p.id and b.eid = e.id and b.uid=u.id and b.id in (?) order by id desc`
 	rows, err := db.Mconn.GetRowsIn(searchsql,
-		(gomysql.InArgs)(myTaskId[start:end]).ToInArgs())
+		(gomysql.InArgs)(myTaskId[start:start+end]).ToInArgs())
 
 	if err != nil {
 		golog.Error(err)
