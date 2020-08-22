@@ -5,6 +5,8 @@ import (
 	"itflow/cache"
 	"itflow/internal/assist"
 	"itflow/internal/comment"
+
+	"github.com/hyahm/golog"
 )
 
 type RespShowBug struct {
@@ -24,6 +26,19 @@ type RespShowBug struct {
 }
 
 func (rsb *RespShowBug) Marshal() []byte {
-	send, _ := json.Marshal(rsb)
+	send, err := json.Marshal(rsb)
+	if err != nil {
+		golog.Error(err)
+	}
 	return send
+}
+
+func (rsb *RespShowBug) Error(msg string) []byte {
+	rsb.Code = 1
+	rsb.Msg = msg
+	return rsb.Marshal()
+}
+
+func (rsb *RespShowBug) ErrorE(err error) []byte {
+	return rsb.Error(err.Error())
 }

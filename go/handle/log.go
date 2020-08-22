@@ -33,7 +33,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 
 	//获取总行数
 	countsql := "select count(id) from log where 1=1" + condition
-	err := db.Mconn.GetOne(countsql, args...).Scan(&alllog.Count)
+	err := db.Mconn.GetOne(countsql, args...).Scan(&listlog.Count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(listlog.ErrorE(err))
@@ -44,7 +44,8 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		w.Write(listlog.NoRows())
 		return
 	}
-	start, end := xmux.GetLimit(alllog.Count, alllog.Page, alllog.Limit)
+	page, start, end := xmux.GetLimit(alllog.Count, alllog.Page, alllog.Limit)
+	listlog.Page = page
 	args = append(args, start, end)
 	basesql := "select l.id,exectime,classify,action,ip,u.realname from log as l join user as u on l.uid=u.id "
 	rows, err := db.Mconn.GetRows(basesql+condition+" order by id desc limit ?,?", args...)
@@ -60,8 +61,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		rows.Scan(&one.Id, &one.Exectime, &one.Classify, &one.Action, &one.Ip, &one.UserName)
 		listlog.LogList = append(listlog.LogList, one)
 	}
-	listlog.Page = alllog.Page
-	listlog.Count = alllog.Count
+
 	send, _ := json.Marshal(listlog)
 	w.Write(send)
 	return
@@ -92,9 +92,10 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	start, end := xmux.GetLimit(count, sl.Page, sl.Limit)
+	page, start, end := xmux.GetLimit(count, sl.Page, sl.Limit)
 	alllog := &log.Loglist{
 		Count: count,
+		Page:  page,
 	}
 
 	dsql := "select id,exectime,classify,action,ip,username from log order by id desc limit ?,?"

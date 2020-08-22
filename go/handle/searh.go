@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"database/sql"
 	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/bug"
@@ -21,7 +20,8 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetData(r).Get("uid").(int64)
 	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
 	al := &model.AllArticleList{
-		Al: make([]*model.ArticleList, 0),
+		Al:   make([]*model.ArticleList, 0),
+		Page: 1,
 	}
 	statislist, err := model.GetMyStatusList(uid)
 	if err != nil {
@@ -42,7 +42,8 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
+	page, start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
+	al.Page = page
 	searchArgs := make([]interface{}, 0)
 	searchArgs = append(searchArgs, (gomysql.InArgs)(statislist).ToInArgs())
 	searchArgs = append(searchArgs, args...)
@@ -105,7 +106,8 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetData(r).Get("uid").(int64)
 	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
 	al := &model.AllArticleList{
-		Al: make([]*model.ArticleList, 0),
+		Al:   make([]*model.ArticleList, 0),
+		Page: 1,
 	}
 	statislist, err := model.GetMyStatusList(uid)
 	if err != nil {
@@ -126,7 +128,8 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
+	page, start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
+	al.Page = page
 	searchArgs := make([]interface{}, 0)
 	searchArgs = append(searchArgs, uid, (gomysql.InArgs)(statislist).ToInArgs())
 	searchArgs = append(searchArgs, args...)
@@ -231,8 +234,8 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 		w.Write(al.Marshal())
 		return
 	}
-	start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
-
+	page, start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
+	al.Page = page
 	// searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs join  on dustbin=true and uid=? "
 	searchsql := `select b.id,b.createtime,i.name,s.name,title,l.name,p.name,e.name,spusers,u.realname from bugs as b
 	join importants as i
@@ -311,7 +314,8 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
+	page, start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
+	al.Page = page
 	args = append(args, start, end)
 	// searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs join  on dustbin=true and uid=? "
 	searchsql := `select b.id,b.createtime,i.name,s.name,title,l.name,p.name,e.name,spusers,u.realname from bugs as b
@@ -405,18 +409,6 @@ func managertotal(basesql string, params *bug.BugManager) (string, []interface{}
 	}
 
 	return basesql, args
-}
-
-func managersearch(basesql string, count int, params *bug.BugManager) (*sql.Rows, error) {
-	searchsql, args := managertotal(basesql, params)
-
-	start, end := xmux.GetLimit(count, params.Page, params.Limit)
-
-	args = append(args, start)
-	args = append(args, end)
-	searchsql = searchsql + " order by id desc limit ?,? "
-
-	return db.Mconn.GetRows(searchsql, args...)
 }
 
 func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool) (*model.AllArticleList, []byte) {

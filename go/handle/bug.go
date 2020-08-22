@@ -258,7 +258,8 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 	golog.Infof("%+v", *mybug)
 	// mybug.GetUsefulCondition(uid)
 	al := &model.AllArticleList{
-		Al: make([]*model.ArticleList, 0),
+		Al:   make([]*model.ArticleList, 0),
+		Page: 1,
 	}
 	countsql := "select count(id) from bugs where dustbin=true and uid=? and sid in (select id from status where name in (?))"
 	err := db.Mconn.GetOneIn(countsql, uid, (gomysql.InArgs)(mybug.ShowsStatus).ToInArgs()).Scan(&al.Count)
@@ -267,7 +268,8 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 		w.Write(al.ErrorE(err))
 		return
 	}
-	start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
+	page, start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
+	al.Page = page
 	// searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs join  on dustbin=true and uid=? "
 	searchsql := `select b.id,b.createtime,i.name,s.name,title,l.name,p.name,e.name,spusers,u.realname from bugs as b
 	join importants as i

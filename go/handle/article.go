@@ -303,6 +303,7 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 	sl := &bug.RespShowBug{
 		Comments: make([]*comment.Informations, 0),
 	}
+	golog.Info(bid)
 	err := db.Mconn.GetOne(`select b.id,b.content,i.name, l.name, e.name, b.title,p.name from bugs as b 
 	join importants as i 
 	join version as v 
@@ -310,11 +311,17 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 	join environment as e 
 	join project as p 
 	join user as u 
-	join statusgroup as s 
-	on b.id=1 
-	and b.uid=u.id and i.id=b.iid and b.sid=s.id and b.vid=v.id and b.lid=l.id and b.eid=e.id and b.pid=p.id`).Scan(
-		&sl.Id, &sl.Content, &sl.Important, &sl.Level,
+	join status as s 
+	on b.id=? 
+	and b.uid=u.id and i.id=b.iid and b.sid=s.id and b.vid=v.id and b.lid=l.id and b.eid=e.id and b.pid=p.id`, bid).Scan(
+		&sl.Id, &sl.Content, &sl.Important, &sl.Level, &sl.Envname, &sl.Title, &sl.Projectname,
 	)
+	if err != nil {
+		golog.Error(err)
+		w.Write(sl.ErrorE(err))
+		return
+	}
+	golog.Infof("%+v", sl)
 
 	err = model.NewInformationsByBid(bid, sl.Comments)
 	if err != nil {
