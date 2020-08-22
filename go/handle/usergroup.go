@@ -229,28 +229,27 @@ func UserGroupGet(w http.ResponseWriter, r *http.Request) {
 }
 
 func GroupAdd(w http.ResponseWriter, r *http.Request) {
-	golog.Info("add..................")
 	errorcode := &response.Response{}
 	uid := xmux.GetData(r).Get("uid").(int64)
 	data := xmux.GetData(r).Data.(*usergroup.RespUserGroup)
-
+	rows, err := db.Mconn.GetRowsIn("select id from usergroup where name in (?)", gomysql.InArgs(data.Users).ToInArgs())
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
 	ids := make([]string, 0)
-	// for _, v := range data.Users {
-	// 	var uid int64
-	// 	var ok bool
-	// 	if uid, ok = cache.CacheRealNameUid[v]; !ok {
-	// 		w.Write(errorcode.Errorf("没有此用户"))
-	// 		return
-	// 	}
-	// 	ids = append(ids, strconv.FormatInt(uid, 10))
-	// }
-	// if _, ok := cache.CacheUserGroupUGid[data.Name]; ok {
-	// 	errorcode.Code = 1
-	// 	w.Write(errorcode.Errorf("%s 重复", data.Name))
-	// 	return
-	// }
+	id := new(string)
+	for rows.Next() {
+		err = rows.Scan(id)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		ids = append(ids, *id)
+	}
+
 	gsql := "insert usergroup(name,ids,uid) values(?,?,?)"
-	var err error
 	errorcode.Id, err = db.Mconn.Insert(gsql, data.Name, strings.Join(ids, ","), uid)
 	if err != nil {
 		golog.Error(err)
@@ -258,17 +257,7 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ug := &cache.UG{}
-	ug.Ugid = errorcode.Id
-	ug.Name = data.Name
-	ug.Uids = strings.Join(ids, ",")
-
-	// if ug, ok := cache.CacheUGidUserGroup[errorcode.Id]; ok {
-	// 	delete(cache.CacheUserGroupUGid, ug.Name)
-	// }
-
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
+	w.Write(errorcode.Success())
 	return
 
 }

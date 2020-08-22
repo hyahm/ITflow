@@ -2,7 +2,6 @@ package project
 
 import (
 	"errors"
-	"itflow/cache"
 	"itflow/internal/response"
 	"itflow/model"
 
@@ -10,9 +9,9 @@ import (
 )
 
 type ReqProject struct {
-	Id          cache.ProjectId `json:"id"`
-	ProjectName cache.Project   `json:"projectname"`
-	GroupName   string          `json:"groupname"`
+	Id          int64  `json:"id"`
+	ProjectName string `json:"projectname"`
+	GroupName   string `json:"groupname"`
 }
 
 var ProjectNameIsEmpty = errors.New("Project name is empty")
@@ -47,6 +46,6 @@ func (rp *ReqProject) Add(userid int64) ([]byte, error) {
 		golog.Error(err)
 		return resp.ErrorE(err), err
 	}
-	resp.Id = project.Id.ToInt64()
+	resp.Id = project.Id
 	return resp.Success(), nil
 }

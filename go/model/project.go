@@ -4,20 +4,34 @@ import (
 	"errors"
 	"itflow/cache"
 	"itflow/db"
+	"strings"
 
 	"github.com/hyahm/golog"
 )
 
 type Project struct {
-	Id   cache.ProjectId
-	Name cache.Project
+	Id   int64
+	Name string
 	Gid  int64
 	Uid  int64
 }
 
 func (p *Project) Insert(groupname string) error {
-	pid, err := db.Mconn.Insert("insert into project(name,ugid,uid) values(?,(select ifnull(min(id),0) from usergroup where name=?),?)", p.Name, groupname, p.Uid)
-	p.Id = cache.ProjectId(pid)
+	rows, err := db.Mconn.GetRows("select id from usergroup where name=?")
+	if err != nil {
+		return err
+	}
+	ids := make([]string, 0)
+	for rows.Next() {
+		var id string
+		err = rows.Scan(&id)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		ids = append(ids, id)
+	}
+	p.Id, err = db.Mconn.Insert("insert into project(name,ugid,uid) values(?,?,?)", p.Name, strings.Join(ids, ","), p.Uid)
 	return err
 }
 

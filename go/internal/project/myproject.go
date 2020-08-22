@@ -57,7 +57,7 @@ func (mp *MyProject) Get(uid int64) []byte {
 				continue
 			}
 			if uid64 == uid {
-				mp.Name = append(mp.Name, p.Name.ToString())
+				mp.Name = append(mp.Name, p.Name)
 				break
 			}
 
