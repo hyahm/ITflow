@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"database/sql"
 	"encoding/json"
 	"itflow/cache"
 	"itflow/db"
@@ -95,21 +96,33 @@ func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 		StatusList: make([]string, 0),
 	}
 	uid := xmux.GetData(r).Get("uid").(int64)
+	var err error
+	var rows *sql.Rows
+	if uid == cache.SUPERID {
+		rows, err = db.Mconn.GetRows(`select name from status`)
+		if err != nil {
+			golog.Error(err)
+			w.Write(sl.ErrorE(err))
+			return
+		}
 
-	var sids string
-	err := db.Mconn.GetOne("select sids from statusgroup where id=ifnull((select bugsid from user where id=?),0)", uid).Scan(&sids)
-	if err != nil {
-		golog.Error(err)
-		w.Write(sl.ErrorE(err))
-		return
-	}
+	} else {
+		var sids string
+		err := db.Mconn.GetOne("select sids from statusgroup where id=ifnull((select bugsid from user where id=?),0)", uid).Scan(&sids)
+		if err != nil {
+			golog.Error(err)
+			w.Write(sl.ErrorE(err))
+			return
+		}
 
-	rows, err := db.Mconn.GetRowsIn(`select name from status where id in (?)`,
-		gomysql.InArgs(strings.Split(sids, ",")).ToInArgs())
-	if err != nil {
-		golog.Error(err)
-		w.Write(sl.ErrorE(err))
-		return
+		rows, err = db.Mconn.GetRowsIn(`select name from status where id in (?)`,
+			gomysql.InArgs(strings.Split(sids, ",")).ToInArgs())
+		if err != nil {
+			golog.Error(err)
+			w.Write(sl.ErrorE(err))
+			return
+		}
+
 	}
 	statusname := new(string)
 	for rows.Next() {
@@ -120,7 +133,6 @@ func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 		}
 		sl.StatusList = append(sl.StatusList, *statusname)
 	}
-
 	w.Write(sl.Marshal())
 	return
 
