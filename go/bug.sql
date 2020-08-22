@@ -351,9 +351,8 @@ CREATE TABLE `log` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `exectime` bigint(20) DEFAULT '0',
   `classify` varchar(30) NOT NULL DEFAULT '',
-  `content` text,
   `ip` varchar(40) DEFAULT '',
-  `username` varchar(50) DEFAULT '',
+  `uid` bigint(20) DEFAULT '0',
   `action` varchar(50) DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1499 DEFAULT CHARSET=utf8;

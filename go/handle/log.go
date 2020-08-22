@@ -3,7 +3,7 @@ package handle
 import (
 	"encoding/json"
 	"fmt"
-	"itflow/cache"
+	"itflow/classify"
 	"itflow/db"
 	"itflow/internal/log"
 	"itflow/internal/response"
@@ -24,7 +24,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 	if alllog.Classify != "" {
 		//判断是否在类别数组中
 		var realclassify bool
-		for _, v := range cache.CLASSIFY {
+		for _, v := range classify.CLASSIFY {
 			if v == alllog.Classify {
 				realclassify = true
 				break
@@ -84,7 +84,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 
 func LogClassify(w http.ResponseWriter, r *http.Request) {
 
-	send, _ := json.Marshal(cache.CLASSIFY)
+	send, _ := json.Marshal(classify.CLASSIFY)
 	w.Write(send)
 	return
 

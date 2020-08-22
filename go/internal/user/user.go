@@ -3,10 +3,10 @@ package user
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"itflow/cache"
 	"itflow/db"
 	"itflow/encrypt"
-	"itflow/internal/response"
 	"strings"
 	"time"
 
@@ -21,39 +21,32 @@ type Login struct {
 	Password string `json:"password"  type:"string" need:"是" default:"" information:"密码"`
 }
 
-func (login *Login) Check(resp *RespLogin) []byte {
+func (login *Login) Check() (*RespLogin, error) {
+	resp := &RespLogin{}
 	login.Username = strings.Trim(login.Username, " ")
-	errorcode := &response.Response{}
 	enpassword := encrypt.PwdEncrypt(login.Password, cache.Salt)
-	golog.Info(enpassword)
 	getsql := "select id,nickname from user where email=? and password=? and disable=0"
-	var id int64
-	err := db.Mconn.GetOne(getsql, login.Username, enpassword).Scan(&id, &login.Username)
-
+	err := db.Mconn.GetOne(getsql, login.Username, enpassword).Scan(&resp.ID, &resp.UserName)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return errorcode.LoginFailed()
+			return resp, errors.New("账号或密码错误")
 		}
 		golog.Error(err)
-		return errorcode.ConnectMysqlFail()
+		return resp, err
 	}
-	golog.Info(id)
-	resp.Token = encrypt.Token(login.Username, cache.Salt)
+	// 这里登录信息插入缓存表
+	resp.Token = encrypt.Token(resp.UserName, cache.Salt)
 	token := &db.Token{
 		Token:    resp.Token,
 		NickName: login.Username,
-		Id:       id,
+		Id:       resp.ID,
 	}
-	golog.Info(token)
-	// err = db.Table.Add(token, time.Second*20)
-	err = db.Table.Add(token, time.Duration(goconfig.ReadInt("expiration", 120))*time.Minute)
+	err = db.Table.Add(token, goconfig.ReadDuration("expiration", time.Minute*120))
 	if err != nil {
 		golog.Error(err)
-		return []byte(err.Error())
+		return resp, err
 	}
-	golog.Infof("login seccuss, user: %s, token: %s", login.Username, resp.Token)
-	resp.UserName = login.Username
-	return nil
+	return resp, nil
 }
 
 type User struct {

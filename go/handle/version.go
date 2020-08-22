@@ -2,9 +2,7 @@ package handle
 
 import (
 	"encoding/json"
-	"fmt"
 	"itflow/db"
-	"itflow/internal/datalog"
 	"itflow/internal/response"
 	"itflow/internal/version"
 	"net/http"
@@ -20,7 +18,6 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 
 	version_add := xmux.GetData(r).Data.(*version.RespVersion)
 
-	nickname := xmux.GetData(r).Get("nickname").(string)
 	uid := xmux.GetData(r).Get("uid").(int64)
 	add_version_sql := "insert into version(pid,name,urlone,urltwo,createtime,createuid) values((select id from project where name=?),?,?,?,?,?)"
 	var err error
@@ -32,12 +29,7 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	// 增加日志
-	go datalog.InsertLog("version",
-		fmt.Sprintf("add version id: %s", version_add.Name),
-		r.RemoteAddr, nickname, "add")
 
-	// 增加缓存
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return

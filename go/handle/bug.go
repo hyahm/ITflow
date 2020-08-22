@@ -173,13 +173,7 @@ func UpdateRoles(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	err = insertlog("updaterole", nickname+"修改了角色权限", r)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+
 	w.Write(errorcode.Success())
 	return
 

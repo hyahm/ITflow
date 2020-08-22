@@ -1,8 +1,9 @@
 package handle
 
 import (
-	"encoding/json"
+	"itflow/classify"
 	"itflow/internal/user"
+	"itflow/model"
 	"net/http"
 
 	"github.com/hyahm/golog"
@@ -13,18 +14,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	login := xmux.GetData(r).Data.(*user.Login)
 
-	resp := &user.RespLogin{}
-	errresp := login.Check(resp)
-	if errresp != nil {
-		golog.Error(string(errresp))
-		w.Write(errresp)
+	resp, err := login.Check()
+	if err != nil {
+		golog.Error(err)
+		w.Write(resp.ErrorE(err))
 		return
 	}
-
-	send, _ := json.Marshal(resp)
-
-	golog.Info("login success")
-	w.Write(send)
+	go model.InsertLog(classify.Login, r.RemoteAddr, "用户登录", resp.ID)
+	w.Write(resp.Marshal())
 	return
 
 }

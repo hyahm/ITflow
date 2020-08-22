@@ -3,8 +3,8 @@ package handle
 import (
 	"errors"
 	"itflow/cache"
+	"itflow/classify"
 	"itflow/db"
-	"net/http"
 	"strings"
 	"time"
 )
@@ -26,9 +26,9 @@ func sortpermlist(permlist []string) []string {
 }
 
 // 插入到log表中
-func insertlog(classify string, content string, r *http.Request) error {
+func InsertLog(classify classify.Classify, content string, ipaddr string) error {
 	logsql := "insert into log(exectime,classify,content,ip) values(?,?,?,?)"
-	ip := strings.Split(r.RemoteAddr, ":")[0]
+	ip := strings.Split(ipaddr, ":")[0]
 	if ip != "127.0.0.1" {
 		_, err := db.Mconn.Insert(logsql, time.Now().Unix(), classify, content, ip)
 		if err != nil {
