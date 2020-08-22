@@ -25,8 +25,14 @@ func init() {
 	Bug.Post("/bug/create", handle.BugCreate).Bind(&bug.EditBug{}).
 		AddMidware(midware.JsonToStruct).
 		ApiDescribe("创建或更新bug").
-		ApiRequestTemplate(`{"title":"metu","content":"<p>反反复复</p>","id":1,"selectuser":["sdfsadf"],"projectname":"123","level":"2","envname":"axi","important":"一般ee","version":"V 1.5"}`).
-		ApiResponseTemplate(`{"id": 20, "code": 0, "msg": "success"}`)
+		ApiRequestTemplate(`{"title":"metu",
+		"content":"<p>反反复复</p>",
+		"id":-1,
+		"selectuser":["sdfsadf"],
+		"projectname":"123",
+		"level":"2","
+		envname":"axi","important":"一般ee","version":"V 1.5"}`).
+		ApiResponseTemplate(`{"id": 20, "code": 0, "message": "success"}`)
 
 	Bug.Get("/bug/edit", handle.BugEdit).
 		ApiDescribe("页面编辑获取数据").
@@ -39,7 +45,7 @@ func init() {
 		AddMidware(midware.JsonToStruct)
 
 	Bug.Post("/status/filter", handle.ChangeFilterStatus).Bind(&status.Status{}).
-		AddMidware(midware.JsonToStruct).ApiDescribe("修改保存显示的状态")
+		AddMidware(midware.JsonToStruct)
 
 	Bug.Get("/bug/show", handle.BugShow).
 		ApiDescribe("获取此bug信息").ApiReqParams("id", "6").ApiResponseTemplate(`{
