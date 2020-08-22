@@ -47,7 +47,7 @@ func BugById(id interface{}) []byte {
 	reb := &EditBug{}
 
 	alsql := `select i.name,title,
-	l.name,p.name,eid,spusers,vid,content 
+	l.name,p.name,e.name,spusers,v.name,content 
 	from bugs as b 
 	join importants as i 
 	join level as l 
