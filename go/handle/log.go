@@ -39,12 +39,12 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		w.Write(listlog.ErrorE(err))
 		return
 	}
-	if alllog.Count == 0 {
+	if listlog.Count == 0 {
 		golog.Error("no rows")
 		w.Write(listlog.NoRows())
 		return
 	}
-	page, start, end := xmux.GetLimit(alllog.Count, alllog.Page, alllog.Limit)
+	page, start, end := xmux.GetLimit(listlog.Count, alllog.Page, alllog.Limit)
 	listlog.Page = page
 	args = append(args, start, end)
 	basesql := "select l.id,exectime,classify,action,ip,u.realname from log as l join user as u on l.uid=u.id "
