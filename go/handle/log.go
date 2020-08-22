@@ -2,7 +2,6 @@ package handle
 
 import (
 	"encoding/json"
-	"fmt"
 	"itflow/classify"
 	"itflow/db"
 	"itflow/internal/log"
@@ -17,39 +16,24 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 
 	alllog := xmux.GetData(r).Data.(*log.Search_log)
 	listlog := &log.Loglist{}
+	args := make([]interface{}, 0)
 
-	basesql := "select id,exectime,classify,action,ip,username from log "
-	endsql := ""
+	condition := ""
 	// 如果搜索了类别
 	if alllog.Classify != "" {
 		//判断是否在类别数组中
-		var realclassify bool
-		for _, v := range classify.CLASSIFY {
-			if v == alllog.Classify {
-				realclassify = true
-				break
-			}
-		}
-		if !realclassify {
-			golog.Debug("没有找到key")
-
-			w.Write(listlog.Error("没有找到key"))
-			return
-		}
-		endsql = fmt.Sprintf("where classify='%v' ", alllog.Classify)
+		condition = " and classify=? "
+		args = append(args, alllog.Classify)
 	}
 	// 如果有时间选择，并且不为0
 	if alllog.StartTime != 0 {
-		if len(endsql) == 0 {
-			endsql = fmt.Sprintf("where exectime between %d and %d ", alllog.StartTime, alllog.EndTime)
-		} else {
-			endsql += fmt.Sprintf(" and exectime between %d and %d ", alllog.StartTime, alllog.EndTime)
-		}
+		condition += " and exectime between ? and ? "
+		args = append(args, alllog.StartTime, alllog.EndTime)
 	}
 
 	//获取总行数
-	countsql := "select count(id) from log " + endsql
-	err := db.Mconn.GetOne(countsql).Scan(&alllog.Count)
+	countsql := "select count(id) from log where 1=1" + condition
+	err := db.Mconn.GetOne(countsql, args...).Scan(&alllog.Count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(listlog.ErrorE(err))
@@ -61,7 +45,9 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	start, end := xmux.GetLimit(alllog.Count, alllog.Page, alllog.Limit)
-	rows, err := db.Mconn.GetRows(basesql+endsql+" order by id desc limit ?,?", start, end)
+	args = append(args, start, end)
+	basesql := "select l.id,exectime,classify,action,ip,u.realname from log as l join user as u on l.uid=u.id "
+	rows, err := db.Mconn.GetRows(basesql+condition+" order by id desc limit ?,?", args...)
 	if err != nil {
 		golog.Error(err)
 		w.Write(listlog.ErrorE(err))

@@ -3,6 +3,7 @@ package model
 import (
 	"itflow/classify"
 	"itflow/db"
+	"strings"
 	"time"
 
 	"github.com/hyahm/golog"
@@ -26,7 +27,8 @@ type Log struct {
 // `action` varchar(50) DEFAULT '',
 
 func InsertLog(classify classify.Classify, ip, action string, uid int64) {
-	_, err := db.Mconn.Insert("insert into log(exectime,classify,ip, uid,action) values(?,?,?,?,?,?)",
+	ip = strings.Split(ip, ":")[0]
+	_, err := db.Mconn.Insert("insert into log(exectime,classify,ip, uid,action) values(?,?,?,?,?)",
 		time.Now().Unix(), classify, ip, uid, action,
 	)
 	if err != nil {
