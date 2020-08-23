@@ -50,6 +50,10 @@ const actions = {
     })
   },
 
+  setHeadImage({ commit, state }) {
+    commit('SET_AVATAR', state.avatar)
+  },
+
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {

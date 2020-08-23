@@ -15,13 +15,14 @@
       @crop-upload-success="cropUploadSuccess"
       @crop-upload-fail="cropUploadFail"
     />
-    <img :src="imgDataUrl">
+    <img :src="avatar">
   </div>
 </template>
 
 <script>
 import myUpload from 'vue-image-crop-upload'
 import { getToken } from '@/utils/auth'
+// import { mapState, mapGetters } from 'vuex'
 export default {
   name: 'HeadImg',
   components: {
@@ -39,8 +40,18 @@ export default {
       headers: {
         smail: '*_~',
         'X-Token': getToken()
+      }
+      // avatar: ''
+    }
+  },
+  computed: {
+    avatar: {
+      get() {
+        return this.$store.state.user.avatar
       },
-      imgDataUrl: ''
+      set(val) {
+        this.$store.commit('user/SET_AVATAR', val)
+      }
     }
   },
   created() {
@@ -57,8 +68,11 @@ export default {
       this.imgname = (new Date()).valueOf().toString()
     },
     cropSuccess(imgDataUrl, field) {
-      this.imgDataUrl = imgDataUrl
-      console.log('cropSuccess')
+
+      // console.log("imgDataUrl")
+      // console.log(imgDataUrl)
+      // this.imgDataUrl = imgDataUrl
+      // console.log('cropSuccess')
     },
     /**
      * upload success
@@ -67,13 +81,13 @@ export default {
      * [param] field
      */
     cropUploadSuccess(jsonData, field) {
-      console.log('cropUploadSuccess')
-      // this.$store.dispatch('ChangeHeadImg', jsonData.url).then(() => {
-      //   this.loading = false
-      //   // this.$router.push({ path: this.redirect || '/' })
-      // }).catch(() => {
-      //   this.loading = false
-      // })
+      this.avatar = jsonData.url
+      this.$store.dispatch('user/setHeadImage', jsonData.url).then(() => {
+        this.loading = false
+        // this.$router.push({ path: this.redirect || '/' })
+      }).catch(() => {
+        this.loading = false
+      })
     },
     /**
      * upload fail
