@@ -46,7 +46,7 @@ func LoadConfig() {
 	if err != nil {
 		panic(err)
 	}
-	ShowBaseUrl = goconfig.ReadString("showbaseurl", " http://127.0.0.1:10001/showimg")
+	ShowBaseUrl = goconfig.ReadWithEndSlash("showbaseurl", " http://127.0.0.1:10001/showimg")
 	Salt = goconfig.ReadString("salt", "hjkkaksjdhfryuooweqzmbvc")
 	ShareDir = goconfig.ReadString("sharedir", "/share/")
 	// 创建共享文件夹

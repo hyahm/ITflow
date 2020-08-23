@@ -221,13 +221,7 @@ func UploadImgs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	l := len(cache.ShowBaseUrl)
-	url := ""
-	if cache.ShowBaseUrl[l-1:l] == "/" {
-		url = cache.ShowBaseUrl + filename
-	} else {
-		url = cache.ShowBaseUrl + "/" + filename
-	}
+	url := cache.ShowBaseUrl + filename
 
 	sendurl := &uploadImage{
 		HasSuccess: true,
@@ -273,25 +267,20 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	ul := len(cache.ShowBaseUrl)
-	if cache.ShowBaseUrl[ul-1:ul] == "/" {
-		url.Url = cache.ShowBaseUrl + filename
-	} else {
-		url.Url = cache.ShowBaseUrl + "/" + filename
-	}
+	url.Url = cache.ShowBaseUrl + filename
 
 	url.FileName = filename
 	url.Uploaded = 1
-	uploadimg := "update user set headimg = ? where nickname=?"
-	nickname := xmux.GetData(r).Get("nickname").(string)
-	_, err = db.Mconn.Update(uploadimg, url.Url, nickname)
+	uploadimg := "update user set headimg = ? where id=?"
+	uid := xmux.GetData(r).Get("uid").(int64)
+	golog.Info(uid)
+	_, err = db.Mconn.Update(uploadimg, url.Url, uid)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	s, _ := json.Marshal(url)
-
 	w.Write(s)
 	return
 
