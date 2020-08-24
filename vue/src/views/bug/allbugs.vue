@@ -18,8 +18,8 @@
           <i class="el-icon-caret-bottom el-icon--right" />
         </el-button>
         <el-dropdown-menu slot="dropdown" class="no-border">
-          <el-checkbox-group v-model="listQuery.status" style="padding-left: 15px;" @change="HandleChange">
-            <el-checkbox v-for="(status, index) in allstatus" :key="index" :label="status">
+          <el-checkbox-group v-model="checkstatus" style="padding-left: 15px;" @change="HandleChange">
+            <el-checkbox v-for="(status, index) in platformsOptions" :key="index" :label="status">
               {{ status }}
             </el-checkbox>
           </el-checkbox-group>
@@ -124,9 +124,9 @@
 
 <script>
 import { changeStatus } from '@/api/bugs'
-import { statusFilter, showStatus } from '@/api/status'
+import { statusFilter } from '@/api/status'
 import { searchAllBugs } from '@/api/search'
-import { getProject, getPermStatus, getStatus, getLevels } from '@/api/get'
+import { getProject, getShowStatus, getStatus, getLevels } from '@/api/get'
 import waves from '@/directive/waves' // 水波纹指令
 import { parseTime } from '@/utils'
 
@@ -182,6 +182,7 @@ export default {
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
       // statusOptions: ['待领取', '待测试'],
       showReviewer: false,
+      platformsOptions: [],
       temp: {
         id: undefined,
         // importance: 1,
@@ -250,21 +251,15 @@ export default {
       })
     },
     HandleChange() {
-      console.log(this.listQuery.status)
       const data = {
         checkstatus: this.checkstatus
       }
+      this.statuslength = this.checkstatus.length
       statusFilter(data).then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
+          this.statuslength = this.checkstatus.length
           this.listLoading = true
-          searchAllBugs(this.listQuery).then(resp => {
-            if (resp.data.code === 0) {
-              this.list = resp.data.articlelist
-              this.total = resp.data.total
-              this.listQuery.page = resp.data.page
-            }
-          })
+          this.handleFilter()
           this.listLoading = false
         } else {
           this.$message.error(resp.data.msg)
@@ -372,16 +367,12 @@ export default {
     },
     getmystatus() {
       // 允许改变的状态
-      getPermStatus().then(resp => {
+      getShowStatus().then(resp => {
         if (resp.data.code === 0) {
-          // this.checkstatus = resp.data.statuslist
-        }
-      })
-      // 过滤的状态
-      showStatus().then(resp => {
-        if (resp.data.code === 0) {
-          this.checkstatus = resp.data.checkstatus
-          this.statuslength = this.checkstatus.length
+          if (resp.data.checkstatus !== null) {
+            this.checkstatus = resp.data.checkstatus
+            this.statuslength = this.checkstatus.length
+          }
         } else {
           this.$message.error(resp.data.msg)
         }
@@ -389,9 +380,8 @@ export default {
     },
     getstatus() {
       getStatus().then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
-          this.allstatus = resp.data.statuslist
+          this.platformsOptions = resp.data.statuslist
         } else {
           this.$message.error(resp.data.msg)
         }

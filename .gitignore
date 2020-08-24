@@ -1,6 +1,6 @@
 go/bin
 go/bug.ini
-go/.token.db
+go/*.db
 go/.idea
 vue/.DS_Store
 vue/node_modules/

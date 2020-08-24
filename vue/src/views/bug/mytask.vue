@@ -285,14 +285,6 @@ export default {
           this.statuslength = this.checkstatus.length
           this.listLoading = true
           this.handleFilter()
-          // searchMyTasks(this.listQuery).then(respfilter => {
-          //   console.log(respfilter)
-          //   if (respfilter.data.code === 0) {
-          //     this.list = respfilter.data.articlelist
-          //     this.total = respfilter.data.total
-          //     this.listQuery.page = respfilter.data.page
-          //   }
-          // })
           this.listLoading = false
         } else {
           this.$message.error(resp.data.msg)
