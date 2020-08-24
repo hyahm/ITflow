@@ -45,7 +45,7 @@ func init() {
 		AddMidware(midware.JsonToStruct)
 
 	Bug.Post("/status/filter", handle.ChangeFilterStatus).Bind(&status.Status{}).
-		AddMidware(midware.JsonToStruct)
+		AddMidware(midware.JsonToStruct).ApiDescribe("修改显示bug的状态")
 
 	Bug.Get("/bug/show", handle.BugShow).
 		ApiDescribe("获取此bug信息").ApiReqParams("id", "6").ApiResponseTemplate(`{

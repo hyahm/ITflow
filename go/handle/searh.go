@@ -18,6 +18,7 @@ import (
 func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 
 	uid := xmux.GetData(r).Get("uid").(int64)
+	uidStr := strconv.FormatInt(uid, 10)
 	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
 	al := &model.AllArticleList{
 		Al:   make([]*model.ArticleList, 0),
@@ -29,12 +30,37 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 		w.Write(al.ErrorE(err))
 		return
 	}
+	// 找出所有跟自己有关的项目， 列出所有项目的bug
+	prows, err := db.Mconn.GetRows("select p.id, u.ids from project as p join usergroup as u on p.ugid=u.id;")
+	if err != nil {
+		golog.Error(err)
+		w.Write(al.ErrorE(err))
+		return
+	}
 
+	myproject := make([]string, 0)
+	for prows.Next() {
+		var pid string
+		var uids string
+		err = prows.Scan(&pid, &uids)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		for _, v := range strings.Split(uids, ",") {
+			if uidStr == v {
+				myproject = append(myproject, pid)
+				break
+			}
+		}
+	}
+	golog.Info(myproject)
 	conditionsql, args := mybug.GetUsefulCondition(uid)
 	countArgs := make([]interface{}, 0)
 	countArgs = append(countArgs, (gomysql.InArgs)(statislist).ToInArgs())
+	countArgs = append(countArgs, (gomysql.InArgs)(myproject).ToInArgs())
 	countArgs = append(countArgs, args...)
-	countsql := "select count(id) from bugs where dustbin=false and sid in (?)"
+	countsql := "select count(id) from bugs where dustbin=false and sid in (?) and pid in (?)"
 	err = db.Mconn.GetOneIn(countsql+conditionsql, countArgs...).Scan(&al.Count)
 	if err != nil {
 		golog.Error(err)
@@ -46,6 +72,7 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 	al.Page = page
 	searchArgs := make([]interface{}, 0)
 	searchArgs = append(searchArgs, (gomysql.InArgs)(statislist).ToInArgs())
+	searchArgs = append(searchArgs, (gomysql.InArgs)(myproject).ToInArgs())
 	searchArgs = append(searchArgs, args...)
 	searchArgs = append(searchArgs, start, end)
 	// searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs join  on dustbin=true and uid=? "
@@ -56,7 +83,7 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 	join project as p
 	join environment as e
 	join user as u
-	on dustbin=false and b.iid = i.id and b.sid = s.id and b.lid = l.id and b.pid=p.id and b.eid = e.id and b.uid=u.id and sid in (?)`
+	on dustbin=false and b.iid = i.id and b.sid = s.id and b.lid = l.id and b.pid=p.id and b.eid = e.id and b.uid=u.id and sid in (?) and pid in (?)`
 	rows, err := db.Mconn.GetRowsIn(searchsql+conditionsql+" limit ?,?", searchArgs...)
 
 	if err != nil {
