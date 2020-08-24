@@ -1,184 +1,171 @@
 package search
 
-import (
-	"database/sql"
-	"encoding/json"
-	"fmt"
-	"itflow/db"
-	"itflow/model"
-	"strconv"
-	"strings"
+// type BugList struct {
+// 	CountSql string
+// 	ListSql  string
+// 	Page     int
+// 	Uid      int64
+// 	Limit    int
+// 	Count    int
+// }
 
-	"github.com/hyahm/golog"
-	"github.com/hyahm/xmux"
-)
+// func (pl *BugList) rows() (*sql.Rows, error) {
+// 	err := db.Mconn.GetOne(pl.CountSql).Scan(&pl.Count)
+// 	if err != nil {
+// 		golog.Error(err)
+// 		return nil, err
+// 	}
+// 	// 增加显示的状态
+// 	start, end := xmux.GetLimit(pl.Count, pl.Page, pl.Limit)
+// 	pl.ListSql += " order by id desc limit ?,? "
+// 	var rows *sql.Rows
+// 	rows, err = db.Mconn.GetRows(pl.ListSql, start, end)
 
-type BugList struct {
-	CountSql string
-	ListSql  string
-	Page     int
-	Uid      int64
-	Limit    int
-	Count    int
-}
+// 	if err != nil {
+// 		golog.Error(err)
+// 		return nil, err
+// 	}
+// 	return rows, nil
+// }
 
-func (pl *BugList) rows() (*sql.Rows, error) {
-	err := db.Mconn.GetOne(pl.CountSql).Scan(&pl.Count)
-	if err != nil {
-		golog.Error(err)
-		return nil, err
-	}
-	// 增加显示的状态
-	start, end := xmux.GetLimit(pl.Count, pl.Page, pl.Limit)
-	pl.ListSql += " order by id desc limit ?,? "
-	var rows *sql.Rows
-	rows, err = db.Mconn.GetRows(pl.ListSql, start, end)
+// func (pl *BugList) GetMyBugs() []byte {
+// 	// 获取所有数据的行
 
-	if err != nil {
-		golog.Error(err)
-		return nil, err
-	}
-	return rows, nil
-}
+// 	al := &model.AllArticleList{
+// 		Al: make([]*model.ArticleList, 0),
+// 	}
+// 	rows, err := pl.rows()
+// 	if err != nil {
+// 		al.Msg = err.Error()
+// 		al.Code = 1
+// 		send, _ := json.Marshal(al)
+// 		return send
+// 	}
+// 	for rows.Next() {
+// 		one := &model.ArticleList{}
 
-func (pl *BugList) GetMyBugs() []byte {
-	// 获取所有数据的行
+// 		var userlist string
+// 		rows.Scan(&one.ID, &one.Date, &one.Importance, &one.Status, &one.Title, &one.Level,
+// 			&one.Projectname, &one.Env, &userlist, &one.Author)
+// 		// 如果不存在这么办， 添加修改的时候需要判断
 
-	al := &model.AllArticleList{
-		Al: make([]*model.ArticleList, 0),
-	}
-	rows, err := pl.rows()
-	if err != nil {
-		al.Msg = err.Error()
-		al.Code = 1
-		send, _ := json.Marshal(al)
-		return send
-	}
-	for rows.Next() {
-		one := &model.ArticleList{}
+// 		rows, err := db.Mconn.GetRows(fmt.Sprintf("select realname from user where id in ('%s')", userlist))
+// 		if err != nil {
+// 			golog.Error(err)
+// 			return al.ErrorE(err)
+// 		}
+// 		for rows.Next() {
+// 			realname := new(string)
+// 			err = rows.Scan(realname)
+// 			if err != nil {
+// 				golog.Error(err)
+// 				continue
+// 			}
+// 			one.Handle = append(one.Handle, *realname)
+// 		}
 
-		var userlist string
-		rows.Scan(&one.ID, &one.Date, &one.Importance, &one.Status, &one.Title, &one.Level,
-			&one.Projectname, &one.Env, &userlist, &one.Author)
-		// 如果不存在这么办， 添加修改的时候需要判断
+// 		al.Al = append(al.Al, one)
 
-		rows, err := db.Mconn.GetRows(fmt.Sprintf("select realname from user where id in ('%s')", userlist))
-		if err != nil {
-			golog.Error(err)
-			return al.ErrorE(err)
-		}
-		for rows.Next() {
-			realname := new(string)
-			err = rows.Scan(realname)
-			if err != nil {
-				golog.Error(err)
-				continue
-			}
-			one.Handle = append(one.Handle, *realname)
-		}
+// 	}
+// 	al.Count = pl.Count
+// 	al.Page = pl.Page
+// 	return al.Marshal()
+// }
 
-		al.Al = append(al.Al, one)
+// func (pl *BugList) myTaskRows() (*sql.Rows, error) {
+// 	var err error
+// 	golog.Info(pl.CountSql)
+// 	countrows, err := db.Mconn.GetRows(pl.CountSql)
+// 	if err != nil {
+// 		golog.Error(err)
+// 		return nil, err
+// 	}
+// 	for countrows.Next() {
+// 		var userlist string
+// 		countrows.Scan(&userlist)
+// 		for _, v := range strings.Split(userlist, ",") {
+// 			//判断用户是否存在，不存在就 删吗 ， 先不删
+// 			userid64, _ := strconv.ParseInt(v, 10, 64)
+// 			if userid64 == pl.Uid {
+// 				pl.Count++
+// 				break
+// 			}
+// 		}
 
-	}
-	al.Count = pl.Count
-	al.Page = pl.Page
-	return al.Marshal()
-}
+// 	}
+// 	// 增加显示的状态
 
-func (pl *BugList) myTaskRows() (*sql.Rows, error) {
-	var err error
-	golog.Info(pl.CountSql)
-	countrows, err := db.Mconn.GetRows(pl.CountSql)
-	if err != nil {
-		golog.Error(err)
-		return nil, err
-	}
-	for countrows.Next() {
-		var userlist string
-		countrows.Scan(&userlist)
-		for _, v := range strings.Split(userlist, ",") {
-			//判断用户是否存在，不存在就 删吗 ， 先不删
-			userid64, _ := strconv.ParseInt(v, 10, 64)
-			if userid64 == pl.Uid {
-				pl.Count++
-				break
-			}
-		}
+// 	pl.ListSql += " order by id desc "
+// 	var rows *sql.Rows
+// 	rows, err = db.Mconn.GetRows(pl.ListSql)
 
-	}
-	// 增加显示的状态
+// 	if err != nil {
+// 		golog.Error(err)
+// 		return nil, err
+// 	}
+// 	return rows, nil
+// }
 
-	pl.ListSql += " order by id desc "
-	var rows *sql.Rows
-	rows, err = db.Mconn.GetRows(pl.ListSql)
+// func (pl *BugList) GetMyTasks() []byte {
 
-	if err != nil {
-		golog.Error(err)
-		return nil, err
-	}
-	return rows, nil
-}
+// 	// 获取所有数据的行
+// 	al := &model.AllArticleList{
+// 		Al: make([]*model.ArticleList, 0),
+// 	}
+// 	rows, err := pl.myTaskRows()
+// 	if err != nil {
+// 		al.Msg = err.Error()
+// 		al.Code = 1
+// 		send, _ := json.Marshal(al)
+// 		return send
+// 	}
+// 	start, end := xmux.GetLimit(pl.Count, pl.Page, pl.Limit)
+// 	var timer int
+// 	for rows.Next() {
+// 		one := &model.ArticleList{}
 
-func (pl *BugList) GetMyTasks() []byte {
+// 		var userlist string
+// 		rows.Scan(&one.ID, &one.Date, &one.Importance, &one.Status, &one.Title, &one.Level, &one.Projectname, &one.Env, &userlist, &one.Author)
 
-	// 获取所有数据的行
-	al := &model.AllArticleList{
-		Al: make([]*model.ArticleList, 0),
-	}
-	rows, err := pl.myTaskRows()
-	if err != nil {
-		al.Msg = err.Error()
-		al.Code = 1
-		send, _ := json.Marshal(al)
-		return send
-	}
-	start, end := xmux.GetLimit(pl.Count, pl.Page, pl.Limit)
-	var timer int
-	for rows.Next() {
-		one := &model.ArticleList{}
+// 		var isMyTask bool
 
-		var userlist string
-		rows.Scan(&one.ID, &one.Date, &one.Importance, &one.Status, &one.Title, &one.Level, &one.Projectname, &one.Env, &userlist, &one.Author)
+// 		for _, v := range strings.Split(userlist, ",") {
+// 			//判断用户是否存在，不存在就 删吗 ，
+// 			userid64, _ := strconv.ParseInt(v, 10, 64)
+// 			if userid64 == pl.Uid {
+// 				isMyTask = true
+// 			}
 
-		var isMyTask bool
+// 		}
 
-		for _, v := range strings.Split(userlist, ",") {
-			//判断用户是否存在，不存在就 删吗 ，
-			userid64, _ := strconv.ParseInt(v, 10, 64)
-			if userid64 == pl.Uid {
-				isMyTask = true
-			}
+// 		// }
+// 		if isMyTask {
+// 			// 超过了后面就不用做了
+// 			if timer >= end {
+// 				break
+// 			}
+// 			if timer >= start && timer < end {
+// 				rows, err := db.Mconn.GetRows(fmt.Sprintf("select realname from user where id in ('%s')", userlist))
+// 				if err != nil {
+// 					golog.Error(err)
+// 					return al.ErrorE(err)
+// 				}
+// 				for rows.Next() {
+// 					realname := new(string)
+// 					err = rows.Scan(realname)
+// 					if err != nil {
+// 						golog.Error(err)
+// 						continue
+// 					}
+// 					one.Handle = append(one.Handle, *realname)
+// 				}
+// 			}
 
-		}
+// 			timer++
+// 		}
 
-		// }
-		if isMyTask {
-			// 超过了后面就不用做了
-			if timer >= end {
-				break
-			}
-			if timer >= start && timer < end {
-				rows, err := db.Mconn.GetRows(fmt.Sprintf("select realname from user where id in ('%s')", userlist))
-				if err != nil {
-					golog.Error(err)
-					return al.ErrorE(err)
-				}
-				for rows.Next() {
-					realname := new(string)
-					err = rows.Scan(realname)
-					if err != nil {
-						golog.Error(err)
-						continue
-					}
-					one.Handle = append(one.Handle, *realname)
-				}
-			}
-
-			timer++
-		}
-
-	}
-	al.Count = pl.Count
-	al.Page = pl.Page
-	return al.Marshal()
-}
+// 	}
+// 	al.Count = pl.Count
+// 	al.Page = pl.Page
+// 	return al.Marshal()
+// }
