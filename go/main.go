@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"itflow/cache"
 	"itflow/db"
 	"itflow/httpserver"
@@ -14,8 +15,12 @@ import (
 )
 
 func main() {
+	conf := "bug.ini"
+	if len(os.Args) > 1 {
+		fmt.Println(os.Args[1])
+	}
 	// 初始化配置文件
-	goconfig.InitConf("bug.ini", goconfig.INI)
+	goconfig.InitConf(conf, goconfig.INI)
 	if goconfig.ReadBool("debug", false) {
 		golog.Level = golog.ALL
 	}

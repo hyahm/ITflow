@@ -1,0 +1,14 @@
+[Unit]
+Description=ITflow bug 管理系统
+After=network.target
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=/bin/file/path
+ExecStart=/bin/file/path /etc/bug.ini
+ExecStop=/bin/kill -s QUIT $MAINPID
+Type=simple
+
+[Install]
+WantedBy=multi-user.target

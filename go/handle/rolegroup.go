@@ -174,7 +174,6 @@ func RoleTemplate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	send, _ := json.Marshal(data)
-	golog.Info(string(send))
 	w.Write(send)
 	return
 
