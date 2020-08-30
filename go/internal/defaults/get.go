@@ -2,16 +2,15 @@ package defaults
 
 import (
 	"encoding/json"
-	"itflow/cache"
 
 	"github.com/hyahm/golog"
 )
 
 type RespDefaultStatus struct {
-	Created   cache.Status `json:"created"`
-	Completed cache.Status `json:"completed"`
-	Code      int          `json:"code"`
-	Msg       string       `json:"msg,omitempty"`
+	Created   string `json:"created"`
+	Completed string `json:"completed"`
+	Code      int    `json:"code"`
+	Msg       string `json:"msg,omitempty"`
 }
 
 func (rds *RespDefaultStatus) Marshal() []byte {

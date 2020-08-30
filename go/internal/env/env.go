@@ -2,7 +2,6 @@ package env
 
 import (
 	"encoding/json"
-	"itflow/cache"
 
 	"github.com/hyahm/golog"
 )
@@ -13,8 +12,8 @@ type Envlist struct {
 	Msg   string `json:"msg"`
 }
 type Env struct {
-	Id      cache.EnvId `json:"id"`
-	EnvName cache.Env   `json:"envname"`
+	Id      int64  `json:"id"`
+	EnvName string `json:"envname"`
 }
 
 func (el *Envlist) Marshal() []byte {

@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/bug"
 	"itflow/internal/search"
@@ -61,7 +60,9 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 	countArgs = append(countArgs, (gomysql.InArgs)(myproject).ToInArgs())
 	countArgs = append(countArgs, args...)
 	countsql := "select count(id) from bugs where dustbin=false and sid in (?) and pid in (?)"
+	db.Mconn.OpenDebug()
 	err = db.Mconn.GetOneIn(countsql+conditionsql, countArgs...).Scan(&al.Count)
+	golog.Info(db.Mconn.GetSql())
 	if err != nil {
 		golog.Error(err)
 		w.Write(al.ErrorE(err))
@@ -410,11 +411,11 @@ func searchParamsSql(params *bug.SearchParam) (string, []interface{}) {
 		args = append(args, params.Level)
 	}
 
-	if params.Project != "" {
-		pid := cache.CacheProjectPid[params.Project]
-		basesql = basesql + " and pid=? "
-		args = append(args, pid)
-	}
+	// if params.Project != "" {
+	// 	pid := cache.CacheProjectPid[params.Project]
+	// 	basesql = basesql + " and pid=? "
+	// 	args = append(args, pid)
+	// }
 	return basesql, args
 }
 

@@ -1,33 +1,29 @@
 package cache
 
-import (
-	"strings"
-)
-
 //
 
-type Namer interface {
-	Id() IDer
-	Trim()
-	ToString() string
-}
+// type Namer interface {
+// 	Id() IDer
+// 	Trim()
+// 	ToString() string
+// }
 
-type IDer interface {
-	ToString() string
-	ToInt64() int64
-	Name() Namer
-}
+// type IDer interface {
+// 	ToString() string
+// 	ToInt64() int64
+// 	Name() Namer
+// }
 
-type DbIds interface {
-}
+// type DbIds interface {
+// }
 
-func ToStore(names []Namer) string {
-	tmp := make([]string, 0)
-	for _, v := range names {
-		tmp = append(tmp, v.Id().ToString())
-	}
-	return strings.Join(tmp, ",")
-}
+// func ToStore(names []Namer) string {
+// 	tmp := make([]string, 0)
+// 	for _, v := range names {
+// 		tmp = append(tmp, v.Id().ToString())
+// 	}
+// 	return strings.Join(tmp, ",")
+// }
 
 // func ToShow(s string) []string {
 // 	sl := make([]string, 0)

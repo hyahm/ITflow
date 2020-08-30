@@ -26,9 +26,9 @@ func GetProject(w http.ResponseWriter, r *http.Request) {
 
 	pl := &projectList{}
 
-	for _, v := range cache.CachePidProject {
-		pl.ProjectList = append(pl.ProjectList, v.ToString())
-	}
+	// for _, v := range cache.CachePidProject {
+	// 	pl.ProjectList = append(pl.ProjectList, v.ToString())
+	// }
 	send, _ := json.Marshal(pl)
 	w.Write(send)
 	return

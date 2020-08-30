@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/response"
 	"net/http"
@@ -34,14 +35,13 @@ func DefaultSave(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	sl := xmux.GetData(r).Data.(*defaults.ReqDefaultValue)
-	golog.Info(sl)
-	err := sl.Update()
+	var err error
+	cache.DefaultCreateSid, cache.DefaultCompleteSid, err = sl.Update()
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-
 	w.Write(errorcode.Success())
 	return
 

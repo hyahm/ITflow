@@ -1,13 +1,12 @@
 package model
 
 import (
-	"itflow/cache"
 	"itflow/db"
 )
 
 type Version struct {
 	Id         int64
-	ProjectId  cache.ProjectId
+	ProjectId  int64
 	Name       string
 	Url        string
 	BakUrl     string

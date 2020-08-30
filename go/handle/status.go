@@ -98,9 +98,6 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 	// 更新缓存
 	// 获取status的索引
 
-	delete(cache.CacheStatusSid, cache.CacheSidStatus[cache.StatusId(sid)])
-	delete(cache.CacheSidStatus, cache.StatusId(sid))
-
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return

@@ -2,18 +2,17 @@ package search
 
 import (
 	"errors"
-	"itflow/cache"
 )
 
 var ErrorNoStatus = errors.New("没选择状态，返回空数组")
 
 type ReqMyBugFilter struct {
-	Page        int           `json:"page"`
-	Limit       int           `json:"limit"`
-	Level       cache.Level   `json:"level"`
-	Project     cache.Project `json:"project"`
-	Title       string        `json:"title"`
-	ShowsStatus []string      `json:"showstatus"`
+	Page        int      `json:"page"`
+	Limit       int      `json:"limit"`
+	Level       string   `json:"level"`
+	Project     string   `json:"project"`
+	Title       string   `json:"title"`
+	ShowsStatus []string `json:"showstatus"`
 }
 
 func (rmf *ReqMyBugFilter) GetUsefulCondition(uid int64) (string, []interface{}) {

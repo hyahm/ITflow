@@ -217,16 +217,16 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 
 	param := xmux.GetData(r).Data.(*bug.ChangeStatus)
 
-	sid := param.Status.Id()
-	if sid == 0 {
-		golog.Errorf("找不到status id: %s", param.Status)
-		w.Write(errorcode.Errorf("找不到status id: %s", param.Status))
-		return
-	}
+	// sid := param.Status.Id()
+	// if sid == 0 {
+	// 	golog.Errorf("找不到status id: %s", param.Status)
+	// 	w.Write(errorcode.Errorf("找不到status id: %s", param.Status))
+	// 	return
+	// }
 
-	basesql := "update bugs set sid=?,updatetime=? where id=?"
+	basesql := "update bugs set sid=(select id from status where name=?),updatetime=? where id=?"
 
-	_, err := db.Mconn.Update(basesql, sid, time.Now().Unix(), param.Id)
+	_, err := db.Mconn.Update(basesql, param.Status, time.Now().Unix(), param.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -244,7 +244,6 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	param := xmux.GetData(r).Data.(*status.Status)
-	golog.Info(param.CheckStatus)
 	rows, err := db.Mconn.GetRowsIn("select id from status where name in (?)",
 		(gomysql.InArgs)(param.CheckStatus).ToInArgs())
 	if err != nil {

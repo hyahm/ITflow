@@ -19,7 +19,7 @@ type User struct {
 	CreateTime int64
 	CreateId   int64
 	RealName   string
-	ShowStatus cache.StoreLevelId
+	ShowStatus int64
 	Disable    bool  // 是否是垃圾箱
 	BugGroupId int64 // 可以查看的bug状态
 	// Level      int   // 是否是管理员， 无效

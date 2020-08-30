@@ -1,7 +1,6 @@
 package project
 
 import (
-	"itflow/cache"
 	"itflow/db"
 	"strings"
 
@@ -11,7 +10,7 @@ import (
 
 // 通过project 获取用户
 
-func GetUsersByProjectName(userid int64, name cache.Project) []byte {
+func GetUsersByProjectName(userid int64, name string) []byte {
 	// 根据项目组获取所属用户和所属版本
 	resp := &MyProject{
 		Name:     make([]string, 0),

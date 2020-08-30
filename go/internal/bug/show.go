@@ -2,8 +2,6 @@ package bug
 
 import (
 	"encoding/json"
-	"itflow/cache"
-	"itflow/internal/assist"
 	"itflow/internal/comment"
 
 	"github.com/hyahm/golog"
@@ -14,11 +12,11 @@ type RespShowBug struct {
 	Title       string                  `json:"title"`
 	Content     string                  `json:"content"`
 	Id          int64                   `json:"id"`
-	Selectusers assist.Names            `json:"selectuser"`
-	Important   cache.Important         `json:"important"`
-	Level       cache.Level             `json:"level"`
-	Projectname cache.Project           `json:"projectname"`
-	Envname     cache.Env               `json:"envname"`
+	Selectusers []string                `json:"selectuser"`
+	Important   string                  `json:"important"`
+	Level       string                  `json:"level"`
+	Projectname string                  `json:"projectname"`
+	Envname     string                  `json:"envname"`
 	Version     string                  `json:"version"`
 	Code        int                     `json:"code"`
 	Msg         string                  `json:"msg,omitempty"`

@@ -2,7 +2,6 @@ package handle
 
 import (
 	"encoding/json"
-	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/response"
 	"itflow/model"
@@ -98,8 +97,6 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 删除缓存
-	delete(cache.CacheLevelLid, cache.CacheLidLevel[cache.LevelId(id64)])
-	delete(cache.CacheLidLevel, cache.LevelId(id64))
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return

@@ -3,9 +3,7 @@ package model
 import (
 	"encoding/json"
 	"html"
-	"itflow/cache"
 	"itflow/db"
-	"itflow/internal/assist"
 
 	"github.com/hyahm/golog"
 )
@@ -57,13 +55,13 @@ type Bug struct {
 	StatusId     int64 // sid
 	Title        string
 	Content      string
-	ImportanceId cache.ImportantId
+	ImportanceId int64
 	CreateTime   int64
-	VersionId    cache.VersionId
-	OprateUsers  assist.Uid
-	LevelId      cache.LevelId
-	EnvId        cache.EnvId
-	ProjectId    cache.ProjectId
+	VersionId    int64
+	OprateUsers  int64
+	LevelId      int64
+	EnvId        int64
+	ProjectId    int64
 	UpdateTime   int64
 	Dustbin      bool
 }

@@ -2,14 +2,13 @@ package model
 
 import (
 	"encoding/json"
-	"itflow/cache"
 
 	"github.com/hyahm/golog"
 )
 
 type Importants struct {
-	Id   cache.ImportantId `json:"id"`
-	Name cache.Important   `json:"name"`
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 type Data_importants struct {

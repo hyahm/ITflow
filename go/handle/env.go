@@ -2,12 +2,10 @@ package handle
 
 import (
 	"encoding/json"
-	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/env"
 	"itflow/internal/response"
 	"net/http"
-	"strconv"
 
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
@@ -91,16 +89,10 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	id := r.FormValue("id")
-	eid, err := strconv.Atoi(id)
-	if err != nil {
 
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
 	var count int
 
-	err = db.Mconn.GetOne("select count(id) from bugs where eid=?", id).Scan(&count)
+	err := db.Mconn.GetOne("select count(id) from bugs where eid=?", id).Scan(&count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -120,8 +112,6 @@ func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	delete(cache.CacheEnvEid, cache.CacheEidEnv[cache.EnvId(eid)])
-	delete(cache.CacheEidEnv, cache.EnvId(eid))
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return

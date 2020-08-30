@@ -2,7 +2,6 @@ package handle
 
 import (
 	"encoding/json"
-	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/response"
 	"itflow/model"
@@ -104,8 +103,6 @@ func ImportantDel(w http.ResponseWriter, r *http.Request) {
 	// 增加日志
 
 	// 删除缓存
-	delete(cache.CacheImportantIid, cache.CacheIidImportant[cache.ImportantId(id32)])
-	delete(cache.CacheIidImportant, cache.ImportantId(id32))
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return

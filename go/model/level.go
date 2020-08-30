@@ -2,20 +2,19 @@ package model
 
 import (
 	"encoding/json"
-	"itflow/cache"
 
 	"github.com/hyahm/golog"
 )
 
 type Table_level struct {
-	Id   cache.LevelId `json:"id"`
-	Name cache.Level   `json:"name"`
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 type Data_level struct {
-	Id   cache.LevelId `json:"id"`
-	Name cache.Level   `json:"name"`
-	Code int           `json:"code"`
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
+	Code int    `json:"code"`
 }
 
 type List_levels struct {
@@ -25,9 +24,9 @@ type List_levels struct {
 }
 
 type Update_level struct {
-	Id      cache.LevelId `json:"id"`
-	Name    cache.Level   `json:"name"`
-	OldName cache.Level   `json:"oldname"`
+	Id      int64  `json:"id"`
+	Name    string `json:"name"`
+	OldName string `json:"oldname"`
 }
 
 func (ll *List_levels) Marshal() []byte {

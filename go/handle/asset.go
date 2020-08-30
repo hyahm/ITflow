@@ -2,7 +2,6 @@ package handle
 
 import (
 	"errors"
-	"itflow/cache"
 	"itflow/classify"
 	"itflow/db"
 	"strings"
@@ -11,19 +10,19 @@ import (
 
 var NotFoundToken = errors.New("not found token")
 
-func sortpermlist(permlist []string) []string {
-	l := len(cache.CacheSidStatus)
+// func sortpermlist(permlist []string) []string {
+// 	l := len(cache.CacheSidStatus)
 
-	newlist := make([]string, 0)
-	for i := 0; i < l; i++ {
-		for _, v := range permlist {
-			if cache.CacheSidStatus[cache.StatusId(i)].ToString() == v {
-				newlist = append(newlist, v)
-			}
-		}
-	}
-	return newlist
-}
+// 	newlist := make([]string, 0)
+// 	for i := 0; i < l; i++ {
+// 		for _, v := range permlist {
+// 			if cache.CacheSidStatus[cache.StatusId(i)].ToString() == v {
+// 				newlist = append(newlist, v)
+// 			}
+// 		}
+// 	}
+// 	return newlist
+// }
 
 // 插入到log表中
 func InsertLog(classify classify.Classify, content string, ipaddr string) error {
