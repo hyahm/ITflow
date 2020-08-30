@@ -10,7 +10,6 @@ import (
 	"itflow/internal/comment"
 	"itflow/internal/project"
 	"itflow/internal/response"
-	"itflow/model"
 	"net/http"
 	"os"
 	"path"
@@ -311,14 +310,27 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	golog.Infof("%+v", sl)
-
-	err = model.NewInformationsByBid(bid, sl.Comments)
+	getinfosql := "select u.realname,info,time from informations as i join user as u on bid=? and u.id=i.uid"
+	rows, err := db.Mconn.GetRows(getinfosql, bid)
 	if err != nil {
-		sl.Code = 1
-		sl.Msg = err.Error()
-		w.Write(sl.Marshal())
+		golog.Error(err)
+		w.Write(sl.ErrorE(err))
 		return
 	}
+	for rows.Next() {
+		im := &comment.Informations{}
+		// var uid int64
+		rows.Scan(&im.User, &im.Info, &im.Date)
+		// im.User = cache.CacheUidRealName[uid]
+		sl.Comments = append(sl.Comments, im)
+	}
+	// err = model.NewInformationsByBid(bid, sl.Comments)
+	// if err != nil {
+	// 	sl.Code = 1
+	// 	sl.Msg = err.Error()
+	// 	w.Write(sl.Marshal())
+	// 	return
+	// }
 
 	send, _ := json.Marshal(sl)
 	w.Write(send)

@@ -8,8 +8,11 @@ import (
 	"itflow/internal/response"
 	"itflow/model"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/gomysql"
 	"github.com/hyahm/xmux"
 )
 
@@ -17,9 +20,10 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 
 	ub := xmux.GetData(r).Data.(*bug.PassBug)
 	// nickname := xmux.GetData(r).Get("nickname").(string)
-	// uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetData(r).Get("uid").(int64)
 	// // 获取参数
-
+	golog.Infof("%+v", *ub)
+	errorcode := &response.Response{}
 	// 判断用户是否能处理这个project
 	// pid, ok := cache.CacheProjectPid[ub.ProjectName]
 	// if !ok {
@@ -34,8 +38,27 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 	// 	w.Write(errorcode.ErrorE(err))
 	// 	return
 	// }
-
 	// 判断这个bug是不是自己的任务，只有自己的任务才可以转交
+
+	// 获取用户id
+	rows, err := db.Mconn.GetRowsIn("select id from user where realname in (?)",
+		gomysql.InArgs(ub.SelectUsers).ToInArgs())
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	ids := make([]string, 0)
+	thisId := new(string)
+	for rows.Next() {
+		err = rows.Scan(thisId)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		ids = append(ids, *thisId)
+	}
+
 	// var havePerm bool
 	// for _, v := range strings.Split(cache.CacheUGidUserGroup[ugid].Uids, ",") {
 	// 	permuid, err := strconv.ParseInt(v, 10, 64)
@@ -93,21 +116,22 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 
 	// ul := strings.Join(idstr, ",")
 
-	// remarksql := "insert into informations(uid,bid,info,time) values(?,?,?,?)"
-	// _, err = db.Mconn.Insert(remarksql, uid, ub.Id, ub.Remark, time.Now().Unix())
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(errorcode.ErrorE(err))
-	// 	return
-	// }
+	remarksql := "insert into informations(uid,bid,info,time) values(?,?,?,?)"
+	_, err = db.Mconn.Insert(remarksql, uid, ub.Id, ub.Remark, time.Now().Unix())
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
 	// //更改bug
 
-	// _, err = db.Mconn.Update("update bugs set sid=?,spusers=?,updatetime=? where id=?", sid, ul, time.Now().Unix(), ub.Id)
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(errorcode.ErrorE(err))
-	// 	return
-	// }
+	_, err = db.Mconn.Update("update bugs set sid=(select id from status where name=?),spusers=?,updatetime=? where id=?",
+		ub.Status, strings.Join(ids, ","), time.Now().Unix(), ub.Id)
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
 
 	// // if cache.CacheEmail.Enable {
 	// // 	go cache.CacheEmail.SendMail("转让bug", fmt.Sprintf("由%s 转交给你", cache.CacheUidRealName[uid]), mails...)
