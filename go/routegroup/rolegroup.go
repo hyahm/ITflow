@@ -22,11 +22,11 @@ func init() {
 	RoleGroup.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
 	RoleGroup.Post("/rolegroup/add", handle.AddRoleGroup).Bind(&rolegroup.ReqRoleGroup{}).
-		AddMidware(midware.JsonToStruct).
+		AddModule(midware.JsonToStruct).
 		ApiDescribe("添加角色组").ApiReqStruct(&rolegroup.ReqRoleGroup{}).ApiResStruct(&response.Response{})
 
 	RoleGroup.Post("/rolegroup/edit", handle.EditRoleGroup).Bind(&rolegroup.ReqRoleGroup{}).
-		AddMidware(midware.JsonToStruct).
+		AddModule(midware.JsonToStruct).
 		ApiDescribe("修改角色组").ApiReqStruct(&rolegroup.ReqRoleGroup{}).ApiResStruct(&response.Response{})
 
 	RoleGroup.Post("/rolegroup/list", handle.RoleGroupList)

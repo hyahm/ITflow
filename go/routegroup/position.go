@@ -13,7 +13,7 @@ var Position *xmux.GroupRoute
 
 func init() {
 	Position = xmux.NewGroupRoute()
-	// AddMidware(midware.CheckPositionPermssion)
+	// AddModule(midware.CheckPositionPermssion)
 	Position.ApiCodeField("code").ApiCodeMsg("0", "成功")
 	Position.ApiCodeField("code").ApiCodeMsg("20", "token过期")
 	Position.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
@@ -22,12 +22,12 @@ func init() {
 	Position.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 	Position.Post("/position/list", handle.PositionGet)
 
-	Position.Post("/position/add", handle.PositionAdd).Bind(&model.Data_jobs{}).AddMidware(midware.JsonToStruct)
+	Position.Post("/position/add", handle.PositionAdd).Bind(&model.Data_jobs{}).AddModule(midware.JsonToStruct)
 
 	Position.Get("/position/del", handle.PositionDel)
 
 	Position.Post("/position/update", handle.PositionUpdate).
-		Bind(&model.Update_jobs{}).AddMidware(midware.JsonToStruct)
+		Bind(&model.Update_jobs{}).AddModule(midware.JsonToStruct)
 
 	Position.Get("/get/hypos", handle.GetHypos)
 

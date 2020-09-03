@@ -24,10 +24,10 @@ func init() {
 
 	UserGroup.Post("/groupnames/get", handle.GroupNamesGet).ApiResponseTemplate(`{"groupnames":["bb"],"code":0}`).ApiDescribe("获取自己创建的用户组")
 
-	UserGroup.Post("/group/add", handle.GroupAdd).Bind(&usergroup.RespUserGroup{}).AddMidware(midware.JsonToStruct)
+	UserGroup.Post("/group/add", handle.GroupAdd).Bind(&usergroup.RespUserGroup{}).AddModule(midware.JsonToStruct)
 	UserGroup.Get("/group/del", handle.GroupDel).ApiDescribe("删除用户组，只有创建者和admin才能操作")
 
 	UserGroup.Post("/group/update", handle.GroupUpdate).Bind(&usergroup.RespUpdateUserGroup{}).
-		AddMidware(midware.JsonToStruct).AddMidware(midware.CheckUser).
+		AddModule(midware.JsonToStruct).AddModule(midware.CheckUser).
 		ApiDescribe("编辑用户组，只有创建者和admin才能操作").ApiRequestTemplate(`{"id":7,"name":"aa","users":["admin","cander"]}`)
 }

@@ -21,11 +21,11 @@ func init() {
 	Project.Post("/project/list", handle.ProjectList).ApiDescribe("获取所有列表").ApiSupplement("只有跟项目有关的参与者才能看到项目")
 
 	Project.Post("/project/add", handle.AddProject).Bind(&project.ReqProject{}).
-		AddMidware(midware.JsonToStruct).
+		AddModule(midware.JsonToStruct).
 		ApiDescribe("增加项目")
 
 	Project.Post("/project/update", handle.UpdateProject).
-		Bind(&project.ReqProject{}).AddMidware(midware.JsonToStruct).
+		Bind(&project.ReqProject{}).AddModule(midware.JsonToStruct).
 		ApiDescribe("修改项目")
 
 	Project.Get("/project/delete", handle.DeleteProject).

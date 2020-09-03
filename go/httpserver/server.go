@@ -17,7 +17,7 @@ func RunHttp() {
 	router.SetHeader("Access-Control-Allow-Origin", "*")
 	router.SetHeader("Content-Type", "application/x-www-form-urlencoded,application/json; charset=UTF-8")
 	router.SetHeader("Access-Control-Allow-Headers", "Content-Type,Access-Token,X-Token,smail")
-	router.AddMidware(midware.CheckToken) // 所有的请求头优先检查token是否有效， 登录除外
+	router.AddModule(midware.CheckToken) // 所有的请求头优先检查token是否有效， 登录除外
 
 	router.AddGroup(routegroup.User) // 已完成
 	router.AddGroup(routegroup.Bug)
@@ -47,14 +47,14 @@ func RunHttp() {
 	router.AddGroup(routegroup.Share)
 	// router.AddGroup(routegroup.Api)
 
-	// router.Post("/uploadimg", handle.UploadImgs).DelMidware(midware.CheckToken)
+	// router.Post("/uploadimg", handle.UploadImgs).DelModule(midware.CheckToken)
 	router.Post("/upload/headimg", handle.UploadHeadImg)
-	router.Get("/showimg/{imgname}", handle.ShowImg).SetHeader("Content-Type", "image/png").DelMidware(midware.CheckToken)
+	router.Get("/showimg/{imgname}", handle.ShowImg).SetHeader("Content-Type", "image/png").DelModule(midware.CheckToken)
 
-	router.Get("/get/expire/{token}", handle.GetExpire).DelMidware(midware.CheckToken)
+	router.Get("/get/expire/{token}", handle.GetExpire).DelModule(midware.CheckToken)
 	// 生产环境中， 这个要么注释， 要么
 	if goconfig.ReadBool("debug", false) {
-		doc := router.ShowApi("/docs").DelMidware(midware.CheckToken)
+		doc := router.ShowApi("/docs").DelModule(midware.CheckToken)
 		router.AddGroup(doc)
 	}
 

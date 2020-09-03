@@ -20,10 +20,10 @@ func init() {
 	StatusGroup.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	StatusGroup.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 	StatusGroup.Post("/statusgroup/add", handle.AddStatusGroup).Bind(&status.StatusGroup{}).
-		AddMidware(midware.JsonToStruct)
+		AddModule(midware.JsonToStruct)
 
 	StatusGroup.Post("/statusgroup/edit", handle.EditStatusGroup).Bind(&status.StatusGroup{}).
-		AddMidware(midware.JsonToStruct).
+		AddModule(midware.JsonToStruct).
 		ApiDescribe("编辑statusgroup").ApiReqStruct(&status.StatusGroup{}).
 		ApiSupplement("如果没有状态组名，就删除")
 

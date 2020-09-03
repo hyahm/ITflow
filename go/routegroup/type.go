@@ -16,9 +16,9 @@ func init() {
 	Type.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	Type.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 	// Type.Post("/type/list", handle.TypeList)
-	// Type.Post("/type/update", handle.TypeUpdate).Bind(&model.Data_types{}).AddMidware(midware.JsonToStruct)
+	// Type.Post("/type/update", handle.TypeUpdate).Bind(&model.Data_types{}).AddModule(midware.JsonToStruct)
 
-	// Type.Post("/type/add", handle.TypeAdd).Bind(&model.Data_types{}).AddMidware(midware.JsonToStruct)
+	// Type.Post("/type/add", handle.TypeAdd).Bind(&model.Data_types{}).AddModule(midware.JsonToStruct)
 	// Type.Get("/type/delete", handle.TypeDel)
 	// Type.Get("/type/get", handle.GetType)
 

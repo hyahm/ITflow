@@ -25,7 +25,7 @@ func init() {
 	Env.Get("/env/add", handle.AddEnv)
 
 	Env.Post("/env/update", handle.UpdateEnv).Bind(&env.Env{}).
-		AddMidware(midware.JsonToStruct)
+		AddModule(midware.JsonToStruct)
 	Env.Post("/get/env", handle.GetEnv)
 	Env.Get("/env/delete", handle.DeleteEnv)
 }

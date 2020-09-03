@@ -16,9 +16,9 @@ func init() {
 	Share.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 	// Share.Get("/share/list", handle.ShareList)
 	// Share.Post("/share/upload", handle.ShareUpload)
-	// Share.Post("/share/mkdir", handle.ShareMkdir).Bind(&model.Data_sharefile{}).AddMidware(midware.JsonToStruct)
+	// Share.Post("/share/mkdir", handle.ShareMkdir).Bind(&model.Data_sharefile{}).AddModule(midware.JsonToStruct)
 	// Share.Get("/share/remove", handle.ShareRemove)
-	// Share.Post("/share/rename", handle.ShareRename).Bind(&model.Data_sharefile{}).AddMidware(midware.JsonToStruct)
+	// Share.Post("/share/rename", handle.ShareRename).Bind(&model.Data_sharefile{}).AddModule(midware.JsonToStruct)
 	// //router.HandleFunc("/share/down", handle.ShareDownload)
 	// Share.Get("/share/down", handle.ShareShow)
 }

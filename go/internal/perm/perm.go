@@ -48,6 +48,13 @@ func VersionPerm(uid int64) (op OptionPerm, err error) {
 }
 
 func perm(uid int64, rid int64) (op OptionPerm, err error) {
+	if uid == cache.SUPERID {
+		op.Select = true
+		op.Update = true
+		op.Delete = true
+		op.Insert = true
+		return
+	}
 	var permids string
 	err = db.Mconn.GetOne("select permids from rolegroup where id=(select rid from user where id=?)", uid).Scan(&permids)
 	if err != nil {

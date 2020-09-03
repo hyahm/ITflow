@@ -20,7 +20,7 @@ func init() {
 	User.ApiCodeField("code").ApiCodeMsg("20", "token过期")
 	User.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	User.Post("/user/login", handle.Login).Bind(&user.Login{}).
-		DelMidware(midware.CheckToken).AddMidware(midware.JsonToStruct).
+		DelModule(midware.CheckToken).AddModule(midware.JsonToStruct).
 		ApiDescribe("用户登录接口").
 		ApiDelReqHeader("X-Token").
 		ApiReqStruct(user.Login{}).
@@ -38,11 +38,11 @@ func init() {
 		ApiResponseTemplate(`{"roles": ["admin"], "code": 0, "avatar":"http://xxxx/aaaa.png", "nickname": "admin"}`)
 
 	User.Post("/user/create", handle.CreateUser).Bind(&user.GetAddUser{}).
-		AddMidware(midware.JsonToStruct).ApiDescribe("添加用户").
+		AddModule(midware.JsonToStruct).ApiDescribe("添加用户").
 		ApiRequestTemplate(`{"nickname":"cander","email":"yifan@uupoweremail.com","password":"123456","repassword":"123456","realname":"cander","rolegroup":"all","statusgroup":"aaa","level":2,"position":"aaaaa"}`)
 
 	User.Post("/password/update", handle.ChangePassword).Bind(&user.ChangePasswod{}).
-		AddMidware(midware.JsonToStruct)
+		AddModule(midware.JsonToStruct)
 
 	User.Post("/get/user", handle.GetUser).ApiDescribe("获取所有用户的真实名")
 	User.Get("/get/project/user", handle.GetProjectUser).ApiDescribe("根据项目获取关联用户和版本")

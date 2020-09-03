@@ -16,9 +16,9 @@ func init() {
 
 	Admin.Get("/admin/reset", handle.Reset).ApiDescribe("修改管理员密码，只能本地使用(已完成)").ApiSupplement(`
 	curl http://127.0.0.1:10001/admin/reset?password=123
-	`).DelMidware(midware.CheckToken)
+	`).DelModule(midware.CheckToken)
 
 	Admin.Post("/info/update", handle.UpdateInfo).Bind(&user.UserInfo{}).
-		AddMidware(midware.JsonToStruct).ApiDescribe("只做保留，没有用到")
+		AddModule(midware.JsonToStruct).ApiDescribe("只做保留，没有用到")
 
 }

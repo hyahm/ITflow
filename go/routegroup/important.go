@@ -21,12 +21,12 @@ func init() {
 	Important.Post("/important/get", handle.ImportantGet)
 
 	Important.Post("/important/add", handle.ImportantAdd).
-		Bind(&model.Data_importants{}).AddMidware(midware.JsonToStruct)
+		Bind(&model.Data_importants{}).AddModule(midware.JsonToStruct)
 
 	Important.Get("/important/del", handle.ImportantDel)
 
 	Important.Post("/important/update", handle.ImportantUpdate).
-		Bind(&model.Importants{}).AddMidware(midware.JsonToStruct)
+		Bind(&model.Importants{}).AddModule(midware.JsonToStruct)
 
 	Important.Post("/get/importants", handle.GetImportants)
 

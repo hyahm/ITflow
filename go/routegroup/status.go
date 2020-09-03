@@ -45,7 +45,7 @@ func init() {
 		}`)
 
 	Status.Post("/status/add", handle.StatusAdd).Bind(&bug.ReqStatus{}).
-		AddMidware(midware.JsonToStruct).
+		AddModule(midware.JsonToStruct).
 		ApiDescribe("添加bug 状态").
 		ApiReqStruct(&bug.ReqStatus{}).ApiRequestTemplate(`{"id": 0, "name": "普通"}`).
 		ApiResStruct(&bug.ResponeStatus{}).ApiResponseTemplate(`{"id": 8,"code": 0}`)
@@ -55,7 +55,7 @@ func init() {
 	Status.Get("/status/remove", handle.StatusRemove).
 		ApiDescribe("删除bug 状态").ApiSupplement("当此状态有bug在使用时， 无法删除")
 
-	Status.Post("/status/update", handle.StatusUpdate).Bind(&bug.ReqStatus{}).AddMidware(midware.JsonToStruct).
+	Status.Post("/status/update", handle.StatusUpdate).Bind(&bug.ReqStatus{}).AddModule(midware.JsonToStruct).
 		ApiDescribe("修改状态").
 		ApiReqStruct(&bug.ReqStatus{}).ApiRequestTemplate(`{"id": 0, "name": "普通"}`).
 		ApiResStruct(&bug.ResponeStatus{}).ApiResponseTemplate(`{"code": 0}`)

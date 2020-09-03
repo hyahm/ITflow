@@ -21,10 +21,10 @@ func init() {
 	Department.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
 	Department.Post("/department/add", handle.AddBugGroup).
-		Bind(&status.StatusGroup{}).AddMidware(midware.JsonToStruct)
+		Bind(&status.StatusGroup{}).AddModule(midware.JsonToStruct)
 
 	Department.Post("/department/edit", handle.EditBugGroup).
-		Bind(&status.StatusGroup{}).AddMidware(midware.JsonToStruct)
+		Bind(&status.StatusGroup{}).AddModule(midware.JsonToStruct)
 	Department.Post("/department/list", handle.BugGroupList)
 	Department.Get("/department/remove", handle.BugGroupDel)
 }

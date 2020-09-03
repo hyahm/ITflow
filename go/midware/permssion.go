@@ -1,8 +1,7 @@
-package Module
+package midware
 
 import (
 	"fmt"
-	"itflow/cache"
 	"itflow/internal/perm"
 	"itflow/internal/response"
 	"net/http"
@@ -132,14 +131,4 @@ func VersionPermModule(w http.ResponseWriter, r *http.Request) bool {
 	}
 	xmux.GetData(r).Set("perm", op)
 	return false
-}
-
-func Midware(handle func(http.ResponseWriter, *http.Request), w http.ResponseWriter, r *http.Request) {
-	uid := xmux.GetData(r).Get("uid").(int64)
-	if xmux.GetData(r).Get("perm") != nil && uid == cache.SUPERID {
-		xmux.GetData(r).Set("perm", perm.OptionPerm{
-			true, true, true, true,
-		})
-	}
-	handle(w, r)
 }

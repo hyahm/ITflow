@@ -22,11 +22,11 @@ func init() {
 	Level.Post("/level/get", handle.LevelGet)
 
 	Level.Post("/level/add", handle.LevelAdd).
-		Bind(&model.Data_level{}).AddMidware(midware.JsonToStruct)
+		Bind(&model.Data_level{}).AddModule(midware.JsonToStruct)
 
 	Level.Get("/level/del", handle.LevelDel)
 
 	Level.Post("/level/update", handle.LevelUpdate).
-		Bind(&model.Update_level{}).AddMidware(midware.JsonToStruct)
+		Bind(&model.Update_level{}).AddModule(midware.JsonToStruct)
 	Level.Post("/get/levels", handle.GetLevels)
 }

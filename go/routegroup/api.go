@@ -22,17 +22,17 @@ func init() {
 	Api.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 	// Api.Post("/rest/list", handle.RestList)
 
-	// Api.Post("/rest/update", handle.RestUpdate).Bind(&model.Data_restful{}).AddMidware(midware.JsonToStruct)
+	// Api.Post("/rest/update", handle.RestUpdate).Bind(&model.Data_restful{}).AddModule(midware.JsonToStruct)
 
-	// Api.Post("/rest/add", handle.RestAdd).Bind(&model.Data_restful{}).AddMidware(midware.JsonToStruct)
+	// Api.Post("/rest/add", handle.RestAdd).Bind(&model.Data_restful{}).AddModule(midware.JsonToStruct)
 
 	// Api.Get("/rest/delete", handle.RestDel)
 
 	// Api.Get("/api/list", handle.ApiList)
 
-	// Api.Post("/api/update", handle.ApiUpdate).Bind(&model.Get_apilist{}).AddMidware(midware.JsonToStruct)
+	// Api.Post("/api/update", handle.ApiUpdate).Bind(&model.Get_apilist{}).AddModule(midware.JsonToStruct)
 
-	// Api.Post("/api/add", handle.ApiAdd).Bind(&model.Get_apilist{}).AddMidware(midware.JsonToStruct)
+	// Api.Post("/api/add", handle.ApiAdd).Bind(&model.Get_apilist{}).AddModule(midware.JsonToStruct)
 
 	// Api.Get("/api/delete", handle.ApiDel)
 
@@ -40,16 +40,16 @@ func init() {
 
 	// Api.Get("/edit/one", handle.EditOne)
 
-	// Api.Post("/api/resp", handle.ApiResp).Bind(&restful.Resp{}).AddMidware(midware.JsonToStruct)
+	// Api.Post("/api/resp", handle.ApiResp).Bind(&restful.Resp{}).AddModule(midware.JsonToStruct)
 
 	Api.Post("/header/list", handle.HeaderList)
 
-	Api.Post("/header/add", handle.HeaderAdd).Bind(&model.Data_header{}).AddMidware(midware.JsonToStruct)
+	Api.Post("/header/add", handle.HeaderAdd).Bind(&model.Data_header{}).AddModule(midware.JsonToStruct)
 
 	Api.Get("/header/del", handle.HeaderDel)
 
 	Api.Post("/header/update", handle.HeaderUpdate).
-		Bind(&model.Data_header{}).AddMidware(midware.JsonToStruct)
+		Bind(&model.Data_header{}).AddModule(midware.JsonToStruct)
 
 	// Api.Post("/header/get", handle.HeaderGet)
 
