@@ -26,10 +26,8 @@ func main() {
 	}
 	// //初始化mysql
 	db.InitMysql()
-	// // // 初始化redis
+	// // // 初始化缓存表
 	db.InitCacheTable()
-
-	// // // 初始化缓存（后面会使用redis）
 	cache.LoadConfig()
 
 	// // // 初始化日志

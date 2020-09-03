@@ -2,7 +2,6 @@ package cache
 
 import (
 	"os"
-	"runtime"
 	"time"
 
 	"github.com/hyahm/goconfig"
@@ -46,22 +45,13 @@ func LoadConfig() {
 	if err != nil {
 		panic(err)
 	}
-	ShowBaseUrl = goconfig.ReadWithEndSlash("showbaseurl", " http://127.0.0.1:10001/showimg")
+	ShowBaseUrl = goconfig.ReadWithEndSlash("showbaseurl", " http://127.0.0.1:10001/showimg/")
 	Salt = goconfig.ReadString("salt", "hjkkaksjdhfryuooweqzmbvc")
 	ShareDir = goconfig.ReadString("sharedir", "/share/")
 	// 创建共享文件夹
 	err = os.MkdirAll(ShareDir, 0755)
 	if err != nil {
 		panic(err)
-	}
-	if runtime.GOOS == "windows" {
-		if ShareDir[len(ShareDir)-1:] == "\\" {
-			ShareDir = ShareDir[:len(ShareDir)-1]
-		}
-	} else {
-		if ShareDir[len(ShareDir)-1:] == "/" {
-			ShareDir = ShareDir[:len(ShareDir)-1]
-		}
 	}
 
 	CacheRidRole = make(map[int64]string, 0)
