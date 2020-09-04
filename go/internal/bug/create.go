@@ -83,6 +83,7 @@ func BugById(id interface{}) []byte {
 		}
 		reb.Selectusers = append(reb.Selectusers, name)
 	}
+	rows.Close()
 	reb.Content = html.UnescapeString(reb.Content)
 
 	return reb.Marshal()

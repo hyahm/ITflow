@@ -34,7 +34,7 @@ func PositionGet(w http.ResponseWriter, r *http.Request) {
 		x[one.Id] = one.Name
 		data.Positions = append(data.Positions, one)
 	}
-
+	rows.Close()
 	for i := range data.Positions {
 		if data.Positions[i].Hid > 0 {
 			data.Positions[i].HypoName = x[data.Positions[i].Hid]
@@ -205,6 +205,7 @@ func GetHypos(w http.ResponseWriter, r *http.Request) {
 		}
 		data.Hypos = append(data.Hypos, hn)
 	}
+	rows.Close()
 	send, _ := json.Marshal(data)
 	w.Write(send)
 	return
@@ -243,7 +244,7 @@ func GetPositions(w http.ResponseWriter, r *http.Request) {
 		}
 		data.Positions = append(data.Positions, name)
 	}
-
+	rows.Close()
 	send, _ := json.Marshal(data)
 	w.Write(send)
 	return

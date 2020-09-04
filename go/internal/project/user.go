@@ -38,7 +38,7 @@ func GetUsersByProjectName(userid int64, name string) []byte {
 		}
 		resp.Name = append(resp.Name, *n)
 	}
-
+	rows.Close()
 	vrows, err := db.Mconn.GetRows("select name from version where pid=(select id from project where name=?)", name)
 	if err != nil {
 		golog.Error(err)
@@ -52,6 +52,6 @@ func GetUsersByProjectName(userid int64, name string) []byte {
 		}
 		resp.Versions = append(resp.Versions, *n)
 	}
-
+	vrows.Close()
 	return resp.Marshal()
 }

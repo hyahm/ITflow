@@ -31,6 +31,7 @@ func (p *Project) Insert(groupname string) error {
 		}
 		ids = append(ids, id)
 	}
+	rows.Close()
 	p.Id, err = db.Mconn.Insert("insert into project(name,ugid,uid) values(?,?,?)", p.Name, strings.Join(ids, ","), p.Uid)
 	return err
 }
@@ -58,6 +59,7 @@ func NewProjectListCheckId(uid int64) ([]*Project, error) {
 
 		ps = append(ps, p)
 	}
+	rows.Close()
 	return ps, nil
 }
 

@@ -49,6 +49,7 @@ func HeaderList(w http.ResponseWriter, r *http.Request) {
 		}
 		data.Headers = append(data.Headers, one)
 	}
+	rows.Close()
 	send, _ := json.Marshal(data)
 	w.Write(send)
 	return

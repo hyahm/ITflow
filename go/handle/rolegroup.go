@@ -49,9 +49,10 @@ func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 			}
 			one.RoleList = append(one.RoleList, rp)
 		}
-
+		permrows.Close()
 		data.RoleList = append(data.RoleList, one)
 	}
+	rows.Close()
 	send, _ := json.Marshal(data)
 	w.Write(send)
 	return
@@ -172,7 +173,7 @@ func RoleTemplate(w http.ResponseWriter, r *http.Request) {
 		}
 		data = append(data, role)
 	}
-
+	rows.Close()
 	send, _ := json.Marshal(data)
 	w.Write(send)
 	return

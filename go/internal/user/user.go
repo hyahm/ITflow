@@ -103,6 +103,7 @@ func (ui *UserInfo) GetUserInfo(uid int64) error {
 			}
 			ui.Roles = append(ui.Roles, *role)
 		}
+		rows.Close()
 	}
 	if len(ui.Roles) == 0 {
 		ui.Roles = append(ui.Roles, "test")
@@ -138,7 +139,7 @@ func (ui *UserInfo) Update() error {
 			}
 			ui.Roles = append(ui.Roles, *role)
 		}
-
+		rows.Close()
 	}
 
 	return nil

@@ -182,6 +182,7 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	userrows.Close()
 	_, err = db.Mconn.Update("delete from user where id=?", id)
 	if err != nil {
 		golog.Error(err)
@@ -252,7 +253,7 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 		}
 		uls.Userlist = append(uls.Userlist, ul)
 	}
-
+	adminrows.Close()
 	send, _ := json.Marshal(uls)
 	w.Write(send)
 	return

@@ -30,5 +30,6 @@ func NewInformationsByBid(bid interface{}, cms []*comment.Informations) error {
 		// im.User = cache.CacheUidRealName[uid]
 		cms = append(cms, im)
 	}
+	rows.Close()
 	return nil
 }

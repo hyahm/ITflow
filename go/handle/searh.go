@@ -53,6 +53,7 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+	prows.Close()
 	golog.Info(myproject)
 	conditionsql, args := mybug.GetUsefulCondition(uid)
 	countArgs := make([]interface{}, 0)
@@ -121,9 +122,10 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 			}
 			bug.Handle = append(bug.Handle, name)
 		}
-
+		realnames.Close()
 		al.Al = append(al.Al, bug)
 	}
+	rows.Close()
 	w.Write(al.Marshal())
 	return
 
@@ -207,9 +209,11 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 			}
 			bug.Handle = append(bug.Handle, name)
 		}
-
+		realnames.Close()
 		al.Al = append(al.Al, bug)
 	}
+
+	rows.Close()
 	w.Write(al.Marshal())
 
 }
@@ -257,6 +261,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+	countRows.Close()
 	al.Count = len(myTaskId)
 	if al.Count == 0 {
 		w.Write(al.Marshal())
@@ -310,9 +315,11 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 			}
 			bug.Handle = append(bug.Handle, name)
 		}
-
+		realnames.Close()
 		al.Al = append(al.Al, bug)
 	}
+
+	rows.Close()
 	w.Write(al.Marshal())
 	return
 
@@ -390,9 +397,11 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 			}
 			bug.Handle = append(bug.Handle, name)
 		}
-
+		realnames.Close()
 		al.Al = append(al.Al, bug)
 	}
+
+	rows.Close()
 	w.Write(al.Marshal())
 	return
 

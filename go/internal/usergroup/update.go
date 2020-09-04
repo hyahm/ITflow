@@ -49,5 +49,6 @@ func (ug *RespUpdateUserGroup) GetIds() (string, error) {
 		}
 		ids = append(ids, id)
 	}
+	rows.Close()
 	return strings.Join(ids, ","), nil
 }

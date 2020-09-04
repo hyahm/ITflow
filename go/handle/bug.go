@@ -84,7 +84,7 @@ func ShowStatus(w http.ResponseWriter, r *http.Request) {
 		}
 		sl.CheckStatus = append(sl.CheckStatus, *statusname)
 	}
-
+	rows.Close()
 	send, _ := json.Marshal(sl)
 	w.Write(send)
 	return
@@ -133,6 +133,7 @@ func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 		}
 		sl.StatusList = append(sl.StatusList, *statusname)
 	}
+	rows.Close()
 	w.Write(sl.Marshal())
 	return
 
@@ -258,7 +259,7 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 		err = rows.Scan(sid)
 		sids = append(sids, *sid)
 	}
-
+	rows.Close()
 	uid := xmux.GetData(r).Get("uid").(int64)
 	user := &model.User{}
 	err = user.UpdateShowStatus(strings.Join(sids, ","), uid)
@@ -338,6 +339,7 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 
 		al.Al = append(al.Al, bug)
 	}
+	rows.Close()
 	golog.Info(string(al.Marshal()))
 	w.Write(al.Marshal())
 	// if err != nil {

@@ -3,6 +3,7 @@ package handle
 import (
 	"encoding/json"
 	"itflow/db"
+	"itflow/internal/perm"
 	"itflow/internal/response"
 	"itflow/model"
 	"net/http"
@@ -33,6 +34,7 @@ func ImportantGet(w http.ResponseWriter, r *http.Request) {
 		}
 		data.ImportantList = append(data.ImportantList, im)
 	}
+	rows.Close()
 	w.Write(data.Marshal())
 	return
 
@@ -41,7 +43,11 @@ func ImportantGet(w http.ResponseWriter, r *http.Request) {
 func ImportantAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Insert {
+		w.Write(errorcode.Error("no perm"))
+		return
+	}
 	data := xmux.GetData(r).Data.(*model.Data_importants)
 
 	var err error
@@ -64,7 +70,11 @@ func ImportantAdd(w http.ResponseWriter, r *http.Request) {
 func ImportantDel(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Delete {
+		w.Write(errorcode.Error("no perm"))
+		return
+	}
 	id := r.FormValue("id")
 	id32, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
@@ -173,6 +183,7 @@ func GetImportants(w http.ResponseWriter, r *http.Request) {
 		}
 		data.Importants = append(data.Importants, name)
 	}
+	rows.Close()
 	send, _ := json.Marshal(data)
 	w.Write(send)
 	return

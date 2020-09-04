@@ -3,6 +3,7 @@ package handle
 import (
 	"encoding/json"
 	"itflow/db"
+	"itflow/internal/perm"
 	"itflow/internal/response"
 	"itflow/internal/status"
 	"net/http"
@@ -16,7 +17,11 @@ import (
 func AddStatusGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Insert {
+		w.Write(errorcode.Error("no perm"))
+		return
+	}
 	data := xmux.GetData(r).Data.(*status.StatusGroup)
 
 	golog.Infof("%+v", *data)
@@ -43,7 +48,11 @@ func AddStatusGroup(w http.ResponseWriter, r *http.Request) {
 func EditStatusGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Update {
+		w.Write(errorcode.Error("no perm"))
+		return
+	}
 	data := xmux.GetData(r).Data.(*status.StatusGroup)
 
 	if data.Name == "" {
@@ -73,7 +82,11 @@ func EditStatusGroup(w http.ResponseWriter, r *http.Request) {
 func StatusGroupList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Select {
+		w.Write(errorcode.Error("no perm"))
+		return
+	}
 	data := &departmentList{}
 	s := "select id,name,sids from statusgroup"
 	rows, err := db.Mconn.GetRows(s)
@@ -112,9 +125,11 @@ func StatusGroupList(w http.ResponseWriter, r *http.Request) {
 			}
 
 		}
-
+		idrows.Close()
 		data.DepartmentList = append(data.DepartmentList, one)
 	}
+
+	rows.Close()
 	send, _ := json.Marshal(data)
 	w.Write(send)
 	return
@@ -124,7 +139,11 @@ func StatusGroupList(w http.ResponseWriter, r *http.Request) {
 func DeleteStatusGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Delete {
+		w.Write(errorcode.Error("no perm"))
+		return
+	}
 	id := r.FormValue("id")
 
 	ssql := "select count(id) from user where bugsid=?"
@@ -178,6 +197,7 @@ func GetStatusGroupName(w http.ResponseWriter, r *http.Request) {
 		data.Names = append(data.Names, name)
 
 	}
+	rows.Close()
 	send, _ := json.Marshal(data)
 	golog.Info(string(send))
 	w.Write(send)

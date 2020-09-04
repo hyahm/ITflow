@@ -26,5 +26,6 @@ func (v *Version) GetProjectNameByPid(pid interface{}) ([]string, error) {
 		)
 		ps = append(ps, v.Name)
 	}
+	rows.Close()
 	return ps, err
 }

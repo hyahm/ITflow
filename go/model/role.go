@@ -19,5 +19,6 @@ func AllRole() ([]*Role, error) {
 		rows.Scan(&rl.Role, &rl.Info)
 		rs = append(rs, rl)
 	}
+	rows.Close()
 	return rs, nil
 }

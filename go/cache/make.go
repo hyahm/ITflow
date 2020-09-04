@@ -18,7 +18,7 @@ func initCache() {
 		CacheRidRole[id] = name
 		CacheRoleRid[name] = id
 	}
-
+	rolerows.Close()
 	// 	//默认值
 	err = db.Mconn.GetOne("select ifnull(min(created),0), ifnull(min(completed),0) from defaultvalue").Scan(&DefaultCreateSid, &DefaultCompleteSid)
 	if err != nil {

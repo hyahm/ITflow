@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"itflow/cache"
 	"itflow/db"
+	"itflow/internal/perm"
 	"itflow/internal/response"
 	"itflow/internal/status"
 	network "itflow/model"
@@ -17,7 +18,12 @@ import (
 )
 
 func StatusList(w http.ResponseWriter, r *http.Request) {
-
+	errorcode := &response.Response{}
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Select {
+		w.Write(errorcode.Error("no perm"))
+		return
+	}
 	w.Write(status.StatusList())
 	return
 
@@ -26,6 +32,11 @@ func StatusList(w http.ResponseWriter, r *http.Request) {
 func StatusAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Insert {
+		w.Write(errorcode.Error("no perm"))
+		return
+	}
 	var err error
 	s := xmux.GetData(r).Data.(*bug.ReqStatus)
 	errorcode.Id, err = db.Mconn.Insert("insert into status(name) values(?)", s.Name)
@@ -44,7 +55,11 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 func StatusRemove(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Delete {
+		w.Write(errorcode.Error("no perm"))
+		return
+	}
 	id := r.FormValue("id")
 	sid, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
@@ -107,7 +122,11 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Update {
+		w.Write(errorcode.Error("no perm"))
+		return
+	}
 	s := xmux.GetData(r).Data.(*bug.ReqStatus)
 	_, err := db.Mconn.Update("update status set name=? where id=?", s.Name, s.Id)
 	if err != nil {

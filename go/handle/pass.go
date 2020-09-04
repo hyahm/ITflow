@@ -58,7 +58,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 		}
 		ids = append(ids, *thisId)
 	}
-
+	rows.Close()
 	// var havePerm bool
 	// for _, v := range strings.Split(cache.CacheUGidUserGroup[ugid].Uids, ",") {
 	// 	permuid, err := strconv.ParseInt(v, 10, 64)
@@ -176,6 +176,8 @@ func TaskList(w http.ResponseWriter, r *http.Request) {
 
 		al.Al = append(al.Al, sendlist)
 	}
+
+	rows.Close()
 	send, _ := json.Marshal(al)
 	w.Write(send)
 	return

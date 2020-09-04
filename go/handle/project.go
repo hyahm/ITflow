@@ -2,6 +2,7 @@ package handle
 
 import (
 	"itflow/db"
+	"itflow/internal/perm"
 	"itflow/internal/project"
 	"itflow/internal/response"
 	"net/http"
@@ -12,6 +13,12 @@ import (
 
 func ProjectList(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetData(r).Get("uid").(int64)
+	errorcode := &response.Response{}
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Select {
+		w.Write(errorcode.Error("no perm"))
+		return
+	}
 	w.Write(project.GetList(uid))
 	return
 
@@ -21,6 +28,12 @@ func AddProject(w http.ResponseWriter, r *http.Request) {
 
 	data := xmux.GetData(r).Data.(*project.ReqProject)
 	uid := xmux.GetData(r).Get("uid").(int64)
+	errorcode := &response.Response{}
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Insert {
+		w.Write(errorcode.Error("no perm"))
+		return
+	}
 	send, err := data.Add(uid)
 	if err != nil {
 		w.Write(send)
@@ -34,6 +47,11 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 	data := xmux.GetData(r).Data.(*project.ReqProject)
 	uid := xmux.GetData(r).Get("uid").(int64)
 	errorcode := &response.Response{}
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Update {
+		w.Write(errorcode.Error("no perm"))
+		return
+	}
 	_, err := db.Mconn.Update("update project set name=?, ugid=(select ifnull(min(id),0) from usergroup where name=?) where id=? and uid=?",
 		data.ProjectName, data.GroupName, data.Id, uid)
 
@@ -49,7 +67,11 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 func DeleteProject(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Delete {
+		w.Write(errorcode.Error("no perm"))
+		return
+	}
 	id := r.FormValue("id")
 	golog.Info(id)
 	// 判断有没有bug在使用这个

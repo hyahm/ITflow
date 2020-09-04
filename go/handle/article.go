@@ -88,7 +88,7 @@ func GetEnv(w http.ResponseWriter, r *http.Request) {
 		}
 		el.EnvList = append(el.EnvList, name)
 	}
-
+	rows.Close()
 	w.Write(el.Marshal())
 	return
 
@@ -146,6 +146,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		}
 		ul.Users = append(ul.Users, *realname)
 	}
+	rows.Close()
 	send, _ := json.Marshal(ul)
 	w.Write(send)
 	return
@@ -324,13 +325,7 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 		// im.User = cache.CacheUidRealName[uid]
 		sl.Comments = append(sl.Comments, im)
 	}
-	// err = model.NewInformationsByBid(bid, sl.Comments)
-	// if err != nil {
-	// 	sl.Code = 1
-	// 	sl.Msg = err.Error()
-	// 	w.Write(sl.Marshal())
-	// 	return
-	// }
+	rows.Close()
 
 	send, _ := json.Marshal(sl)
 	w.Write(send)

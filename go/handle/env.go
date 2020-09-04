@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"itflow/db"
 	"itflow/internal/env"
+	"itflow/internal/perm"
 	"itflow/internal/response"
 	"net/http"
 
@@ -16,7 +17,11 @@ func EnvList(w http.ResponseWriter, r *http.Request) {
 	el := &env.Envlist{
 		Elist: make([]*env.Env, 0),
 	}
-
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Insert {
+		w.Write(el.Error("no perm"))
+		return
+	}
 	// 管理员
 	rows, err := db.Mconn.GetRows("select id,name from environment")
 	if err != nil {
@@ -33,7 +38,7 @@ func EnvList(w http.ResponseWriter, r *http.Request) {
 		}
 		el.Elist = append(el.Elist, e)
 	}
-
+	rows.Close()
 	w.Write(el.Marshal())
 	return
 
@@ -42,7 +47,11 @@ func EnvList(w http.ResponseWriter, r *http.Request) {
 func AddEnv(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Select {
+		w.Write(errorcode.Error("no perm"))
+		return
+	}
 	envname := r.FormValue("name")
 
 	getaritclesql := "insert into environment(name) values(?)"
@@ -64,7 +73,11 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Update {
+		w.Write(errorcode.Error("no perm"))
+		return
+	}
 	er := xmux.GetData(r).Data.(*env.Env)
 
 	getaritclesql := "update environment set name=? where id=?"
@@ -87,7 +100,11 @@ func UpdateEnv(w http.ResponseWriter, r *http.Request) {
 func DeleteEnv(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Delete {
+		w.Write(errorcode.Error("no perm"))
+		return
+	}
 	id := r.FormValue("id")
 
 	var count int

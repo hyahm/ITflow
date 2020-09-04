@@ -103,9 +103,10 @@ func BugGroupList(w http.ResponseWriter, r *http.Request) {
 			}
 
 		}
-
+		idrows.Close()
 		data.DepartmentList = append(data.DepartmentList, one)
 	}
+	rows.Close()
 	send, _ := json.Marshal(data)
 	w.Write(send)
 	return
@@ -166,6 +167,7 @@ func GroupNamesGet(w http.ResponseWriter, r *http.Request) {
 		}
 		data.UserGroupNames = append(data.UserGroupNames, name)
 	}
+	rows.Close()
 	w.Write(data.Marshal())
 	return
 
@@ -219,9 +221,10 @@ func UserGroupGet(w http.ResponseWriter, r *http.Request) {
 			}
 			onegroup.Users = append(onegroup.Users, *realname)
 		}
+		namerows.Close()
 		data.UserGroupList = append(data.UserGroupList, onegroup)
 	}
-
+	rows.Close()
 	send, _ := json.Marshal(data)
 	w.Write(send)
 	return
@@ -248,7 +251,7 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 		}
 		ids = append(ids, *id)
 	}
-
+	rows.Close()
 	gsql := "insert usergroup(name,ids,uid) values(?,?,?)"
 	errorcode.Id, err = db.Mconn.Insert(gsql, data.Name, strings.Join(ids, ","), uid)
 	if err != nil {

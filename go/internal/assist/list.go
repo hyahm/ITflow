@@ -22,7 +22,7 @@ func (names Names) RealNameToUsersId() Uid {
 		err = rows.Scan(realname)
 		ul = append(ul, *realname)
 	}
-
+	rows.Close()
 	return Uid(strings.Join(ul, ","))
 }
 
@@ -38,7 +38,7 @@ func (uids Uid) UsersIdToRealName() Names {
 		err = rows.Scan(realname)
 		ul = append(ul, *realname)
 	}
-
+	rows.Close()
 	return ul
 }
 
@@ -54,5 +54,6 @@ func FormatUserlistToShow(userlist string) Names {
 		err = rows.Scan(realname)
 		al = append(al, *realname)
 	}
+	rows.Close()
 	return al
 }

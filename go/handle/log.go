@@ -61,7 +61,7 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		rows.Scan(&one.Id, &one.Exectime, &one.Classify, &one.Action, &one.Ip, &one.UserName)
 		listlog.LogList = append(listlog.LogList, one)
 	}
-
+	rows.Close()
 	send, _ := json.Marshal(listlog)
 	w.Write(send)
 	return
@@ -110,6 +110,7 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 		rows.Scan(&log.Id, &log.Exectime, &log.Classify, &log.Action, &log.Ip, &log.UserName)
 		alllog.LogList = append(alllog.LogList, log)
 	}
+	rows.Close()
 	send, _ := json.Marshal(alllog)
 	w.Write(send)
 	return

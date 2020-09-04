@@ -73,7 +73,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 		}
 		ids = append(ids, id)
 	}
-
+	rows.Close()
 	// bug, err := data.ToBug()
 	// if err != nil {
 	// 	w.Write(errorcode.ErrorE(err))

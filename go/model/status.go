@@ -23,6 +23,7 @@ func (status *Status) Names() ([]string, error) {
 		rows.Scan(&name)
 		names = append(names, name)
 	}
+	rows.Close()
 	return names, nil
 }
 
@@ -38,6 +39,7 @@ func (status *Status) List() ([]*Status, error) {
 		rows.Scan(&st.ID, &st.Name)
 		ss = append(ss, st)
 	}
+	rows.Close()
 	return ss, nil
 }
 
