@@ -18,7 +18,11 @@ func ImportantGet(w http.ResponseWriter, r *http.Request) {
 	data := &model.List_importants{
 		ImportantList: make([]*model.Importants, 0),
 	}
-
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Delete {
+		w.Write(data.Error("no perm"))
+		return
+	}
 	rows, err := db.Mconn.GetRows("select id,name from importants")
 	if err != nil {
 		golog.Error(err)
@@ -122,7 +126,11 @@ func ImportantDel(w http.ResponseWriter, r *http.Request) {
 func ImportantUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-
+	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	if !perm.Update {
+		w.Write(errorcode.Error("no perm"))
+		return
+	}
 	data := xmux.GetData(r).Data.(*model.Importants)
 	gsql := "update importants set name=? where id=?"
 

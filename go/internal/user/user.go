@@ -12,6 +12,7 @@ import (
 
 	"github.com/hyahm/goconfig"
 	"github.com/hyahm/golog"
+	"github.com/hyahm/gomysql"
 )
 
 // 用户登录
@@ -87,8 +88,14 @@ func (ui *UserInfo) GetUserInfo(uid int64) error {
 	if uid == cache.SUPERID {
 		ui.Roles = append(ui.Roles, "admin")
 	} else {
-		permids := "select name from roles where id in (select permids from rolegroup where id=(select rid from user where id=?))"
-		rows, err := db.Mconn.GetRows(permids, uid)
+		var permids string
+		err = db.Mconn.GetOne("select permids from rolegroup where id=(select rid from user where id=?)", uid).Scan(&permids)
+		if err != nil {
+			golog.Error(err)
+			return err
+		}
+		rows, err := db.Mconn.GetRows("select r.name from perm as p join roles as r on p.id in (?) and p.find=true and p.rid=r.id",
+			gomysql.InArgs(strings.Split(permids, ",")).ToInArgs())
 
 		if err != nil {
 			golog.Error(err)
@@ -146,6 +153,9 @@ func (ui *UserInfo) Update() error {
 }
 
 func (ui *UserInfo) Json() []byte {
-	send, _ := json.Marshal(ui)
+	send, err := json.Marshal(ui)
+	if err != nil {
+		golog.Error(err)
+	}
 	return send
 }
