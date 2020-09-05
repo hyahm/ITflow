@@ -26,7 +26,13 @@ func (login *Login) Check() (*RespLogin, error) {
 	resp := &RespLogin{}
 	login.Username = strings.Trim(login.Username, " ")
 	enpassword := encrypt.PwdEncrypt(login.Password, cache.Salt)
-	getsql := "select id,nickname from user where email=? and password=? and disable=0"
+	getsql := ""
+	if strings.Contains(login.Username, "@") {
+		getsql = "select id,nickname from user where email=? and password=? and disable=0"
+	} else {
+		getsql = "select id,nickname from user where nickname=? and password=? and disable=0"
+	}
+
 	err := db.Mconn.GetOne(getsql, login.Username, enpassword).Scan(&resp.ID, &resp.UserName)
 	if err != nil {
 		if err == sql.ErrNoRows {

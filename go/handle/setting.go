@@ -42,6 +42,10 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	createTime := time.Now().Unix()
 	getuser := xmux.GetData(r).Data.(*user.GetAddUser)
+	if strings.Contains(getuser.Nickname, "@") {
+		w.Write(errorcode.Error("昵称不能包含@符号"))
+		return
+	}
 	enpassword := encrypt.PwdEncrypt(getuser.Password, cache.Salt)
 	var err error
 	errorcode.Id, err = db.Mconn.Insert(`insert into user(nickname, password, email, createtime, createuid, realname, bugsid, rid, jid) values(
@@ -301,6 +305,10 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 	// 	w.Write(errorcode.Error("没有找到status"))
 	// 	return
 	// }
+	if strings.Contains(uls.Nickname, "@") {
+		w.Write(errorcode.Error("昵称不能包含@符号"))
+		return
+	}
 	getallsql := `update user set 
 	 realname=?,	nickname=?,	email=?,
 	 rid=(select coalesce(min(id),0) from rolegroup where name=?),
