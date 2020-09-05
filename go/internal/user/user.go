@@ -94,7 +94,7 @@ func (ui *UserInfo) GetUserInfo(uid int64) error {
 			golog.Error(err)
 			return err
 		}
-		rows, err := db.Mconn.GetRows("select r.name from perm as p join roles as r on p.id in (?) and p.find=true and p.rid=r.id",
+		rows, err := db.Mconn.GetRowsIn("select r.name from perm as p join roles as r on p.id in (?) and p.find=true and p.rid=r.id",
 			gomysql.InArgs(strings.Split(permids, ",")).ToInArgs())
 
 		if err != nil {
