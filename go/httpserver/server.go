@@ -9,8 +9,15 @@ import (
 	"time"
 
 	"github.com/hyahm/goconfig"
+	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
+
+func GetExecTime(handle func(http.ResponseWriter, *http.Request), w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
+	handle(w, r)
+	golog.Debugf("url: %s -- addr: %s -- method: %s -- exectime: %f\n", r.URL.Path, r.RemoteAddr, r.Method, time.Since(start).Seconds())
+}
 
 func RunHttp() {
 	router := xmux.NewRouter()
@@ -18,7 +25,10 @@ func RunHttp() {
 	router.SetHeader("Content-Type", "application/x-www-form-urlencoded,application/json; charset=UTF-8")
 	router.SetHeader("Access-Control-Allow-Headers", "Content-Type,Access-Token,X-Token,smail")
 	router.AddModule(midware.CheckToken) // 所有的请求头优先检查token是否有效， 登录除外
-
+	if goconfig.ReadBool("debug") {
+		// 打印所有接口的执行时间
+		router.MiddleWare(GetExecTime)
+	}
 	router.AddGroup(routegroup.User) // 已完成
 	router.AddGroup(routegroup.Bug)
 	router.AddGroup(routegroup.Search)
