@@ -31,6 +31,8 @@ github.com/hyahm/golog v0.0.0-20200903091725-fb6aa179364d h1:PWGzsKLekq2dHioTfM2
 github.com/hyahm/golog v0.0.0-20200903091725-fb6aa179364d/go.mod h1:zKiO0JeV7UoTS6Gx7jZaGr+GblF6B57e04Q+/+ChEZA=
 github.com/hyahm/golog v0.0.0-20200911092805-82b58472dde8 h1:5sZRzX/Zoj4vmLcTIzW2afxONDcDcMzWqSVbMXKwaG0=
 github.com/hyahm/golog v0.0.0-20200911092805-82b58472dde8/go.mod h1:5r6TkZlPqe63JSuVJXrGd62di17HIgkaHfJNzgTAmV4=
+github.com/hyahm/golog v0.0.0-20200921065817-f362e2249806 h1:rm5e0+GHtCytNub7RHQtYOJmwH02rdON2Te/+jwUgq0=
+github.com/hyahm/golog v0.0.0-20200921065817-f362e2249806/go.mod h1:5r6TkZlPqe63JSuVJXrGd62di17HIgkaHfJNzgTAmV4=
 github.com/hyahm/gomysql v0.0.0-20200819135014-dea4aaca4f85 h1:rxWeb1NumMZHZ991pb0XlL++dHTH0GN1ohoc1oELL0U=
 github.com/hyahm/gomysql v0.0.0-20200819135014-dea4aaca4f85/go.mod h1:EQJNsrxZf9s8+XxRsyaXrs09r7hL+cGE8m0+ztzTKkY=
 github.com/hyahm/gomysql v0.0.0-20200820035719-2862f4f0e5c5 h1:oapxKfFIw3tZPLyXKe/E9DVzf0i+wSYAuvHSkjC4Puc=
@@ -53,6 +55,8 @@ github.com/hyahm/xmux v0.0.0-20200903093009-e56e6c1d0aa9 h1:9748mgw7QrAOvAMIgKch
 github.com/hyahm/xmux v0.0.0-20200903093009-e56e6c1d0aa9/go.mod h1:UoEQtjCaA8OzZJPtmiflvZ+cFMlmZo7o7WSQ/VdkDmE=
 github.com/hyahm/xmux v0.0.0-20200916082557-8d7596be15b9 h1:SUmhzmdL+iNYu5RjdguTt3RQqu500HdlSBkJ9odMdVQ=
 github.com/hyahm/xmux v0.0.0-20200916082557-8d7596be15b9/go.mod h1:UoEQtjCaA8OzZJPtmiflvZ+cFMlmZo7o7WSQ/VdkDmE=
+github.com/hyahm/xmux v0.0.0-20200924075511-b6d3162e5e6e h1:g4qNzIoEHB+VKInxm9YOaNmDxqLvkrMnV593waNP+Z4=
+github.com/hyahm/xmux v0.0.0-20200924075511-b6d3162e5e6e/go.mod h1:UoEQtjCaA8OzZJPtmiflvZ+cFMlmZo7o7WSQ/VdkDmE=
 github.com/json-iterator/go v1.1.6/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
 github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7VTCxuUUipMqKk8s4w=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
