@@ -72,7 +72,7 @@
         <!--<el-form-item style="margin-bottom: 40px;" prop="title">-->
         <!--<PlatformDropdown v-model="postForm.platforms" />-->
         <!--</el-form-item>-->
-        <el-form-item style="display: inline-block;width: 300px" label="严重级别：">
+        <el-form-item style="display: inline-block;width: 300px" label="重要性：">
           <el-select v-model="postForm.important" placeholder="请选择">
             <el-option
               v-for="(important, index) in importants"

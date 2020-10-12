@@ -1,7 +1,7 @@
 <template>
   <div>
     <p class="warn-content">
-      bug严重级别
+      bug重要性
     </p>
     <el-table
       :data="tableData"
@@ -17,7 +17,7 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="严重级别名"
+        label="重要性别名"
         width="180"
       >
         <template slot-scope="scope">
@@ -39,11 +39,11 @@
       </el-table-column>
     </el-table>
     <div>
-      <el-button type="success" plain style="margin: 20px" @click="addstatus">添加严重级别</el-button>
+      <el-button type="success" plain style="margin: 20px" @click="addstatus">添加重要性</el-button>
     </div>
-    <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" title="严重级别管理">
+    <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" title="重要性管理">
       <el-form>
-        <el-form-item label="严重级别">
+        <el-form-item label="重要性">
           <el-input v-model="form.name" auto-complete="off" />
         </el-form-item>
       </el-form>
