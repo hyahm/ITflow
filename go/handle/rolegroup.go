@@ -32,6 +32,7 @@ func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 			RoleList: make([]*rolegroup.PermRole, 0),
 		}
 		rows.Scan(&one.Id, &one.Name, &permids)
+		golog.Info(one.Id, " ", one.Name)
 		permrows, err := db.Mconn.GetRowsIn("select find, remove, revise, increase, r.name, r.info from perm as p join roles as r on p.id in (?) and p.rid=r.id",
 			(gomysql.InArgs)(strings.Split(permids, ",")).ToInArgs())
 		if err != nil {

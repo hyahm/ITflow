@@ -49,6 +49,7 @@ func (reqrg *ReqRoleGroup) Add(uid int64) []byte {
 	}
 	// 过滤
 	pernids := make([]string, 0)
+	golog.Info("info: ", cache.CacheRoleRid)
 	// 确保每个info 没漏掉， 应该要加个判断的
 	for _, v := range reqrg.RoleList {
 		// 不管有没有效， 全部插入
@@ -57,8 +58,9 @@ func (reqrg *ReqRoleGroup) Add(uid int64) []byte {
 			v.Update = false
 			v.Add = false
 		}
+		golog.Info("info: ", v.Info)
 
-		if rid, ok := cache.CacheRoleRid[v.Info]; ok {
+		if rid, ok := cache.CacheRoleRid[v.Name]; ok {
 			perm := &model.Perm{
 				Find:     v.Select,
 				Remove:   v.Remove,
@@ -66,13 +68,13 @@ func (reqrg *ReqRoleGroup) Add(uid int64) []byte {
 				Increase: v.Add,
 				Rid:      rid,
 			}
+			golog.Info(*perm)
 			// 数据插入到perm表
 			err := perm.Insert()
 			if err != nil {
 				golog.Info(err)
 				return errrocode.ErrorE(err)
 			}
-			errrocode.Id = perm.Id
 			pernids = append(pernids, strconv.FormatInt(perm.Id, 10))
 		} else {
 			golog.Info(v.Name)
