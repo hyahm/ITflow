@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"database/sql"
 	"encoding/json"
 	"itflow/db"
 	"itflow/internal/perm"
@@ -176,6 +177,10 @@ func GetLevels(w http.ResponseWriter, r *http.Request) {
 	rows, err := db.Mconn.GetRows("select name from level")
 	if err != nil {
 		golog.Error(err)
+		if err == sql.ErrNoRows {
+			w.Write(data.Marshal())
+			return
+		}
 		w.Write(data.ErrorE(err))
 		return
 	}

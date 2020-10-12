@@ -36,7 +36,6 @@ func main() {
 			goconfig.ReadInt64("log.size", 0),
 			goconfig.ReadBool("log.everyday", false))
 	}
-
 	// ////
 	signalChan := make(chan os.Signal)
 

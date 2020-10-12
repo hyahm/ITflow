@@ -5,6 +5,7 @@ import (
 	"itflow/db"
 	"strings"
 
+	"github.com/hyahm/golog"
 	"github.com/hyahm/gomysql"
 )
 
@@ -58,6 +59,7 @@ func perm(uid int64, rid int64) (op OptionPerm, err error) {
 	var permids string
 	err = db.Mconn.GetOne("select permids from rolegroup where id=(select rid from user where id=?)", uid).Scan(&permids)
 	if err != nil {
+		golog.Info(err)
 		return
 	}
 	err = db.Mconn.GetOneIn("select  find, remove, revise, increase from perm where id in (?) and rid=?",
@@ -65,6 +67,7 @@ func perm(uid int64, rid int64) (op OptionPerm, err error) {
 		&op.Select, &op.Delete, &op.Update, &op.Insert,
 	)
 	if err != nil {
+		golog.Info(err)
 		return
 	}
 	return

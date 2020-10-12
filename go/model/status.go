@@ -1,6 +1,7 @@
 package model
 
 import (
+	"database/sql"
 	"itflow/db"
 	"strings"
 
@@ -16,6 +17,9 @@ func (status *Status) Names() ([]string, error) {
 	names := make([]string, 0)
 	rows, err := db.Mconn.GetRows("select name from status")
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return names, nil
+		}
 		return names, err
 	}
 	for rows.Next() {

@@ -48,6 +48,7 @@ func (sl *statusList) ErrorE(err error) []byte {
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
 	// 获取状态名
+	golog.Info(5555)
 	w.Write(status.GetNames())
 	return
 
@@ -56,6 +57,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 func ShowStatus(w http.ResponseWriter, r *http.Request) {
 	// 获取显示的状态名
 	// sl := xmux.GetData(r).Data.(*status.Status)
+	golog.Info("8888888888")
 	sl := &status.Status{
 		CheckStatus: make([]string, 0),
 	}
@@ -64,6 +66,10 @@ func ShowStatus(w http.ResponseWriter, r *http.Request) {
 	err := db.Mconn.GetOne("select showstatus from user where id=?", uid).Scan(&sids)
 	if err != nil {
 		golog.Error(err)
+		if err == sql.ErrNoRows {
+			w.Write(sl.Marshal())
+			return
+		}
 		w.Write(sl.ErrorE(err))
 		return
 	}
@@ -72,6 +78,10 @@ func ShowStatus(w http.ResponseWriter, r *http.Request) {
 		(gomysql.InArgs)(strings.Split(sids, ",")).ToInArgs())
 	if err != nil {
 		golog.Error(err)
+		if err == sql.ErrNoRows {
+			w.Write(sl.Marshal())
+			return
+		}
 		w.Write(sl.ErrorE(err))
 		return
 	}

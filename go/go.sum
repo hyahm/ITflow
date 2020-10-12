@@ -59,6 +59,10 @@ github.com/hyahm/xmux v0.0.0-20200924075511-b6d3162e5e6e h1:g4qNzIoEHB+VKInxm9YO
 github.com/hyahm/xmux v0.0.0-20200924075511-b6d3162e5e6e/go.mod h1:UoEQtjCaA8OzZJPtmiflvZ+cFMlmZo7o7WSQ/VdkDmE=
 github.com/hyahm/xmux v0.0.0-20201010095241-9de4ca0e7196 h1:5Rg+ovuJ+k8qiub/aiODhcX/VioQnjIzmcpmgMbl8ao=
 github.com/hyahm/xmux v0.0.0-20201010095241-9de4ca0e7196/go.mod h1:vSz1z8NJmeGLQmMxVmUbUI2VhfXkyaZ95NT/OzIxn3g=
+github.com/hyahm/xmux v0.0.0-20201012064532-4be3a9c5132b h1:K2xcB6jbU4vm5Q2SDHEC6PKYNJhHsNUlnLJ9kAMfubo=
+github.com/hyahm/xmux v0.0.0-20201012064532-4be3a9c5132b/go.mod h1:vSz1z8NJmeGLQmMxVmUbUI2VhfXkyaZ95NT/OzIxn3g=
+github.com/hyahm/xmux v0.0.0-20201012065236-17cf91e3b4c8 h1:lC711wim90VSFXz4nOvLjq4g/XvvHWSY6JMm3DIZWRM=
+github.com/hyahm/xmux v0.0.0-20201012065236-17cf91e3b4c8/go.mod h1:xUTWFvc+Hh41JMgycVFFrfKmn8mG9NmT0FtlMARYpf8=
 github.com/json-iterator/go v1.1.6/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
 github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7VTCxuUUipMqKk8s4w=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
