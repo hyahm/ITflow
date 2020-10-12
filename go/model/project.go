@@ -17,8 +17,9 @@ type Project struct {
 }
 
 func (p *Project) Insert(groupname string) error {
-	rows, err := db.Mconn.GetRows("select id from usergroup where name=?")
+	rows, err := db.Mconn.GetRows("select id from usergroup where name=?", groupname)
 	if err != nil {
+		golog.Error(err)
 		return err
 	}
 	ids := make([]string, 0)
