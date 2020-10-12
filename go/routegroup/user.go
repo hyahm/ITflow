@@ -46,4 +46,6 @@ func init() {
 
 	User.Post("/get/user", handle.GetUser).ApiDescribe("获取所有用户的真实名")
 	User.Get("/get/project/user", handle.GetProjectUser).ApiDescribe("根据项目获取关联用户和版本")
+
+	User.Post("/is/admin", handle.IsAdmin).ApiDescribe("判断是都是管理员")
 }

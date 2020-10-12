@@ -55,7 +55,7 @@
           <!--<el-tag>{{scope.row.type | typeFilter}}</el-tag>-->
         </template>
       </el-table-column>
-      <el-table-column width="110px" align="center" label="作者">
+      <el-table-column width="110px" align="center" label="创建者">
         <template slot-scope="scope">
           <span>{{ scope.row.author }}</span>
         </template>

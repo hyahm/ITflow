@@ -108,3 +108,10 @@ export function getProjectUser(name) {
     params: { name }
   })
 }
+
+export function isAdmin() {
+  return request({
+    url: '/is/admin',
+    method: 'post'
+  })
+}

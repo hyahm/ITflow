@@ -97,6 +97,14 @@ func (bug *Bug) Resume(id interface{}) error {
 	return err
 }
 
+func (bug *Bug) Delete(id interface{}) error {
+	getlistsql := "delete from bugs  where id=?"
+
+	_, err := db.Mconn.Update(getlistsql, id)
+
+	return err
+}
+
 func (bug *Bug) CreateBug() (err error) {
 	insertsql := "insert into bugs(uid,title,sid,content,iid,createtime,lid,pid,eid,spusers,vid,dustbin) values(?,?,?,?,?,?,?,?,?,?,?,true)"
 	bug.ID, err = db.Mconn.Insert(insertsql,

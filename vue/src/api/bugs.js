@@ -95,3 +95,10 @@ export function fetchBug(id) {
   })
 }
 
+export function delBug(id) {
+  return request({
+    url: '/bug/delete',
+    method: 'get',
+    params: { id }
+  })
+}

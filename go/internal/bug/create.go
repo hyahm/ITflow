@@ -3,6 +3,7 @@ package bug
 import (
 	"encoding/json"
 	"html"
+	"itflow/cache"
 	"itflow/db"
 	"strings"
 
@@ -43,11 +44,11 @@ func (reb *EditBug) ErrorE(err error) []byte {
 	return reb.Error(err.Error())
 }
 
-func BugById(id interface{}) []byte {
+func BugById(id string, uid int64) []byte {
 	reb := &EditBug{}
-
+	golog.Info(id)
 	alsql := `select i.name,title,
-	l.name,p.name,e.name,spusers,v.name,content 
+	l.name,p.name,e.name,spusers,v.name,content, b.uid 
 	from bugs as b 
 	join importants as i 
 	join level as l 
@@ -59,13 +60,17 @@ func BugById(id interface{}) []byte {
 	l.id=b.lid and 
 	p.id=b.pid and  
 	e.id=b.eid and 
-	v.id=b.vid`
+	v.id=b.vid `
 	var spids string
+	var bugUid int64
 	err := db.Mconn.GetOne(alsql, id).Scan(&reb.Important, &reb.Title, &reb.Level, &reb.Projectname,
-		&reb.Envname, &spids, &reb.Version, &reb.Content)
+		&reb.Envname, &spids, &reb.Version, &reb.Content, &bugUid)
 	if err != nil {
 		golog.Error(err)
 		return reb.ErrorE(err)
+	}
+	if bugUid != uid && uid != cache.SUPERID {
+		return reb.Error("没有权限")
 	}
 	rows, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
 		(gomysql.InArgs)(strings.Split(spids, ",")).ToInArgs())
@@ -85,7 +90,6 @@ func BugById(id interface{}) []byte {
 	}
 	rows.Close()
 	reb.Content = html.UnescapeString(reb.Content)
-
 	return reb.Marshal()
 }
 

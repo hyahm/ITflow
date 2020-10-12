@@ -153,6 +153,15 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func IsAdmin(w http.ResponseWriter, r *http.Request) {
+	if xmux.GetData(r).Get("uid").(int64) == cache.SUPERID {
+		w.Write([]byte("1"))
+	} else {
+		w.Write([]byte("0"))
+	}
+	return
+}
+
 func GetProjectUser(w http.ResponseWriter, r *http.Request) {
 	// 通过project 来获取所属用户
 	projectname := r.FormValue("name")

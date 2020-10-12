@@ -61,7 +61,7 @@
           <!--<el-tag>{{scope.row.type | typeFilter}}</el-tag>-->
         </template>
       </el-table-column>
-      <el-table-column label="作者" width="110px" align="center">
+      <el-table-column label="创建者" width="110px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.author }}</span>
         </template>
@@ -97,10 +97,20 @@
           <!--<span v-else>0</span>-->
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="状态" align="center" width="90" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <span>{{ scope.row.status }}</span>
           <!-- <el-select v-model="scope.row.status" style="width: 200px" class="filter-item" placeholder="修改状态" @change="changestatus(scope.row)" /> -->
+        </template>
+      </el-table-column>
+
+      <el-table-column v-if="admin" label="操作" align="center" width="250" class-name="small-padding fixed-width">
+        <template slot-scope="scope">
+          <router-link :to="'/bug/edit/'+scope.row.id">
+            <el-button type="primary" size="mini">编辑</el-button>
+          </router-link>
+          <el-button type="primary" size="mini" @click="handleCLose(scope.row)">关闭</el-button>
+          <el-button type="primary" size="mini" @click="handleDel(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -123,10 +133,10 @@
 </template>
 
 <script>
-import { changeStatus } from '@/api/bugs'
+import { changeStatus, closeBug, delBug } from '@/api/bugs'
 import { statusFilter } from '@/api/status'
 import { searchAllBugs } from '@/api/search'
-import { getProject, getShowStatus, getStatus, getLevels } from '@/api/get'
+import { getProject, getShowStatus, getStatus, getLevels, isAdmin } from '@/api/get'
 import waves from '@/directive/waves' // 水波纹指令
 import { parseTime } from '@/utils'
 
@@ -163,6 +173,7 @@ export default {
   },
   data() {
     return {
+      admin: false,
       users: [],
       tableKey: 0,
       list: null,
@@ -231,6 +242,7 @@ export default {
     this.getmystatus()
     this.getlevels()
     this.getprojectname()
+    this.isadmin()
   },
   created() {
     this.getstatus()
@@ -238,9 +250,79 @@ export default {
     this.getlevels()
     this.getList()
     this.getprojectname()
+    this.isadmin()
     // this.gettaskstatus()
   },
   methods: {
+    handleDel(row) {
+      this.$confirm('此操作将关闭bug, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        delBug(row.id).then(response => {
+          if (response.data.code === 0) {
+            this.list = this.list.filter(items => {
+              return items.id !== row.id
+            })
+            this.$message({
+              message: '已关闭',
+              type: 'success'
+            })
+          } else {
+            this.$message({
+              message: '操作失败',
+              type: 'error'
+            })
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
+    handleClose(row) {
+      this.$confirm('此操作将关闭bug, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        closeBug(row.id).then(response => {
+          if (response.data.code === 0) {
+            this.list = this.list.filter(items => {
+              return items.id !== row.id
+            })
+            this.$message({
+              message: '已关闭',
+              type: 'success'
+            })
+          } else {
+            this.$message({
+              message: '操作失败',
+              type: 'error'
+            })
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
+    isadmin() {
+      isAdmin().then(resp => {
+        console.log(resp.data)
+        if (resp.data === 1) {
+          this.admin = true
+        } else {
+          this.admin = false
+        }
+        console.log(this.admin)
+      })
+    },
     getlevels() {
       getLevels().then(resp => {
         if (resp.data.code === 0) {

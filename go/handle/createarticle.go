@@ -113,6 +113,18 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		// update
+		permsql := "select uid from bugs where id=?"
+		var bugUid int64
+		err := db.Mconn.GetOne(permsql, data.Id).Scan(&bugUid)
+		if err != nil {
+			golog.Error(err)
+			w.Write(data.ErrorE(err))
+			return
+		}
+		if bugUid != uid && uid != cache.SUPERID {
+			w.Write(data.Error("没有权限"))
+			return
+		}
 		updatesql := `update bugs set title=?,content=?,
 			iid=(select ifnull(min(id),0) from importants where name=?),
 			updatetime=?,
@@ -121,12 +133,13 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 			lid=(select ifnull(min(id),0) from level where name=?),
 			eid=(select ifnull(min(id),0) from environment where name=?),
 			pid=(select ifnull(min(id),0) from project where name=?) 
-		where uid=? and id=?`
-
+		where id=?`
+		db.Mconn.OpenDebug()
 		_, err = db.Mconn.Update(updatesql, data.Title,
 			html.EscapeString(data.Content), data.Important,
 			time.Now().Unix(), data.Version, strings.Join(ids, ","),
-			data.Level, data.Envname, data.Projectname, uid, data.Id)
+			data.Level, data.Envname, data.Projectname, data.Id)
+		golog.Info(db.Mconn.GetSql())
 		if err != nil {
 			golog.Error(err)
 			w.Write(data.ErrorE(err))

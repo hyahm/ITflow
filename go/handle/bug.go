@@ -373,10 +373,27 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func DeleteBug(w http.ResponseWriter, r *http.Request) {
+	id := r.FormValue("id")
+	errorcode := &response.Response{}
+	if xmux.GetData(r).Get("uid").(int64) != cache.SUPERID {
+		w.Write(errorcode.Error("没有权限"))
+		return
+	}
+
+	bug := &model.Bug{}
+	err := bug.Delete(id)
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	w.Write(errorcode.Success())
+	return
+}
+
 func ResumeBug(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
-	golog.Info("0000")
-	golog.Info(id)
 	errorcode := &response.Response{}
 	bug := &model.Bug{}
 	err := bug.Resume(id)
@@ -385,7 +402,6 @@ func ResumeBug(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	golog.Info("0000")
 	w.Write(errorcode.Success())
 	return
 }
@@ -425,7 +441,8 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 func BugEdit(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("id")
-	w.Write(bug.BugById(id))
+	uid := xmux.GetData(r).Get("uid").(int64)
+	w.Write(bug.BugById(id, uid))
 	return
 
 }
