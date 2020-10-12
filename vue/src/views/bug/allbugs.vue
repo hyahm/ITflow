@@ -255,7 +255,7 @@ export default {
   },
   methods: {
     handleDel(row) {
-      this.$confirm('此操作将关闭bug, 是否继续?', '提示', {
+      this.$confirm('此操作将删除bug, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -266,7 +266,7 @@ export default {
               return items.id !== row.id
             })
             this.$message({
-              message: '已关闭',
+              message: '已删除',
               type: 'success'
             })
           } else {
