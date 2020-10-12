@@ -27,7 +27,7 @@ func (status *StatusGroup) GetIds() (string, error) {
 		var id string
 		err = rows.Scan(&id)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		ids = append(ids, id)

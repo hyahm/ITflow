@@ -79,7 +79,7 @@ func ShowStatus(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		err = rows.Scan(statusname)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		sl.CheckStatus = append(sl.CheckStatus, *statusname)
@@ -128,7 +128,7 @@ func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		err = rows.Scan(statusname)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		sl.StatusList = append(sl.StatusList, *statusname)
@@ -317,7 +317,7 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 			&bug.Date, &bug.Importance, &bug.Status, &bug.Title, &bug.Level, &bug.Projectname,
 			&bug.Env, &ids, &bug.Author)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		realnames, err := db.Mconn.GetRows("select realname from user where id in (?)",

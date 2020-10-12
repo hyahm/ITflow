@@ -53,7 +53,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		err = rows.Scan(thisId)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		ids = append(ids, *thisId)

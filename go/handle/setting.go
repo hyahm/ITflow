@@ -252,7 +252,7 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 		err = adminrows.Scan(&ul.Id, &ul.Createtime, &ul.Realname, &ul.Nickname, &ul.Email,
 			&ul.Disable, &ul.RoleGroup, &ul.StatusGroup, &ul.Position)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		uls.Userlist = append(uls.Userlist, ul)

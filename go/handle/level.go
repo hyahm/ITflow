@@ -35,7 +35,7 @@ func LevelGet(w http.ResponseWriter, r *http.Request) {
 		level := &model.Table_level{}
 		err = rows.Scan(&level.Id, &level.Name)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		data.Levels = append(data.Levels, level)
@@ -184,7 +184,7 @@ func GetLevels(w http.ResponseWriter, r *http.Request) {
 		var name string
 		err = rows.Scan(&name)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		data.Levels = append(data.Levels, name)

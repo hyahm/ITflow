@@ -83,7 +83,7 @@ func GetEnv(w http.ResponseWriter, r *http.Request) {
 		var name string
 		err = rows.Scan(&name)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		el.EnvList = append(el.EnvList, name)
@@ -141,7 +141,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		// var realname string
 		err = rows.Scan(realname)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		ul.Users = append(ul.Users, *realname)

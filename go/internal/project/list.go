@@ -38,7 +38,7 @@ func GetList(uid int64) []byte {
 		rp.Id = p.Id
 		err = db.Mconn.GetOne("select name from usergroup where id=?", p.Gid).Scan(&rp.GroupName)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		// ug, ok := cache.CacheUGidUserGroup[p.Gid]

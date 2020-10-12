@@ -78,7 +78,7 @@ func BugById(id interface{}) []byte {
 		var name string
 		err = rows.Scan(&name)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		reb.Selectusers = append(reb.Selectusers, name)

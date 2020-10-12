@@ -34,7 +34,7 @@ func EnvList(w http.ResponseWriter, r *http.Request) {
 		e := &env.Env{}
 		err = rows.Scan(&e.Id, &e.EnvName)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		el.Elist = append(el.Elist, e)

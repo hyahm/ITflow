@@ -74,7 +74,7 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 		rl := &version.RespVersion{}
 		err = rows.Scan(&rl.Id, &rl.Project, &rl.Name, &rl.Url, &rl.BakUrl, &rl.Date)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		al.VersionList = append(al.VersionList, rl)

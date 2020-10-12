@@ -34,7 +34,7 @@ func ImportantGet(w http.ResponseWriter, r *http.Request) {
 		im := &model.Importants{}
 		err = rows.Scan(&im.Id, &im.Name)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		data.ImportantList = append(data.ImportantList, im)
@@ -191,7 +191,7 @@ func GetImportants(w http.ResponseWriter, r *http.Request) {
 		var name string
 		err = rows.Scan(&name)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		data.Importants = append(data.Importants, name)

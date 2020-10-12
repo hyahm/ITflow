@@ -43,7 +43,7 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 		var uids string
 		err = prows.Scan(&pid, &uids)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		for _, v := range strings.Split(uids, ",") {
@@ -103,7 +103,7 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 			&bug.Date, &bug.Importance, &bug.Status, &bug.Title, &bug.Level, &bug.Projectname,
 			&bug.Env, &ids, &bug.Author)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		realnames, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
@@ -190,7 +190,7 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 			&bug.Date, &bug.Importance, &bug.Status, &bug.Title, &bug.Level, &bug.Projectname,
 			&bug.Env, &ids, &bug.Author)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		realnames, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
@@ -250,7 +250,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 		var spusers string
 		err = countRows.Scan(&id, &spusers)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		for _, v := range strings.Split(spusers, ",") {
@@ -296,7 +296,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 			&bug.Date, &bug.Importance, &bug.Status, &bug.Title, &bug.Level, &bug.Projectname,
 			&bug.Env, &ids, &bug.Author)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		realnames, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
@@ -378,7 +378,7 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 			&bug.Date, &bug.Importance, &bug.Status, &bug.Title, &bug.Level, &bug.Projectname,
 			&bug.Env, &ids, &bug.Author)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		realnames, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",

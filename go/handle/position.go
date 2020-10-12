@@ -205,7 +205,7 @@ func GetHypos(w http.ResponseWriter, r *http.Request) {
 		hn := &Hypo{}
 		err = rows.Scan(&hn.Id, &hn.Name)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		data.Hypos = append(data.Hypos, hn)
@@ -244,7 +244,7 @@ func GetPositions(w http.ResponseWriter, r *http.Request) {
 		var name string
 		err = rows.Scan(&name)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		data.Positions = append(data.Positions, name)

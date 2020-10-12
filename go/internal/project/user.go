@@ -33,7 +33,7 @@ func GetUsersByProjectName(userid int64, name string) []byte {
 	for rows.Next() {
 		err = rows.Scan(n)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		resp.Name = append(resp.Name, *n)
@@ -47,7 +47,7 @@ func GetUsersByProjectName(userid int64, name string) []byte {
 	for vrows.Next() {
 		err = vrows.Scan(n)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		resp.Versions = append(resp.Versions, *n)

@@ -163,7 +163,7 @@ func GroupNamesGet(w http.ResponseWriter, r *http.Request) {
 		var name string
 		err = rows.Scan(&name)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		data.UserGroupNames = append(data.UserGroupNames, name)
@@ -210,7 +210,7 @@ func UserGroupGet(w http.ResponseWriter, r *http.Request) {
 		namerows, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
 			(gomysql.InArgs)(strings.Split(users, ",")).ToInArgs())
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 
@@ -247,7 +247,7 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		err = rows.Scan(id)
 		if err != nil {
-			golog.Error(err)
+			golog.Info(err)
 			continue
 		}
 		ids = append(ids, *id)
