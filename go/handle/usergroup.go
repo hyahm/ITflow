@@ -235,7 +235,7 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 	uid := xmux.GetData(r).Get("uid").(int64)
 	data := xmux.GetData(r).Data.(*usergroup.RespUserGroup)
-	rows, err := db.Mconn.GetRowsIn("select id from usergroup where name in (?)", gomysql.InArgs(data.Users).ToInArgs())
+	rows, err := db.Mconn.GetRowsIn("select id from user where realname in (?)", gomysql.InArgs(data.Users).ToInArgs())
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

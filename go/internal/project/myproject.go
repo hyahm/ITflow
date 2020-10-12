@@ -36,6 +36,7 @@ func (mp *MyProject) ErrorE(err error) []byte {
 }
 
 func (mp *MyProject) Get(uid int64) []byte {
+	golog.Debug(uid)
 	pl, err := model.NewProjectListCheckId(uid)
 	if err != nil {
 		mp.Code = 1
@@ -45,6 +46,7 @@ func (mp *MyProject) Get(uid int64) []byte {
 
 	for _, p := range pl {
 		var uids string
+		golog.Debug(p)
 		err = db.Mconn.GetOne("select ids from usergroup where id=?", p.Gid).Scan(&uids)
 		if err != nil {
 			golog.Error(err)
