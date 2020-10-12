@@ -207,7 +207,6 @@ export default {
       // 选择不用项目会显示不同的用户
       this.users = []
       getProjectUser(name).then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.users = resp.data.name
           this.versions = resp.data.versions
@@ -224,7 +223,6 @@ export default {
       // 选择不用项目会显示不同的用户
       this.users = []
       getProjectUser(name).then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.users = resp.data.name
           this.versions = resp.data.versions
@@ -240,8 +238,6 @@ export default {
           if (resp.data.importants !== null) {
             this.importants = resp.data.importants
           }
-        } else {
-          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -249,8 +245,6 @@ export default {
       getLevels().then(resp => {
         if (resp.data.code === 0) {
           this.levels = resp.data.levels
-        } else {
-          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -258,8 +252,6 @@ export default {
       getEnv().then(resp => {
         if (resp.data.code === 0) {
           this.envnames = resp.data.envlist
-        } else {
-          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -267,8 +259,6 @@ export default {
       getMyProject().then(resp => {
         if (resp.data.code === 0) {
           this.projectnames = resp.data.name
-        } else {
-          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -363,9 +353,7 @@ export default {
       }
       this.$refs.postForm.validate(valid => {
         if (valid) {
-          console.log(this.postForm)
           createBug(this.postForm).then(resp => {
-            console.log(resp.data)
             if (resp.data.code === 0) {
               if (this.postForm.id === -1) {
                 this.$notify({

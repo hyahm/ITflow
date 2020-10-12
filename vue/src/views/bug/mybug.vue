@@ -189,8 +189,6 @@ export default {
       getLevels().then(resp => {
         if (resp.data.code === 0) {
           this.levels = resp.data.levels
-        } else {
-          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -212,16 +210,12 @@ export default {
       getStatus().then(resp => {
         if (resp.data.code === 0) {
           this.platformsOptions = resp.data.statuslist
-        } else {
-          this.$message.error(resp.data.msg)
         }
       })
       // 可以修改的权限
       getPermStatus().then(resp => {
         if (resp.data.code === 0) {
           this.statuslist = resp.data.statuslist
-        } else {
-          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -232,8 +226,6 @@ export default {
         if (resp.data.code === 0) {
           this.listQuery.showstatus = resp.data.checkstatus
           this.statuslength = this.listQuery.showstatus.length
-        } else {
-          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -241,8 +233,6 @@ export default {
       getMyProject().then(resp => {
         if (resp.data.code === 0) {
           this.projectnames = resp.data.name
-        } else {
-          this.$message.error(resp.data.msg)
         }
       })
     },

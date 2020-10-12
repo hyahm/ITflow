@@ -254,8 +254,6 @@ export default {
       getLevels().then(resp => {
         if (resp.data.code === 0) {
           this.levels = resp.data.levels
-        } else {
-          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -263,15 +261,11 @@ export default {
       getStatus().then(resp => {
         if (resp.data.code === 0) {
           this.platformsOptions = resp.data.statuslist
-        } else {
-          this.$message.error(resp.data.msg)
         }
       })
       getPermStatus().then(resp => {
         if (resp.data.code === 0) {
           this.statuslist = resp.data.statuslist
-        } else {
-          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -293,11 +287,8 @@ export default {
     },
     getpname() {
       getMyProject().then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.projectnames = resp.data.name
-        } else {
-          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -309,8 +300,6 @@ export default {
             this.checkstatus = resp.data.checkstatus
             this.statuslength = this.checkstatus.length
           }
-        } else {
-          this.$message.error(resp.data.msg)
         }
       })
     },
@@ -318,8 +307,6 @@ export default {
       getUsers().then(resp => {
         if (resp.data.code === 0) {
           this.users = resp.data.users
-        } else {
-          this.$message.error(resp.data.msg)
         }
       })
     },
