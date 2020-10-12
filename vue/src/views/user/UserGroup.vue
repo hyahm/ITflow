@@ -124,7 +124,6 @@ export default {
       this.dialogFormVisible = true
     },
     confirm() {
-      console.log(this.form)
       if (this.form.id > 0) {
         updateGroup(this.form).then(resp => {
           if (resp.data.code === 0) {
@@ -143,7 +142,6 @@ export default {
         })
       } else {
         addGroup(this.form).then(resp => {
-          console.log(resp.data)
           if (resp.data.code === 0) {
             this.list.push({
               id: resp.data.id,
@@ -166,7 +164,6 @@ export default {
       this.dialogFormVisible = false
     },
     handleUpdate(row) {
-      console.log(row)
       this.dialogFormVisible = true
       this.form.id = row.id
       this.form.users = row.users

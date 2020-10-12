@@ -108,11 +108,9 @@ export default {
       // 获取模板
       getPermTemplate().then(resp => {
         this.templateperm = resp.data
-        console.log(this.templateperm)
       })
     },
     handleEdit(row) {
-      console.log(row)
       this.form.id = row.id
       this.form.name = row.name
       this.form.rolelist = row.rolelist
@@ -122,7 +120,6 @@ export default {
       roleList().then(resp => {
         if (resp.data.code === 0) {
           this.list = resp.data.rolelist
-          console.log(this.list)
         } else {
           this.$message.error(resp.data.msg)
         }

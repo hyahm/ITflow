@@ -95,7 +95,6 @@ export default {
   methods: {
     getemail() {
       getEmailStatus().then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.email = resp.data.email
           this.enable = resp.data.enable
@@ -125,7 +124,6 @@ export default {
       })
     },
     handleSave() {
-      console.log(this.id)
       const data = {
         'id': this.id,
         'host': this.host,

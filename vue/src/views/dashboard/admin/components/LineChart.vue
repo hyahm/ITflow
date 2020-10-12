@@ -92,7 +92,6 @@ export default {
     },
     setOptions(data) {
       var { createdData, completedData, xData } = data
-      console.log(createdData)
       this.chart.setOption({
         xAxis: {
           data: xData,

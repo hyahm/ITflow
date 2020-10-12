@@ -321,7 +321,6 @@ export default {
     },
     // 上传文件
     handleSuccess(res, file) {
-      console.log('上传文件成功')
       if (res.code === 0) {
         this.tableData.push({
           id: res.id,

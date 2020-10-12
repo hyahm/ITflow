@@ -154,7 +154,6 @@ export default {
   methods: {
     getproject() {
       getMyProject().then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.projects = resp.data.name
         } else {
@@ -172,7 +171,6 @@ export default {
     },
     getversionlist() {
       getVersion().then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.list = resp.data.versionlist
           this.total = resp.data.versionlist.length
@@ -200,7 +198,6 @@ export default {
     confirm() {
       if (this.form.id <= 0) {
         addVersion(this.form).then(response => {
-          console.log(response.data)
           if (response.data.code === 0) {
             this.form.id = response.data.id
             this.form.date = response.data.updatetime

@@ -52,7 +52,6 @@ service.interceptors.response.use(
         removeToken()
         location.href = '/login'
       } else if (response.data.code === 10) {
-        console.log(response.data)
         Message({
           message: response.data.message,
           type: 'error',

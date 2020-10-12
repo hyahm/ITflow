@@ -126,7 +126,6 @@ export default {
       })
     },
     addProject() {
-      console.log(this.tableData)
       this.form.id = -1
       this.form.projectname = ''
       this.form.groupname = ''
@@ -175,7 +174,6 @@ export default {
       if (this.form.groupname === '') {
         this.$message.success('请选择用户组')
       }
-      console.log(this.form)
       if (this.form.id <= 0) {
         addProjectName(this.form).then(resp => {
           if (resp.data.code === 0) {

@@ -314,13 +314,11 @@ export default {
     },
     isadmin() {
       isAdmin().then(resp => {
-        console.log(resp.data)
         if (resp.data === 1) {
           this.admin = true
         } else {
           this.admin = false
         }
-        console.log(this.admin)
       })
     },
     getlevels() {

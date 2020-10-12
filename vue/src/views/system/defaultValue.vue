@@ -99,7 +99,6 @@ export default {
     getdefaultstatus() {
       status().then(resp => {
         if (resp.data.code === 0) {
-          console.log(resp.data)
           this.form.created = resp.data.created
           this.form.completed = resp.data.completed
         } else {

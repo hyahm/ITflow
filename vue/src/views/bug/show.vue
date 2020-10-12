@@ -169,7 +169,6 @@ export default {
       if (id % 1 === 0) {
         this.temp.id = parseInt(id)
         showBug(id).then(resp => {
-          console.log(resp.data)
           if (resp.data.code === 0) {
             this.bug = resp.data
           } else {

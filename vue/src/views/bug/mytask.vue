@@ -313,7 +313,6 @@ export default {
     handleFilter() {
       this.listLoading = true
       searchMyTasks(this.listQuery).then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           this.list = resp.data.articlelist
           this.total = resp.data.total
@@ -353,7 +352,6 @@ export default {
         if (resp.data.code === 0) {
           this.users = resp.data.name
           for (var i = 0; i < this.users.length; i++) {
-            console.log(row.handle)
             for (var j = 0; j < row.handle.length; j++) {
               if (this.temp.selectusers[j] === this.users[i]) {
                 this.temp.selectusers.push(this.users[i])
