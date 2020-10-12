@@ -19,7 +19,7 @@ func EnvList(w http.ResponseWriter, r *http.Request) {
 		Elist: make([]*env.Env, 0),
 	}
 	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
-	if !perm.Insert {
+	if !perm.Select {
 		w.Write(el.Error("no perm"))
 		return
 	}
@@ -49,7 +49,7 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
-	if !perm.Select {
+	if !perm.Insert {
 		w.Write(errorcode.Error("no perm"))
 		return
 	}
