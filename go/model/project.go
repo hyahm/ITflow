@@ -6,6 +6,7 @@ import (
 	"itflow/db"
 	"strings"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/hyahm/golog"
 )
 
@@ -34,6 +35,12 @@ func (p *Project) Insert(groupname string) error {
 	}
 	rows.Close()
 	p.Id, err = db.Mconn.Insert("insert into project(name,ugid,uid) values(?,?,?)", p.Name, strings.Join(ids, ","), p.Uid)
+	if err != nil {
+		if err.(*mysql.MySQLError).Number == 1062 {
+			return db.DuplicateErr
+		}
+
+	}
 	return err
 }
 

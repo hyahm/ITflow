@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
@@ -31,6 +32,10 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 		version_add.Name, version_add.Url, version_add.BakUrl, errorcode.UpdateTime, uid)
 	if err != nil {
 		golog.Error(err)
+		if err.(*mysql.MySQLError).Number == 1062 {
+			w.Write(errorcode.ErrorE(db.DuplicateErr))
+			return
+		}
 		w.Write(errorcode.ErrorE(err))
 		return
 	}

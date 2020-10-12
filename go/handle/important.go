@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
@@ -58,6 +59,10 @@ func ImportantAdd(w http.ResponseWriter, r *http.Request) {
 	errorcode.Id, err = db.Mconn.Insert("insert into importants(name) value(?)", data.Name)
 	if err != nil {
 		golog.Error(err)
+		if err.(*mysql.MySQLError).Number == 1062 {
+			w.Write(errorcode.ErrorE(db.DuplicateErr))
+			return
+		}
 		w.Write(errorcode.ErrorE(err))
 		return
 	}

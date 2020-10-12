@@ -4,6 +4,7 @@ import (
 	"itflow/db"
 	"strings"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/hyahm/golog"
 	"github.com/hyahm/gomysql"
 )
@@ -28,6 +29,12 @@ func (perm *Perm) Insert() error {
 	var err error
 	perm.Id, err = db.Mconn.Insert("insert into perm(rid, find, remove,revise, increase) values(?,?,?,?,?)",
 		perm.Rid, perm.Find, perm.Remove, perm.Revise, perm.Increase)
+	if err != nil {
+		if err.(*mysql.MySQLError).Number == 1062 {
+			return db.DuplicateErr
+		}
+	}
+
 	return err
 }
 

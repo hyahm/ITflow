@@ -6,6 +6,7 @@ import (
 	"itflow/db"
 	"strings"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/hyahm/golog"
 )
 
@@ -31,6 +32,12 @@ func NewRoleGroup(uid int64) (*RoleGroup, error) {
 func (rg *RoleGroup) Insert() error {
 	var err error
 	rg.ID, err = db.Mconn.Insert("insert into rolegroup(name,permids) values(?,?)", rg.Name, rg.Permids)
+	if err != nil {
+		if err.(*mysql.MySQLError).Number == 1062 {
+			return db.DuplicateErr
+		}
+
+	}
 	return err
 }
 

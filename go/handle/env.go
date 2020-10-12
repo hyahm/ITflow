@@ -8,6 +8,7 @@ import (
 	"itflow/internal/response"
 	"net/http"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
@@ -59,6 +60,10 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 	errorcode.Id, err = db.Mconn.Insert(getaritclesql, envname)
 	if err != nil {
 		golog.Error(err)
+		if err.(*mysql.MySQLError).Number == 1062 {
+			w.Write(errorcode.ErrorE(db.DuplicateErr))
+			return
+		}
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
