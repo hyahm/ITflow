@@ -121,7 +121,7 @@ export default {
           }
         },
         legend: {
-          data: ['create', 'complate']
+          data: ['created', 'completed']
         },
         series: [{
           name: 'create', itemStyle: {
@@ -140,7 +140,7 @@ export default {
           animationEasing: 'cubicInOut'
         },
         {
-          name: 'complate',
+          name: 'complete',
           smooth: true,
           type: 'line',
           itemStyle: {

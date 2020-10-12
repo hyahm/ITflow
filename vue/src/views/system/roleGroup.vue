@@ -112,6 +112,7 @@ export default {
       })
     },
     handleEdit(row) {
+      console.log(row)
       this.form.id = row.id
       this.form.name = row.name
       this.form.rolelist = row.rolelist
