@@ -19,5 +19,5 @@ func GetExpire(w http.ResponseWriter, r *http.Request) {
 	}
 	time := filter.TTL()
 
-	w.Write([]byte(fmt.Sprintf("%d", time)))
+	w.Write([]byte(fmt.Sprintf("%f", time)))
 }

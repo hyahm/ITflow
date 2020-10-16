@@ -2,6 +2,7 @@ package handle
 
 import (
 	"encoding/json"
+	"fmt"
 	"html"
 	"itflow/cache"
 	"itflow/db"
@@ -111,6 +112,24 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// 根据处理人的id找出邮箱地址
+		idrows, err := db.Mconn.GetRowsIn("select email from user where id in (?)", gomysql.InArgs(ids).ToInArgs())
+		if err != nil {
+			golog.Error(err)
+			w.Write(data.ErrorE(err))
+			return
+		}
+		toEmails := make([]string, 0)
+		for idrows.Next() {
+			var et string
+			idrows.Scan(&et)
+			toEmails = append(toEmails, et)
+		}
+		bugUrl := fmt.Sprintf("%s/showbug/%d", r.Referer(), data.Id)
+		cache.CacheEmail.SendMail("您有一个新的bug需要处理",
+			fmt.Sprintf(`<html><body><h1>%s<h1>bug地址:<a href="%s">%s</a></body></html>`,
+				data.Title, bugUrl, bugUrl),
+			toEmails...)
 	} else {
 		// update
 		permsql := "select uid from bugs where id=?"

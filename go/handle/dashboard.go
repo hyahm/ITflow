@@ -23,7 +23,6 @@ type userCount struct {
 }
 
 func UserCount(w http.ResponseWriter, r *http.Request) {
-
 	errorcode := &response.Response{}
 
 	uc := &userCount{}

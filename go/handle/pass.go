@@ -2,6 +2,8 @@ package handle
 
 import (
 	"encoding/json"
+	"fmt"
+	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/assist"
 	"itflow/internal/bug"
@@ -21,8 +23,8 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 	ub := xmux.GetData(r).Data.(*bug.PassBug)
 	// nickname := xmux.GetData(r).Get("nickname").(string)
 	uid := xmux.GetData(r).Get("uid").(int64)
+	nickname := xmux.GetData(r).Get("nickname").(string)
 	// // 获取参数
-	golog.Infof("%+v", *ub)
 	errorcode := &response.Response{}
 	// 判断用户是否能处理这个project
 	// pid, ok := cache.CacheProjectPid[ub.ProjectName]
@@ -132,7 +134,23 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-
+	idrows, err := db.Mconn.GetRowsIn("select email from user where id in (?)", gomysql.InArgs(ids).ToInArgs())
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	toEmails := make([]string, 0)
+	for idrows.Next() {
+		var et string
+		idrows.Scan(&et)
+		toEmails = append(toEmails, et)
+	}
+	bugUrl := fmt.Sprintf("%s/showbug/%d", r.Referer(), ub.Id)
+	cache.CacheEmail.SendMail("您有一个bug被转交过来",
+		fmt.Sprintf(`<html><body>转交人: %s</br>bug地址:<a href="%s">%s</a></br>原因: %s</body></html>`,
+			nickname, bugUrl, bugUrl, ub.Remark),
+		toEmails...)
 	// // if cache.CacheEmail.Enable {
 	// // 	go cache.CacheEmail.SendMail("转让bug", fmt.Sprintf("由%s 转交给你", cache.CacheUidRealName[uid]), mails...)
 	// // }

@@ -33,6 +33,10 @@ github.com/hyahm/golog v0.0.0-20200911092805-82b58472dde8 h1:5sZRzX/Zoj4vmLcTIzW
 github.com/hyahm/golog v0.0.0-20200911092805-82b58472dde8/go.mod h1:5r6TkZlPqe63JSuVJXrGd62di17HIgkaHfJNzgTAmV4=
 github.com/hyahm/golog v0.0.0-20200921065817-f362e2249806 h1:rm5e0+GHtCytNub7RHQtYOJmwH02rdON2Te/+jwUgq0=
 github.com/hyahm/golog v0.0.0-20200921065817-f362e2249806/go.mod h1:5r6TkZlPqe63JSuVJXrGd62di17HIgkaHfJNzgTAmV4=
+github.com/hyahm/golog v0.0.0-20201013150209-119ff9d352e4 h1:8bbpfez4bV+KHwePnEdvVieRDr8CTbZFmSVBkmzhKy8=
+github.com/hyahm/golog v0.0.0-20201013150209-119ff9d352e4/go.mod h1:5r6TkZlPqe63JSuVJXrGd62di17HIgkaHfJNzgTAmV4=
+github.com/hyahm/golog v0.0.0-20201016030526-1be00f25fa14 h1:Xywvenhehs4oXLJVnHXAMuAq4kE8eMno4LDWpt/LW4E=
+github.com/hyahm/golog v0.0.0-20201016030526-1be00f25fa14/go.mod h1:5r6TkZlPqe63JSuVJXrGd62di17HIgkaHfJNzgTAmV4=
 github.com/hyahm/gomysql v0.0.0-20200819135014-dea4aaca4f85 h1:rxWeb1NumMZHZ991pb0XlL++dHTH0GN1ohoc1oELL0U=
 github.com/hyahm/gomysql v0.0.0-20200819135014-dea4aaca4f85/go.mod h1:EQJNsrxZf9s8+XxRsyaXrs09r7hL+cGE8m0+ztzTKkY=
 github.com/hyahm/gomysql v0.0.0-20200820035719-2862f4f0e5c5 h1:oapxKfFIw3tZPLyXKe/E9DVzf0i+wSYAuvHSkjC4Puc=
@@ -116,6 +120,8 @@ golang.org/x/sys v0.0.0-20200116001909-b77594299b42/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20201009025420-dfb3f7c4e634 h1:bNEHhJCnrwMKNMmOx3yAynp5vs5/gRy+XWFtZFu7NBM=
 golang.org/x/sys v0.0.0-20201009025420-dfb3f7c4e634/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20201015000850-e3ed0017c211 h1:9UQO31fZ+0aKQOFldThf7BKPMJTiBfWycGh/u3UoO88=
+golang.org/x/sys v0.0.0-20201015000850-e3ed0017c211/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.2/go.mod h1:bEr9sfX3Q8Zfm5fL9x+3itogRgK3+ptLWKqgva+5dAk=
 golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=

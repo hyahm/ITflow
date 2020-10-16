@@ -2,6 +2,7 @@ package handle
 
 import (
 	"encoding/json"
+	"fmt"
 	"itflow/cache"
 	"itflow/db"
 	"itflow/encrypt"
@@ -26,19 +27,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("没有权限创建用户"))
 		return
 	}
-	// id` bigint NOT NULL AUTO_INCREMENT,
-	// `nickname` varchar(30) NOT NULL,
-	// `password` varchar(40) NOT NULL,
-	// `email` varchar(50) NOT NULL,
-	// `headimg` varchar(100) DEFAULT '',
-	// `createtime` bigint DEFAULT '0',
-	// `createuid` bigint DEFAULT '0',
-	// `realname` varchar(30) NOT NULL,
-	// `showstatus` varchar(200) DEFAULT '',
-	// `disable` tinyint(1) DEFAULT '0',
-	// `bugsid` bigint DEFAULT '0',
-	// `rid` bigint DEFAULT '0',
-	// `jid` bigint DEFAULT '0',
 
 	createTime := time.Now().Unix()
 	getuser := xmux.GetData(r).Data.(*user.GetAddUser)
@@ -60,6 +48,9 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	cache.CacheEmail.SendMail("成功创建用户",
+		fmt.Sprintf(`<html><body><h1>已成功创建用户<h1>登录网址:<a href="%s">%s</a></br>用户名: %s</br> 密码: %s</br>邮箱: %s</body></html>`, r.Referer(), r.Referer(), getuser.Nickname, getuser.Password, getuser.Email),
+		getuser.Email)
 	// // 验证组和职位不能为空
 	// if getuser.StatusGroup == "" || getuser.RoleGroup == "" || getuser.Position == "" {
 	// 	w.Write(errorcode.Error("验证组和职位不能为空"))

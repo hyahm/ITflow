@@ -177,6 +177,7 @@ func (im *importantslist) ErrorE(err error) []byte {
 }
 
 func GetImportants(w http.ResponseWriter, r *http.Request) {
+
 	data := &importantslist{
 		Importants: make([]string, 0),
 	}

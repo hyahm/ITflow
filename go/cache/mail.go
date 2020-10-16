@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"itflow/db"
 
+	"github.com/hyahm/golog"
 	"gopkg.in/gomail.v2"
 )
 
@@ -29,7 +30,10 @@ func cacheemail() {
 	}
 }
 
-func (e *Email) SendMail(subject string, content string, touser ...string) error {
+func (e *Email) SendMail(subject string, content string, touser ...string) {
+	if !e.Enable {
+		return
+	}
 	d := gomail.NewDialer(e.Host, e.Port, e.EmailAddr, e.Password)
 
 	m := gomail.NewMessage()
@@ -39,5 +43,8 @@ func (e *Email) SendMail(subject string, content string, touser ...string) error
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", content)
 	// mailconf.SendMail()
-	return d.DialAndSend(m)
+	if err := d.DialAndSend(m); err != nil {
+		golog.Error(err)
+	}
+	return
 }
