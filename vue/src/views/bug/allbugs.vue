@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <p class="warn-content">
-      所有的bug，按道理是不能修改状态的，还不清楚， 选择器的状态是显示所选的状态，永久保存，多页面生效
+      搜索栏的状态是显示所选的状态，永久保存，多页面生效
     </p>
     <div class="filter-container">
       <el-input v-model="listQuery.title" placeholder="标题" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
@@ -134,7 +134,7 @@
 import { changeStatus, closeBug, delBug } from '@/api/bugs'
 import { statusFilter } from '@/api/status'
 import { searchAllBugs } from '@/api/search'
-import { getProject, getShowStatus, getStatus, getLevels, isAdmin } from '@/api/get'
+import { getMyProject, getShowStatus, getStatus, getLevels, isAdmin } from '@/api/get'
 import waves from '@/directive/waves' // 水波纹指令
 import { parseTime } from '@/utils'
 
@@ -344,9 +344,9 @@ export default {
     },
     getprojectname() {
       // const now = new Date().getTime()
-      getProject().then(resp => {
+      getMyProject().then(resp => {
         if (resp.data.code === 0) {
-          this.projectnames = resp.data.projectlist
+          this.projectnames = resp.data.name
         }
       })
     },
@@ -459,4 +459,6 @@ export default {
     }
   }
 }
+
 </script>
+
