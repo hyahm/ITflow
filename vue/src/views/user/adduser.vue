@@ -30,6 +30,7 @@
         <el-form-item style="margin-bottom: 40px;" prop="title" label="邮箱:">
           <el-input
             v-model="postForm.email"
+            autocomplete="off"
             :maxlength="100"
             placeholder="请输入邮箱"
             clearable
@@ -40,6 +41,7 @@
         <el-form-item style="margin-bottom: 40px;" prop="title" label="密码:">
           <el-input
             v-model="postForm.password"
+            autocomplete="off"
             :maxlength="100"
             placeholder="请输入密码"
             type="password"

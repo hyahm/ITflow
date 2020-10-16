@@ -96,11 +96,12 @@ export default {
     getemail() {
       getEmailStatus().then(resp => {
         if (resp.data.code === 0) {
-          this.email = resp.data.email
+          this.email = resp.data.emailaddr
           this.enable = resp.data.enable
           this.host = resp.data.host
           this.port = resp.data.port
           this.id = resp.data.id
+          this.password = resp.data.password
         } else {
           this.$message.error(resp.data.msg)
         }
