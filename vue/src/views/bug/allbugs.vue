@@ -90,14 +90,14 @@
           <!--<el-tag :type="scope.row.status | statusFilter">{{scope.row.env}}</el-tag>-->
         </template>
       </el-table-column>
-      <el-table-column label="处理人" align="center" width="300">
+      <el-table-column label="处理人" align="center" width="200">
         <template slot-scope="scope">
           <span>{{ scope.row.handle }}</span>
           <!--<span v-if="scope.row.handle" class="link-type" @click='handleFetchPv(scope.row.pageviews)'>{{scope.row.pageviews}}</span>-->
           <!--<span v-else>0</span>-->
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center" width="90" class-name="small-padding fixed-width">
+      <el-table-column label="状态" align="center" width="100" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <span>{{ scope.row.status }}</span>
           <!-- <el-select v-model="scope.row.status" style="width: 200px" class="filter-item" placeholder="修改状态" @change="changestatus(scope.row)" /> -->
@@ -106,9 +106,7 @@
 
       <el-table-column v-if="admin" label="操作" align="center" width="250" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <router-link :to="'/bug/edit/'+scope.row.id">
-            <el-button type="primary" size="mini">编辑</el-button>
-          </router-link>
+          <el-button type="primary" size="mini"><router-link :to="'/bug/edit/'+scope.row.id">编辑</router-link></el-button>
           <el-button type="primary" size="mini" @click="handleCLose(scope.row)">关闭</el-button>
           <el-button type="primary" size="mini" @click="handleDel(scope.row)">删除</el-button>
         </template>

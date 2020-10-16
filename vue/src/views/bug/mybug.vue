@@ -87,9 +87,7 @@
 
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <router-link :to="'/bug/edit/'+scope.row.id">
-            <el-button type="primary" size="mini">编辑</el-button>
-          </router-link>
+          <el-button type="primary" size="mini"><router-link :to="'/bug/edit/'+scope.row.id">编辑</router-link></el-button>
           <el-button type="success" size="mini" @click="handleClose(scope.row)">关闭</el-button>
           <!--<el-button type="danger" size="mini" @click="handleRemove(scope.row)">{{ $t('list.remove') }}</el-button>-->
         </template>
