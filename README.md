@@ -6,8 +6,6 @@
 文档地址： http://itflow.doc.hyahm.com  
 路由接口文档地址： http://hyahm.com:10001/docs （配合新前端不断更新中）
 
-新前端地址：  https://github.com/jiandanzhiyun/vue-elementAdmin   
-
 ### 功能
 - [x] 增加bug，改变bug状态，转交bug 
 - [x] 部门管理
