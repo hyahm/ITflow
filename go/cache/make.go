@@ -25,6 +25,5 @@ func initCache() {
 		if err != sql.ErrNoRows {
 			panic(err)
 		}
-
 	}
 }

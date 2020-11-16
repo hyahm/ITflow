@@ -13,6 +13,11 @@ import (
 func Login(w http.ResponseWriter, r *http.Request) {
 
 	login := xmux.GetData(r).Data.(*user.Login)
+	ipAddr := r.RemoteAddr
+	ip := r.Header.Get("X-Forwarded-For")
+	if ip != "" {
+		ipAddr = ip
+	}
 
 	resp, err := login.Check()
 	if err != nil {
@@ -20,7 +25,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		w.Write(resp.ErrorE(err))
 		return
 	}
-	go model.InsertLog(classify.Login, r.RemoteAddr, "用户登录", resp.ID)
+
+	go model.InsertLog(classify.Login, ipAddr, "用户登录", resp.ID)
 	w.Write(resp.Marshal())
 	return
 
