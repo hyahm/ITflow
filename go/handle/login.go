@@ -22,6 +22,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	defer atomic.AddInt32(&loginSign, -1)
 	login := xmux.GetData(r).Data.(*user.Login)
 	ipAddr := r.RemoteAddr
+	for k, v := range r.Header {
+		golog.Infof("%v: %v", k, v)
+	}
 	ip := r.Header.Get("X-Forwarded-For")
 	if ip != "" {
 		ipAddr = ip
