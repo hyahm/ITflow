@@ -7,10 +7,9 @@ import (
 	"itflow/cache"
 	"itflow/db"
 	"itflow/encrypt"
+	"itflow/jwt"
 	"strings"
-	"time"
 
-	"github.com/hyahm/goconfig"
 	"github.com/hyahm/golog"
 	"github.com/hyahm/gomysql"
 )
@@ -42,17 +41,19 @@ func (login *Login) Check() (*RespLogin, error) {
 		return resp, err
 	}
 	// 这里登录信息插入缓存表
-	resp.Token = encrypt.Token(resp.UserName, cache.Salt)
-	token := &db.Token{
-		Token:    resp.Token,
-		NickName: login.Username,
-		Id:       resp.ID,
-	}
-	err = db.Table.Add(token, goconfig.ReadDuration("expiration", time.Minute*120))
-	if err != nil {
-		golog.Error(err)
-		return resp, err
-	}
+
+	resp.Token = jwt.MakeJwt(resp.ID, resp.UserName)
+	// resp.Token = encrypt.Token(resp.UserName, cache.Salt)
+	// token := &db.Token{
+	// 	Token:    tk,
+	// 	NickName: login.Username,
+	// 	Id:       resp.ID,
+	// }
+	// err = db.Table.Add(token, goconfig.ReadDuration("expiration", time.Minute*120))
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	return resp, err
+	// }
 	return resp, nil
 }
 

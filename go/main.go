@@ -15,6 +15,7 @@ import (
 )
 
 func main() {
+
 	conf := "bug.ini"
 	if len(os.Args) > 1 {
 		fmt.Println(os.Args[1])
@@ -27,7 +28,7 @@ func main() {
 	// //初始化mysql
 	db.InitMysql()
 	// // // 初始化缓存表
-	db.InitCacheTable()
+	// db.InitCacheTable()
 	cache.LoadConfig()
 
 	// // // 初始化日志

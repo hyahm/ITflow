@@ -3,6 +3,7 @@ module itflow
 go 1.12
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.1-0.20200107013213-dc14462fd587+incompatible // indirect
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/hyahm/cachetable v0.0.0-20200707100838-5dd5455ce3d5
 	github.com/hyahm/goconfig v0.0.0-20200814144712-bd712352a305

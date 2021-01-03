@@ -3,9 +3,10 @@ package midware
 import (
 	"encoding/json"
 	"io/ioutil"
-	"itflow/db"
 	"itflow/internal/response"
+	"itflow/jwt"
 	"net/http"
+	"strings"
 
 	"github.com/hyahm/goconfig"
 	"github.com/hyahm/golog"
@@ -42,28 +43,29 @@ func JsonToStruct(w http.ResponseWriter, r *http.Request) bool {
 
 func CheckToken(w http.ResponseWriter, r *http.Request) bool {
 	errorcode := &response.Response{}
-	a := r.Header.Get("X-Token")
+	a := r.Header.Get("Authorization")
 	if a == "" {
 		golog.Error("not found token")
 		w.Write(errorcode.TokenNotFound())
 		return true
 	}
-	filter, err := db.Table.Filter("Token", a)
-	if err != nil {
-		golog.Error(err)
+	token := &jwt.Token{}
+	golog.Info(a)
+	if !token.CheckJwt(strings.Split(a, " ")[1]) {
 		w.Write(errorcode.TokenNotFound())
 		return true
 	}
-	var nickname string
-	var uid int64
-	err = filter.Get(db.NICKNAME, db.ID).Scan(&nickname, &uid)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.TokenNotFound())
-		return true
-	}
-	xmux.GetData(r).Set("nickname", nickname)
-	xmux.GetData(r).Set("uid", uid)
+
+	// var nickname string
+	// var uid int64
+	// err = filter.Get(db.NICKNAME, db.ID).Scan(&nickname, &uid)
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	w.Write(errorcode.TokenNotFound())
+	// 	return true
+	// }
+	xmux.GetData(r).Set("nickname", token.Nickname)
+	xmux.GetData(r).Set("uid", token.Id)
 
 	return false
 }

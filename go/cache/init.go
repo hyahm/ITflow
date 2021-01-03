@@ -15,7 +15,7 @@ var (
 	PrivateKey  string
 	ShowBaseUrl string
 	Salt        string
-	Expirontion int
+	Expirontion time.Duration
 	ShareDir    string
 )
 
@@ -57,8 +57,8 @@ func LoadConfig() {
 	CacheRidRole = make(map[int64]string, 0)
 	CacheRoleRid = make(map[string]int64, 0)
 	CacheEmail = &Email{}
-
-	golog.Info("cookie过期时间为：", goconfig.ReadDuration("expiration", 120*time.Minute))
+	Expirontion = goconfig.ReadDuration("expiration", 120*time.Minute)
+	golog.Info("cookie过期时间为：", Expirontion)
 	initCache()
 	// 添加一个admin 用户的权限，默认全是1
 	cacheemail()
