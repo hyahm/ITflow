@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <p class="warn-content">
-      我提交的bug，可以编辑和关闭，不能删除， 选择器的状态是显示所选的状态，永久保存，多页面生效
+      如果没看到需要的bug, 请勾选需要显示的状态 ,永久保存，多页面生效
     </p>
     <div class="filter-container">
       <el-input v-model="listQuery.title" placeholder="标题" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />

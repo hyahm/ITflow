@@ -25,7 +25,7 @@
           </el-form-item>
         </el-row>
 
-        <el-form-item style="display: inline-block;width: 300px" label="项目名称：">
+        <el-form-item style="display: inline-block;width: 400px" label="项目名称：">
           <el-select v-model="postForm.projectname" placeholder="请选择" @change="changeProject(postForm.projectname)">
             <el-option
               v-for="(item, index) in projectnames"
@@ -36,7 +36,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item style="display: inline-block;width: 300px" label="运行环境：">
+        <el-form-item style="display: inline-block;width: 400px" label="运行环境：">
           <el-select v-model="postForm.envname" placeholder="请选择">
             <el-option
               v-for="(item, index) in envnames"
@@ -47,7 +47,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item style="display: inline-block;width: 300px" label="应用版本：">
+        <el-form-item style="display: inline-block;width: 400px" label="应用版本：">
           <el-select v-model="postForm.version" placeholder="请选择">
             <el-option
               v-for="(item, index) in versions"
@@ -58,7 +58,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item style="display: inline-block;width: 300px" label="优先级别：">
+        <el-form-item style="display: inline-block;width: 400px" label="优先级别：">
           <el-select v-model="postForm.level" placeholder="请选择">
             <el-option
               v-for="(item, index) in levels"
@@ -72,7 +72,7 @@
         <!--<el-form-item style="margin-bottom: 40px;" prop="title">-->
         <!--<PlatformDropdown v-model="postForm.platforms" />-->
         <!--</el-form-item>-->
-        <el-form-item style="display: inline-block;width: 300px" label="重要性：">
+        <el-form-item style="display: inline-block;width: 400px" label="重要性：">
           <el-select v-model="postForm.important" placeholder="请选择">
             <el-option
               v-for="(important, index) in importants"
@@ -83,7 +83,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item style="display: inline-block;width: 300px" label="分配任务：">
+        <el-form-item style="display: inline-block;width: 400px" label="分配任务：">
           <el-select v-model="postForm.selectuser" multiple placeholder="分配任务">
             <el-option
               v-for="(item, index) in users"
