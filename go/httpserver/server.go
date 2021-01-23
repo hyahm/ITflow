@@ -21,7 +21,8 @@ func GetExecTime(handle func(http.ResponseWriter, *http.Request), w http.Respons
 
 func RunHttp() {
 	router := xmux.NewRouter()
-	router.SetHeader("Access-Control-Allow-Origin", "*")
+
+	router.SetHeader("Access-Control-Allow-Origin", goconfig.ReadString("cross", "*"))
 	router.SetHeader("Content-Type", "application/x-www-form-urlencoded,application/json; charset=UTF-8")
 	router.SetHeader("Access-Control-Allow-Headers", "Content-Type,Access-Token,X-Token,smail,authorization")
 	router.AddModule(midware.CheckToken) // 所有的请求头优先检查token是否有效， 登录除外

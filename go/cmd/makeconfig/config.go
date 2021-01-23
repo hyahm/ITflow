@@ -24,7 +24,7 @@ func main() {
 	goconfig.WriteInt("adminid", 1, "默认管理员id")
 	goconfig.WriteString("defaulthead", "", "默认头像地址")
 
-	// goconfig.WriteString("redis.pwd", "")
+	goconfig.WriteString("cross", "http://127.0.0.1:9527", "跨域字段")
 	// goconfig.WriteString("redis.host", "127.0.0.1:6379")
 	// goconfig.WriteInt("redis.db", 0)
 	goconfig.WriteString("expiration", "120m", "token 过期时间")
