@@ -518,7 +518,7 @@ CREATE TABLE `roles` (
 
 LOCK TABLES `roles` WRITE;
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
-INSERT INTO `roles` VALUES (1,'env','环境页面'),(2,'important','重要性页面'),(3,'level','重要性页面'),(5,'position','职位页面'),(6,'project','项目页面'),(7,'status','bug状态流程页面'),(8,'statusgroup','状态组页面'),(9,'version','版本页面');
+INSERT INTO `roles` VALUES (1,'env','环境页面'),(2,'important','重要性页面'),(3,'level','优先级别页面'),(5,'position','职位页面'),(6,'project','项目页面'),(7,'status','bug状态流程页面'),(8,'statusgroup','状态组页面'),(9,'version','版本页面');
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 UNLOCK TABLES;
 

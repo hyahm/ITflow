@@ -57,7 +57,7 @@ func RunHttp() {
 	router.AddGroup(routegroup.Share)
 	// router.AddGroup(routegroup.Api)
 
-	// router.Post("/uploadimg", handle.UploadImgs).DelModule(midware.CheckToken)
+	router.Post("/uploadimg", handle.UploadImgs).DelModule(midware.CheckToken)
 	router.Post("/upload/headimg", handle.UploadHeadImg)
 	router.Get("/showimg/{imgname}", handle.ShowImg).SetHeader("Content-Type", "image/png").DelModule(midware.CheckToken)
 

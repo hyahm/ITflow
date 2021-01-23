@@ -66,7 +66,7 @@
       <el-form>
         <el-radio-group v-model="form.level">
           <el-radio :label="levelone">管理者</el-radio>
-          <el-radio :label="leveltwo">普通员工</el-radio>
+          <el-radio checked :label="leveltwo">普通员工</el-radio>
         </el-radio-group>
       </el-form>
       <el-form style="margin-top: 10px">
