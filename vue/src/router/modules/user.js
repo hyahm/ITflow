@@ -52,6 +52,15 @@ const userRoute = {
       }
     },
     {
+      path: 'email',
+      component: () => import('@/views/user/email'),
+      name: 'email',
+      meta: {
+        title: '修改邮箱',
+        icon: 'email'
+      }
+    },
+    {
       path: 'uploadhead',
       component: () => import('@/views/user/headImg'),
       name: 'uploadhead',

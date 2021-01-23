@@ -48,4 +48,6 @@ func init() {
 	User.Get("/get/project/user", handle.GetProjectUser).ApiDescribe("根据项目获取关联用户和版本")
 
 	User.Post("/is/admin", handle.IsAdmin).ApiDescribe("判断是都是管理员")
+	// User.Post("/email/get", handle.GetEmail).ApiDescribe("获取邮箱")
+	User.Post("/email/update", handle.UpdateEmail).ApiDescribe("修改邮箱")
 }

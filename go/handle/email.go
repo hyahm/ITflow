@@ -2,6 +2,7 @@ package handle
 
 import (
 	"encoding/json"
+	"fmt"
 	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/email"
@@ -64,12 +65,19 @@ func SaveEmail(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetEmail(w http.ResponseWriter, r *http.Request) {
+	errorcode := &response.Response{}
 
-	email := &cache.Email{}
-
-	email = cache.CacheEmail
-	send, _ := json.Marshal(email)
-	w.Write(send)
+	id := xmux.GetData(r).Get("uid")
+	// email := &cache.Email{}
+	var email string
+	// email = cache.CacheEmail
+	err := db.Mconn.GetOne("select email from user where id=?", id).Scan(&email)
+	if err != nil {
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	send := fmt.Sprintf(`{"code": 0, "email": "%s"}`, email)
+	w.Write([]byte(send))
 	return
 
 }

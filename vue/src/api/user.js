@@ -71,3 +71,18 @@ export function updateUser(data) {
   })
 }
 
+export function getEmail() {
+  return request({
+    url: '/email/get',
+    method: 'post'
+  })
+}
+
+export function setEmail(data) {
+  return request({
+    url: '/email/update',
+    method: 'post',
+    data
+  })
+}
+

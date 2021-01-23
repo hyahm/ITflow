@@ -162,6 +162,32 @@ func IsAdmin(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+// func GetEmail(w http.ResponseWriter, r *http.Request) {
+// 	if xmux.GetData(r).Get("uid").(int64) == cache.SUPERID {
+// 		w.Write([]byte("1"))
+// 	} else {
+// 		w.Write([]byte("0"))
+// 	}
+// 	return
+// }
+
+func UpdateEmail(w http.ResponseWriter, r *http.Request) {
+	errorcode := &response.Response{}
+	id := xmux.GetData(r).Get("uid")
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	_, err = db.Mconn.Update("update user set email=? where id=?", string(b), id)
+	if err != nil {
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+	w.Write(errorcode.Success())
+	return
+}
+
 func GetProjectUser(w http.ResponseWriter, r *http.Request) {
 	// 通过project 来获取所属用户
 	projectname := r.FormValue("name")
