@@ -91,6 +91,7 @@ CREATE TABLE `bugs` (
   `title` varchar(50) DEFAULT NULL,
   `sid` bigint(20) DEFAULT '0',
   `content` text,
+  `ownerid` bigint(20) DEFAULT '0',
   `iid` bigint(20) DEFAULT '0',
   `createtime` bigint(20) DEFAULT '0',
   `vid` bigint(20) DEFAULT '0',
@@ -100,8 +101,18 @@ CREATE TABLE `bugs` (
   `pid` bigint(20) DEFAULT '0',
   `updatetime` bigint(20) DEFAULT '0',
   `dustbin` tinyint(1) DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `uid` (`uid`),
+  KEY `sid` (`sid`),
+  KEY `iid` (`iid`),
+  KEY `ownerid` (`ownerid`),
+  KEY `vid` (`vid`),
+  KEY `lid` (`lid`),
+  KEY `eid` (`eid`),
+  KEY `pid` (`pid`),
+  KEY `dustbin` (`dustbin`),
+  KEY `updatetime` (`updatetime`)
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -662,7 +673,7 @@ CREATE TABLE `user` (
   KEY `createuid` (`createuid`),
   KEY `disable` (`disable`),
   KEY `showstatus` (`showstatus`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
