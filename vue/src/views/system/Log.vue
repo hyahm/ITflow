@@ -5,7 +5,7 @@
     </p>
     <div class="filter-container">
       <div style="margin-left: 10px">
-        <el-select v-model="listQuery.classify" placeholder="分类" clearable style="width: 90px" class="filter-item">
+        <el-select v-model="listQuery.classify" placeholder="分类" clearable class="filter-item">
           <el-option v-for="(item, index) in classifys" :key="index" :label="item" :value="item" />
         </el-select>
 
@@ -167,4 +167,9 @@ export default {
   #log .el-date-editor .el-range-separator{
     width: 7%;
   }
+  .filter-container .filter-item {
+    display: inline-fix;
+    vertical-align: middle;
+    margin-bottom: 3px;
+}
 </style>
