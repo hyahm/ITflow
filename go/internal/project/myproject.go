@@ -46,7 +46,6 @@ func (mp *MyProject) Get(uid int64) []byte {
 
 	for _, p := range pl {
 		var uids string
-		golog.Debug(p)
 		err = db.Mconn.GetOne("select ids from usergroup where id=?", p.Gid).Scan(&uids)
 		if err != nil {
 			golog.Info(err)
@@ -66,6 +65,5 @@ func (mp *MyProject) Get(uid int64) []byte {
 		}
 
 	}
-	golog.Infof("%+v", mp)
 	return mp.Marshal()
 }

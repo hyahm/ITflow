@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="padding-left: 20px">
     <p class="warn-content">
       bug优先级别
     </p>

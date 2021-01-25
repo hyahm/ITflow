@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div style="padding-left: 20px">
     <p class="warn-content">
       某些选项的默认值
     </p>
-    <div style="margin: 10px 0 10px 10px"> bug创建时的状态:
+    <div style="margin-top: 20px"> bug创建时的状态:
       <el-select v-model="form.created" placeholder="Select" @change="handleCreated">
         <el-option
           v-for="(status, index) in statuslist"
@@ -13,7 +13,7 @@
         />
       </el-select>
     </div>
-    <div style="margin: 10px 0 10px 10px"> bug完成时的状态:
+    <div style="margin-top: 20px"> bug完成时的状态:
       <el-select v-model="form.completed" placeholder="Select" @change="handleCompleted">
         <el-option
           v-for="(status, index) in statuslist"
@@ -33,7 +33,7 @@
         />
       </el-select>
     </div> -->
-    <el-button type="primary" plain @click="handleSave">保存</el-button>
+    <el-button style="margin-top: 20px" type="primary" plain @click="handleSave">保存</el-button>
   </div>
 </template>
 

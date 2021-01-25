@@ -18,13 +18,13 @@ func init() {
 		ApiCodeField("code").ApiCodeMsg("1", "其他错误,请查看返回的msg").
 		ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
-	UserManager.Post("/password/reset", handle.ResetPwd).Bind(&user.ResetPassword{}).
+	UserManager.Post("/password/reset", handle.ResetPwd).Bind(&user.ResetPassword{}).AddModule(midware.UserPerm).
 		AddModule(midware.JsonToStruct).ApiDescribe("修改密码")
 
-	UserManager.Get("/user/remove", handle.RemoveUser).ApiDescribe("删除用户")
+	UserManager.Get("/user/remove", handle.RemoveUser).ApiDescribe("删除用户").AddModule(midware.UserPerm)
 
-	UserManager.Get("/user/disable", handle.DisableUser).ApiDescribe("禁用用户")
-	UserManager.Post("/user/list", handle.UserList).ApiDescribe("获取用户列表")
-	UserManager.Post("/user/update", handle.UserUpdate).Bind(&user.User{}).AddModule(midware.JsonToStruct).
+	UserManager.Get("/user/disable", handle.DisableUser).ApiDescribe("禁用用户").AddModule(midware.UserPerm)
+	UserManager.Post("/user/list", handle.UserList).ApiDescribe("获取用户列表").AddModule(midware.UserPerm)
+	UserManager.Post("/user/update", handle.UserUpdate).Bind(&user.User{}).AddModule(midware.UserPerm).AddModule(midware.JsonToStruct).
 		ApiDescribe("修改用户").ApiRequestTemplate(`{"id":3,"createtime":1594094022,"realname":"test","nickname":"test","email":"test@qq.com","disable":0,"statusgroup":"验证","rolegroup":"test","position":"python"}`)
 }

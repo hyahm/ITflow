@@ -655,8 +655,14 @@ CREATE TABLE `user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `nickname` (`nickname`),
   UNIQUE KEY `email` (`email`),
-  UNIQUE KEY `realname` (`realname`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+  UNIQUE KEY `realname` (`realname`),
+  KEY `rid` (`rid`),
+  KEY `bugsid` (`bugsid`),
+  KEY `jid` (`jid`),
+  KEY `createuid` (`createuid`),
+  KEY `disable` (`disable`),
+  KEY `showstatus` (`showstatus`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

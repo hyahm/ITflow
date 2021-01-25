@@ -1,5 +1,5 @@
 <template>
-  <div id="head">
+  <div id="head" style="padding-left: 20px">
     <p class="warn-content">
       修改个人头像
     </p>

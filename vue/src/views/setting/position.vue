@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="padding-left: 20px">
     <p class="warn-content">
       职位，在管理的时候，上级有管理下级的权限，级别只有普通员工和管理者，管理者也可以被其他管理者管理（从属于），一个员工只能被一个管理者管理
     </p>

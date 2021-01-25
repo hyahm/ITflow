@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="padding-left: 20px">
     <p class="warn-content">
       正常的，一般至少有个测试环境，和一个生产环境
     </p>

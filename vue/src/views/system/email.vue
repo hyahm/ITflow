@@ -1,9 +1,10 @@
 <template>
-  <div>
-    <p class="warn-content">
+  <div style="padding-left: 20px">
+   
+    <el-form ref="form" label-width="100px" class="form-container"  prop="title"> 
+      <p class="warn-content">
       设置并启用后 只有创建用户，创建bug，转交bug才会有邮件通知
     </p>
-    <el-form ref="form" label-width="100px" class="form-container" style="margin-top: 40px;" prop="title">
       <!-- <el-switch
         v-model="email.createuser"
         style="display: block;margin: 20px"
@@ -20,28 +21,31 @@
         active-text="启用创建bug通知"
         inactive-text="禁用通知"
       /> -->
-      <el-switch
+       <el-form-item
+   
+        style="width: 500px"    >
+          <el-switch
         v-model="enable"
-        style="display: block;margin: 20px"
+        style="display: block;"
         active-color="#13ce66"
         inactive-color="#ff4949"
         active-text="启用"
         inactive-text="禁用"
       />
+         </el-form-item>
+    
 
       <el-form-item
         label="邮箱服务器："
         clearable
-        style="width: 500px"
-      >
+        style="width: 500px"    >
         <el-input v-model="host" type="email" placeholder="请输入邮箱地址" />
       </el-form-item>
 
       <el-form-item
         label="邮箱地址："
         clearable
-        style="width: 500px"
-      >
+        style="width: 500px"      >
         <el-input v-model="email" type="email" placeholder="请输入邮箱地址" />
       </el-form-item>
 

@@ -50,7 +50,6 @@ func CheckToken(w http.ResponseWriter, r *http.Request) bool {
 		return true
 	}
 	token := &jwt.Token{}
-	golog.Info(a)
 	if !token.CheckJwt(strings.Split(a, " ")[1]) {
 		w.Write(errorcode.TokenNotFound())
 		return true

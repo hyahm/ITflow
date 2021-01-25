@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="warn-content">
+    <p class="warn-content" style="padding-left: 20px">
       状态组是相对于bug管理的状态的，角色组是共享文件夹和接口文档的权限，都是必须项，姓名，邮箱，姓名都必须是唯一值
     </p>
     <el-form ref="postForm" :model="postForm" class="form-container">

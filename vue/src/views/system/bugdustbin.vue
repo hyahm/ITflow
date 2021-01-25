@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <p class="warn-content">
+  <div style="padding-left: 20px">
+    <p class="warn-content" >
       可以改变bug的所有信息, 必须搜索才有显示
     </p>
     <div class="filter-container">

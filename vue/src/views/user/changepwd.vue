@@ -1,9 +1,10 @@
 <template>
   <div>
-    <p class="warn-content">
+    <p class="warn-content" style="padding-left: 20px">
       修改密码
-    </p>
+      </p>
     <el-form class="form-container">
+      
       <div style="height: 20px" />
       <el-form-item label="旧密码:">
         <el-input

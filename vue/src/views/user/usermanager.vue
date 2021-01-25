@@ -1,9 +1,10 @@
 <template>
   <div class="app-container">
-    <p class="warn-content">
-      管理员能修改所有信息，管理者只能修改下一级的信息，有些麻烦，此功能最后完善
-    </p>
+  
     <div class="filter-container">
+        <p class="warn-content">
+      管理员能修改所有信息，管理者只能修改下一级的信息或者创建下一级的用户账号
+    </p>
       <!--<el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" :placeholder="$t('table.title')" v-model="listQuery.title">-->
       <!--</el-input>-->
       <!--<el-select clearable style="width: 90px" class="filter-item" v-model="listQuery.importance" :placeholder="$t('table.importance')">-->
@@ -301,6 +302,7 @@ export default {
       })
     },
     handleDisable(row) {
+      console.log(1111)
       userDisable(row.id).then(resp => {
         if (resp.data.code === 0) {
           const l = this.userlist.length

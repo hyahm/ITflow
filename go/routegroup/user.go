@@ -37,7 +37,7 @@ func init() {
 		ApiResStruct(user.UserInfo{}).
 		ApiResponseTemplate(`{"roles": ["admin"], "code": 0, "avatar":"http://xxxx/aaaa.png", "nickname": "admin"}`)
 
-	User.Post("/user/create", handle.CreateUser).Bind(&user.GetAddUser{}).
+	User.Post("/user/create", handle.CreateUser).Bind(&user.GetAddUser{}).AddModule(midware.UserPerm).
 		AddModule(midware.JsonToStruct).ApiDescribe("添加用户").
 		ApiRequestTemplate(`{"nickname":"cander","email":"yifan@uupoweremail.com","password":"123456","repassword":"123456","realname":"cander","rolegroup":"all","statusgroup":"aaa","level":2,"position":"aaaaa"}`)
 

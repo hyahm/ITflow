@@ -1,5 +1,5 @@
 <template>
-  <div class="group">
+  <div class="group" style="padding-left: 20px">
     <p class="warn-content">
       只有创建才能删除， 管理员和创建者可以查看编辑
     </p>

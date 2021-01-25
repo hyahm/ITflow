@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="padding-left: 20px">
     <p class="warn-content">
       如果删除的此项目的某参与者， 在他任务里面还是会显示，只不过没操作权限
     </p>

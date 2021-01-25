@@ -31,5 +31,5 @@ func init() {
 
 	Position.Get("/get/hypos", handle.GetHypos)
 
-	Position.Post("/get/positions", handle.GetPositions)
+	Position.Post("/get/positions", handle.GetPositions).AddModule(midware.UserPerm)
 }

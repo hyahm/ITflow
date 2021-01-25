@@ -94,34 +94,48 @@ func (ui *UserInfo) GetUserInfo(uid int64) error {
 	// 管理员
 	if uid == cache.SUPERID {
 		ui.Roles = append(ui.Roles, "admin")
-	} else {
-		var permids string
-		err = db.Mconn.GetOne("select permids from rolegroup where id=(select rid from user where id=?)", uid).Scan(&permids)
-		if err != nil {
-			golog.Error(err)
-			return err
-		}
-		rows, err := db.Mconn.GetRowsIn("select r.name from perm as p join roles as r on p.id in (?) and p.find=true and p.rid=r.id",
-			gomysql.InArgs(strings.Split(permids, ",")).ToInArgs())
-
-		if err != nil {
-			golog.Error(err)
-			return err
-		}
-		for rows.Next() {
-			role := new(string)
-			err = rows.Scan(role)
-			if err != nil {
-				golog.Error(err)
-				continue
-			}
-			ui.Roles = append(ui.Roles, *role)
-		}
-		rows.Close()
+		return nil
 	}
+
+	var permids string
+	err = db.Mconn.GetOne("select permids from rolegroup where id=(select rid from user where id=?)", uid).Scan(&permids)
+	if err != nil {
+		golog.Error(err)
+		return err
+	}
+	rows, err := db.Mconn.GetRowsIn("select r.name from perm as p join roles as r on p.id in (?) and p.find=true and p.rid=r.id",
+		gomysql.InArgs(strings.Split(permids, ",")).ToInArgs())
+
+	if err != nil {
+		golog.Error(err)
+		return err
+	}
+	for rows.Next() {
+		role := new(string)
+		err = rows.Scan(role)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		ui.Roles = append(ui.Roles, *role)
+	}
+
+	rows.Close()
+	var manager_count int
+	golog.Info(uid)
+	err = db.Mconn.GetOne("select count(id) from jobs where hypo=(select jid from user where id=?)", uid).Scan(&manager_count)
+	if err != nil {
+		golog.Error(err)
+	}
+	golog.Info(manager_count)
 	if len(ui.Roles) == 0 {
 		ui.Roles = append(ui.Roles, "test")
+	} else {
+		if manager_count > 0 {
+			ui.Roles = append(ui.Roles, "user")
+		}
 	}
+
 	return nil
 }
 

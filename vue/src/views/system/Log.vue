@@ -1,5 +1,5 @@
 <template>
-  <div id="log">
+  <div id="log" style="padding-left: 20px">
     <p class="warn-content">
       操作日志
     </p>

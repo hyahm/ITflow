@@ -228,16 +228,22 @@ func GetPositions(w http.ResponseWriter, r *http.Request) {
 
 	data := &positions{}
 	uid := xmux.GetData(r).Get("uid").(int64)
-	if uid != cache.SUPERID {
-		errorcode.Msg = "暂时只能管理员才能添加用户"
-		w.Write(errorcode.Success())
-		return
-	}
-	rows, err := db.Mconn.GetRows("select name from jobs")
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
+	var rows *sql.Rows
+	var err error
+	if uid == cache.SUPERID {
+		rows, err = db.Mconn.GetRows("select name from jobs")
+		if err != nil {
+			golog.Error(err)
+			w.Write(errorcode.ErrorE(err))
+			return
+		}
+	} else {
+		rows, err = db.Mconn.GetRows("select name from jobs where hypo=(select jid from user where id=?)", uid)
+		if err != nil {
+			golog.Error(err)
+			w.Write(errorcode.ErrorE(err))
+			return
+		}
 	}
 
 	for rows.Next() {

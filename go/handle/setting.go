@@ -23,11 +23,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	// nickname := xmux.GetData(r).Get("nickname").(string)
 	uid := xmux.GetData(r).Get("uid").(int64)
 
-	if uid != cache.SUPERID {
-		w.Write(errorcode.Error("没有权限创建用户"))
-		return
-	}
-
 	createTime := time.Now().Unix()
 	getuser := xmux.GetData(r).Data.(*user.GetAddUser)
 	if strings.Contains(getuser.Nickname, "@") {
@@ -220,38 +215,60 @@ func DisableUser(w http.ResponseWriter, r *http.Request) {
 func UserList(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetData(r).Get("uid").(int64)
 	errorcode := &response.Response{}
-	if cache.SUPERID != uid {
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
-
 	uls := &user.UserList{}
-
-	getallsql := `select u.id,createtime,realname,nickname,email,disable,r.name,s.name,j.name from 
-	user as u join rolegroup as r 
-	join statusgroup as s 
-	join jobs as j 
-	on u.rid = r.id and u.bugsid = s.id and u.jid = j.id and u.id<>?`
-	adminrows, err := db.Mconn.GetRows(getallsql, cache.SUPERID)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+	if uid == cache.SUPERID {
+		getallsql := `select u.id,createtime,realname,nickname,email,disable,r.name,s.name,j.name from 
+		user as u join rolegroup as r 
+		join statusgroup as s 
+		join jobs as j 
+		on u.rid = r.id and u.bugsid = s.id and u.jid = j.id and u.id<>?`
+		adminrows, err := db.Mconn.GetRows(getallsql, cache.SUPERID)
+		if err != nil {
+			golog.Error(err)
+			w.Write(errorcode.ErrorE(err))
+			return
+		}
+		for adminrows.Next() {
+			ul := &user.User{}
+			err = adminrows.Scan(&ul.Id, &ul.Createtime, &ul.Realname, &ul.Nickname, &ul.Email,
+				&ul.Disable, &ul.RoleGroup, &ul.StatusGroup, &ul.Position)
+			if err != nil {
+				golog.Info(err)
+				continue
+			}
+			uls.Userlist = append(uls.Userlist, ul)
+		}
+		adminrows.Close()
+		send, _ := json.Marshal(uls)
+		w.Write(send)
+		return
+	} else {
+		getallsql := `select u.id,createtime,realname,nickname,email,disable,r.name,s.name,j.name from 
+		user as u  join rolegroup as r 
+		join statusgroup as s 
+		join jobs as j 
+		on u.rid = r.id and u.bugsid = s.id and u.jid = j.id and u.jid in (select id from jobs where hypo=(select jid from user where id=?))`
+		adminrows, err := db.Mconn.GetRows(getallsql, uid)
+		if err != nil {
+			golog.Error(err)
+			w.Write(errorcode.ErrorE(err))
+			return
+		}
+		for adminrows.Next() {
+			ul := &user.User{}
+			err = adminrows.Scan(&ul.Id, &ul.Createtime, &ul.Realname, &ul.Nickname, &ul.Email,
+				&ul.Disable, &ul.RoleGroup, &ul.StatusGroup, &ul.Position)
+			if err != nil {
+				golog.Info(err)
+				continue
+			}
+			uls.Userlist = append(uls.Userlist, ul)
+		}
+		adminrows.Close()
+		send, _ := json.Marshal(uls)
+		w.Write(send)
 		return
 	}
-	for adminrows.Next() {
-		ul := &user.User{}
-		err = adminrows.Scan(&ul.Id, &ul.Createtime, &ul.Realname, &ul.Nickname, &ul.Email,
-			&ul.Disable, &ul.RoleGroup, &ul.StatusGroup, &ul.Position)
-		if err != nil {
-			golog.Info(err)
-			continue
-		}
-		uls.Userlist = append(uls.Userlist, ul)
-	}
-	adminrows.Close()
-	send, _ := json.Marshal(uls)
-	w.Write(send)
-	return
 
 }
 

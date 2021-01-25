@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/hyahm/golog"
 	"github.com/hyahm/gomysql"
@@ -237,6 +238,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 	countArgs := make([]interface{}, 0)
 	countArgs = append(countArgs, (gomysql.InArgs)(statislist).ToInArgs())
 	countArgs = append(countArgs, args...)
+
 	countsql := "select id,spusers from bugs where dustbin=false and sid in (?) order by id desc"
 	countRows, err := db.Mconn.GetRowsIn(countsql+conditionsql, countArgs...)
 	if err != nil {
@@ -267,6 +269,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 		w.Write(al.Marshal())
 		return
 	}
+
 	page, start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
 	al.Page = page
 	// searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs join  on dustbin=true and uid=? "
@@ -286,8 +289,9 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 		w.Write(al.ErrorE(err))
 		return
 	}
-
+	wg := &sync.WaitGroup{}
 	for rows.Next() {
+
 		bug := &model.ArticleList{
 			Handle: make([]string, 0),
 		}
@@ -299,26 +303,31 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 			golog.Info(err)
 			continue
 		}
-		realnames, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
-			(gomysql.InArgs)(strings.Split(ids, ",")).ToInArgs())
-		if err != nil {
-			golog.Error(err)
-			w.Write(al.ErrorE(err))
-			return
-		}
-		for realnames.Next() {
-			var name string
-			err = realnames.Scan(&name)
+		wg.Add(1)
+		go func() {
+			realnames, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
+				(gomysql.InArgs)(strings.Split(ids, ",")).ToInArgs())
 			if err != nil {
 				golog.Error(err)
-				continue
+				w.Write(al.ErrorE(err))
+				return
 			}
-			bug.Handle = append(bug.Handle, name)
-		}
-		realnames.Close()
-		al.Al = append(al.Al, bug)
-	}
+			for realnames.Next() {
+				var name string
+				err = realnames.Scan(&name)
+				if err != nil {
+					golog.Error(err)
+					return
+				}
+				bug.Handle = append(bug.Handle, name)
+			}
+			realnames.Close()
+			al.Al = append(al.Al, bug)
+			wg.Done()
+		}()
 
+	}
+	wg.Wait()
 	rows.Close()
 	w.Write(al.Marshal())
 	return

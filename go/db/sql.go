@@ -22,6 +22,8 @@ func InitMysql() {
 		Timeout:         time.Second * 5,
 		ReadTimeout:     time.Second * 30,
 		ConnMaxLifetime: time.Hour * 4,
+		MaxOpenConns:    10,
+		MaxIdleConns:    1,
 	}
 	Mconn, err = conf.NewDb()
 	if err != nil {

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="padding-left: 20px">
     <p class="warn-content">
       选择可以操作的页面组， 操作的角色由开发者决定, 如果查看的权限没有， 那么后面的所有权限都被无视
     </p>

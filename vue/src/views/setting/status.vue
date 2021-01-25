@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="padding-left: 20px">
     <p class="warn-content">
       bug的所有状态流程， 比如从新建->解决中->测试->完成 等
     </p>

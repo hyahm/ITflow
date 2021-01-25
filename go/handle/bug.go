@@ -57,7 +57,6 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 func ShowStatus(w http.ResponseWriter, r *http.Request) {
 	// 获取显示的状态名
 	// sl := xmux.GetData(r).Data.(*status.Status)
-	golog.Info("8888888888")
 	sl := &status.Status{
 		CheckStatus: make([]string, 0),
 	}

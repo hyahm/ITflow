@@ -6,7 +6,10 @@ import (
 	"itflow/cache"
 	"itflow/model"
 	"log"
+	"sync"
 	"time"
+
+	"github.com/hyahm/golog"
 )
 
 type BugCount struct {
@@ -25,15 +28,31 @@ func GetCount() []byte {
 		Completed: make([]int, SHOWDAY),
 	}
 	count := 0
+	wg := &sync.WaitGroup{}
 	for i := SHOWDAY - 1; i >= 0; i-- {
-		if cache.DefaultCreateSid > 0 {
-			bc.Created[count], _ = model.GetCreatedCountByTime(start[i], end[i], cache.DefaultCreateSid)
-		}
-		if cache.DefaultCompleteSid > 0 {
-			bc.Completed[count], _ = model.GetCompletedCountByTime(start[i], end[i], cache.DefaultCompleteSid)
-		}
+		var err error
+		wg.Add(2)
+		go func(count, i int) {
+			if cache.DefaultCreateSid > 0 {
+				bc.Created[count], err = model.GetCreatedCountByTime(start[i], end[i], cache.DefaultCreateSid)
+				if err != nil {
+					golog.Error(err)
+				}
+			}
+			wg.Done()
+		}(count, i)
+		go func(count, i int) {
+			if cache.DefaultCompleteSid > 0 {
+				bc.Completed[count], err = model.GetCompletedCountByTime(start[i], end[i], cache.DefaultCompleteSid)
+				if err != nil {
+					golog.Error(err)
+				}
+			}
+			wg.Done()
+		}(count, i)
 		count++
 	}
+	wg.Wait()
 	send, _ := json.Marshal(bc)
 	return send
 }
