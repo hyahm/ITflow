@@ -326,7 +326,7 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 	bid := r.FormValue("id")
 	sl := &bug.RespShowBug{
 		Comments: make([]*comment.Informations, 0),
-		Url:      make([]string, 2),
+		Url:      make([]string, 0),
 	}
 	golog.Info(bid)
 	var u1, u2 string
@@ -348,8 +348,7 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	golog.Infof("%+v", sl)
-	sl.Url[0] = u1
-	sl.Url[1] = u2
+	sl.Url = append(sl.Url, u1, u2)
 	getinfosql := "select u.realname,info,time from informations as i join user as u on bid=? and u.id=i.uid"
 	rows, err := db.Mconn.GetRows(getinfosql, bid)
 	if err != nil {
