@@ -25,12 +25,16 @@
           <el-col :span="5">
             <span>版本：{{ bug.version }}</span>
           </el-col>
-          <el-col :span="5">
+          <el-col :span="4">
             <span>级别：{{ bug.level }}</span>
           </el-col>
-          <el-col :span="5">
+          <el-col :span="4">
             <span>重要性：{{ bug.important }}</span>
           </el-col>
+          <el-col :span="4">
+            <span>环境：{{ bug.envname }}</span>
+          </el-col>
+          
         </el-row>
          
          
