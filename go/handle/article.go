@@ -326,9 +326,11 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 	bid := r.FormValue("id")
 	sl := &bug.RespShowBug{
 		Comments: make([]*comment.Informations, 0),
+		Url:      make([]string, 2),
 	}
 	golog.Info(bid)
-	err := db.Mconn.GetOne(`select b.id,b.content,i.name, l.name, e.name, b.title,p.name from bugs as b 
+	var u1, u2 string
+	err := db.Mconn.GetOne(`select b.id,b.content,i.name, l.name, e.name, b.title,p.name,v.name, v.urlone, v.urltwo from bugs as b 
 	join importants as i 
 	join version as v 
 	join level as l 
@@ -338,7 +340,7 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 	join status as s 
 	on b.id=? 
 	and b.uid=u.id and i.id=b.iid and b.sid=s.id and b.vid=v.id and b.lid=l.id and b.eid=e.id and b.pid=p.id`, bid).Scan(
-		&sl.Id, &sl.Content, &sl.Important, &sl.Level, &sl.Envname, &sl.Title, &sl.Projectname,
+		&sl.Id, &sl.Content, &sl.Important, &sl.Level, &sl.Envname, &sl.Title, &sl.Projectname, &sl.Version, &u1, &u2,
 	)
 	if err != nil {
 		golog.Error(err)
@@ -346,6 +348,8 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	golog.Infof("%+v", sl)
+	sl.Url[0] = u1
+	sl.Url[1] = u2
 	getinfosql := "select u.realname,info,time from informations as i join user as u on bid=? and u.id=i.uid"
 	rows, err := db.Mconn.GetRows(getinfosql, bid)
 	if err != nil {

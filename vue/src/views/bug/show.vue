@@ -32,8 +32,16 @@
             <span>重要性：{{ bug.important }}</span>
           </el-col>
         </el-row>
-
+         
+         
+        <!-- <el-row> -->
+           
+          <!-- </el-row > -->
+         <!-- <span style="padding-top: 20px">URL：{{ bug.url }}</span> -->
       </el-card>
+      <el-card class="box-card" style="background-color: #8cbda4">
+        <span style="padding-top: 20px">URL：{{ bug.url }}</span>
+        </el-card>
       <div id="main">
         <mavon-editor
           style="width: 100%;min-height:10px"
