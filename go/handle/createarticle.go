@@ -172,6 +172,24 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 		// }
 		// go datalog.InsertLog("bug", nickname+fmt.Sprintf(" update bug id: %d", data.Id), r.RemoteAddr, nickname, "update")
 
+		// 根据处理人的id找出邮箱地址
+		idrows, err := db.Mconn.GetRowsIn("select email from user where id in (?)", gomysql.InArgs(ids).ToInArgs())
+		if err != nil {
+			golog.Error(err)
+			w.Write(data.ErrorE(err))
+			return
+		}
+		toEmails := make([]string, 0)
+		for idrows.Next() {
+			var et string
+			idrows.Scan(&et)
+			toEmails = append(toEmails, et)
+		}
+		bugUrl := fmt.Sprintf("%s/showbug/%d", r.Referer(), data.Id)
+		cache.CacheEmail.SendMail("您有一个的bug需要处理",
+			fmt.Sprintf(`<html><body><h1>%s<h1>bug地址:<a href="%s">%s</a></body></html>`,
+				data.Title, bugUrl, bugUrl),
+			toEmails...)
 	}
 
 	w.Write(data.Marshal())
