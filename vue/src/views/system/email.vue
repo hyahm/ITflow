@@ -99,8 +99,11 @@ export default {
   methods: {
     getemail() {
       getEmailStatus().then(resp => {
+         console.log(resp.data)
+         console.log(resp.data.code)
         if (resp.data.code === 0) {
-          this.email = resp.data.emailaddr
+          console.log(resp.data.email)
+          this.email = resp.data.email
           this.enable = resp.data.enable
           this.host = resp.data.host
           this.port = resp.data.port

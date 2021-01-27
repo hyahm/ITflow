@@ -81,7 +81,7 @@ func GetEmail(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	send := fmt.Sprintf(`{"code": 0, "email": "%s", "id": %d, "password": "%s", "port": %d, "enable", %t, "host":"%s"}`,
+	send := fmt.Sprintf(`{"code": 0, "email": "%s", "id": %d, "password": "%s", "port": %d, "enable": %t, "host":"%s"}`,
 		cache.CacheEmail.EmailAddr, cache.CacheEmail.Id, cache.CacheEmail.Password, cache.CacheEmail.Port, cache.CacheEmail.Enable, cache.CacheEmail.Host)
 	w.Write([]byte(send))
 	return
