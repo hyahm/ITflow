@@ -33,7 +33,80 @@
    展示页面会更新为最新可使用的代码  
    [ITflow](http://bug.hyahm.com "ITflow")  
    
- 
+### 部署  
+```
+git clone https://github.com/hyahm/ITflow.git
+cd ITflow
+```
+###### 后端(安装最新版的go， 并将其目录下的bin目录添加进环境变量, 保证有go命令),  有安装好mysql数据库   
+```shell
+cd go
+
+```
+> 创建一个库  
+
+```
+mysql> create database bug;
+```
+> 导入表  
+
+```
+mysql bug < bug.sql
+```
+> 修改配置文件   
+
+```
+go run cmd/makeconfig/config.go   # 自动生成默认配置文件到本目录   bug.ini
+showbaseurl = http://127.0.0.1:10001/showimg/
+salt = hjkkakoweqzmbvc   # 修改salt值后用 curl http://127.0.0.1:10001/admin/reset?password=123 修改admin 密码
+cross=*   # 设置跨域的域名   eg:  http://127.0.0.1
+```  
+> 启动后端服务  
+
+```
+export GOPROXY=https://goproxy.cn
+go build main.go
+./main
+```
+###### 前端(最新版node, 保证有npm命令)
+```
+cd vue
+
+```
+> 修改配置文件  .env.production
+```
+VUE_APP_BASE_API = 'http://120.26.164.125:10001'  # 改为后端服务器外网地址
+VUE_APP_USERNAME = ''  # 设置为空
+VUE_APP_PASSWORD = ''   # 设置为空
+```
+> 打包
+```
+npm run build:prod
+
+```
+>  使用nginx 部署    
+
+```
+server {
+        listen 80;
+        server_name 127.0.0.1;
+        root <ITflow_dir>/vue/dist;
+        index index.html;
+
+
+        location / {
+                try_files $uri $uri/ @router;
+                index index.html;
+        }
+
+
+        location @router {
+                rewrite ^.*$ /index.html last;
+        }
+}
+```
+
+然后通过  http://<server_name>:port  访问
 
 ### 项目优势   
  部署简单, 使用简单, 高定制, 永久开源  可以自己二次开发   
@@ -41,3 +114,4 @@
   
 ### QQ群  
     928790087
+
