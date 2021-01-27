@@ -348,7 +348,12 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	golog.Infof("%+v", sl)
-	sl.Url = append(sl.Url, u1, u2)
+	if u1 != "" {
+		sl.Url = append(sl.Url, u1)
+	}
+	if u2 != "" {
+		sl.Url = append(sl.Url, u2)
+	}
 	getinfosql := "select u.realname,info,time from informations as i join user as u on bid=? and u.id=i.uid"
 	rows, err := db.Mconn.GetRows(getinfosql, bid)
 	if err != nil {
