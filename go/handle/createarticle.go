@@ -126,9 +126,9 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 			toEmails = append(toEmails, et)
 		}
 		bugUrl := fmt.Sprintf("%s/showbug/%d", r.Referer(), data.Id)
+		content := fmt.Sprintf(`<html><body><h1>%s<h1>bug地址:<a href="%s">%s</a></body></html>`, data.Title, bugUrl, bugUrl)
 		cache.CacheEmail.SendMail("您有一个新的bug需要处理",
-			fmt.Sprintf(`<html><body><h1>%s<h1>bug地址:<a href="%s">%s</a></body></html>`,
-				data.Title, bugUrl, bugUrl),
+			content,
 			toEmails...)
 	} else {
 		// update
@@ -186,9 +186,9 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 			toEmails = append(toEmails, et)
 		}
 		bugUrl := fmt.Sprintf("%s/showbug/%d", r.Referer(), data.Id)
+		content := fmt.Sprintf(`<html><body><h1>%s<h1>bug地址:<a href="%s">%s</a></body></html>`, data.Title, bugUrl, bugUrl)
 		cache.CacheEmail.SendMail("您有一个的bug需要处理",
-			fmt.Sprintf(`<html><body><h1>%s<h1>bug地址:<a href="%s">%s</a></body></html>`,
-				data.Title, bugUrl, bugUrl),
+			content,
 			toEmails...)
 	}
 
