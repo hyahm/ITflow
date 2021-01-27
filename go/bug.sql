@@ -722,8 +722,8 @@ DROP TABLE IF EXISTS `version`;
 CREATE TABLE `version` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
-  `urlone` varchar(30) DEFAULT '',
-  `urltwo` varchar(30) DEFAULT '',
+  `urlone` varchar(255) DEFAULT '',
+  `urltwo` varchar(255) DEFAULT '',
   `createtime` varchar(30) DEFAULT '0',
   `createuid` bigint(20) NOT NULL,
   `pid` bigint(20) NOT NULL DEFAULT '0',

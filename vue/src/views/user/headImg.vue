@@ -39,7 +39,7 @@ export default {
       },
       headers: {
         smail: '*_~',
-        'X-Token': getToken()
+        'Authorization': 'Bearer '+ getToken()
       }
       // avatar: ''
     }
