@@ -147,9 +147,10 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 		toEmails = append(toEmails, et)
 	}
 	bugUrl := fmt.Sprintf("%s/showbug/%d", r.Referer(), ub.Id)
+	context := fmt.Sprintf(`<html><body>转交人: %s</br>bug地址:<a href="%s">%s</a></br>原因: %s</body></html>`, nickname, bugUrl, bugUrl, ub.Remark)
+	golog.Info(context)
 	cache.CacheEmail.SendMail("您有一个bug被转交过来",
-		fmt.Sprintf(`<html><body>转交人: %s</br>bug地址:<a href="%s">%s</a></br>原因: %s</body></html>`,
-			nickname, bugUrl, bugUrl, ub.Remark),
+		context,
 		toEmails...)
 	// // if cache.CacheEmail.Enable {
 	// // 	go cache.CacheEmail.SendMail("转让bug", fmt.Sprintf("由%s 转交给你", cache.CacheUidRealName[uid]), mails...)
