@@ -187,6 +187,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 		}
 		bugUrl := fmt.Sprintf("%s/showbug/%d", r.Referer(), data.Id)
 		content := fmt.Sprintf(`<html><body><h1>%s<h1>bug地址:<a href="%s">%s</a></body></html>`, data.Title, bugUrl, bugUrl)
+		golog.Info(content)
 		cache.CacheEmail.SendMail("您有一个的bug需要处理",
 			content,
 			toEmails...)
