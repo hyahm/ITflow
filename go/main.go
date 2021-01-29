@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-
+	defer golog.Sync()
 	conf := "bug.ini"
 	if len(os.Args) > 1 {
 		fmt.Println(os.Args[1])
@@ -34,6 +34,6 @@ func main() {
 			goconfig.ReadInt64("log.size", 0),
 			goconfig.ReadBool("log.everyday", false))
 	}
-
+	golog.Info("000000000")
 	httpserver.RunHttp()
 }

@@ -77,19 +77,15 @@ func NewBugById(id interface{}) (*Bug, error) {
 	return bug, err
 }
 
-func GetCreatedCountByTime(start, end, statusid int64) (int, error) {
+func GetCreatedCountByTime(start, end int64) (int, error) {
 	var count int
-	db.Mconn.OpenDebug()
-	err := db.Mconn.GetOne("select count(id) from bugs where dustbin=true and createtime between ? and ? and sid=?", start, end, statusid).Scan(&count)
-	golog.Info(db.Mconn.GetSql())
+	err := db.Mconn.GetOne("select count(id) from bugs where dustbin=false and createtime between ? and ?", start, end).Scan(&count)
 	return count, err
 }
 
 func GetCompletedCountByTime(start, end, statusid int64) (int, error) {
 	var count int
-	db.Mconn.OpenDebug()
-	err := db.Mconn.GetOne("select count(id) from bugs where dustbin=true and updatetime between ? and ? and sid=?", start, end, statusid).Scan(&count)
-	golog.Info(db.Mconn.GetSql())
+	err := db.Mconn.GetOne("select count(id) from bugs where dustbin=false and updatetime between ? and ? and sid=?", start, end, statusid).Scan(&count)
 	return count, err
 }
 

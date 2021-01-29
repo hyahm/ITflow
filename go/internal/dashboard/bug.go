@@ -22,7 +22,8 @@ type BugCount struct {
 const SHOWDAY = 7
 
 func GetCount() []byte {
-	start, end := getTime()
+	start := getTime()
+	golog.Info(start)
 	bc := &BugCount{
 		Created:   make([]int, SHOWDAY),
 		Completed: make([]int, SHOWDAY),
@@ -33,17 +34,15 @@ func GetCount() []byte {
 		var err error
 		wg.Add(2)
 		go func(count, i int) {
-			if cache.DefaultCreateSid > 0 {
-				bc.Created[count], err = model.GetCreatedCountByTime(start[i], end[i], cache.DefaultCreateSid)
-				if err != nil {
-					golog.Error(err)
-				}
+			bc.Created[count], err = model.GetCreatedCountByTime(start[i], start[i]+24*60*60-1)
+			if err != nil {
+				golog.Error(err)
 			}
 			wg.Done()
 		}(count, i)
 		go func(count, i int) {
 			if cache.DefaultCompleteSid > 0 {
-				bc.Completed[count], err = model.GetCompletedCountByTime(start[i], end[i], cache.DefaultCompleteSid)
+				bc.Completed[count], err = model.GetCompletedCountByTime(start[i], start[i]+24*60*60-1, cache.DefaultCompleteSid)
 				if err != nil {
 					golog.Error(err)
 				}
@@ -57,18 +56,16 @@ func GetCount() []byte {
 	return send
 }
 
-func getTime() ([]int64, []int64) {
+func getTime() []int64 {
 	start := make([]int64, SHOWDAY)
-	end := make([]int64, SHOWDAY)
 	now := time.Now()
 	start[0] = zeroTimeUnix(now)
-	end[0] = now.Unix()
+	golog.Infof("start: %d", start[0])
 	for i := 1; i < SHOWDAY; i++ {
 		start[i] = zeroTimeUnix(now.AddDate(0, 0, -i))
-		end[i] = start[i-1] - 1
 	}
 
-	return start, end
+	return start
 }
 
 func zeroTimeUnix(now time.Time) int64 {
