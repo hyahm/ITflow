@@ -93,3 +93,10 @@ export function userDisable(id) {
         params: { id }
     })
 }
+
+export function myEmail() {
+    return request({
+        url: '/my/email',
+        method: 'post',
+    })
+}

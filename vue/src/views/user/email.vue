@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { getEmail, setEmail } from '@/api/user'
+import { myEmail, setEmail } from '@/api/user'
 export default {
   name: 'Changepwd',
   data() {
@@ -33,8 +33,10 @@ export default {
   },
   methods: {
     getEmailHandle() {
-      getEmail().then(response => {
+      myEmail().then(response => {
+        console.log(response.data)
         if (response.data.code === 0) {
+          
           this.email = response.data.email
         }
       })

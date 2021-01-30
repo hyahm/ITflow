@@ -22,4 +22,5 @@ func init() {
 	Email.Post("/email/test", handle.TestEmail).Bind(&email.Email{}).AddModule(midware.JsonToStruct)
 	Email.Post("/email/save", handle.SaveEmail).Bind(&email.Email{}).AddModule(midware.JsonToStruct)
 	Email.Post("/email/get", handle.GetEmail)
+	Email.Post("/my/email", handle.MyEmail)
 }

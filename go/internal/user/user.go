@@ -27,6 +27,7 @@ func (login *Login) Check() (*RespLogin, error) {
 	enpassword := encrypt.PwdEncrypt(login.Password, cache.Salt)
 	getsql := ""
 	if strings.Contains(login.Username, "@") {
+		golog.Info("email login")
 		getsql = "select id,nickname from user where email=? and password=? and disable=0"
 	} else {
 		getsql = "select id,nickname from user where nickname=? and password=? and disable=0"

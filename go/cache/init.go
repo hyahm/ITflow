@@ -56,7 +56,7 @@ func LoadConfig() {
 
 	CacheRidRole = make(map[int64]string, 0)
 	CacheRoleRid = make(map[string]int64, 0)
-	CacheEmail = &Email{}
+
 	Expirontion = goconfig.ReadDuration("expiration", 120*time.Minute)
 	golog.Info("cookie过期时间为：", Expirontion)
 	initCache()

@@ -19,6 +19,7 @@ type Email struct {
 }
 
 func cacheemail() {
+	CacheEmail = &Email{}
 	err := db.Mconn.GetOne("select id,email,password,port,host,enable from email limit 1").
 		Scan(&CacheEmail.Id, &CacheEmail.EmailAddr, &CacheEmail.Password, &CacheEmail.Port, &CacheEmail.Host, &CacheEmail.Enable)
 
