@@ -56,17 +56,16 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="角色组" width="100px" align="center">
+      <!-- <el-table-column label="角色组" width="100px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.rolegroup }}</span>
-          <!--<svg-icon v-for="n in +scope.row.importance" icon-class="star" class="meta-item__icon" :key="n"></svg-icon>-->
         </template>
       </el-table-column>
       <el-table-column label="状态组" width="110px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.statusgroup }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
 
       <el-table-column label="职位" width="110px" align="center">
         <template slot-scope="scope">
@@ -121,7 +120,7 @@
         <el-form-item label="邮箱">
           <el-input v-model="form.email" />
         </el-form-item>
-        <el-form-item label="状态组">
+        <!-- <el-form-item label="状态组">
           <el-select v-model="form.statusgroup" placeholder="Select">
             <el-option
               v-for="(role, index) in statusgrouplist"
@@ -140,7 +139,7 @@
               :value="role"
             />
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="职位：">
           <el-select v-model="form.position" placeholder="Select">
             <el-option

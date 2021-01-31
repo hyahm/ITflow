@@ -34,6 +34,5 @@ func main() {
 			goconfig.ReadInt64("log.size", 0),
 			goconfig.ReadBool("log.everyday", false))
 	}
-	golog.Info("000000000")
 	httpserver.RunHttp()
 }

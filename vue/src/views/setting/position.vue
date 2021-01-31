@@ -3,6 +3,9 @@
     <p class="warn-content">
       职位，在管理的时候，上级有管理下级的权限，级别只有普通员工和管理者，管理者也可以被其他管理者管理（从属于），一个员工只能被一个管理者管理
     </p>
+        <div>
+      <el-button type="success" plain style="margin: 20px" @click="addposition">添加职位</el-button>
+    </div>
     <el-table
       :data="tableData"
       height="600"
@@ -54,30 +57,40 @@
         </template>
       </el-table-column>
     </el-table>
-    <div>
-      <el-button type="success" plain style="margin: 20px" @click="addposition">添加职位</el-button>
-    </div>
+
     <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" title="职位管理">
       <el-form>
-        <el-form-item label="职位名">
-          <el-input v-model="form.name" />
+
+         <el-form-item label="管理层：">
+          <el-radio-group v-model="form.level">
+            <el-radio :label="levelone">管理者</el-radio>
+            <el-radio :label="leveltwo">普通员工</el-radio>
+          </el-radio-group>
         </el-form-item>
-      </el-form>
-      <el-form>
-        <el-radio-group v-model="form.level">
-          <el-radio :label="levelone">管理者</el-radio>
-          <el-radio checked :label="leveltwo">普通员工</el-radio>
-        </el-radio-group>
-      </el-form>
-      <el-form style="margin-top: 10px">
+        <el-form-item label="职位名：" >
+          <el-input v-model="form.name" />
+          
+        </el-form-item>
+       
+       <el-form-item style="margin-bottom: 40px;" prop="title" label="状态组:">
+          <el-select v-model="form.statusgroup" class="filter-item" style="width: 130px">
+            <el-option v-for="(status, index) in statusgroups" :key="index" :label="status" :value="status" />
+          </el-select>
+        </el-form-item>
+        <el-form-item style="margin-bottom: 40px;" prop="title" label="角色组:">
+          <el-select v-model="form.rolegroup" class="filter-item" style="width: 130px">
+            <el-option v-for="(role, index) in rolegroups" :key="index" :label="role" :value="role" />
+          </el-select>
+        </el-form-item>
+      <!-- <el-form style="margin-top: 10px"> -->
         <!--从属于哪个管理者-->
-        <el-form-item label="从属于">
+        <el-form-item label="从属于:">
           <el-select v-model="form.hyponame" clearable placeholder="Select">
             <el-option
               v-for="(hypo, index) in manager"
               :key="index"
-              :label="hypo.name"
-              :value="hypo.name"
+              :label="hypo"
+              :value="hypo"
             />
           </el-select>
         </el-form-item>
@@ -92,6 +105,8 @@
 
 <script>
 import { addPosition, updatePosition, delPosition, getHypos, PositionsList } from '@/api/position'
+import { getRoleGroup } from '@/api/rolegroup'
+import { getStatusGroupName } from '@/api/statusgroup'
 export default {
   name: 'Position',
   filters: {
@@ -109,6 +124,8 @@ export default {
       changeName: '',
       tableData: [],
       statuslist: [],
+      statusgroups: [],
+      rolegroups: [],
       dialogFormVisible: false,
       status: '',
       levelone: 1,
@@ -117,22 +134,39 @@ export default {
       form: {
         id: -1,
         name: '',
-        level: 0,
-        hyponame: ''
+        level: 2,
+        hyponame: '',
+        rolegroup: '',
+        statusgroup: ''
       }
     }
   },
   created() {
     this.getlist()
+    this.getrolegroups()
+    this.getstatusgroups()
   },
   methods: {
     changeHypo(e) {
       console.log(e)
     },
-    gethypos(id) {
-      getHypos(id).then(resp => {
+    getrolegroups() {
+      getRoleGroup().then(resp => {
         if (resp.data.code === 0) {
-          this.manager = resp.data.hypos
+            this.rolegroups = resp.data.rolelist
+        } else {
+          this.$message.error(resp.data.msg)
+        }
+      })
+    },
+    handleGetHypos(id) {
+      getHypos(id).then(resp => {
+        console.log(resp.data)
+        if (resp.data.code === 0) {
+          for (let i=0;i< resp.data.length;i++) {
+             this.manager.push( resp.data.hypos[i].name)
+          }
+          // this.manager = resp.data.hypos
         } else {
           this.$message.error(resp.data.msg)
         }
@@ -142,6 +176,11 @@ export default {
       PositionsList().then(resp => {
         if (resp.data.code === 0) {
           this.tableData = resp.data.positions
+          for (let i = 0; i < this.tableData.length; i++) {
+            if (this.tableData[i].level === 1) {
+              this.manager.push(this.tableData[i].name)
+            }
+          }
         } else {
           this.$message.error(resp.data.msg)
         }
@@ -159,10 +198,7 @@ export default {
             })
 
             if (this.form.level === 1) {
-              this.manager.push({
-                'id': this.form.id,
-                'name': this.form.hyponame
-              })
+              this.manager.push(this.form.hyponame)
             }
           } else {
             this.$message.error(resp.data.msg)
@@ -170,6 +206,7 @@ export default {
         })
       } else {
         updatePosition(this.form).then(resp => {
+          console.log(this.form)
           if (resp.data.code === 0) {
             const l = this.tableData.length
             for (let i = 0; i < l; i++) {
@@ -193,6 +230,17 @@ export default {
     },
     cancel() {
       this.dialogFormVisible = false
+    },
+    getstatusgroups() {
+      getStatusGroupName().then(resp => {
+        if (resp.data.code === 0) {
+          if (resp.data.names.length > 0) {
+            this.statusgroups = resp.data.names
+          }
+        } else {
+          this.$message.error(resp.data.msg)
+        }
+      })
     },
     handleDelete(row) {
       this.$confirm('此操作将关闭bug, 是否继续?', '提示', {
@@ -235,15 +283,19 @@ export default {
     addposition() {
       this.dialogFormVisible = true
       this.form.id = -1
-      this.form.level = 0
+      this.form.level = 2
       this.form.hyponame = ''
       this.form.name = ''
+      this.form.rolegroup = ''
+      this.form.statusgroup = ''
     },
     handleUpdate(row) {
+      console.log(row)
       this.form = row
       this.changeName = row.name
+
       this.dialogFormVisible = true
-      this.gethypos(row.id)
+      this.handleGetHypos(row.id)
     }
   }
 }

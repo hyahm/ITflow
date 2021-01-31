@@ -34,9 +34,7 @@ export default {
   methods: {
     getEmailHandle() {
       myEmail().then(response => {
-        console.log(response.data)
         if (response.data.code === 0) {
-          
           this.email = response.data.email
         }
       })

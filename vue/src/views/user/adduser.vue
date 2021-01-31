@@ -61,7 +61,7 @@
           />
         </el-form-item>
 
-        <el-form-item style="margin-bottom: 40px;" prop="title" label="状态组:">
+        <!-- <el-form-item style="margin-bottom: 40px;" prop="title" label="状态组:">
           <el-select v-model="postForm.statusgroup" class="filter-item" style="width: 130px">
             <el-option v-for="(status, index) in statusgroups" :key="index" :label="status" :value="status" />
           </el-select>
@@ -70,7 +70,7 @@
           <el-select v-model="postForm.rolegroup" class="filter-item" style="width: 130px">
             <el-option v-for="(role, index) in rolegroups" :key="index" :label="role" :value="role" />
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item style="margin-bottom: 40px;" prop="title" label="职位名:">
           <el-select v-model="postForm.position" placeholder="Select">
             <el-option
@@ -93,8 +93,8 @@
 
 <script>
 import { createUser } from '@/api/user'
-import { getStatusGroupName } from '@/api/statusgroup'
-import { getRoleGroup } from '@/api/rolegroup'
+// import { getStatusGroupName } from '@/api/statusgroup'
+// import { getRoleGroup } from '@/api/rolegroup'
 import { getPositions } from '@/api/position'
 export default {
   name: 'Adduser',
@@ -129,9 +129,9 @@ export default {
     this.getpositions()
   },
   created() {
-    this.getrolegroups()
+    // this.getrolegroups()
     this.getpositions()
-    this.getstatusgroups()
+    // this.getstatusgroups()
   },
   methods: {
     getpositions() {
@@ -145,28 +145,28 @@ export default {
         }
       })
     },
-    getstatusgroups() {
-      getStatusGroupName().then(resp => {
-        if (resp.data.code === 0) {
-          if (resp.data.names.length > 0) {
-            this.statusgroups = resp.data.names
-          }
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
-    },
-    getrolegroups() {
-      getRoleGroup().then(resp => {
-        if (resp.data.code === 0) {
-          if (resp.data.rolelist !== null) {
-            this.rolegroups = resp.data.rolelist
-          }
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
-    },
+    // getstatusgroups() {
+    //   getStatusGroupName().then(resp => {
+    //     if (resp.data.code === 0) {
+    //       if (resp.data.names.length > 0) {
+    //         this.statusgroups = resp.data.names
+    //       }
+    //     } else {
+    //       this.$message.error(resp.data.msg)
+    //     }
+    //   })
+    // },
+    // getrolegroups() {
+    //   getRoleGroup().then(resp => {
+    //     if (resp.data.code === 0) {
+    //       if (resp.data.rolelist !== null) {
+    //         this.rolegroups = resp.data.rolelist
+    //       }
+    //     } else {
+    //       this.$message.error(resp.data.msg)
+    //     }
+    //   })
+    // },
     adduser() {
       const regEmail = /^.*@.+\.[A-Za-zd]{2,5}$/
       if (this.postForm.email === '') {
@@ -190,20 +190,20 @@ export default {
         })
         return
       }
-      if (this.postForm.statusgroup === '') {
-        this.$message({
-          message: '请选择状态组',
-          type: 'error'
-        })
-        return
-      }
-      if (this.postForm.rolegroups === '') {
-        this.$message({
-          message: '请选择角色组',
-          type: 'error'
-        })
-        return
-      }
+      // if (this.postForm.statusgroup === '') {
+      //   this.$message({
+      //     message: '请选择状态组',
+      //     type: 'error'
+      //   })
+      //   return
+      // }
+      // if (this.postForm.rolegroups === '') {
+      //   this.$message({
+      //     message: '请选择角色组',
+      //     type: 'error'
+      //   })
+      //   return
+      // }
       if (this.postForm.position === '') {
         this.$message({
           message: '请选择职位',

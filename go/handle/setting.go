@@ -31,13 +31,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	enpassword := encrypt.PwdEncrypt(getuser.Password, cache.Salt)
 	var err error
-	errorcode.Id, err = db.Mconn.Insert(`insert into user(nickname, password, email, createtime, createuid, realname, bugsid, rid, jid) values(
+	db.Mconn.OpenDebug()
+	errorcode.Id, err = db.Mconn.Insert(`insert into user(nickname, password, email, createtime, createuid, realname, jid) values(
 		?,?,?,?,?,?, 
-		(select id from statusgroup where name=?),  
-		(select id from rolegroup where name=?),
 		(select id from jobs where name=?))`, getuser.Nickname,
 		enpassword, getuser.Email, createTime,
-		uid, getuser.RealName, getuser.StatusGroup, getuser.RoleGroup, getuser.Position)
+		uid, getuser.RealName, getuser.Position)
+	golog.Info(db.Mconn.GetSql())
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -217,11 +217,10 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 	uls := &user.UserList{}
 	if uid == cache.SUPERID {
-		getallsql := `select u.id,createtime,realname,nickname,email,disable,r.name,s.name,j.name from 
-		user as u join rolegroup as r 
-		join statusgroup as s 
+		getallsql := `select u.id,createtime,realname,nickname,email,disable,j.name from 
+		user as u 
 		join jobs as j 
-		on u.rid = r.id and u.bugsid = s.id and u.jid = j.id and u.id<>?`
+		on u.jid = j.id and u.id<>?`
 		adminrows, err := db.Mconn.GetRows(getallsql, cache.SUPERID)
 		if err != nil {
 			golog.Error(err)
@@ -231,7 +230,7 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 		for adminrows.Next() {
 			ul := &user.User{}
 			err = adminrows.Scan(&ul.Id, &ul.Createtime, &ul.Realname, &ul.Nickname, &ul.Email,
-				&ul.Disable, &ul.RoleGroup, &ul.StatusGroup, &ul.Position)
+				&ul.Disable, &ul.Position)
 			if err != nil {
 				golog.Info(err)
 				continue
@@ -319,13 +318,10 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	getallsql := `update user set 
 	 realname=?,	nickname=?,	email=?,
-	 rid=(select coalesce(min(id),0) from rolegroup where name=?),
-	 bugsid=(select coalesce(min(id),0) from statusgroup where name=?), 
 	 jid=(select coalesce(min(id),0) from jobs where name=?) 
 	 where id=?`
-	// getallsql := "update user set realname=?,nickname=?,email=?,rid=?,bugsid=?,jid=?  where id=?"
 	_, err := db.Mconn.Update(getallsql,
-		uls.Realname, uls.Nickname, uls.Email, uls.RoleGroup, uls.StatusGroup, uls.Position,
+		uls.Realname, uls.Nickname, uls.Email, uls.Position,
 		uls.Id,
 	)
 	if err != nil {

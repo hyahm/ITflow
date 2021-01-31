@@ -55,10 +55,10 @@ const userRoute = {
             }
         },
         {
-            path: 'email',
+            path: 'myemail',
             component: () =>
                 import ('@/views/user/email'),
-            name: 'email',
+            name: 'myemail',
             meta: {
                 title: '修改邮箱',
                 icon: 'email'

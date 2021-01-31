@@ -22,7 +22,9 @@ func PositionGet(w http.ResponseWriter, r *http.Request) {
 		Positions: make([]*model.Table_jobs, 0),
 	}
 
-	rows, err := db.Mconn.GetRows("select id,name,level,hypo from jobs")
+	rows, err := db.Mconn.GetRows(`select j.id,j.name,level,hypo,IFNULL(s.name,''), IFNULL(r.name,'') from bug.jobs as j 
+	left join bug.statusgroup as s  on j.bugsid = s.id 
+	left join bug.rolegroup as r on j.rid=r.id`)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -31,7 +33,7 @@ func PositionGet(w http.ResponseWriter, r *http.Request) {
 	x := make(map[int64]string)
 	for rows.Next() {
 		one := &model.Table_jobs{}
-		rows.Scan(&one.Id, &one.Name, &one.Level, &one.Hid)
+		rows.Scan(&one.Id, &one.Name, &one.Level, &one.Hid, &one.StatusGroup, &one.RoleGroup)
 		x[one.Id] = one.Name
 		data.Positions = append(data.Positions, one)
 	}
@@ -158,7 +160,9 @@ func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	_, err := db.Mconn.Update("update jobs set name=?,level=?,hypo=? where id=?", data.Name, data.Level, hid, data.Id)
+	_, err := db.Mconn.Update(`update jobs set name=?,level=?,hypo=?, 
+	bugsid=(select id from statusgroup where name=?),rid=(select id from rolegroup where name=?) where id=?`,
+		data.Name, data.Level, hid, data.StatusGroup, data.RoleGroup, data.Id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

@@ -313,8 +313,12 @@ CREATE TABLE `jobs` (
   `name` varchar(30) NOT NULL DEFAULT '',
   `level` bigint(20) NOT NULL DEFAULT '2',
   `hypo` varchar(30) NOT NULL DEFAULT '0',
+  `rid` bigint(20) DEFAULT '0',
+  `jid` bigint(20) DEFAULT '0',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
+  UNIQUE KEY `name` (`name`),
+  KEY `rid` (`rid`),
+  KEY `bugsid` (`bugsid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -661,14 +665,12 @@ CREATE TABLE `user` (
   `showstatus` varchar(200) DEFAULT '',
   `disable` tinyint(1) DEFAULT '0',
   `bugsid` bigint(20) DEFAULT '0',
-  `rid` bigint(20) DEFAULT '0',
-  `jid` bigint(20) DEFAULT '0',
+
   PRIMARY KEY (`id`),
   UNIQUE KEY `nickname` (`nickname`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `realname` (`realname`),
-  KEY `rid` (`rid`),
-  KEY `bugsid` (`bugsid`),
+
   KEY `jid` (`jid`),
   KEY `createuid` (`createuid`),
   KEY `disable` (`disable`),

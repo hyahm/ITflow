@@ -39,7 +39,6 @@ func SaveEmail(w http.ResponseWriter, r *http.Request) {
 			getemail.Password, getemail.Port, getemail.Host, getemail.Enable)
 		if err != nil {
 			golog.Error(err)
-
 			w.Write(errorcode.ErrorE(err))
 			return
 		}
