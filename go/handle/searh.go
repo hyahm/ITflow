@@ -24,12 +24,13 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 		Al:   make([]*model.ArticleList, 0),
 		Page: 1,
 	}
-	statislist, err := model.GetMyStatusList(uid)
+	statuslist, err := model.GetMyStatusList(uid)
 	if err != nil {
 		golog.Error(err)
 		w.Write(al.ErrorE(err))
 		return
 	}
+	golog.Info(statuslist)
 	// 找出所有跟自己有关的项目， 列出所有项目的bug
 	prows, err := db.Mconn.GetRows("select p.id, u.ids from project as p join usergroup as u on p.ugid=u.id;")
 	if err != nil {
@@ -58,11 +59,13 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 	golog.Info(myproject)
 	conditionsql, args := mybug.GetUsefulCondition(uid)
 	countArgs := make([]interface{}, 0)
-	countArgs = append(countArgs, (gomysql.InArgs)(statislist).ToInArgs())
+	countArgs = append(countArgs, (gomysql.InArgs)(statuslist).ToInArgs())
 	countArgs = append(countArgs, (gomysql.InArgs)(myproject).ToInArgs())
 	countArgs = append(countArgs, args...)
 	countsql := "select count(id) from bugs where dustbin=false and sid in (?) and pid in (?)"
 	db.Mconn.OpenDebug()
+	golog.Info(countsql + conditionsql)
+	golog.Info(countArgs)
 	err = db.Mconn.GetOneIn(countsql+conditionsql, countArgs...).Scan(&al.Count)
 	golog.Info(db.Mconn.GetSql())
 	if err != nil {
@@ -74,7 +77,7 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 	page, start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
 	al.Page = page
 	searchArgs := make([]interface{}, 0)
-	searchArgs = append(searchArgs, (gomysql.InArgs)(statislist).ToInArgs())
+	searchArgs = append(searchArgs, (gomysql.InArgs)(statuslist).ToInArgs())
 	searchArgs = append(searchArgs, (gomysql.InArgs)(myproject).ToInArgs())
 	searchArgs = append(searchArgs, args...)
 	searchArgs = append(searchArgs, start, end)
@@ -87,7 +90,7 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 	join environment as e
 	join user as u
 	on dustbin=false and b.iid = i.id and b.sid = s.id and b.lid = l.id and b.pid=p.id and b.eid = e.id and b.uid=u.id and sid in (?) and pid in (?)`
-	rows, err := db.Mconn.GetRowsIn(searchsql+conditionsql+" limit ?,?", searchArgs...)
+	rows, err := db.Mconn.GetRowsIn(searchsql+conditionsql+" order by id desc limit ?,?", searchArgs...)
 
 	if err != nil {
 		golog.Error(err)
@@ -174,7 +177,7 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 	join environment as e
 	join user as u
 	on dustbin=false and b.iid = i.id and b.sid = s.id and b.lid = l.id and b.pid=p.id and b.eid = e.id and b.uid=u.id and b.uid=? and sid in (?)`
-	rows, err := db.Mconn.GetRowsIn(searchsql+conditionsql+" limit ?,?", searchArgs...)
+	rows, err := db.Mconn.GetRowsIn(searchsql+conditionsql+" order by id desc limit ?,?", searchArgs...)
 
 	if err != nil {
 		golog.Error(err)

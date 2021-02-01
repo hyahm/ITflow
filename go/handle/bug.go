@@ -48,7 +48,6 @@ func (sl *statusList) ErrorE(err error) []byte {
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
 	// 获取状态名
-	golog.Info(5555)
 	w.Write(status.GetNames())
 	return
 

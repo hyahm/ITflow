@@ -9,7 +9,7 @@ require (
 	github.com/hyahm/cachetable v0.0.0-20200707100838-5dd5455ce3d5
 	github.com/hyahm/goconfig v0.0.0-20200814144712-bd712352a305
 	github.com/hyahm/golog v0.0.0-20210121062944-1d6fdf70ca5e
-	github.com/hyahm/gomysql v0.0.0-20200907042853-4c3633416726
+	github.com/hyahm/gomysql v0.0.0-20210201074602-081fe378c151
 	github.com/hyahm/xmux v0.0.0-20201012065236-17cf91e3b4c8
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
