@@ -30,7 +30,6 @@ func GetList(uid int64) []byte {
 		rpl.Msg = err.Error()
 		return rpl.Marshal()
 	}
-	golog.Info(ps)
 	for _, p := range ps {
 		rp := &ReqProject{
 			ProjectName: p.Name,

@@ -22,6 +22,7 @@ type RespShowBug struct {
 	Msg         string                  `json:"msg,omitempty"`
 	Comments    []*comment.Informations `json:"comments,omitempty"`
 	Url         []string                `json:"url,omitempty"`
+	Typ         int                     `json:"typ"`
 }
 
 func (rsb *RespShowBug) Marshal() []byte {

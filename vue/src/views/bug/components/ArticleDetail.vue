@@ -13,6 +13,11 @@
 
       <div class="" style="padding: 20px">
         <el-row>
+          <el-form-item  label="任务类型: ">
+            <el-radio-group v-model="typ" @change="handleChangeType">
+              <el-radio v-for="(t, key) in ts" :key="key" :label="key">{{ t }}</el-radio>
+            </el-radio-group>
+          </el-form-item>
           <!--<el-col :span="24" >-->
           <el-form-item prop="title" label="文章标题：">
             <el-input
@@ -36,7 +41,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item style="display: inline-block;width: 400px" label="运行环境：">
+        <el-form-item v-if="typ==1" style="display: inline-block;width: 400px" label="运行环境：">
           <el-select v-model="postForm.envname" placeholder="请选择">
             <el-option
               v-for="(item, index) in envnames"
@@ -47,7 +52,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item style="display: inline-block;width: 400px" label="应用版本：">
+        <el-form-item v-if="typ==1" style="display: inline-block;width: 400px" label="应用版本：">
           <el-select v-model="postForm.version" placeholder="请选择">
             <el-option
               v-for="(item, index) in versions"
@@ -58,7 +63,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item style="display: inline-block;width: 400px" label="优先级别：">
+        <el-form-item v-if="typ==1" style="display: inline-block;width: 400px" label="优先级别：">
           <el-select v-model="postForm.level" placeholder="请选择">
             <el-option
               v-for="(item, index) in levels"
@@ -72,7 +77,7 @@
         <!--<el-form-item style="margin-bottom: 40px;" prop="title">-->
         <!--<PlatformDropdown v-model="postForm.platforms" />-->
         <!--</el-form-item>-->
-        <el-form-item style="display: inline-block;width: 400px" label="重要性：">
+        <el-form-item v-if="typ==1" style="display: inline-block;width: 400px" label="重要性：">
           <el-select v-model="postForm.important" placeholder="请选择">
             <el-option
               v-for="(important, index) in importants"
@@ -117,7 +122,7 @@ import Sticky from '@/components/Sticky' // 粘性header组件
 import { validateURL } from '@/utils/validate'
 import { fetchBug, createBug } from '@/api/bugs'
 import { uploadImg } from '@/api/uploadimg'
-import { getEnv, getMyProject, getLevels, getImportants, getProjectUser } from '@/api/get'
+import { getEnv, getMyProject, getLevels, getImportants, getProjectUser, getTyp } from '@/api/get'
 
 const defaultForm = {
   // status: 'draft',
@@ -129,7 +134,8 @@ const defaultForm = {
   level: '',
   envname: '',
   important: '',
-  version: ''
+  version: '',
+  typ: 1,
 }
 
 export default {
@@ -179,7 +185,9 @@ export default {
       oses: [],
       users: [],
       projectnames: [],
-      envnames: []
+      envnames: [],
+      ts: [],
+      typ: '1'
     }
   },
   activated() {
@@ -187,6 +195,7 @@ export default {
     this.getproject()
     this.getenv()
     this.getlevels()
+    
   },
   created() {
     this.getimportants()
@@ -194,6 +203,7 @@ export default {
     // this.getversion()
     this.getlevels()
     this.getenv()
+    this.gettyp()
     if (this.isEdit) {
       const id = this.$route.params && this.$route.params.id
       this.postForm.id = parseInt(id)
@@ -203,6 +213,13 @@ export default {
     }
   },
   methods: {
+    gettyp() {
+      getTyp().then(resp => {
+        if (resp.data.code === 0) {
+          this.ts = resp.data.ts
+        }
+      })
+    },
     changeProject(name) {
       // 选择不用项目会显示不同的用户
       this.users = []
@@ -267,6 +284,7 @@ export default {
       fetchBug(id).then(resp => {
         if (resp.data.code === 0) {
           const dd = resp.data
+          console.log(dd)
           this.editProject(dd.projectname)
           this.postForm.title = dd.title
           this.postForm.content = dd.content
@@ -276,6 +294,7 @@ export default {
           this.postForm.envname = dd.envname
           this.postForm.level = dd.level
           this.postForm.projectname = dd.projectname
+          this.typ = dd.typ + ''
           // 第一次获取数据， 请求到当前项目关联的版本和用户
         } else {
           this.$message.error(resp.data.msg)
@@ -283,6 +302,9 @@ export default {
       }).catch(err => {
         console.log(err)
       })
+    },
+    handleChangeType(t) {
+      
     },
     submitForm() {
       this.ispub = true
@@ -311,7 +333,7 @@ export default {
         this.ispub = false
         return
       }
-      if (this.postForm.level.length < 1) {
+      if (this.postForm.level.length < 1 && this.typ == 1) {
         this.$message({
           message: '请选择项目级别',
           type: 'error'
@@ -319,7 +341,7 @@ export default {
         this.ispub = false
         return
       }
-      if (this.postForm.important.length < 1) {
+      if (this.postForm.important.length < 1  && this.typ == 1) {
         this.$message({
           message: '请选择项目严重程度',
           type: 'error'
@@ -335,7 +357,7 @@ export default {
         this.ispub = false
         return
       }
-      if (this.postForm.envname.length < 1) {
+      if (this.postForm.envname.length < 1  && this.typ == 1) {
         this.$message({
           message: '请选择运行环境',
           type: 'error'
@@ -343,7 +365,7 @@ export default {
         this.ispub = false
         return
       }
-      if (this.postForm.version.length < 1) {
+      if (this.postForm.version.length < 1 && this.typ == 1) {
         this.$message({
           message: '请选择版本',
           type: 'error'
@@ -353,6 +375,7 @@ export default {
       }
       this.$refs.postForm.validate(valid => {
         if (valid) {
+          this.postForm.typ = parseInt(this.typ)
           createBug(this.postForm).then(resp => {
             if (resp.data.code === 0) {
               if (this.postForm.id === -1) {

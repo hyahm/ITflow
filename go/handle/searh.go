@@ -169,14 +169,15 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 	searchArgs = append(searchArgs, args...)
 	searchArgs = append(searchArgs, start, end)
 	// searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs join  on dustbin=true and uid=? "
-	searchsql := `select b.id,b.createtime,i.name,s.name,title,l.name,p.name,e.name,spusers,u.realname from bugs as b
-	join importants as i
-	join status as s
-	join level as l
-	join project as p
-	join environment as e
-	join user as u
-	on dustbin=false and b.iid = i.id and b.sid = s.id and b.lid = l.id and b.pid=p.id and b.eid = e.id and b.uid=u.id and b.uid=? and sid in (?)`
+	searchsql := `select b.id,b.createtime, ifnull(i.name, ''), ifnull(s.name, ''),title, 
+	ifnull(l.name, ''), ifnull(p.name, ''), ifnull(e.name, ''),spusers, ifnull(u.realname,'') from bugs as b
+	left join importants as i on b.iid = i.id 
+	left join status as s on b.sid = s.id 
+	left join level as l on b.lid = l.id 
+	left join project as p on b.pid=p.id 
+	left join environment as e on b.eid = e.id 
+	left join user as u on  b.uid=u.id 
+	where dustbin=false  and b.uid=? and sid in (?)`
 	rows, err := db.Mconn.GetRowsIn(searchsql+conditionsql+" order by id desc limit ?,?", searchArgs...)
 
 	if err != nil {

@@ -15,7 +15,6 @@ func initCache() {
 		var id int64
 		var name string
 		rolerows.Scan(&id, &name)
-		CacheRidRole[id] = name
 		CacheRoleRid[name] = id
 	}
 	rolerows.Close()

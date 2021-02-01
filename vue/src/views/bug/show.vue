@@ -22,16 +22,16 @@
           <el-col :span="5">
             <span>项目名: {{ bug.projectname }}</span>
           </el-col>
-          <el-col :span="5">
+          <el-col v-if="bug.typ==1" :span="5">
             <span>版本：{{ bug.version }}</span>
           </el-col>
-          <el-col :span="4">
+          <el-col v-if="bug.typ==1" :span="4">
             <span>级别：{{ bug.level }}</span>
           </el-col>
-          <el-col :span="4">
+          <el-col v-if="bug.typ==1" :span="4">
             <span>重要性：{{ bug.important }}</span>
           </el-col>
-          <el-col :span="4">
+          <el-col v-if="bug.typ==1" :span="4">
             <span>环境：{{ bug.envname }}</span>
           </el-col>
           
@@ -43,7 +43,7 @@
           <!-- </el-row > -->
          <!-- <span style="padding-top: 20px">URL：{{ bug.url }}</span> -->
       </el-card>
-      <el-card class="box-card" style="background-color: #8cbda4">
+      <el-card class="box-card" v-if="bug.typ==1" style="background-color: #8cbda4">
         <span style="padding-top: 20px">URL：{{ bug.url }}</span>
         </el-card>
       <div id="main">

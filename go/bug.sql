@@ -36,7 +36,7 @@ CREATE TABLE `apilist` (
   `hid` bigint(20) DEFAULT NULL,
   `calltype` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -66,7 +66,7 @@ CREATE TABLE `apiproject` (
   `eid` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -98,6 +98,7 @@ CREATE TABLE `bugs` (
   `spusers` varchar(255) DEFAULT '',
   `lid` bigint(20) DEFAULT '0',
   `eid` bigint(20) DEFAULT '0',
+  `tid` bigint(20) DEFAULT '0',
   `pid` bigint(20) DEFAULT '0',
   `updatetime` bigint(20) DEFAULT '0',
   `dustbin` tinyint(1) DEFAULT '0',
@@ -110,9 +111,10 @@ CREATE TABLE `bugs` (
   KEY `lid` (`lid`),
   KEY `eid` (`eid`),
   KEY `pid` (`pid`),
+  KEY `tid` (`tid`),
   KEY `dustbin` (`dustbin`),
   KEY `updatetime` (`updatetime`)
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -138,8 +140,7 @@ CREATE TABLE `defaultvalue` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `defaultvalue`
+
 --
 
 LOCK TABLES `defaultvalue` WRITE;
@@ -151,6 +152,21 @@ UNLOCK TABLES;
 --
 -- Table structure for table `email`
 --
+
+DROP TABLE IF EXISTS `typ`;
+--
+CREATE TABLE `typ` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- Dumping data for table `typ`
+
+LOCK TABLES `typ` WRITE;
+insert into typ(name) values('bug'), ('需求');
+/*!40000 ALTER TABLE `typ` DISABLE KEYS */;
+/*!40000 ALTER TABLE `typ` ENABLE KEYS */;
+UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `email`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -188,7 +204,7 @@ CREATE TABLE `environment` (
   `name` varchar(30) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -214,7 +230,7 @@ CREATE TABLE `header` (
   `remark` varchar(30) DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -239,7 +255,7 @@ CREATE TABLE `headerlist` (
   `v` text NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `k` (`k`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -263,7 +279,7 @@ CREATE TABLE `importants` (
   `name` varchar(40) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+) ENGINE=InnoD DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -289,7 +305,7 @@ CREATE TABLE `informations` (
   `info` varchar(200) NOT NULL DEFAULT '',
   `time` bigint(20) DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -314,12 +330,12 @@ CREATE TABLE `jobs` (
   `level` bigint(20) NOT NULL DEFAULT '2',
   `hypo` varchar(30) NOT NULL DEFAULT '0',
   `rid` bigint(20) DEFAULT '0',
-  `jid` bigint(20) DEFAULT '0',
+  `bugsid` bigint(20) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `rid` (`rid`),
   KEY `bugsid` (`bugsid`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -343,7 +359,7 @@ CREATE TABLE `level` (
   `name` varchar(30) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -370,7 +386,7 @@ CREATE TABLE `log` (
   `uid` bigint(20) DEFAULT '0',
   `action` varchar(50) DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1499 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -397,7 +413,7 @@ CREATE TABLE `options` (
   `df` varchar(10) DEFAULT '',
   `need` varchar(10) DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -424,7 +440,7 @@ CREATE TABLE `perm` (
   `increase` tinyint(1) NOT NULL DEFAULT '0',
   `rid` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -450,7 +466,7 @@ CREATE TABLE `project` (
   `uid` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -499,7 +515,7 @@ CREATE TABLE `rolegroup` (
   `permids` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -524,7 +540,7 @@ CREATE TABLE `roles` (
   `info` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -557,7 +573,7 @@ CREATE TABLE `sharefile` (
   `updatetime` bigint(20) DEFAULT '0',
   `name` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -581,7 +597,7 @@ CREATE TABLE `status` (
   `name` varchar(30) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -606,7 +622,7 @@ CREATE TABLE `statusgroup` (
   `sids` varchar(200) DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -634,7 +650,7 @@ CREATE TABLE `types` (
   `default` varchar(50) DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -664,7 +680,7 @@ CREATE TABLE `user` (
   `realname` varchar(30) NOT NULL,
   `showstatus` varchar(200) DEFAULT '',
   `disable` tinyint(1) DEFAULT '0',
-  `bugsid` bigint(20) DEFAULT '0',
+  `jid` bigint(20) DEFAULT '0',
 
   PRIMARY KEY (`id`),
   UNIQUE KEY `nickname` (`nickname`),
@@ -675,7 +691,7 @@ CREATE TABLE `user` (
   KEY `createuid` (`createuid`),
   KEY `disable` (`disable`),
   KEY `showstatus` (`showstatus`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -684,7 +700,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'admin','69ad5117e7553ecfa7f918a223426dd8da08a57f','admin@qq.com','http://120.26.164.125:10001/showimg/1594376285974981434.png',1557131883,0,'admin','',0,0,0,0);
+INSERT INTO `user` VALUES (1,'admin','69ad5117e7553ecfa7f918a223426dd8da08a57f','admin@qq.com','http://120.26.164.125:10001/showimg/1594376285974981434.png',1557131883,0,'admin','',0,0);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -702,7 +718,7 @@ CREATE TABLE `usergroup` (
   `uid` bigint(20) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -731,7 +747,7 @@ CREATE TABLE `version` (
   `pid` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_version` (`pid`,`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

@@ -24,6 +24,7 @@ type EditBug struct {
 	Version     string   `json:"version,omitempty"`
 	Code        int      `json:"code"`
 	Msg         string   `json:"msg,omitempty"`
+	Typ         int      `json:"typ"`
 }
 
 func (reb *EditBug) Marshal() []byte {
@@ -47,28 +48,24 @@ func (reb *EditBug) ErrorE(err error) []byte {
 func BugById(id string, uid int64) []byte {
 	reb := &EditBug{}
 	golog.Info(id)
-	alsql := `select i.name,title,
-	l.name,p.name,e.name,spusers,v.name,content, b.uid 
-	from bugs as b 
-	join importants as i 
-	join level as l 
-	join project as p  
-	join environment as e  
-	join version as v  
-	on b.id=? and 
-	i.id=b.iid and 
-	l.id=b.lid and 
-	p.id=b.pid and  
-	e.id=b.eid and 
-	v.id=b.vid `
+	alsql := `select b.tid,ifnull(i.name, ''),title,
+	ifnull(l.name, ''), ifnull(p.name, ''), ifnull(e.name, ''),spusers,ifnull(v.name, ''),content, b.uid 
+	from bug.bugs as b 
+	left join bug.importants as i on i.id=b.iid
+	left join bug.level as l on l.id=b.lid
+	left join bug.project as p  on p.id=b.pid
+	left join bug.environment as e  on e.id=b.eid
+	left join version as v  on v.id=b.vid
+	where b.id=? `
 	var spids string
 	var bugUid int64
-	err := db.Mconn.GetOne(alsql, id).Scan(&reb.Important, &reb.Title, &reb.Level, &reb.Projectname,
+	err := db.Mconn.GetOne(alsql, id).Scan(&reb.Typ, &reb.Important, &reb.Title, &reb.Level, &reb.Projectname,
 		&reb.Envname, &spids, &reb.Version, &reb.Content, &bugUid)
 	if err != nil {
 		golog.Error(err)
 		return reb.ErrorE(err)
 	}
+	golog.Info(reb.Typ)
 	if bugUid != uid && uid != cache.SUPERID {
 		return reb.Error("没有权限")
 	}

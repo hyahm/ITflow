@@ -11,12 +11,13 @@ import (
 // 生成初始化本地缓存
 
 var (
-	ImgDir      string
-	PrivateKey  string
-	ShowBaseUrl string
-	Salt        string
-	Expirontion time.Duration
-	ShareDir    string
+	CacheRoleRid map[string]int64
+	ImgDir       string
+	PrivateKey   string
+	ShowBaseUrl  string
+	Salt         string
+	Expirontion  time.Duration
+	ShareDir     string
 )
 
 type UG struct {
@@ -27,8 +28,6 @@ type UG struct {
 
 // cached
 var (
-	CacheRidRole       map[int64]string
-	CacheRoleRid       map[string]int64
 	DefaultCreateSid   int64
 	DefaultCompleteSid int64
 
@@ -54,7 +53,6 @@ func LoadConfig() {
 		panic(err)
 	}
 
-	CacheRidRole = make(map[int64]string, 0)
 	CacheRoleRid = make(map[string]int64, 0)
 
 	Expirontion = goconfig.ReadDuration("expiration", 120*time.Minute)

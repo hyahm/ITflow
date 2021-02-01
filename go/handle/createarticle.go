@@ -84,7 +84,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 	// bug.Uid = xmux.GetData(r).Get("uid").(int64)
 	//
 	// go datalog.InsertLog("bug", nickname+"create bug: "+data.Title, r.RemoteAddr, nickname, "create")
-
+	golog.Infof("%#v", data)
 	if data.Id <= 0 {
 		// 插入bug
 		// err = bug.CreateBug()
@@ -96,14 +96,14 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 			w.Write(data.Error("必须先设置一个默认的创建状态（系统设置->默认值->bug创建时的状态）"))
 			return
 		}
-		createsql := `insert into bugs(uid,title,sid,content,iid,createtime,vid,spusers,lid,eid,pid) 
-		values(?,?,?,?,(select ifnull(min(id),0) from importants where name=?),?,
+		createsql := `insert into bugs(tid,uid,title,sid,content,iid,createtime,vid,spusers,lid,eid,pid) 
+		values(?,?,?,?,?,(select ifnull(min(id),0) from importants where name=?),?,
 		(select ifnull(min(id),0) from version where name=?),?,
 		(select ifnull(min(id),0) from level where name=?),
 		(select ifnull(min(id),0) from environment where name=?),
 		(select ifnull(min(id),0) from project where name=?))`
-
-		data.Id, err = db.Mconn.Insert(createsql, uid, data.Title,
+		golog.Info(data.Typ)
+		data.Id, err = db.Mconn.Insert(createsql, data.Typ, uid, data.Title,
 			cache.DefaultCreateSid, html.EscapeString(data.Content), data.Important,
 			time.Now().Unix(), data.Version, strings.Join(ids, ","), data.Level, data.Envname, data.Projectname)
 		if err != nil {
@@ -144,7 +144,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 			w.Write(data.Error("没有权限"))
 			return
 		}
-		updatesql := `update bugs set title=?,content=?,
+		updatesql := `update bugs set tid=?, title=?,content=?,
 			iid=(select ifnull(min(id),0) from importants where name=?),
 			updatetime=?,
 			vid=(select ifnull(min(id),0) from version where name=?),
@@ -153,12 +153,10 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 			eid=(select ifnull(min(id),0) from environment where name=?),
 			pid=(select ifnull(min(id),0) from project where name=?) 
 		where id=?`
-		db.Mconn.OpenDebug()
-		_, err = db.Mconn.Update(updatesql, data.Title,
+		_, err = db.Mconn.Update(updatesql, data.Typ, data.Title,
 			html.EscapeString(data.Content), data.Important,
 			time.Now().Unix(), data.Version, strings.Join(ids, ","),
 			data.Level, data.Envname, data.Projectname, data.Id)
-		golog.Info(db.Mconn.GetSql())
 		if err != nil {
 			golog.Error(err)
 			w.Write(data.ErrorE(err))

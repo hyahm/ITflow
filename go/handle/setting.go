@@ -414,6 +414,37 @@ func GetGroup(w http.ResponseWriter, r *http.Request) {
 
 }
 
+type sty struct {
+	Ts   map[int]string `json:"ts"`
+	Code int            `json:"code"`
+}
+
+func GetTaskTyp(w http.ResponseWriter, r *http.Request) {
+
+	ts := &sty{
+		Ts: make(map[int]string, 0),
+	}
+	rows, err := db.Mconn.GetRows("select id,name from typ")
+	if err != nil {
+		w.Write([]byte(fmt.Sprintf(`{"code": 2, "msg": "%s"}`, err.Error())))
+		return
+	}
+	for rows.Next() {
+		var t string
+		var id int
+		err = rows.Scan(&id, &t)
+		if err != nil {
+			golog.Info(err)
+			continue
+		}
+		ts.Ts[id] = t
+	}
+	send, _ := json.Marshal(ts)
+	w.Write(send)
+	return
+
+}
+
 func ResetPwd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}

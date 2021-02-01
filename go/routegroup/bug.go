@@ -64,4 +64,5 @@ func init() {
 
 	Bug.Get("/bug/delete", handle.DeleteBug)
 	Bug.Post("/get/group", handle.GetGroup)
+	Bug.Post("/get/task/typ", handle.GetTaskTyp)
 }

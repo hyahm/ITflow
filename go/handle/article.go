@@ -330,17 +330,17 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 	}
 	golog.Info(bid)
 	var u1, u2 string
-	err := db.Mconn.GetOne(`select b.id,b.content,i.name, l.name, e.name, b.title,p.name,v.name, v.urlone, v.urltwo from bugs as b 
-	join importants as i 
-	join version as v 
-	join level as l 
-	join environment as e 
-	join project as p 
-	join user as u 
-	join status as s 
-	on b.id=? 
-	and b.uid=u.id and i.id=b.iid and b.sid=s.id and b.vid=v.id and b.lid=l.id and b.eid=e.id and b.pid=p.id`, bid).Scan(
-		&sl.Id, &sl.Content, &sl.Important, &sl.Level, &sl.Envname, &sl.Title, &sl.Projectname, &sl.Version, &u1, &u2,
+	err := db.Mconn.GetOne(`select b.tid, b.id,b.content,ifnull(i.name, ''), ifnull(l.name, ''), 
+	ifnull(e.name, ''), b.title, p.name, ifnull(v.name, ''), ifnull(v.urlone, ''), ifnull(v.urltwo, '') from bugs as b 
+	left join importants as i on i.id=b.iid 
+	left join version as v on b.vid=v.id 
+	left join level as l on b.lid=l.id 
+	left join environment as e on b.eid=e.id 
+	left join project as p on b.pid=p.id 
+	left join user as u on b.uid=u.id  
+	left join status as s on   b.sid=s.id  
+	where b.id=? `, bid).Scan(
+		&sl.Typ, &sl.Id, &sl.Content, &sl.Important, &sl.Level, &sl.Envname, &sl.Title, &sl.Projectname, &sl.Version, &u1, &u2,
 	)
 	if err != nil {
 		golog.Error(err)
