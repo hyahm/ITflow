@@ -13,7 +13,7 @@
 
       <div class="" style="padding: 20px">
         <el-row>
-          <el-form-item  label="任务类型: ">
+          <el-form-item label="任务类型: ">
             <el-radio-group v-model="typ" @change="handleChangeType">
               <el-radio v-for="(t, key) in ts" :key="key" :label="key">{{ t }}</el-radio>
             </el-radio-group>
@@ -119,7 +119,6 @@
 // import Tinymce from '@/components/Tinymce'
 
 import Sticky from '@/components/Sticky' // 粘性header组件
-import { validateURL } from '@/utils/validate'
 import { fetchBug, createBug } from '@/api/bugs'
 import { uploadImg } from '@/api/uploadimg'
 import { getEnv, getMyProject, getLevels, getImportants, getProjectUser, getTyp } from '@/api/get'
@@ -135,7 +134,7 @@ const defaultForm = {
   envname: '',
   important: '',
   version: '',
-  typ: 1,
+  typ: 1
 }
 
 export default {
@@ -151,21 +150,6 @@ export default {
     }
   },
   data() {
-    const validateSourceUri = (rule, value, callback) => {
-      if (value) {
-        if (validateURL(value)) {
-          callback()
-        } else {
-          this.$message({
-            message: '外链url填写不正确',
-            type: 'error'
-          })
-          callback(null)
-        }
-      } else {
-        callback()
-      }
-    }
     return {
       postForm: Object.assign({}, defaultForm),
       loading: false,
@@ -175,7 +159,7 @@ export default {
         // image_uri: [{ valiimportantsdator: validateRequire }],
         // title: [{ validator: validateRequire }],
         // content: [{ validator: validateRequire }],
-        source_uri: [{ validator: validateSourceUri }]
+        // source_uri: [{ validator: validateSourceUri }]
         // source_uri: [{ validator: validateSourceUri, trigger: 'blur' }]
       },
       classname: [],
@@ -195,7 +179,6 @@ export default {
     this.getproject()
     this.getenv()
     this.getlevels()
-    
   },
   created() {
     this.getimportants()
@@ -304,7 +287,7 @@ export default {
       })
     },
     handleChangeType(t) {
-      
+
     },
     submitForm() {
       this.ispub = true
@@ -333,7 +316,7 @@ export default {
         this.ispub = false
         return
       }
-      if (this.postForm.level.length < 1 && this.typ == 1) {
+      if (this.postForm.level.length < 1 && this.typ === 1) {
         this.$message({
           message: '请选择项目级别',
           type: 'error'
@@ -341,7 +324,7 @@ export default {
         this.ispub = false
         return
       }
-      if (this.postForm.important.length < 1  && this.typ == 1) {
+      if (this.postForm.important.length < 1 && this.typ === 1) {
         this.$message({
           message: '请选择项目严重程度',
           type: 'error'
@@ -357,7 +340,7 @@ export default {
         this.ispub = false
         return
       }
-      if (this.postForm.envname.length < 1  && this.typ == 1) {
+      if (this.postForm.envname.length < 1 && this.typ === 1) {
         this.$message({
           message: '请选择运行环境',
           type: 'error'
@@ -365,7 +348,7 @@ export default {
         this.ispub = false
         return
       }
-      if (this.postForm.version.length < 1 && this.typ == 1) {
+      if (this.postForm.version.length < 1 && this.typ === 1) {
         this.$message({
           message: '请选择版本',
           type: 'error'
