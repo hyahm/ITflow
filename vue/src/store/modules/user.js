@@ -1,7 +1,7 @@
 import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken, setTimeout } from '@/utils/auth'
 // import router, { resetRouter } from '@/router'
-import router from '@/router'
+// import router from '@/router'
 
 const state = {
   token: getToken(),
@@ -60,13 +60,13 @@ const actions = {
     return new Promise((resolve, reject) => {
       getInfo().then(response => {
         const { data } = response
-
+        console.log(data)
         if (data.code !== 0) {
           reject('Verification failed, please Login again.')
         }
 
         const { roles, name, avatar } = data
-
+        console.log(roles)
         // roles must be a non-empty array
         if (!roles || roles.length <= 0) {
           reject('getInfo: roles must be a non-null array!')
@@ -75,6 +75,7 @@ const actions = {
         commit('SET_ROLES', roles)
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
+        console.log(roles)
         // commit('SET_INTRODUCTION', introduction)
         resolve(roles)
       }).catch(error => {
@@ -111,32 +112,32 @@ const actions = {
       removeToken()
       resolve()
     })
-  },
+  }
 
   // dynamically modify permissions
-  changeRoles({ commit, dispatch }, role) {
-    return new Promise(async resolve => {
-      const token = role + '-token'
+  // changeRoles({ commit, dispatch }, role) {
+  //   return new Promise(async resolve => {
+  //     const token = role + '-token'
 
-      commit('SET_TOKEN', token)
-      setToken(token)
+  //     commit('SET_TOKEN', token)
+  //     setToken(token)
 
-      const { roles } = await dispatch('getInfo')
+  //     const { roles } = await dispatch('getInfo')
 
-      // resetRouter()
+  //     // resetRouter()
 
-      // generate accessible routes map based on roles
-      const accessRoutes = await dispatch('permission/generateRoutes', roles, { root: true })
+  //     // generate accessible routes map based on roles
+  //     const accessRoutes = await dispatch('permission/generateRoutes', roles, { root: true })
 
-      // dynamically add accessible routes
-      router.addRoutes(accessRoutes)
+  //     // dynamically add accessible routes
+  //     router.addRoutes(accessRoutes)
 
-      // reset visited views and cached views
-      dispatch('tagsView/delAllViews', null, { root: true })
+  //     // reset visited views and cached views
+  //     dispatch('tagsView/delAllViews', null, { root: true })
 
-      resolve()
-    })
-  }
+  //     resolve()
+  //   })
+  // }
 }
 
 export default {

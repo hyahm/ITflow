@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import Chart from '@/components/Charts/keyboard'
+import Chart from '@/components/Charts/Keyboard'
 
 export default {
   name: 'KeyboardChart',
@@ -16,9 +16,8 @@ export default {
 <style scoped>
 .chart-container{
   position: relative;
-  padding: 20px;
   width: 100%;
-  height: 85vh;
+  height: calc(100vh - 84px);
 }
 </style>
 

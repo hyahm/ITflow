@@ -3,7 +3,7 @@
     <p class="warn-content">
       职位，在管理的时候，上级有管理下级的权限，级别只有普通员工和管理者，管理者也可以被其他管理者管理（从属于），一个员工只能被一个管理者管理
     </p>
-        <div>
+    <div>
       <el-button type="success" plain style="margin: 20px" @click="addposition">添加职位</el-button>
     </div>
     <el-table
@@ -39,7 +39,7 @@
         label="从属于"
         width="180"
       >
-       
+
         <template slot-scope="scope">
           <span>{{ scope.row.hyponame }}</span>
         </template>
@@ -73,28 +73,28 @@
     <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" title="职位管理">
       <el-form>
 
-         <el-form-item label="管理层：">
+        <el-form-item label="管理层：">
           <el-radio-group v-model="form.level">
             <el-radio :label="levelone">管理者</el-radio>
             <el-radio :label="leveltwo">普通员工</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="职位名：" >
+        <el-form-item label="职位名：" label-width="100">
           <el-input v-model="form.name" />
-          
+
         </el-form-item>
-       
-       <el-form-item style="margin-bottom: 40px;" prop="title" label="状态组:">
+
+        <el-form-item style="margin-bottom: 40px;" label="状态组:">
           <el-select v-model="form.statusgroup" class="filter-item" style="width: 130px">
-            <el-option v-for="(status, index) in statusgroups" :key="index" :label="status" :value="status" />
+            <el-option v-for="(s, index) in statusgroups" :key="index" :label="s" :value="s" />
           </el-select>
         </el-form-item>
-        <el-form-item style="margin-bottom: 40px;" prop="title" label="角色组:">
+        <el-form-item style="margin-bottom: 40px;" label="角色组:">
           <el-select v-model="form.rolegroup" class="filter-item" style="width: 130px">
             <el-option v-for="(role, index) in rolegroups" :key="index" :label="role" :value="role" />
           </el-select>
         </el-form-item>
-      <!-- <el-form style="margin-top: 10px"> -->
+        <!-- <el-form style="margin-top: 10px"> -->
         <!--从属于哪个管理者-->
         <el-form-item label="从属于:">
           <el-select v-model="form.hyponame" clearable placeholder="Select">
@@ -165,7 +165,7 @@ export default {
     getrolegroups() {
       getRoleGroup().then(resp => {
         if (resp.data.code === 0) {
-            this.rolegroups = resp.data.rolelist
+          this.rolegroups = resp.data.rolelist
         } else {
           this.$message.error(resp.data.msg)
         }
@@ -175,8 +175,8 @@ export default {
       getHypos(id).then(resp => {
         console.log(resp.data)
         if (resp.data.code === 0) {
-          for (let i=0;i< resp.data.length;i++) {
-             this.manager.push( resp.data.hypos[i].name)
+          for (let i = 0; i < resp.data.length; i++) {
+            this.manager.push(resp.data.hypos[i].name)
           }
           // this.manager = resp.data.hypos
         } else {

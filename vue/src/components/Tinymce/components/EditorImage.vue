@@ -3,8 +3,7 @@
     <el-button :style="{background:color,borderColor:color}" icon="el-icon-upload" size="mini" type="primary" @click=" dialogVisible=true">
       upload
     </el-button>
-    <!-- action="https://httpbin.org/post" -->
-    <el-dialog :close-on-click-modal="false" :visible.sync="dialogVisible">
+    <el-dialog :visible.sync="dialogVisible">
       <el-upload
         :multiple="true"
         :file-list="fileList"
@@ -13,7 +12,7 @@
         :on-success="handleSuccess"
         :before-upload="beforeUpload"
         class="editor-slide-upload"
-        :action="posturl"
+        action="https://httpbin.org/post"
         list-type="picture-card"
       >
         <el-button size="small" type="primary">
@@ -32,6 +31,7 @@
 
 <script>
 // import { getToken } from 'api/qiniu'
+
 export default {
   name: 'EditorSlideUpload',
   props: {
@@ -44,8 +44,7 @@ export default {
     return {
       dialogVisible: false,
       listObj: {},
-      fileList: [],
-      posturl: process.env.VUE_APP_BASE_API + '/uploadimg'
+      fileList: []
     }
   },
   methods: {
@@ -65,11 +64,10 @@ export default {
     },
     handleSuccess(response, file) {
       const uid = file.uid
-
       const objKeyArr = Object.keys(this.listObj)
       for (let i = 0, len = objKeyArr.length; i < len; i++) {
         if (this.listObj[objKeyArr[i]].uid === uid) {
-          this.listObj[objKeyArr[i]].url = response.url
+          this.listObj[objKeyArr[i]].url = response.files.file
           this.listObj[objKeyArr[i]].hasSuccess = true
           return
         }
@@ -106,7 +104,7 @@ export default {
 <style lang="scss" scoped>
 .editor-slide-upload {
   margin-bottom: 20px;
-  /deep/ .el-upload--picture-card {
+  ::v-deep .el-upload--picture-card {
     width: 100%;
   }
 }
