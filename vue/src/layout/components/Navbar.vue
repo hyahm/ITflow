@@ -8,7 +8,7 @@
       <template v-if="device!=='mobile'">
         <search id="header-search" class="right-menu-item" />
 
-        <error-log class="errLog-container right-menu-item hover-effect" />
+        <!-- <error-log class="errLog-container right-menu-item hover-effect" /> -->
 
         <screenfull id="screenfull" class="right-menu-item hover-effect" />
 
