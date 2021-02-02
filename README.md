@@ -77,8 +77,6 @@ npm install  --registry=https://registry.npm.taobao.org  cnpm -g
 cnpm install
 或 npm 安装
 npm install  --registry=https://registry.npm.taobao.org  # 安装依赖
-# 如果上面安装的时候提示错误  stack Error: EACCES: permission denied, mkdir '/root/ITflow/vue/node_modules/node-sass/.node-gyp'
-npm install  --registry=https://registry.npm.taobao.org  --unsafe-perm node-sass  # 需要单独安装一下node-sass
 
 ```
 > 修改配置文件  .env.production
