@@ -32,6 +32,7 @@
    [ITflow](http://bug.hyahm.com "ITflow")  
    
 ### 部署  
+需要 mysql >= 5.7   node 和go 最近即可，  然后还需要nginx 代理前端代码
 ```
 git clone https://github.com/hyahm/ITflow.git
 cd ITflow
