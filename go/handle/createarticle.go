@@ -84,7 +84,6 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 	// bug.Uid = xmux.GetData(r).Get("uid").(int64)
 	//
 	// go datalog.InsertLog("bug", nickname+"create bug: "+data.Title, r.RemoteAddr, nickname, "create")
-	golog.Infof("%#v", data)
 	if data.Id <= 0 {
 		// 插入bug
 		// err = bug.CreateBug()
@@ -92,6 +91,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 		// 	w.Write(errorcode.ErrorE(err))
 		// 	return
 		// }
+		golog.Info(cache.DefaultCreateSid)
 		if cache.DefaultCreateSid == 0 {
 			w.Write(data.Error("必须先设置一个默认的创建状态（系统设置->默认值->bug创建时的状态）"))
 			return

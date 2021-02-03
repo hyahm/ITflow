@@ -6,6 +6,7 @@ import (
 	"itflow/internal/response"
 	"net/http"
 
+	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
 
@@ -57,6 +58,7 @@ func ImportantPermModule(w http.ResponseWriter, r *http.Request) bool {
 		w.Write(resp.ErrorE(err))
 		return true
 	}
+	golog.Info(op)
 	xmux.GetData(r).Set("perm", op)
 	return false
 }

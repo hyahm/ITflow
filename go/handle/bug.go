@@ -116,7 +116,7 @@ func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		var sids string
-		err := db.Mconn.GetOne("select sids from statusgroup where id=ifnull((select bugsid from user where id=?),0)", uid).Scan(&sids)
+		err := db.Mconn.GetOne("select permids from statusgroup where id = (select bugsid from jobs where id=(select jid from user where id=?))", uid).Scan(&sids)
 		if err != nil {
 			golog.Error(err)
 			w.Write(sl.ErrorE(err))

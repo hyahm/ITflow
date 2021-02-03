@@ -11,11 +11,13 @@ type Table_jobs struct {
 }
 
 type Data_jobs struct {
-	Id       int64  `json:"id"`
-	Name     string `json:"name"`
-	Level    int    `json:"level"`
-	Hyponame string `json:"hyponame"`
-	Code     int    `json:"code"`
+	Id          int64  `json:"id"`
+	Name        string `json:"name"`
+	Level       int    `json:"level"`
+	Hyponame    string `json:"hyponame"`
+	StatusGroup string `json:"statusgroup"`
+	RoleGroup   string `json:"rolegroup"`
+	Code        int    `json:"code"`
 }
 
 type List_jobs struct {

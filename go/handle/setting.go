@@ -242,11 +242,9 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 		w.Write(send)
 		return
 	} else {
-		getallsql := `select u.id,createtime,realname,nickname,email,disable,r.name,s.name,j.name from 
-		user as u  join rolegroup as r 
-		join statusgroup as s 
-		join jobs as j 
-		on u.rid = r.id and u.bugsid = s.id and u.jid = j.id and u.jid in (select id from jobs where hypo=(select jid from user where id=?))`
+		getallsql := `select u.id,createtime,realname,nickname,email,disable, j.name from 
+		user as u  join jobs as j 
+		on u.jid in (select id from jobs where hypo=(select jid from user where id=?))`
 		adminrows, err := db.Mconn.GetRows(getallsql, uid)
 		if err != nil {
 			golog.Error(err)

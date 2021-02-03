@@ -21,9 +21,9 @@ func DefaultStatus(w http.ResponseWriter, r *http.Request) {
 	err := db.Mconn.GetOne("select s.name from defaultvalue as d join status as s on created=s.id ").Scan(&sl.Created)
 	err = db.Mconn.GetOne("select s.name from defaultvalue as d join status as s on completed=s.id ").Scan(&sl.Completed)
 	if err != nil {
-		golog.Error(err)
-		w.Write(sl.ErrorE(err))
-		return
+		golog.Info(err)
+		// w.Write(sl.Marshal())
+		// return
 	}
 	w.Write(sl.Marshal())
 	return
@@ -42,6 +42,7 @@ func DefaultSave(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
+	golog.Info(cache.DefaultCreateSid)
 	w.Write(errorcode.Success())
 	return
 

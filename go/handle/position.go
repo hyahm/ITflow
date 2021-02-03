@@ -54,7 +54,7 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	data := xmux.GetData(r).Data.(*model.Data_jobs)
-
+	golog.Infof("%#v", *data)
 	// 如果不存在管理层名，就参数错误
 	var hid int64
 	var err error
@@ -71,7 +71,9 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	errorcode.Id, err = db.Mconn.Insert("insert into jobs(name,level,hypo) value(?,?,?)", data.Name, data.Level, hid)
+	errorcode.Id, err = db.Mconn.Insert(`insert into jobs(name,level,hypo,rid,bugsid) 
+	value(?,?,?,(select id from rolegroup where name=?),(select id from statusgroup where name=?))`,
+		data.Name, data.Level, hid, data.RoleGroup, data.StatusGroup)
 	if err != nil {
 		golog.Error(err)
 		if err.(*mysql.MySQLError).Number == 1062 {

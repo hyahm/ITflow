@@ -159,9 +159,6 @@ export default {
     this.getstatusgroups()
   },
   methods: {
-    changeHypo(e) {
-      console.log(e)
-    },
     getrolegroups() {
       getRoleGroup().then(resp => {
         if (resp.data.code === 0) {
@@ -173,7 +170,6 @@ export default {
     },
     handleGetHypos(id) {
       getHypos(id).then(resp => {
-        console.log(resp.data)
         if (resp.data.code === 0) {
           for (let i = 0; i < resp.data.length; i++) {
             this.manager.push(resp.data.hypos[i].name)
@@ -210,7 +206,7 @@ export default {
             })
 
             if (this.form.level === 1) {
-              this.manager.push(this.form.hyponame)
+              this.manager.push(this.form.name)
             }
           } else {
             this.$message.error(resp.data.msg)
@@ -218,7 +214,6 @@ export default {
         })
       } else {
         updatePosition(this.form).then(resp => {
-          console.log(this.form)
           if (resp.data.code === 0) {
             const l = this.tableData.length
             for (let i = 0; i < l; i++) {
@@ -261,7 +256,6 @@ export default {
         type: 'warning'
       }).then(() => {
         delPosition(row.id).then(resp => {
-          // console
           if (resp === undefined) {
             return
           }
@@ -302,7 +296,6 @@ export default {
       this.form.statusgroup = ''
     },
     handleUpdate(row) {
-      console.log(row)
       this.form = row
       this.changeName = row.name
 

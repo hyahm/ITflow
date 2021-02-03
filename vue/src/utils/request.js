@@ -4,11 +4,10 @@ import { getToken, setTimeout, removeToken } from '@/utils/auth'
 import store from '@/store'
 
 // create an axios instance
-console.log(process.env.VUE_APP_BASE_API)
 const service = axios.create({
     baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
     // withCredentials: true, // send cookies when cross-domain requests
-    timeout: 15000 // request timeout
+    timeout: 5000 // request timeout
 })
 
 // request interceptor

@@ -20,7 +20,7 @@ func ImportantGet(w http.ResponseWriter, r *http.Request) {
 		ImportantList: make([]*model.Importants, 0),
 	}
 	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
-	if !perm.Delete {
+	if !perm.Select {
 		w.Write(data.Error("no perm"))
 		return
 	}

@@ -316,7 +316,7 @@ export default {
         this.ispub = false
         return
       }
-      if (this.postForm.level.length < 1 && this.typ === 1) {
+      if (this.typ === 1 && this.postForm.level.length < 1) {
         this.$message({
           message: '请选择项目级别',
           type: 'error'
@@ -324,7 +324,7 @@ export default {
         this.ispub = false
         return
       }
-      if (this.postForm.important.length < 1 && this.typ === 1) {
+      if (this.typ === 1 && this.postForm.important.length < 1) {
         this.$message({
           message: '请选择项目严重程度',
           type: 'error'
@@ -340,7 +340,7 @@ export default {
         this.ispub = false
         return
       }
-      if (this.postForm.envname.length < 1 && this.typ === 1) {
+      if (this.typ === 1 && this.postForm.envname.length < 1 ) {
         this.$message({
           message: '请选择运行环境',
           type: 'error'
@@ -348,7 +348,7 @@ export default {
         this.ispub = false
         return
       }
-      if (this.postForm.version.length < 1 && this.typ === 1) {
+      if (this.typ === 1 && this.postForm.version.length < 1 ) {
         this.$message({
           message: '请选择版本',
           type: 'error'
