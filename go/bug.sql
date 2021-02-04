@@ -178,6 +178,7 @@ CREATE TABLE `email` (
   `port` int(11) DEFAULT '25',
   `enable` tinyint(1) NOT NULL DEFAULT '0',
   `host` varchar(30) NOT NULL DEFAULT '',
+  `nickname` varchar(30) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

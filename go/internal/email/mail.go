@@ -6,6 +6,7 @@ type Email struct {
 	Id        int64  `json:"id"`
 	Port      int    `json:"port"`
 	EmailAddr string `json:"email"`
+	Nickname  string `json:"nickname"`
 	Password  string `json:"password"`
 	To        string `json:"to"`
 	Code      int    `json:"code"`
