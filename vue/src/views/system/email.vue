@@ -43,10 +43,17 @@
       </el-form-item>
 
       <el-form-item
+        label="："
+        clearable
+        style="width: 500px"  >
+        <el-input v-model="nickname" type="text" placeholder="请输入昵称不填默认邮箱的名称" />
+      </el-form-item>
+
+      <el-form-item
         label="邮箱地址："
         clearable
         style="width: 500px"      >
-        <el-input v-model="email" type="email" placeholder="请输入邮箱地址" />
+        <el-input v-model="email" type="text" placeholder="请输入邮箱地址" />
       </el-form-item>
 
       <el-form-item
@@ -68,7 +75,7 @@
         clearable
         style="width: 500px"
       >
-        <el-input v-model="to" type="email" placeholder="请输入接收邮箱" />
+        <el-input v-model="to" type="text" placeholder="请输入接收邮箱" />
       </el-form-item>
       <el-button style="margin-left: 40px" type="primary" @click="handleTest">验证</el-button>
       <el-button style="margin-left: 40px" type="primary" @click="handleSave">保存</el-button>
@@ -88,6 +95,7 @@ export default {
       host: '',
       id: 0,
       enable: false,
+      nickname: '',
       // 验证邮箱
       to: ''
 
@@ -105,6 +113,7 @@ export default {
           this.enable = resp.data.enable
           this.host = resp.data.host
           this.port = resp.data.port
+          this.nickname = resp.data.nickname
           this.id = resp.data.id
           this.password = resp.data.password
         } else {
@@ -119,6 +128,7 @@ export default {
         'port': parseInt(this.port),
         'email': this.email,
         'password': this.password,
+        'nickname': this.nickname,
         'to': this.to
       }
       testEmail(data).then(resp => {
@@ -136,7 +146,8 @@ export default {
         'enable': this.enable,
         'port': parseInt(this.port),
         'email': this.email,
-        'password': this.password
+        'password': this.password,
+        'nickname': this.nickname
       }
       saveEmail(data).then(resp => {
         if (resp.data.code === 0) {
