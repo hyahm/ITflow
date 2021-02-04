@@ -23,7 +23,7 @@ func TestEmail(w http.ResponseWriter, r *http.Request) {
 	if getemail.Nickname == "" {
 		getemail.Nickname = strings.Split(getemail.EmailAddr, "@")[0]
 	}
-	mail.TestMail(getemail.Host, getemail.EmailAddr, getemail.Password, getemail.Port, getemail.To)
+	mail.TestMail(getemail.Host, getemail.EmailAddr, getemail.Password, getemail.Port, getemail.To, getemail.Nickname)
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
