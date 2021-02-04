@@ -43,7 +43,7 @@
       </el-form-item>
 
       <el-form-item
-        label="："
+        label="昵称："
         clearable
         style="width: 500px"  >
         <el-input v-model="nickname" type="text" placeholder="请输入昵称不填默认邮箱的名称" />
