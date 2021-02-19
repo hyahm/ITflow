@@ -32,7 +32,7 @@ const bugRouter = {
             component: () =>
                 import ('@/views/bug/mybug'),
             name: 'articleList',
-            meta: { title: '我的任务', icon: 'guide' }
+            meta: { title: '我的创建', icon: 'guide' }
         },
         {
             path: 'allbugs',
