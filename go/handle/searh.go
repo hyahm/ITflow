@@ -277,14 +277,15 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 	page, start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
 	al.Page = page
 	// searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs join  on dustbin=true and uid=? "
-	searchsql := `select b.id,b.createtime,i.name,s.name,title,l.name,p.name,e.name,spusers,u.realname from bugs as b
-	join importants as i
-	join status as s
-	join level as l
-	join project as p
-	join environment as e
+	searchsql := `select b.id,b.createtime,ifnull( i.name, ''),ifnull( s.name, ''),title, ifnull(l.name, ''),ifnull( p.name, ''), ifnull(e.name, ''),spusers,u.realname 
+	from bugs as b 
+	left join importants as i on b.iid = i.id 
+	left join status as s on b.sid = s.id 
+	left join level as l on b.lid = l.id 
+	join project as p on b.pid=p.id 
+	left join environment as e on  b.eid = e.id 
 	join user as u
-	on dustbin=false and b.iid = i.id and b.sid = s.id and b.lid = l.id and b.pid=p.id and b.eid = e.id and b.uid=u.id and b.id in (?) order by id desc`
+	 on b.uid=u.id and  dustbin=false and  b.id in (?)  order by id desc`
 	rows, err := db.Mconn.GetRowsIn(searchsql,
 		(gomysql.InArgs)(myTaskId[start:start+end]).ToInArgs())
 
