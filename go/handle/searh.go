@@ -273,7 +273,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 		w.Write(al.Marshal())
 		return
 	}
-
+	golog.Info(myTaskId)
 	page, start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
 	al.Page = page
 	// searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs join  on dustbin=true and uid=? "
