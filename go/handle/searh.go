@@ -88,8 +88,8 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 	left join level as l on b.lid = l.id 
 	join project as p on  b.pid=p.id 
 	left join environment as e on b.eid = e.id 
-	join user as u
-	on dustbin=false and b.uid=u.id and sid in (?) and pid in (?);`
+	join user as u 
+	on dustbin=false and b.uid=u.id and sid in (?) and pid in (?)`
 	rows, err := db.Mconn.GetRowsIn(searchsql+conditionsql+" order by id desc limit ?,?", searchArgs...)
 
 	if err != nil {
