@@ -237,7 +237,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 		w.Write(al.ErrorE(err))
 		return
 	}
-
+	golog.Info(statislist)
 	conditionsql, args := mybug.GetUsefulCondition(uid)
 	countArgs := make([]interface{}, 0)
 	countArgs = append(countArgs, (gomysql.InArgs)(statislist).ToInArgs())
