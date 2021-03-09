@@ -61,7 +61,7 @@ export GOPROXY=https://goproxy.cn   // 国内的机器需要执行代理， 国�
 
 ```
 go run cmd/makeconfig/config.go   # 自动生成默认配置文件到本目录   bug.ini
-showbaseurl = http://127.0.0.1:10001/showimg/
+showbaseurl = http://127.0.0.1:10001/showimg/    #  127.0.0.1 换成外网的IP地址
 salt = hjkkakoweqzmbvc   # 修改salt值后用 curl http://127.0.0.1:10001/admin/reset?password=123 修改admin 密码
 cross=*   # 设置跨域的域名   eg:  http://127.0.0.1
 ```  
