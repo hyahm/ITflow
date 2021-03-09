@@ -52,6 +52,11 @@ mysql> create database bug;
 ```
 mysql bug < bug.sql
 ```
+> 设置代理
+```
+export GOPROXY=https://goproxy.cn   // 国内的机器需要执行代理， 国外的机器不需要
+```
+
 > 修改配置文件   
 
 ```
@@ -63,7 +68,6 @@ cross=*   # 设置跨域的域名   eg:  http://127.0.0.1
 > 启动后端服务  
 
 ```
-export GOPROXY=https://goproxy.cn
 go build main.go
 ./main
 ```
