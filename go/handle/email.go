@@ -24,7 +24,11 @@ func TestEmail(w http.ResponseWriter, r *http.Request) {
 		getemail.Nickname = strings.Split(getemail.EmailAddr, "@")[0]
 	}
 	golog.Infof("%#v", *getemail)
-	mail.TestMail(getemail.Host, getemail.EmailAddr, getemail.Password, getemail.Port, getemail.To, getemail.Nickname)
+	err := mail.TestMail(getemail.Host, getemail.EmailAddr, getemail.Password, getemail.Port, getemail.To, getemail.Nickname)
+	if err != nil {
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return
