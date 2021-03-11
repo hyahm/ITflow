@@ -33,6 +33,7 @@ func cacheemail() {
 }
 
 func (e *Email) SendMail(subject string, content string, touser ...string) {
+	golog.Infof("%#v", *e)
 	if !e.Enable {
 		return
 	}
