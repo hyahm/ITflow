@@ -64,15 +64,22 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 	rows.Close()
 	send, _ := json.Marshal(listlog)
 	w.Write(send)
-	return
 
 }
 
 func LogClassify(w http.ResponseWriter, r *http.Request) {
-
-	send, _ := json.Marshal(classify.CLASSIFY)
+	data := &struct {
+		Classify []string `json:"classify"`
+		Code     int      `json:"code"`
+		Msg      string   `json:"msg"`
+	}{
+		Classify: classify.CLASSIFY,
+	}
+	send, err := json.Marshal(data)
+	if err != nil {
+		golog.Error(err)
+	}
 	w.Write(send)
-	return
 
 }
 

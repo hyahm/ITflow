@@ -156,9 +156,26 @@ func AddRoleGroup(w http.ResponseWriter, r *http.Request) {
 
 }
 
+type ResponseRoleTemplate struct {
+	Code     int                   `json:"code"`
+	Msg      string                `json:"msg"`
+	Template []*rolegroup.PermRole `json:"template,omitempty"`
+}
+
+func (rrt *ResponseRoleTemplate) Marshal() []byte {
+	send, err := json.Marshal(rrt)
+	if err != nil {
+		golog.Error(err)
+		return nil
+	}
+	return send
+}
+
 func RoleTemplate(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
-	data := make([]*rolegroup.PermRole, 0)
+	data := &ResponseRoleTemplate{
+		Template: make([]*rolegroup.PermRole, 0),
+	}
 	rows, err := db.Mconn.GetRows("select name, info from roles")
 	if err != nil {
 		golog.Error(err)
@@ -172,11 +189,9 @@ func RoleTemplate(w http.ResponseWriter, r *http.Request) {
 			golog.Info(err)
 			continue
 		}
-		data = append(data, role)
+		data.Template = append(data.Template, role)
 	}
 	rows.Close()
-	send, _ := json.Marshal(data)
-	w.Write(send)
-	return
+	w.Write(data.Marshal())
 
 }

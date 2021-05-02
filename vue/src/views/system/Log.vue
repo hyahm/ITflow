@@ -128,7 +128,8 @@ export default {
   methods: {
     classifylist() {
       logClassify().then(resp => {
-        this.classifys = resp.data
+        console.log(resp)
+        this.classifys = resp.data.classify
       })
     },
     handleCurrentChange(val) {

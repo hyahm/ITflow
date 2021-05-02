@@ -86,7 +86,7 @@ func (es *Response) ErrorNoPermission() []byte {
 }
 
 func (es *Response) TokenNotFound() []byte {
-	es.Code = 20
+	es.Code = -1
 	es.Msg = "token过期"
 	send, _ := json.Marshal(es)
 	return send

@@ -155,11 +155,10 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 func IsAdmin(w http.ResponseWriter, r *http.Request) {
 	if xmux.GetData(r).Get("uid").(int64) == cache.SUPERID {
-		w.Write([]byte("1"))
+		w.Write([]byte(`{"code": 0 , "admin": true}`))
 	} else {
-		w.Write([]byte("0"))
+		w.Write([]byte(`{"code": 0 , "admin": false}`))
 	}
-	return
 }
 
 // func GetEmail(w http.ResponseWriter, r *http.Request) {

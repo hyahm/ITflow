@@ -17,12 +17,6 @@
         </template>
       </el-table-column>
 
-      <!-- <el-table-column label="角色组" width="500" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.rolelist }}</span>
-        </template>
-      </el-table-column> -->
-
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleEdit(scope.row)">编辑</el-button>
@@ -107,7 +101,7 @@ export default {
     getTemplate() {
       // 获取模板
       getPermTemplate().then(resp => {
-        this.templateperm = resp.data
+        this.templateperm = resp.template
       })
     },
     handleEdit(row) {
@@ -118,11 +112,7 @@ export default {
     },
     getlist() {
       roleList().then(resp => {
-        if (resp.data.code === 0) {
           this.list = resp.data.rolelist
-        } else {
-          this.$message.error(resp.data.msg)
-        }
       })
     },
     handleAdd() {
@@ -135,21 +125,13 @@ export default {
       this.$confirm('确认关闭？')
         .then(_ => {
           removeRole(id).then(resp => {
-            if (resp === undefined) {
-              return
-            }
-            if (resp.data.code === 0) {
-              const l = this.list.length
-              for (let i = 0; i < l; i++) {
-                if (this.list[i].id === id) {
-                  this.list.splice(i, 1)
-                }
+            const l = this.list.length
+            for (let i = 0; i < l; i++) {
+              if (this.list[i].id === id) {
+                this.list.splice(i, 1)
               }
-              this.$message.success('删除成功')
-              return
-            } else {
-              this.$message.error(resp.data.msg)
             }
+            this.$message.success('删除成功')
           })
         })
         .catch(_ => {})
@@ -165,7 +147,6 @@ export default {
       if (this.form.id > 0) {
         editRole(this.form).then(resp => {
           // 成功后赋值到源数据
-          if (resp.data.code === 0) {
             const l = this.list.length
             for (let i = 0; i < l; i++) {
               if (this.list[i].id === this.form.id) {
@@ -174,22 +155,15 @@ export default {
               }
             }
             this.$message.success('修改成功')
-          } else {
-            this.$message.error(resp.data.msg)
-          }
         })
       } else {
         addRole(this.form).then(resp => {
-          if (resp.data.code === 0) {
             this.list.push({
               id: resp.data.id,
               name: this.form.name,
               rolelist: this.form.rolelist
             })
             this.$message.success('添加成功')
-          } else {
-            this.$message.error(resp.data.msg)
-          }
         })
       }
 

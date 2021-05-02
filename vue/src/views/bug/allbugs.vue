@@ -157,14 +157,6 @@ export default {
     waves
   },
   filters: {
-    // statusFilter(status) {
-    //   const statusMap = {
-    //     published: 'success',
-    //     draft: 'info',
-    //     deleted: 'danger'
-    //   }
-    //   return statusMap[status]
-    // },
     typeFilter(type) {
       return calendarTypeKeyValue[type]
     }
@@ -259,7 +251,6 @@ export default {
         type: 'warning'
       }).then(() => {
         delBug(row.id).then(response => {
-          if (response.data.code === 0) {
             this.list = this.list.filter(items => {
               return items.id !== row.id
             })
@@ -267,12 +258,6 @@ export default {
               message: '已删除',
               type: 'success'
             })
-          } else {
-            this.$message({
-              message: '操作失败',
-              type: 'error'
-            })
-          }
         })
       }).catch(() => {
         this.$message({
@@ -288,7 +273,6 @@ export default {
         type: 'warning'
       }).then(() => {
         closeBug(row.id).then(response => {
-          if (response.data.code === 0) {
             this.list = this.list.filter(items => {
               return items.id !== row.id
             })
@@ -296,12 +280,6 @@ export default {
               message: '已关闭',
               type: 'success'
             })
-          } else {
-            this.$message({
-              message: '操作失败',
-              type: 'error'
-            })
-          }
         })
       }).catch(() => {
         this.$message({
@@ -312,18 +290,13 @@ export default {
     },
     isadmin() {
       isAdmin().then(resp => {
-        if (resp.data === 1) {
-          this.admin = true
-        } else {
-          this.admin = false
-        }
+        console.log(resp)
+        this.admin = resp.data.admin
       })
     },
     getlevels() {
       getLevels().then(resp => {
-        if (resp.data.code === 0) {
           this.levels = resp.data.levels
-        }
       })
     },
     HandleChange() {
@@ -332,22 +305,16 @@ export default {
       }
       this.statuslength = this.checkstatus.length
       statusFilter(data).then(resp => {
-        if (resp.data.code === 0) {
           this.statuslength = this.checkstatus.length
           this.listLoading = true
           this.handleFilter()
           this.listLoading = false
-        } else {
-          this.$message.error(resp.data.msg)
-        }
       })
     },
     getprojectname() {
       // const now = new Date().getTime()
       getMyProject().then(resp => {
-        if (resp.data.code === 0) {
-          this.projectnames = resp.data.name
-        }
+        this.projectnames = resp.data.name
       })
     },
     changestatus(row) {
@@ -356,30 +323,18 @@ export default {
         status: row.status
       }
       changeStatus(param).then(response => {
-        if (response.data.code === 0) {
           this.$notify({
             title: '成功',
             message: '修改成功',
             type: 'success'
           })
-        } else {
-          this.$notify({
-            title: '失败',
-            message: '操作失败',
-            type: 'error'
-          })
-        }
       })
     },
     getList() {
       this.listLoading = true
       searchAllBugs(this.listQuery).then(resp => {
-        if (resp.data.code === 0) {
-          this.total = resp.data.total
-          this.list = resp.data.articlelist
-        } else {
-          this.$message.error(resp.data.msg)
-        }
+        this.total = resp.data.total
+        this.list = resp.data.articlelist
         this.listLoading = false
       })
     },
@@ -390,12 +345,8 @@ export default {
         this.getList()
       } else {
         searchAllBugs(this.listQuery).then(resp => {
-          if (resp.data.code === 0) {
-            this.total = resp.data.total
-            this.list = resp.data.articlelist
-          } else {
-            this.$message.error(resp.data.msg)
-          }
+          this.total = resp.data.total
+          this.list = resp.data.articlelist
           this.listLoading = false
         })
       }
@@ -442,19 +393,13 @@ export default {
     getmystatus() {
       // 允许改变的状态
       getShowStatus().then(resp => {
-        if (resp.data.code === 0) {
-          if (resp.data.checkstatus !== null) {
-            this.checkstatus = resp.data.checkstatus
-            this.statuslength = this.checkstatus.length
-          }
-        }
+        this.checkstatus = resp.data.checkstatus
+        this.statuslength = this.checkstatus.length
       })
     },
     getstatus() {
       getStatus().then(resp => {
-        if (resp.data.code === 0) {
-          this.platformsOptions = resp.data.statuslist
-        }
+        this.platformsOptions = resp.data.statuslist
       })
     }
   }

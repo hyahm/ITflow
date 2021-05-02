@@ -14,7 +14,6 @@ const service = axios.create({
 service.interceptors.request.use(
     config => {
         // do something before request is sent
-
         if (store.getters.token) {
             config.headers['Authorization'] = 'Bearer ' + getToken()
             setTimeout()
@@ -46,19 +45,17 @@ service.interceptors.response.use(
      * You can also judge the status by HTTP Status Code
      */
     response => {
-        const url = response.request.responseURL
-        if (url.indexOf('/login/login') < 0 && url.indexOf('/api/resp') < 0) {
-            if (response.data.code === 20) {
-                removeToken()
-                location.href = '/login'
-            } else if (response.data.code === 10) {
-                Message({
-                    message: response.data.message,
-                    type: 'error',
-                    duration: 5 * 1000
-                })
-                return
-            }
+        if (response.data.code === -1) {
+            removeToken()
+            location.href = '/login'
+        }
+        if (response.data.code != 0) {
+            Message({
+                message: response.data.message,
+                type: 'error',
+                duration: 5 * 1000
+            })
+            return
         }
         return response
     },
