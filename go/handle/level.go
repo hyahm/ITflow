@@ -17,8 +17,8 @@ import (
 
 func LevelGet(w http.ResponseWriter, r *http.Request) {
 
-	data := &model.List_levels{
-		Levels: make([]*model.Table_level, 0),
+	data := &model.Levels{
+		Levels: make([]*model.Level, 0),
 	}
 	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
 	if !perm.Insert {
@@ -33,7 +33,7 @@ func LevelGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for rows.Next() {
-		level := &model.Table_level{}
+		level := &model.Level{}
 		err = rows.Scan(&level.Id, &level.Name)
 		if err != nil {
 			golog.Info(err)
@@ -55,7 +55,7 @@ func LevelAdd(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("no perm"))
 		return
 	}
-	data := xmux.GetData(r).Data.(*model.Data_level)
+	data := xmux.GetData(r).Data.(*model.RequestLevel)
 	var err error
 	errorcode.Id, err = db.Mconn.Insert("insert into level(name) value(?)", data.Name)
 	if err != nil {
@@ -146,32 +146,32 @@ func LevelUpdate(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type levelslist struct {
+type levels struct {
 	Levels []string `json:"levels"`
 	Code   int      `json:"code"`
 	Msg    string   `json:"msg"`
 }
 
-func (ll *levelslist) Marshal() []byte {
+func (ll *levels) Marshal() []byte {
 	send, err := json.Marshal(ll)
 	if err != nil {
 		golog.Error(err)
 	}
 	return send
 }
-func (ll *levelslist) Error(msg string) []byte {
+func (ll *levels) Error(msg string) []byte {
 	ll.Code = 1
 	ll.Msg = msg
 	return ll.Marshal()
 
 }
-func (ll *levelslist) ErrorE(err error) []byte {
+func (ll *levels) ErrorE(err error) []byte {
 	return ll.Error(err.Error())
 }
 
 func GetLevels(w http.ResponseWriter, r *http.Request) {
 
-	data := &levelslist{
+	data := &levels{
 		Levels: make([]string, 0),
 	}
 	rows, err := db.Mconn.GetRows("select name from level")

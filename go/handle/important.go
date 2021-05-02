@@ -16,8 +16,8 @@ import (
 
 func ImportantGet(w http.ResponseWriter, r *http.Request) {
 
-	data := &model.List_importants{
-		ImportantList: make([]*model.Importants, 0),
+	data := &model.ResposeImportant{
+		ImportantList: make([]*model.Important, 0),
 	}
 	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
 	if !perm.Select {
@@ -31,7 +31,7 @@ func ImportantGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for rows.Next() {
-		im := &model.Importants{}
+		im := &model.Important{}
 		err = rows.Scan(&im.Id, &im.Name)
 		if err != nil {
 			golog.Info(err)
@@ -53,7 +53,7 @@ func ImportantAdd(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("no perm"))
 		return
 	}
-	data := xmux.GetData(r).Data.(*model.Data_importants)
+	data := xmux.GetData(r).Data.(*model.Important)
 
 	var err error
 	errorcode.Id, err = db.Mconn.Insert("insert into importants(name) value(?)", data.Name)
@@ -136,7 +136,7 @@ func ImportantUpdate(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("no perm"))
 		return
 	}
-	data := xmux.GetData(r).Data.(*model.Importants)
+	data := xmux.GetData(r).Data.(*model.Important)
 	gsql := "update importants set name=? where id=?"
 
 	_, err := db.Mconn.Update(gsql, data.Name, data.Id)
@@ -154,31 +154,31 @@ func ImportantUpdate(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type importantslist struct {
+type importants struct {
 	Importants []string `json:"importants"`
 	Code       int      `json:"code"`
 	Msg        string   `json:"msg"`
 }
 
-func (im *importantslist) Marshal() []byte {
+func (im *importants) Marshal() []byte {
 	send, err := json.Marshal(im)
 	if err != nil {
 		golog.Error(err)
 	}
 	return send
 }
-func (im *importantslist) Error(msg string) []byte {
+func (im *importants) Error(msg string) []byte {
 	im.Code = 1
 	im.Msg = msg
 	return im.Marshal()
 }
-func (im *importantslist) ErrorE(err error) []byte {
+func (im *importants) ErrorE(err error) []byte {
 	return im.Error(err.Error())
 }
 
 func GetImportants(w http.ResponseWriter, r *http.Request) {
 
-	data := &importantslist{
+	data := &importants{
 		Importants: make([]string, 0),
 	}
 	rows, err := db.Mconn.GetRows("select name from importants")

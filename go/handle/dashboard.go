@@ -11,11 +11,6 @@ import (
 	"github.com/hyahm/golog"
 )
 
-//type totalProject struct {
-//	CountBugs     int `json:"countbugs"`
-//	CountComplete int `json:"countcomplete"`
-//}
-
 type userCount struct {
 	Code        int `json:"code"`
 	CountUsers  int `json:"countusers"`

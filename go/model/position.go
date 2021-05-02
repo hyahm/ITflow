@@ -1,6 +1,6 @@
 package model
 
-type Table_jobs struct {
+type Job struct {
 	Id          int64  `json:"id"`
 	Name        string `json:"name"`
 	Level       int    `json:"level"`
@@ -10,26 +10,7 @@ type Table_jobs struct {
 	Hid         int64  // 临时变量
 }
 
-type Data_jobs struct {
-	Id          int64  `json:"id"`
-	Name        string `json:"name"`
-	Level       int    `json:"level"`
-	Hyponame    string `json:"hyponame"`
-	StatusGroup string `json:"statusgroup"`
-	RoleGroup   string `json:"rolegroup"`
-	Code        int    `json:"code"`
-}
-
-type List_jobs struct {
-	Positions []*Table_jobs `json:"positions"`
-	Code      int           `json:"code"`
-}
-
-type Update_jobs struct {
-	Id          int64  `json:"id"`
-	Name        string `json:"name"`
-	Level       int    `json:"level"`
-	StatusGroup string `json:"statusgroup"`
-	RoleGroup   string `json:"rolegroup"`
-	Hyponame    string `json:"hyponame"`
+type Jobs struct {
+	Positions []*Job `json:"positions"`
+	Code      int    `json:"code"`
 }

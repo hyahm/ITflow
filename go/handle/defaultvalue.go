@@ -47,33 +47,3 @@ func DefaultSave(w http.ResponseWriter, r *http.Request) {
 	return
 
 }
-
-// type defaultImportant struct {
-// 	DefaultImportant string `json:"defaultimportant"`
-// 	Code             int    `json:"code"`
-// }
-
-// func DefaultImportant(w http.ResponseWriter, r *http.Request) {
-
-// 	data := &defaultImportant{}
-// 	data.DefaultImportant = cache.CacheIidImportant[cache.CacheDefault["important"]]
-// 	send, _ := json.Marshal(data)
-// 	w.Write(send)
-// 	return
-
-// }
-
-// type defaultLevel struct {
-// 	DefaultLevel string `json:"defaultlevel"`
-// 	Code         int    `json:"code"`
-// }
-
-// func DefaultLevel(w http.ResponseWriter, r *http.Request) {
-
-// 	data := &defaultLevel{}
-// 	data.DefaultLevel = cache.CacheLidLevel[cache.CacheDefault["level"]]
-// 	send, _ := json.Marshal(data)
-// 	w.Write(send)
-// 	return
-
-// }

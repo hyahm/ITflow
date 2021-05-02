@@ -18,8 +18,8 @@ func PositionGet(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := &model.List_jobs{
-		Positions: make([]*model.Table_jobs, 0),
+	data := &model.Jobs{
+		Positions: make([]*model.Job, 0),
 	}
 
 	rows, err := db.Mconn.GetRows(`select j.id,j.name,level,hypo,IFNULL(s.name,''), IFNULL(r.name,'') from bug.jobs as j 
@@ -32,7 +32,7 @@ func PositionGet(w http.ResponseWriter, r *http.Request) {
 	}
 	x := make(map[int64]string)
 	for rows.Next() {
-		one := &model.Table_jobs{}
+		one := &model.Job{}
 		rows.Scan(&one.Id, &one.Name, &one.Level, &one.Hid, &one.StatusGroup, &one.RoleGroup)
 		x[one.Id] = one.Name
 		data.Positions = append(data.Positions, one)
@@ -53,14 +53,14 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := xmux.GetData(r).Data.(*model.Data_jobs)
+	data := xmux.GetData(r).Data.(*model.Job)
 	golog.Infof("%#v", *data)
 	// 如果不存在管理层名，就参数错误
 	var hid int64
 	var err error
 	golog.Info("start add position")
-	if data.Hyponame != "" {
-		err = db.Mconn.GetOne("select id from jobs where name=?", data.Hyponame).Scan(&hid)
+	if data.HypoName != "" {
+		err = db.Mconn.GetOne("select id from jobs where name=?", data.HypoName).Scan(&hid)
 		if err != nil {
 			if err != sql.ErrNoRows {
 				golog.Error(err)
@@ -144,13 +144,13 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	data := xmux.GetData(r).Data.(*model.Update_jobs)
+	data := xmux.GetData(r).Data.(*model.Job)
 
 	var hid int64
 	golog.Infof("%+v", *data)
 	// 不存在这个职位的hypo，直接返回参数错误
-	if data.Hyponame != "" {
-		err := db.Mconn.GetOne("select id from jobs where name=?", data.Hyponame).Scan(&hid)
+	if data.HypoName != "" {
+		err := db.Mconn.GetOne("select id from jobs where name=?", data.HypoName).Scan(&hid)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				w.Write(errorcode.Error("没有找到职位"))
