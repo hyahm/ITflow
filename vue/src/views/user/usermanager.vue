@@ -86,7 +86,7 @@
           <!--<el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>-->
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="300" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="400" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleResetPwd(scope.row)">修改密码</el-button>
           <el-button size="mini" type="danger" @click="handlePermission(scope.row)">更改信息

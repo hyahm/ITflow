@@ -146,6 +146,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 		idrows.Scan(&et)
 		toEmails = append(toEmails, et)
 	}
+
 	bugUrl := fmt.Sprintf("%s/showbug/%d", r.Referer(), ub.Id)
 	context := fmt.Sprintf(`<html><body>转交人: %s</br>bug地址:<a href="%s">%s</a></br>原因: %s</body></html>`, nickname, bugUrl, bugUrl, ub.Remark)
 	golog.Info(context)
