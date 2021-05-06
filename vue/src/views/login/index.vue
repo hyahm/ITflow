@@ -68,20 +68,16 @@ export default {
       }
     },
     handleLogin() {
-      this.$refs.loginForm.validate(valid => {
-        if (valid) {
-          this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.loading = false
-            this.$router.push('/dashboard')
-          }).catch(() => {
-            this.loading = false
-          })
-        } else {
-          this.$message.error('error submit!!')
-          return false
-        }
-      })
+        this.loading = true
+        this.$store.dispatch('user/login', this.loginForm).then(() => {
+          this.loading = false
+          this.$router.push('/dashboard')
+        }).catch((err) => {
+          this.$message.error(err)
+          this.loading = false
+        })
+          // this.$message.error('error submit!!')
+          // return false
     }
   }
 }
