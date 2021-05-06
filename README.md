@@ -81,6 +81,9 @@ cnpm install
 或 npm 安装
 npm install  --registry=https://registry.npm.taobao.org  # 安装依赖
 
+或 yarm 安装
+npm install  --registry=https://registry.npm.taobao.org  yarm -g
+yarm install
 ```
 > 修改配置文件  .env.production
 ```
