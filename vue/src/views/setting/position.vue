@@ -4,42 +4,27 @@
       职位，在管理的时候，上级有管理下级的权限，级别只有普通员工和管理者，管理者也可以被其他管理者管理（从属于），一个员工只能被一个管理者管理
     </p>
     <div>
-      <el-button type="success" plain style="margin: 20px" @click="addposition">添加职位</el-button>
-    </div>
-    <el-table
-      :data="tableData"
-      height="600"
-      style="width: 100%"
-    >
-      <el-table-column
-        label="Id"
-        width="180"
+      <el-button type="success" plain style="margin: 20px" @click="addposition"
+        >添加职位</el-button
       >
+    </div>
+    <el-table :data="tableData" height="600" style="width: 100%">
+      <el-table-column label="Id" width="180">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        label="职位名"
-        width="180"
-      >
+      <el-table-column label="职位名" width="180">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        label="职位级别"
-        width="180"
-      >
+      <el-table-column label="职位级别" width="180">
         <template slot-scope="scope">
           <span>{{ scope.row.level | level }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        label="从属于"
-        width="180"
-      >
-
+      <el-table-column label="从属于" width="180">
         <template slot-scope="scope">
           <span>{{ scope.row.hyponame }}</span>
         </template>
@@ -57,22 +42,22 @@
       </el-table-column>
       <el-table-column width="200" label="操作">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            @click="handleUpdate(scope.row)"
-          >修改</el-button>
-          <el-button
-            size="mini"
-            type="danger"
-            @click="handleDelete(scope.row)"
-          >删除</el-button>
+          <el-button size="mini" @click="handleUpdate(scope.row)"
+            >修改</el-button
+          >
+          <el-button size="mini" type="danger" @click="handleDelete(scope.row)"
+            >删除</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
 
-    <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" title="职位管理">
+    <el-dialog
+      :close-on-click-modal="false"
+      :visible.sync="dialogFormVisible"
+      title="职位管理"
+    >
       <el-form>
-
         <el-form-item label="管理层：">
           <el-radio-group v-model="form.level">
             <el-radio :label="levelone">管理者</el-radio>
@@ -81,17 +66,34 @@
         </el-form-item>
         <el-form-item label="职位名：" label-width="100">
           <el-input v-model="form.name" />
-
         </el-form-item>
 
         <el-form-item style="margin-bottom: 40px;" label="状态组:">
-          <el-select v-model="form.statusgroup" class="filter-item" style="width: 130px">
-            <el-option v-for="(s, index) in statusgroups" :key="index" :label="s" :value="s" />
+          <el-select
+            v-model="form.statusgroup"
+            class="filter-item"
+            style="width: 130px"
+          >
+            <el-option
+              v-for="(s, index) in statusgroups"
+              :key="index"
+              :label="s"
+              :value="s"
+            />
           </el-select>
         </el-form-item>
         <el-form-item style="margin-bottom: 40px;" label="角色组:">
-          <el-select v-model="form.rolegroup" class="filter-item" style="width: 130px">
-            <el-option v-for="(role, index) in rolegroups" :key="index" :label="role" :value="role" />
+          <el-select
+            v-model="form.rolegroup"
+            class="filter-item"
+            style="width: 130px"
+          >
+            <el-option
+              v-for="(role, index) in rolegroups"
+              :key="index"
+              :label="role"
+              :value="role"
+            />
           </el-select>
         </el-form-item>
         <!-- <el-form style="margin-top: 10px"> -->
@@ -116,196 +118,167 @@
 </template>
 
 <script>
-import { addPosition, updatePosition, delPosition, getHypos, PositionsList } from '@/api/position'
-import { getRoleGroup } from '@/api/rolegroup'
-import { getStatusGroupName } from '@/api/statusgroup'
+import {
+  addPosition,
+  updatePosition,
+  delPosition,
+  getHypos,
+  PositionsList
+} from "@/api/position";
+import { getRoleGroup } from "@/api/rolegroup";
+import { getStatusGroupName } from "@/api/statusgroup";
 export default {
-  name: 'Position',
+  name: "Position",
   filters: {
     level: function(value) {
       switch (value) {
         case 1:
-          return '管理者'
+          return "管理者";
         default:
-          return '普通员工'
+          return "普通员工";
       }
     }
   },
   data() {
     return {
-      changeName: '',
+      changeName: "",
       tableData: [],
       statuslist: [],
       statusgroups: [],
       rolegroups: [],
       dialogFormVisible: false,
-      status: '',
+      status: "",
       levelone: 1,
       leveltwo: 2,
       manager: [],
       form: {
         id: -1,
-        name: '',
+        name: "",
         level: 2,
-        hyponame: '',
-        rolegroup: '',
-        statusgroup: ''
+        hyponame: "",
+        rolegroup: "",
+        statusgroup: ""
       }
-    }
+    };
   },
   created() {
-    this.getlist()
-    this.getrolegroups()
-    this.getstatusgroups()
+    this.getlist();
+    this.getrolegroups();
+    this.getstatusgroups();
   },
   methods: {
     getrolegroups() {
       getRoleGroup().then(resp => {
-        if (resp.data.code === 0) {
-          this.rolegroups = resp.data.rolelist
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
+        this.rolegroups = resp.data.rolelist;
+      });
     },
     handleGetHypos(id) {
       getHypos(id).then(resp => {
-        if (resp.data.code === 0) {
-          for (let i = 0; i < resp.data.length; i++) {
-            this.manager.push(resp.data.hypos[i].name)
-          }
-          // this.manager = resp.data.hypos
-        } else {
-          this.$message.error(resp.data.msg)
+        for (let i = 0; i < resp.data.length; i++) {
+          this.manager.push(resp.data.hypos[i].name);
         }
-      })
+      });
     },
     getlist() {
       PositionsList().then(resp => {
-        if (resp.data.code === 0) {
-          this.tableData = resp.data.positions
-          for (let i = 0; i < this.tableData.length; i++) {
-            if (this.tableData[i].level === 1) {
-              this.manager.push(this.tableData[i].name)
-            }
+        this.tableData = resp.data.positions;
+        for (let i = 0; i < this.tableData.length; i++) {
+          if (this.tableData[i].level === 1) {
+            this.manager.push(this.tableData[i].name);
           }
-        } else {
-          this.$message.error(resp.data.msg)
         }
-      })
+      });
     },
     confirm() {
       if (this.form.id === -1) {
         addPosition(this.form).then(resp => {
-          if (resp.data.code === 0) {
-            this.tableData.push({
-              id: resp.data.id,
-              name: this.form.name,
-              hyponame: this.form.hyponame,
-              level: this.form.level
-            })
+          this.tableData.push({
+            id: resp.data.id,
+            name: this.form.name,
+            hyponame: this.form.hyponame,
+            level: this.form.level
+          });
 
-            if (this.form.level === 1) {
-              this.manager.push(this.form.name)
-            }
-          } else {
-            this.$message.error(resp.data.msg)
+          if (this.form.level === 1) {
+            this.manager.push(this.form.name);
           }
-        })
+        });
       } else {
         updatePosition(this.form).then(resp => {
-          if (resp.data.code === 0) {
-            const l = this.tableData.length
-            for (let i = 0; i < l; i++) {
-              if (this.tableData[i].id === this.form.id) {
-                this.tableData[i].name = this.form.name
-                break
-              }
-              for (let i = 0; i < this.manager.length; i++) {
-                if (this.manager[i] === this.changeName) {
-                  this.manager[i] = this.form.name
-                  return
-                }
+          const l = this.tableData.length;
+          for (let i = 0; i < l; i++) {
+            if (this.tableData[i].id === this.form.id) {
+              this.tableData[i].name = this.form.name;
+              break;
+            }
+            for (let i = 0; i < this.manager.length; i++) {
+              if (this.manager[i] === this.changeName) {
+                this.manager[i] = this.form.name;
+                return;
               }
             }
-          } else {
-            this.$message.error(resp.data.msg)
           }
-        })
+        });
       }
-      this.dialogFormVisible = false
+      this.dialogFormVisible = false;
     },
     cancel() {
-      this.dialogFormVisible = false
+      this.dialogFormVisible = false;
     },
     getstatusgroups() {
       getStatusGroupName().then(resp => {
-        if (resp.data.code === 0) {
-          if (resp.data.names.length > 0) {
-            this.statusgroups = resp.data.names
-          }
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
+        this.statusgroups = resp.data.names;
+      });
     },
     handleDelete(row) {
-      this.$confirm('此操作将关闭bug, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        delPosition(row.id).then(resp => {
-          if (resp === undefined) {
-            return
-          }
-
-          if (resp.data.code === 0) {
-            const l = this.tableData.length
+      this.$confirm("此操作将关闭bug, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          delPosition(row.id).then(resp => {
+            const l = this.tableData.length;
             for (let i = 0; i < l; i++) {
               if (this.tableData[i].id === row.id) {
-                this.tableData.splice(i, 1)
-                break
+                this.tableData.splice(i, 1);
+                break;
               }
             }
             for (let i = 0; i < this.manager.length; i++) {
               if (this.manager[i] === row.name) {
-                this.manager.splice(i, 1)
-                break
+                this.manager.splice(i, 1);
+                break;
               }
             }
-            this.$message.success(resp.data.msg)
-            return
-          }
-          this.$message.error(resp.data.msg)
+            this.$message.success(resp.data.msg);
+          });
         })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        })
-      })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     },
     addposition() {
-      this.dialogFormVisible = true
-      this.form.id = -1
-      this.form.level = 2
-      this.form.hyponame = ''
-      this.form.name = ''
-      this.form.rolegroup = ''
-      this.form.statusgroup = ''
+      this.dialogFormVisible = true;
+      this.form.id = -1;
+      this.form.level = 2;
+      this.form.hyponame = "";
+      this.form.name = "";
+      this.form.rolegroup = "";
+      this.form.statusgroup = "";
     },
     handleUpdate(row) {
-      this.form = row
-      this.changeName = row.name
+      this.form = row;
+      this.changeName = row.name;
 
-      this.dialogFormVisible = true
-      this.handleGetHypos(row.id)
+      this.dialogFormVisible = true;
+      this.handleGetHypos(row.id);
     }
   }
-}
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

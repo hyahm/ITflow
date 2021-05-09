@@ -51,11 +51,11 @@ service.interceptors.response.use(
         }
         if (response.data.code != 0) {
             Message({
-                message: response.data.message,
+                message: response.data.msg,
                 type: 'error',
                 duration: 5 * 1000
             })
-            return
+            return Promise.reject(error)
         }
         return response
     },

@@ -80,39 +80,25 @@ export default {
   methods: {
     getimportant() {
       getImportant().then(resp => {
-        if (resp.data.code === 0) {
-          if (resp.data.importantlist != null) {
             this.tableData = resp.data.importantlist
-          }
-        } else {
-          this.$message.error(resp.data.msg)
-        }
       })
     },
     confirm() {
       if (this.form.id === -1) {
         addImportant(this.form).then(resp => {
-          if (resp.data.code === 0) {
             this.tableData.push({
               id: resp.data.id,
               name: this.form.name
             })
-          } else {
-            this.$message.error('操作失败')
-          }
         })
       } else {
         updateImportant(this.form).then(resp => {
-          if (resp.data.code === 0) {
             const l = this.tableData.length
             for (let i = 0; i < l; i++) {
               if (this.tableData[i].id === this.form.id) {
                 this.tableData[i].name = this.form.name
               }
             }
-          } else {
-            this.$message.error(resp.data.msg)
-          }
         })
       }
       this.dialogFormVisible = false
@@ -127,12 +113,6 @@ export default {
         type: 'warning'
       }).then(() => {
         delImportant(id).then(resp => {
-          // console
-          if (resp === undefined) {
-            return
-          }
-
-          if (resp.data.code === 0) {
             const l = this.tableData.length
             for (let i = 0; i < l; i++) {
               if (this.tableData[i].id === id) {
@@ -140,9 +120,6 @@ export default {
               }
             }
             this.$message.success('删除成功')
-            return
-          }
-          this.$message.error('操作失败')
         })
       }).catch(() => {
         this.$message({

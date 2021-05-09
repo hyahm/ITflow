@@ -15,64 +15,57 @@
       @crop-upload-success="cropUploadSuccess"
       @crop-upload-fail="cropUploadFail"
     />
-    <img :src="avatar">
+    <img :src="avatar" />
   </div>
 </template>
 
 <script>
-import myUpload from 'vue-image-crop-upload'
-import { getToken } from '@/utils/auth'
+import myUpload from "vue-image-crop-upload";
+import { getToken } from "@/utils/auth";
 // import { mapState, mapGetters } from 'vuex'
 export default {
-  name: 'HeadImg',
+  name: "HeadImg",
   components: {
     myUpload
   },
   data() {
     return {
       show: false,
-      imgname: 'head',
-      url: process.env.VUE_APP_BASE_API + '/upload/headimg',
+      imgname: "head",
+      url: process.env.VUE_APP_BASE_API + "/upload/headimg",
       params: {
         token: getToken(),
-        name: 'avatar'
+        name: "avatar"
       },
       headers: {
-        smail: '*_~',
-        'Authorization': 'Bearer '+ getToken()
+        smail: "*_~",
+        Authorization: "Bearer " + getToken()
       }
       // avatar: ''
-    }
+    };
   },
   computed: {
     avatar: {
       get() {
-        return this.$store.state.user.avatar
+        return this.$store.state.user.avatar;
       },
       set(val) {
-        this.$store.commit('user/SET_AVATAR', val)
+        this.$store.commit("user/SET_AVATAR", val);
       }
     }
   },
   created() {
-    this.checktoken()
+    this.checktoken();
   },
   methods: {
     checktoken() {
-      if (getToken() === '') {
-        this.$router.push('/login')
+      if (getToken() === "") {
+        this.$router.push("/login");
       }
     },
     toggleShow() {
-      this.show = !this.show
-      this.imgname = (new Date()).valueOf().toString()
-    },
-    cropSuccess(imgDataUrl, field) {
-
-      // console.log("imgDataUrl")
-      // console.log(imgDataUrl)
-      // this.imgDataUrl = imgDataUrl
-      // console.log('cropSuccess')
+      this.show = !this.show;
+      this.imgname = new Date().valueOf().toString();
     },
     /**
      * upload success
@@ -81,13 +74,16 @@ export default {
      * [param] field
      */
     cropUploadSuccess(jsonData, field) {
-      this.avatar = jsonData.url
-      this.$store.dispatch('user/setHeadImage', jsonData.url).then(() => {
-        this.loading = false
-        // this.$router.push({ path: this.redirect || '/' })
-      }).catch(() => {
-        this.loading = false
-      })
+      this.avatar = jsonData.url;
+      this.$store
+        .dispatch("user/setHeadImage", jsonData.url)
+        .then(() => {
+          this.loading = false;
+          // this.$router.push({ path: this.redirect || '/' })
+        })
+        .catch(() => {
+          this.loading = false;
+        });
     },
     /**
      * upload fail
@@ -96,8 +92,8 @@ export default {
      * [param] field
      */
     cropUploadFail(status, field) {
-      console.log('field: ' + field)
+      console.log("field: " + field);
     }
   }
-}
+};
 </script>

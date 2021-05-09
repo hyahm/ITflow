@@ -3,28 +3,11 @@
     <p class="warn-content">
       版本管理，有些可能是app的下载地址或者是网页的地址，有一个是备用的
     </p>
-    <div class="filter-container">
-      <!--<el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" :placeholder="$t('table.title')" v-model="listQuery.title">-->
-      <!--</el-input>-->
-      <!--<el-select clearable style="width: 90px" class="filter-item" v-model="listQuery.importance" :placeholder="$t('table.importance')">-->
-      <!--<el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item">-->
-      <!--</el-option>-->
-      <!--</el-select>-->
-      <!--<el-select clearable class="filter-item" style="width: 130px" v-model="listQuery.type" :placeholder="$t('table.type')">-->
-      <!--<el-option v-for="item in  calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key">-->
-      <!--</el-option>-->
-      <!--</el-select>-->
-      <!--<el-select @change='handleFilter' style="width: 140px" class="filter-item" v-model="listQuery.sort">-->
-      <!--<el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key">-->
-      <!--</el-option>-->
-      <!--</el-select>-->
-      <!--<el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">{{$t('table.search')}}</el-button>-->
-      <!--<el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-edit">{{$t('table.add')}}</el-button>-->
-      <!--<el-button class="filter-item" type="primary" :loading="downloadLoading" v-waves icon="el-icon-download" @click="handleDownload">{{$t('table.export')}}</el-button>-->
-      <!--<el-checkbox class="filter-item" style='margin-left:15px;' @change='tableKey=tableKey+1' v-model="showReviewer">{{$t('table.reviewer')}}</el-checkbox>-->
-    </div>
+    <div class="filter-container"></div>
     <div>
-      <el-button type="success" plain style="margin: 20px" @click="add">添加版本</el-button>
+      <el-button type="success" plain style="margin: 20px" @click="add"
+        >添加版本</el-button
+      >
     </div>
     <el-table
       :key="tableKey"
@@ -42,7 +25,7 @@
       </el-table-column>
       <el-table-column label="日期" width="150px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.date | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{ scope.row.date | parseTime("{y}-{m}-{d} {h}:{i}") }}</span>
         </template>
       </el-table-column>
       <el-table-column label="项目名" width="150px" align="center">
@@ -68,25 +51,35 @@
           <!--<el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>-->
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column
+        label="操作"
+        align="center"
+        width="230"
+        class-name="small-padding fixed-width"
+      >
         <template slot-scope="scope">
-          <!--<el-button type="primary" size="mini"  @click="handleUpdate(scope.row)">{{$t('table.pass')}}</el-button>-->
-          <el-button size="mini" type="success" @click="handleModifyStatus(scope.row)">修改
+          <el-button
+            size="mini"
+            type="success"
+            @click="handleModifyStatus(scope.row)"
+            >修改
           </el-button>
-          <!--&lt;!&ndash;v-if="scope.row.status!='published'"&ndash;&gt;-->
-          <el-button v-if="scope.row.status!='draft'" size="mini" @click="handleRemove(scope.row,'draft')">删除
+          <el-button
+            v-if="scope.row.status != 'draft'"
+            size="mini"
+            @click="handleRemove(scope.row, 'draft')"
+            >删除
           </el-button>
-        <!--<el-button  size="mini" type="danger" @click="handleStopStatus(scope.row)">{{ scope.row.stop }}-->
-        <!--</el-button>-->
         </template>
       </el-table-column>
     </el-table>
 
-    <!--<div class="pagination-container">-->
-    <!--<el-pagination :current-page="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>-->
-    <!--</div>-->
-
-    <el-dialog :close-on-click-modal="false" :visible.sync="dialogFormVisible" width="60%" title="版本管理">
+    <el-dialog
+      :close-on-click-modal="false"
+      :visible.sync="dialogFormVisible"
+      width="60%"
+      title="版本管理"
+    >
       <el-form :model="form">
         <el-form-item label-width="100" label="项目名">
           <el-select v-model="form.project" placeholder="请选择">
@@ -113,15 +106,19 @@
         <el-button type="primary" @click="confirm">确 定</el-button>
       </div>
     </el-dialog>
-
   </div>
 </template>
 
 <script>
-import { getVersion, removeVersion, updateVersion, addVersion } from '@/api/version'
-import { getMyProject } from '@/api/get'
+import {
+  getVersion,
+  removeVersion,
+  updateVersion,
+  addVersion
+} from "@/api/version";
+import { getMyProject } from "@/api/get";
 export default {
-  name: 'Versionlist',
+  name: "Versionlist",
   data() {
     return {
       list: [],
@@ -136,137 +133,125 @@ export default {
       total: 0,
       form: {
         id: -1,
-        name: '',
-        url: '',
-        bakurl: '',
-        project: ''
+        name: "",
+        url: "",
+        bakurl: "",
+        project: ""
       }
-    }
+    };
   },
   activated() {
-    this.getproject()
-    this.getversionlist()
+    this.getproject();
+    this.getversionlist();
   },
   created() {
-    this.getversionlist()
-    this.getproject()
+    this.getversionlist();
+    this.getproject();
   },
   methods: {
     getproject() {
       getMyProject().then(resp => {
         if (resp.data.code === 0) {
-          this.projects = resp.data.name
+          this.projects = resp.data.name;
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.msg);
         }
-      })
+      });
     },
     add() {
-      this.form.id = -1
-      this.form.name = ''
-      this.form.url = ''
-      this.form.bakurl = ''
-      this.form.project = ''
-      this.dialogFormVisible = true
+      this.form.id = -1;
+      this.form.name = "";
+      this.form.url = "";
+      this.form.bakurl = "";
+      this.form.project = "";
+      this.dialogFormVisible = true;
     },
     getversionlist() {
       getVersion().then(resp => {
         if (resp.data.code === 0) {
-          this.list = resp.data.versionlist
-          this.total = resp.data.versionlist.length
+          this.list = resp.data.versionlist;
+          this.total = resp.data.versionlist.length;
         } else {
-          this.$message.error(resp.data.msg)
+          this.$message.error(resp.data.msg);
         }
-      })
+      });
     },
     handleSizeChange(val) {
-      this.listQuery.limit = val
-      this.getList()
+      this.listQuery.limit = val;
+      this.getList();
     },
     handleCurrentChange(val) {
-      this.listQuery.page = val
-      this.getList()
+      this.listQuery.page = val;
+      this.getList();
     },
     handleModifyStatus(row) {
-      this.dialogFormVisible = true
-      this.form.id = row.id
-      this.form.name = row.name
-      this.form.url = row.url
-      this.form.bakurl = row.bakurl
-      this.form.project = row.project
+      this.dialogFormVisible = true;
+      this.form.id = row.id;
+      this.form.name = row.name;
+      this.form.url = row.url;
+      this.form.bakurl = row.bakurl;
+      this.form.project = row.project;
     },
     confirm() {
       if (this.form.id <= 0) {
-        addVersion(this.form).then(response => {
-          if (response.data.code === 0) {
-            this.form.id = response.data.id
-            this.form.date = response.data.updatetime
+        addVersion(this.form)
+          .then(response => {
+            this.form.id = response.data.id;
+            this.form.date = response.data.updatetime;
 
-            this.list.unshift(this.form)
-            this.$message.success('添加成功')
-          } else {
-            this.$message.error(response.data.message)
-          }
-        }).catch()
+            this.list.unshift(this.form);
+            this.$message.success("添加成功");
+          })
+          .catch();
       } else {
-        updateVersion(this.form).then(resp => {
-          if (resp.data.code === 0) {
-            this.$message.success('修改成功')
-            const l = this.list.length
-            for (let i = 0; i < l; i++) {
-              if (this.list[i].id === this.form.id) {
-                this.list[i].name = this.form.name
-                this.list[i].url = this.form.url
-                this.list[i].bakurl = this.form.bakurl
-                this.list[i].project = this.form.project
-                break
-              }
+        updateVersion(this.form).then(_ => {
+          this.$message.success("修改成功");
+          const l = this.list.length;
+          for (let i = 0; i < l; i++) {
+            if (this.list[i].id === this.form.id) {
+              this.list[i].name = this.form.name;
+              this.list[i].url = this.form.url;
+              this.list[i].bakurl = this.form.bakurl;
+              this.list[i].project = this.form.project;
+              break;
             }
-            this.$message.success('修改成功')
-            this.dialogFormVisible = false
-            return
-          } else {
-            this.$message.error(resp.data.msg)
           }
-        })
+          this.$message.success("修改成功");
+          this.dialogFormVisible = false;
+        });
       }
 
-      this.dialogFormVisible = false
+      this.dialogFormVisible = false;
     },
     cancel() {
-      this.dialogFormVisible = false
+      this.dialogFormVisible = false;
     },
     handleRemove(row) {
-      this.$confirm('此操作将关闭bug, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        removeVersion(row.id).then(resp => {
-          if (resp.data.code === 0) {
-            const l = this.list.length
+      this.$confirm("此操作将关闭bug, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          removeVersion(row.id).then(_ => {
+            const l = this.list.length;
             for (let i = 0; i < l; i++) {
               if (this.list[i].id === row.id) {
-                this.list.splice(i, 1)
+                this.list.splice(i, 1);
               }
             }
-            this.$message.success('删除成功')
-            return
-          }
-          // }
-          this.$message.error('删除失败')
+            this.$message.success("删除成功");
+          });
         })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        })
-      })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     }
   }
-}
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

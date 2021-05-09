@@ -3,8 +3,13 @@
     <p class="warn-content">
       某些选项的默认值
     </p>
-    <div style="margin-top: 20px"> bug创建时的状态:
-      <el-select v-model="form.created" placeholder="Select" @change="handleCreated">
+    <div style="margin-top: 20px">
+      bug创建时的状态:
+      <el-select
+        v-model="form.created"
+        placeholder="Select"
+        @change="handleCreated"
+      >
         <el-option
           v-for="(status, index) in statuslist"
           :key="index"
@@ -13,8 +18,13 @@
         />
       </el-select>
     </div>
-    <div style="margin-top: 20px"> bug完成时的状态:
-      <el-select v-model="form.completed" placeholder="Select" @change="handleCompleted">
+    <div style="margin-top: 20px">
+      bug完成时的状态:
+      <el-select
+        v-model="form.completed"
+        placeholder="Select"
+        @change="handleCompleted"
+      >
         <el-option
           v-for="(status, index) in statuslist"
           :key="index"
@@ -33,110 +43,81 @@
         />
       </el-select>
     </div> -->
-    <el-button style="margin-top: 20px" type="primary" plain @click="handleSave">保存</el-button>
+    <el-button style="margin-top: 20px" type="primary" plain @click="handleSave"
+      >保存</el-button
+    >
   </div>
 </template>
 
 <script>
-import { status, save, important, level } from '@/api/defaultvalue'
-import { getStatus, getImportants, getLevels } from '@/api/get'
+import { status, save, important, level } from "@/api/defaultvalue";
+import { getStatus, getImportants, getLevels } from "@/api/get";
 export default {
-  name: 'DefaultValue',
+  name: "DefaultValue",
   data() {
     return {
       form: {
-        created: '',
-        completed: ''
-        // defaultlevel: ''
+        created: "",
+        completed: ""
       },
 
       statuslist: [],
       importants: [],
       levels: []
-    }
+    };
   },
   created() {
-    this.getdefaultstatus()
-    this.getstatuslist()
+    this.getdefaultstatus();
+    this.getstatuslist();
   },
   methods: {
     getlevels() {
       getLevels().then(resp => {
-        if (resp.data.code === 0) {
-          this.levels = resp.data.levels
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
+        this.levels = resp.data.levels;
+      });
     },
     getdefaultlevel() {
       level().then(resp => {
-        if (resp.data.code === 0) {
-          this.form.defaultlevel = resp.data.defaultlevel
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
+        this.form.defaultlevel = resp.data.defaultlevel;
+      });
     },
     getimportantlist() {
       getImportants().then(resp => {
-        if (resp.data.code === 0) {
-          this.importants = resp.data.importants
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
+        this.importants = resp.data.importants;
+      });
     },
     getdefaultimportant() {
       important().then(resp => {
-        if (resp.data.code === 0) {
-          this.form.defaultimportant = resp.data.defaultimportant
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
+        this.form.defaultimportant = resp.data.defaultimportant;
+      });
     },
     getdefaultstatus() {
       status().then(resp => {
-        if (resp.data.code === 0) {
-          this.form.created = resp.data.created
-          this.form.completed = resp.data.completed
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
+        this.form.created = resp.data.created;
+        this.form.completed = resp.data.completed;
+      });
     },
     getstatuslist() {
       getStatus().then(resp => {
-        if (resp.data.code === 0) {
-          this.statuslist = resp.data.statuslist
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
+        this.statuslist = resp.data.statuslist;
+      });
     },
     handleCompleted(e) {
-      this.form.completed = e
+      this.form.completed = e;
     },
     handleCreated(e) {
-      this.form.created = e
+      this.form.created = e;
     },
     handleChangeLevel(e) {
-      this.form.defaultlevel = e
+      this.form.defaultlevel = e;
     },
     handleSave() {
-      save(this.form).then(resp => {
-        if (resp.data.code === 0) {
-          this.$message.success('保存成功')
-        } else {
-          this.$message.error(resp.data.code)
-        }
-      })
+      save(this.form).then(_ => {
+        this.$message.success("保存成功");
+      });
     }
   }
-}
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

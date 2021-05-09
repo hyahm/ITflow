@@ -4,7 +4,6 @@
       修改用户信息，都只能唯一
     </p>
     <el-form ref="postForm" :model="postForm" class="form-container">
-
       <div class="createPost-main-container">
         <!--<el-col :span="24" >-->
         <div style="height: 30px" />
@@ -38,7 +37,13 @@
           />
         </el-form-item>
         <div>
-          <el-button type="success" style="margin-left: 40px" plain @click="handleUpdate">修改</el-button>
+          <el-button
+            type="success"
+            style="margin-left: 40px"
+            plain
+            @click="handleUpdate"
+            >修改</el-button
+          >
         </div>
       </div>
     </el-form>
@@ -46,39 +51,32 @@
 </template>
 
 <script>
-import { updateInfo, getInfo } from '@/api/user'
+import { updateInfo, getInfo } from "@/api/user";
 export default {
-  name: 'Changeinfo',
+  name: "Changeinfo",
   data() {
     return {
       postForm: {
-        nickname: '',
-        realname: '',
-        email: ''
+        nickname: "",
+        realname: "",
+        email: ""
       }
-    }
+    };
   },
   created() {
-    this.getinfo()
+    this.getinfo();
   },
   methods: {
     getinfo() {
       getInfo().then(resp => {
-        if (resp.data.code === 0) {
-          this.postForm = resp.data
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
+        this.postForm = resp.data;
+      });
     },
     handleUpdate() {
-      updateInfo(this.postForm).then(resp => {
-        if (resp.data.code === 0) {
-          this.$message.success('修改成功')
-        }
-      })
+      updateInfo(this.postForm).then(_ => {
+        this.$message.success("修改成功");
+      });
     }
   }
-}
+};
 </script>
-

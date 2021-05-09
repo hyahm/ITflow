@@ -241,7 +241,6 @@ export default {
     this.getList()
     this.getprojectname()
     this.isadmin()
-    // this.gettaskstatus()
   },
   methods: {
     handleDel(row) {
@@ -250,7 +249,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        delBug(row.id).then(response => {
+        delBug(row.id).then(_ => {
             this.list = this.list.filter(items => {
               return items.id !== row.id
             })
@@ -272,7 +271,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        closeBug(row.id).then(response => {
+        closeBug(row.id).then(_ => {
             this.list = this.list.filter(items => {
               return items.id !== row.id
             })
@@ -290,7 +289,6 @@ export default {
     },
     isadmin() {
       isAdmin().then(resp => {
-        console.log(resp)
         this.admin = resp.data.admin
       })
     },
@@ -304,7 +302,7 @@ export default {
         checkstatus: this.checkstatus
       }
       this.statuslength = this.checkstatus.length
-      statusFilter(data).then(resp => {
+      statusFilter(data).then(_ => {
           this.statuslength = this.checkstatus.length
           this.listLoading = true
           this.handleFilter()
@@ -312,7 +310,6 @@ export default {
       })
     },
     getprojectname() {
-      // const now = new Date().getTime()
       getMyProject().then(resp => {
         this.projectnames = resp.data.name
       })
@@ -322,7 +319,7 @@ export default {
         id: row.id,
         status: row.status
       }
-      changeStatus(param).then(response => {
+      changeStatus(param).then(_ => {
           this.$notify({
             title: '成功',
             message: '修改成功',
@@ -335,8 +332,8 @@ export default {
       searchAllBugs(this.listQuery).then(resp => {
         this.total = resp.data.total
         this.list = resp.data.articlelist
-        this.listLoading = false
       })
+      this.listLoading = false
     },
     handleFilter() {
       this.listLoading = true
@@ -347,9 +344,9 @@ export default {
         searchAllBugs(this.listQuery).then(resp => {
           this.total = resp.data.total
           this.list = resp.data.articlelist
-          this.listLoading = false
         })
       }
+      this.listLoading = false
     },
     handleSizeChange(val) {
       this.listQuery.limit = val
@@ -359,39 +356,9 @@ export default {
       this.listQuery.page = val
       this.getList()
     },
-    handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
-        const filterVal = ['timestamp', 'title', 'type', 'importance', 'status']
-        const data = this.formatJson(filterVal, this.list)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: 'table-list'
-        })
-        this.downloadLoading = false
-      })
-    },
-    formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j])
-        } else {
-          return v[j]
-        }
-      }))
-    },
+  
+
     getmystatus() {
-      // 允许改变的状态
       getShowStatus().then(resp => {
         this.checkstatus = resp.data.checkstatus
         this.statuslength = this.checkstatus.length

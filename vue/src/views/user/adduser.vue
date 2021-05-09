@@ -61,16 +61,6 @@
           />
         </el-form-item>
 
-        <!-- <el-form-item style="margin-bottom: 40px;" prop="title" label="状态组:">
-          <el-select v-model="postForm.statusgroup" class="filter-item" style="width: 130px">
-            <el-option v-for="(status, index) in statusgroups" :key="index" :label="status" :value="status" />
-          </el-select>
-        </el-form-item>
-        <el-form-item style="margin-bottom: 40px;" prop="title" label="角色组:">
-          <el-select v-model="postForm.rolegroup" class="filter-item" style="width: 130px">
-            <el-option v-for="(role, index) in rolegroups" :key="index" :label="role" :value="role" />
-          </el-select>
-        </el-form-item> -->
         <el-form-item style="margin-bottom: 40px;" prop="title" label="职位名:">
           <el-select v-model="postForm.position" placeholder="Select">
             <el-option
@@ -82,8 +72,20 @@
           </el-select>
         </el-form-item>
         <div>
-          <el-button type="success" style="margin-left: 10px" plain @click="adduser">添加</el-button>
-          <el-button type="warning" style="margin-left: 20px" plain @click="clean">清空</el-button>
+          <el-button
+            type="success"
+            style="margin-left: 10px"
+            plain
+            @click="adduser"
+            >添加</el-button
+          >
+          <el-button
+            type="warning"
+            style="margin-left: 20px"
+            plain
+            @click="clean"
+            >清空</el-button
+          >
         </div>
         <div style="margin-bottom: 30px;height: 30px" />
       </div>
@@ -92,22 +94,20 @@
 </template>
 
 <script>
-import { createUser } from '@/api/user'
-// import { getStatusGroupName } from '@/api/statusgroup'
-// import { getRoleGroup } from '@/api/rolegroup'
-import { getPositions } from '@/api/position'
+import { createUser } from "@/api/user";
+import { getPositions } from "@/api/position";
 export default {
-  name: 'Adduser',
+  name: "Adduser",
   data() {
     return {
       postForm: {
-        nickname: '',
-        email: '',
-        password: '',
-        repassword: '',
-        realname: '',
-        rolegroup: '',
-        statusgroup: '',
+        nickname: "",
+        email: "",
+        password: "",
+        repassword: "",
+        realname: "",
+        rolegroup: "",
+        statusgroup: "",
         level: 2
       },
       number: {
@@ -121,127 +121,86 @@ export default {
       checkedRoles: [],
       isIndeterminate: true,
       groups: null
-    }
+    };
   },
   activated() {
-    this.getrolegroups()
-    this.getstatusgroups()
-    this.getpositions()
+    this.getrolegroups();
+    this.getstatusgroups();
+    this.getpositions();
   },
   created() {
     // this.getrolegroups()
-    this.getpositions()
+    this.getpositions();
     // this.getstatusgroups()
   },
   methods: {
     getpositions() {
       getPositions().then(resp => {
-        if (resp.data.code === 0) {
-          if (resp.data.positions !== null) {
-            this.positions = resp.data.positions
-          }
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
+        this.positions = resp.data.positions;
+      });
     },
-    // getstatusgroups() {
-    //   getStatusGroupName().then(resp => {
-    //     if (resp.data.code === 0) {
-    //       if (resp.data.names.length > 0) {
-    //         this.statusgroups = resp.data.names
-    //       }
-    //     } else {
-    //       this.$message.error(resp.data.msg)
-    //     }
-    //   })
-    // },
-    // getrolegroups() {
-    //   getRoleGroup().then(resp => {
-    //     if (resp.data.code === 0) {
-    //       if (resp.data.rolelist !== null) {
-    //         this.rolegroups = resp.data.rolelist
-    //       }
-    //     } else {
-    //       this.$message.error(resp.data.msg)
-    //     }
-    //   })
-    // },
+
     adduser() {
-      const regEmail = /^.*@.+\.[A-Za-zd]{2,5}$/
-      if (this.postForm.email === '') {
+      const regEmail = /^.*@.+\.[A-Za-zd]{2,5}$/;
+      if (this.postForm.email === "") {
         this.$message({
-          message: '请输入邮箱',
-          type: 'error'
-        })
-        return
+          message: "请输入邮箱",
+          type: "error"
+        });
+        return;
       }
       if (!regEmail.test(this.postForm.email)) {
         this.$message({
-          message: '邮箱格式正确',
-          type: 'error'
-        })
-        return
+          message: "邮箱格式正确",
+          type: "error"
+        });
+        return;
       }
       if (this.postForm.repassword !== this.postForm.password) {
         this.$message({
-          message: '2次密码不对',
-          type: 'error'
-        })
-        return
+          message: "2次密码不对",
+          type: "error"
+        });
+        return;
       }
-      // if (this.postForm.statusgroup === '') {
-      //   this.$message({
-      //     message: '请选择状态组',
-      //     type: 'error'
-      //   })
-      //   return
-      // }
-      // if (this.postForm.rolegroups === '') {
-      //   this.$message({
-      //     message: '请选择角色组',
-      //     type: 'error'
-      //   })
-      //   return
-      // }
-      if (this.postForm.position === '') {
+      if (this.postForm.position === "") {
         this.$message({
-          message: '请选择职位',
-          type: 'error'
-        })
-        return
+          message: "请选择职位",
+          type: "error"
+        });
+        return;
       }
       createUser(this.postForm).then(resp => {
         if (resp.data.code === 0) {
           this.$message({
-            message: '添加用户成功',
-            type: 'success'
-          })
-          this.clean()
+            message: "添加用户成功",
+            type: "success"
+          });
+          this.clean();
         } else {
           this.$message({
-            message: '添加用户失败',
-            type: 'error'
-          })
+            message: "添加用户失败",
+            type: "error"
+          });
         }
-      })
+      });
     },
     clean() {
       this.postForm = {
-        nickname: '',
-        email: '',
-        password: '',
-        repassword: '',
-        rolegroup: '',
-        statusgroup: ''
-      }
+        nickname: "",
+        email: "",
+        password: "",
+        repassword: "",
+        rolegroup: "",
+        statusgroup: ""
+      };
     }
   }
-}
+};
 </script>
 
-<style type="text/css" >
-  .form-container .createPost-main-container .el-form-item {
-    padding: 0px 15px 0px 15px;
-  }
+<style type="text/css">
+.form-container .createPost-main-container .el-form-item {
+  padding: 0px 15px 0px 15px;
+}
 </style>

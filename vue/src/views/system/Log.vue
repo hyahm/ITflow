@@ -5,8 +5,18 @@
     </p>
     <div class="filter-container">
       <div style="margin-left: 10px">
-        <el-select v-model="listQuery.classify" placeholder="分类" clearable class="filter-item">
-          <el-option v-for="(item, index) in classifys" :key="index" :label="item" :value="item" />
+        <el-select
+          v-model="listQuery.classify"
+          placeholder="分类"
+          clearable
+          class="filter-item"
+        >
+          <el-option
+            v-for="(item, index) in classifys"
+            :key="index"
+            :label="item"
+            :value="item"
+          />
         </el-select>
 
         <el-date-picker
@@ -20,10 +30,15 @@
           @change="changeDate"
         />
 
-        <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
-
+        <el-button
+          v-waves
+          class="filter-item"
+          type="primary"
+          icon="el-icon-search"
+          @click="handleFilter"
+          >搜索</el-button
+        >
       </div>
-
     </div>
     <el-table
       v-loading="listLoading"
@@ -41,7 +56,9 @@
 
       <el-table-column label="日期" width="150px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.exectime | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{
+            scope.row.exectime | parseTime("{y}-{m}-{d} {h}:{i}")
+          }}</span>
         </template>
       </el-table-column>
 
@@ -60,25 +77,11 @@
           <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
-      <!--<el-table-column min-width="150px" align="center" :label="$t('table.title')">-->
-      <!--<template slot-scope="scope">-->
-      <!--<router-link class="link-type" :to="'/components/back-to-top/'+scope.row.id">-->
-      <!--<span class="link-type" >{{scope.row.title}}</span>-->
-      <!--</router-link>-->
-      <!--&lt;!&ndash;<el-tag>{{scope.row.type | typeFilter}}</el-tag>&ndash;&gt;-->
-      <!--</template>-->
-      <!--</el-table-column>-->
       <el-table-column label="操作" width="400" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.action }}</span>
         </template>
       </el-table-column>
-      <!--<el-table-column width="110px" v-if='showReviewer' align="center" :label="$t('table.reviewer')">-->
-      <!--<template slot-scope="scope">-->
-      <!--<span style='color:red;'>{{scope.row.reviewer}}</span>-->
-      <!--</template>-->
-      <!--</el-table-column>-->
-
     </el-table>
     <div>
       <el-pagination
@@ -90,15 +93,14 @@
         @current-change="handleCurrentChange"
       />
     </div>
-
   </div>
 </template>
 
 <script>
-import waves from '@/directive/waves' // 水波纹指令
-import { searchLog, logClassify } from '@/api/log'
+import waves from "@/directive/waves"; // 水波纹指令
+import { searchLog, logClassify } from "@/api/log";
 export default {
-  name: 'Log',
+  name: "Log",
   directives: {
     waves
   },
@@ -109,68 +111,62 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        classify: '',
+        classify: "",
         starttime: 0,
         endtime: 0
       },
       count: 10,
       classifys: [],
-      value2: ''
-    }
+      value2: ""
+    };
   },
   activated() {
-    this.classifylist()
+    this.classifylist();
   },
   created() {
-    this.handleFilter()
-    this.classifylist()
+    this.handleFilter();
+    this.classifylist();
   },
   methods: {
     classifylist() {
       logClassify().then(resp => {
-        console.log(resp)
-        this.classifys = resp.data.classify
-      })
+        console.log(resp);
+        this.classifys = resp.data.classify;
+      });
     },
     handleCurrentChange(val) {
-      this.listQuery.page = val
-      this.handleFilter()
+      this.listQuery.page = val;
+      this.handleFilter();
     },
     changeDate(e) {
       if (e.length === 0) {
-        this.listQuery.starttime = 0
-        this.listQuery.endtime = 0
+        this.listQuery.starttime = 0;
+        this.listQuery.endtime = 0;
       } else {
-        this.listQuery.starttime = e[0] / 1000
-        this.listQuery.endtime = e[1] / 1000
+        this.listQuery.starttime = e[0] / 1000;
+        this.listQuery.endtime = e[1] / 1000;
       }
     },
 
     handleFilter() {
       searchLog(this.listQuery).then(resp => {
-        if (resp.data.code === 0) {
-          this.list = resp.data.loglist
-          this.count = resp.data.count
-          this.listQuery.page = resp.data.page
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
+        this.list = resp.data.loglist;
+        this.count = resp.data.count;
+        this.listQuery.page = resp.data.page;
+      });
     }
   }
-}
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
 <style>
-  #log .el-date-editor .el-range-separator{
-    width: 7%;
-  }
-  .filter-container .filter-item {
-    display: inline-fix;
-    vertical-align: middle;
-    margin-bottom: 3px;
+#log .el-date-editor .el-range-separator {
+  width: 7%;
+}
+.filter-container .filter-item {
+  display: inline-fix;
+  vertical-align: middle;
+  margin-bottom: 3px;
 }
 </style>

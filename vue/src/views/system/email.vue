@@ -5,22 +5,6 @@
       <p class="warn-content">
       设置并启用后 只有创建用户，创建bug，转交bug才会有邮件通知
     </p>
-      <!-- <el-switch
-        v-model="email.createuser"
-        style="display: block;margin: 20px"
-        active-color="#13ce66"
-        inactive-color="#ff4949"
-        active-text="启用创建用户通知"
-        inactive-text="禁用通知"
-      />
-      <el-switch
-        v-model="email.createbug"
-        active-color="#13ce66"
-        inactive-color="#ff4949"
-        style="display: block;margin: 20px"
-        active-text="启用创建bug通知"
-        inactive-text="禁用通知"
-      /> -->
        <el-form-item
    
         style="width: 500px"    >
@@ -68,7 +52,7 @@
         clearable
         style="width: 500px"
       >
-        <el-input v-model="port" type="number" placeholder="请输入邮箱端口" />
+        <el-input v-model.number="port" type="number" placeholder="请输入邮箱端口" />
       </el-form-item>
       <el-form-item
         label="测试邮箱："
@@ -96,7 +80,6 @@ export default {
       id: 0,
       enable: false,
       nickname: '',
-      // 验证邮箱
       to: ''
 
     }
@@ -107,21 +90,44 @@ export default {
   methods: {
     getemail() {
       getEmailStatus().then(resp => {
-        if (resp.data.code === 0) {
-          console.log(resp.data.email)
-          this.email = resp.data.email
-          this.enable = resp.data.enable
-          this.host = resp.data.host
-          this.port = resp.data.port
-          this.nickname = resp.data.nickname
-          this.id = resp.data.id
-          this.password = resp.data.password
-        } else {
-          this.$message.error(resp.data.msg)
-        }
+        console.log(resp.data.email)
+        this.email = resp.data.email
+        this.enable = resp.data.enable
+        this.host = resp.data.host
+        this.port = resp.data.port
+        this.nickname = resp.data.nickname
+        this.id = resp.data.id
+        this.password = resp.data.password
       })
     },
     handleTest() {
+      const rules = [
+        {
+          filed: this.host,
+          msg: 'host不能为空'
+        },
+         {
+          filed: this.to,
+          msg: '收件人不能为空'
+        },
+        {
+          filed: this.email,
+          msg: '邮箱账号不能为空'
+        },
+        {
+          filed: this.password,
+          msg: '邮箱地址不能为空'
+        }
+      ]
+      if (this.port === 0) {
+        this.port = 25
+      }
+      for (let v of rules) {
+        if (v.filed === "") {
+          this.$message.error(v.msg)
+          return
+        }
+      }
       const data = {
         'host': this.host,
         'enable': this.enable,
@@ -131,12 +137,8 @@ export default {
         'nickname': this.nickname,
         'to': this.to
       }
-      testEmail(data).then(resp => {
-        if (resp.data.code === 0) {
-          this.$message.success('发送成功')
-        } else {
-          this.$message.error(resp.data.msg)
-        }
+      testEmail(data).then(_ => {
+        this.$message.success('发送成功')
       })
     },
     handleSave() {
@@ -150,12 +152,8 @@ export default {
         'nickname': this.nickname
       }
       saveEmail(data).then(resp => {
-        if (resp.data.code === 0) {
           this.id = resp.data.id
           this.$message.success('保存成功')
-        } else {
-          this.$message.error(resp.data.msg)
-        }
       })
     }
   }

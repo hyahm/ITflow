@@ -13,57 +13,54 @@
       </el-form-item>
 
       <div>
-        <el-button type="success" style="margin-left: 20px" plain @click="changeEmail">修改</el-button>
+        <el-button
+          type="success"
+          style="margin-left: 20px"
+          plain
+          @click="changeEmail"
+          >修改</el-button
+        >
       </div>
     </el-form>
   </div>
 </template>
 
 <script>
-import { myEmail, setEmail } from '@/api/user'
+import { myEmail, setEmail } from "@/api/user";
 export default {
-  name: 'Changepwd',
+  name: "Changepwd",
   data() {
     return {
-      email: ''
-    }
+      email: ""
+    };
   },
   mounted() {
-    this.getEmailHandle()
+    this.getEmailHandle();
   },
   methods: {
     getEmailHandle() {
       myEmail().then(response => {
-        if (response.data.code === 0) {
-          this.email = response.data.email
-        }
-      })
+        this.email = response.data.email;
+      });
     },
     changeEmail() {
       if (this.newpassword !== this.repassword) {
         this.$message({
-          message: '新密码不一致',
-          type: 'error'
-        })
-        return
+          message: "新密码不一致",
+          type: "error"
+        });
+        return;
       }
-      setEmail(this.email).then(response => {
-        if (response.data.code === 0) {
-          this.$message({
-            message: '修改密码成功',
-            type: 'success'
-          })
-          this.clean()
-        } else {
-          this.$message({
-            message: '修改密码失败',
-            type: 'error'
-          })
-        }
-      })
+      setEmail(this.email).then(_ => {
+        this.$message({
+          message: "修改密码成功",
+          type: "success"
+        });
+        this.clean();
+      });
     }
   }
-}
+};
 </script>
 
 <style type="text/css">

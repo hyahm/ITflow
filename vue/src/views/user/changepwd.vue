@@ -2,9 +2,8 @@
   <div>
     <p class="warn-content" style="padding-left: 20px">
       修改密码
-      </p>
+    </p>
     <el-form class="form-container">
-      
       <div style="height: 20px" />
       <el-form-item label="旧密码:">
         <el-input
@@ -40,59 +39,60 @@
       </el-form-item>
 
       <div>
-        <el-button type="success" style="margin-left: 20px" plain @click="changepwd">修改</el-button>
-        <el-button type="warning" style="margin-left: 20px" plain @click="clean">清空</el-button>
+        <el-button
+          type="success"
+          style="margin-left: 20px"
+          plain
+          @click="changepwd"
+          >修改</el-button
+        >
+        <el-button type="warning" style="margin-left: 20px" plain @click="clean"
+          >清空</el-button
+        >
       </div>
     </el-form>
   </div>
 </template>
 
 <script>
-import { updatePassword } from '@/api/user'
+import { updatePassword } from "@/api/user";
 export default {
-  name: 'Changepwd',
+  name: "Changepwd",
   data() {
     return {
-      oldpassword: '',
-      newpassword: '',
-      repassword: ''
-    }
+      oldpassword: "",
+      newpassword: "",
+      repassword: ""
+    };
   },
   methods: {
     changepwd() {
       if (this.newpassword !== this.repassword) {
         this.$message({
-          message: '新密码不一致',
-          type: 'error'
-        })
-        return
+          message: "新密码不一致",
+          type: "error"
+        });
+        return;
       }
       const ch = {
         oldpassword: this.oldpassword,
         newpassword: this.newpassword
-      }
-      updatePassword(ch).then(response => {
-        if (response.data.code === 0) {
-          this.$message({
-            message: '修改密码成功',
-            type: 'success'
-          })
-          this.clean()
-        } else {
-          this.$message({
-            message: '修改密码失败',
-            type: 'error'
-          })
-        }
-      })
+      };
+      updatePassword(ch).then(_ => {
+        this.$message({
+          message: "修改密码成功",
+          type: "success"
+        });
+        this.clean();
+      });
     },
     clean() {
-      this.oldpassword = ''
-      this.newpassword = ''
-      this.repassword = ''
+      this.oldpassword = "";
+      this.newpassword = "";
+      this.repassword = "";
     }
   }
-}
+};
 </script>
 
 <style type="text/css">

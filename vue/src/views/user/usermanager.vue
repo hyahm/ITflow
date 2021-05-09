@@ -1,10 +1,9 @@
 <template>
   <div class="app-container">
-  
     <div class="filter-container">
-        <p class="warn-content">
-      管理员能修改所有信息，管理者只能修改下一级的信息或者创建下一级的用户账号
-    </p>
+      <p class="warn-content">
+        管理员能修改所有信息，管理者只能修改下一级的信息或者创建下一级的用户账号
+      </p>
       <!--<el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" :placeholder="$t('table.title')" v-model="listQuery.title">-->
       <!--</el-input>-->
       <!--<el-select clearable style="width: 90px" class="filter-item" v-model="listQuery.importance" :placeholder="$t('table.importance')">-->
@@ -41,7 +40,9 @@
       </el-table-column>
       <el-table-column label="日期" width="150px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.createtime | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{
+            scope.row.createtime | parseTime("{y}-{m}-{d} {h}:{i}")
+          }}</span>
         </template>
       </el-table-column>
 
@@ -55,17 +56,6 @@
           <span>{{ scope.row.nickname }}</span>
         </template>
       </el-table-column>
-
-      <!-- <el-table-column label="角色组" width="100px" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.rolegroup }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="状态组" width="110px" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.statusgroup }}</span>
-        </template>
-      </el-table-column> -->
 
       <el-table-column label="职位" width="110px" align="center">
         <template slot-scope="scope">
@@ -81,21 +71,46 @@
       </el-table-column>
       <el-table-column label="状态" class-name="status-col" width="60">
         <template slot-scope="scope">
-          <span v-if="scope.row.disable==0">启用</span>
+          <span v-if="scope.row.disable == 0">启用</span>
           <span v-else>禁用</span>
           <!--<el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>-->
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="400" class-name="small-padding fixed-width">
+      <el-table-column
+        label="操作"
+        align="center"
+        width="400"
+        class-name="small-padding fixed-width"
+      >
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleResetPwd(scope.row)">修改密码</el-button>
-          <el-button size="mini" type="danger" @click="handlePermission(scope.row)">更改信息
+          <el-button
+            type="primary"
+            size="mini"
+            @click="handleResetPwd(scope.row)"
+            >修改密码</el-button
+          >
+          <el-button
+            size="mini"
+            type="danger"
+            @click="handlePermission(scope.row)"
+            >更改信息
           </el-button>
-          <el-button size="mini" type="danger" @click="handleRemove(scope.row)">删除
+          <el-button size="mini" type="danger" @click="handleRemove(scope.row)"
+            >删除
           </el-button>
-          <el-button v-if="scope.row.disable==1" size="mini" type="danger" @click="handleDisable(scope.row)">启用
+          <el-button
+            v-if="scope.row.disable == 1"
+            size="mini"
+            type="danger"
+            @click="handleDisable(scope.row)"
+            >启用
           </el-button>
-          <el-button v-else size="mini" type="danger" @click="handleDisable(scope.row)">禁用
+          <el-button
+            v-else
+            size="mini"
+            type="danger"
+            @click="handleDisable(scope.row)"
+            >禁用
           </el-button>
         </template>
       </el-table-column>
@@ -120,26 +135,7 @@
         <el-form-item label="邮箱">
           <el-input v-model="form.email" />
         </el-form-item>
-        <!-- <el-form-item label="状态组">
-          <el-select v-model="form.statusgroup" placeholder="Select">
-            <el-option
-              v-for="(role, index) in statusgrouplist"
-              :key="index"
-              :label="role"
-              :value="role"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="角色组">
-          <el-select v-model="form.rolegroup" placeholder="Select">
-            <el-option
-              v-for="(role, index) in rolegrouplist"
-              :key="index"
-              :label="role"
-              :value="role"
-            />
-          </el-select>
-        </el-form-item> -->
+
         <el-form-item label="职位：">
           <el-select v-model="form.position" placeholder="Select">
             <el-option
@@ -150,37 +146,41 @@
             />
           </el-select>
         </el-form-item>
-        <!--<el-button type="success" round @click="HandlerAddGroup">添加部门</el-button>-->
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="cancel">取 消</el-button>
         <el-button type="primary" @click="HandlerUpdateRoles">确 定</el-button>
       </span>
     </el-dialog>
-
   </div>
 </template>
 
 <script>
-import { userList, resetPwd, updateUser, userRemove, userDisable } from '@/api/user'
-import { getRoleGroup } from '@/api/rolegroup'
-import { getStatusGroupName } from '@/api/statusgroup'
-import { getPositions } from '@/api/position'
-import waves from '@/directive/waves' // 水波纹指令
+import {
+  userList,
+  resetPwd,
+  updateUser,
+  userRemove,
+  userDisable
+} from "@/api/user";
+import { getRoleGroup } from "@/api/rolegroup";
+import { getStatusGroupName } from "@/api/statusgroup";
+import { getPositions } from "@/api/position";
+import waves from "@/directive/waves"; // 水波纹指令
 
 export default {
-  name: 'Usermanager',
+  name: "Usermanager",
   directives: {
     waves
   },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
+        published: "success",
+        draft: "info",
+        deleted: "danger"
+      };
+      return statusMap[status];
     }
   },
   data() {
@@ -191,161 +191,127 @@ export default {
       rolegrouplist: [],
       statusgrouplist: [],
       positionlist: [],
-      // users: [],
       tableKey: 0,
       userlist: [],
       admin: false,
       form: {
         id: -1,
-        name: ''
+        name: ""
       },
       statusgroup: [],
-      // total: null,
       listLoading: false,
-      sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }]
-    }
+      sortOptions: [
+        { label: "ID Ascending", key: "+id" },
+        { label: "ID Descending", key: "-id" }
+      ]
+    };
   },
   activated() {
-    this.getuserList()
+    this.getuserList();
   },
   created() {
-    this.getuserList()
-    this.getgrouplist()
+    this.getuserList();
+    this.getgrouplist();
   },
   methods: {
     getgrouplist() {
       getRoleGroup().then(resp => {
-        if (resp.data.code === 0) {
-          this.rolegrouplist = resp.data.rolelist
-        }
-      })
+        this.rolegrouplist = resp.data.rolelist;
+      });
       getStatusGroupName().then(resp => {
-        if (resp.data.code === 0) {
-          this.statusgrouplist = resp.data.names
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
+        this.statusgrouplist = resp.data.names;
+      });
       getPositions().then(resp => {
-        if (resp.data.code === 0) {
-          this.positionlist = resp.data.positions
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      })
+        this.positionlist = resp.data.positions;
+      });
     },
 
     cancel() {
-      this.dialogVisible = false
+      this.dialogVisible = false;
     },
     HandlerUpdateRoles() {
-      updateUser(this.form).then(resp => {
-        if (resp.data.code === 0) {
-          const l = this.userlist.length
-          for (let i = 0; i < l; i++) {
-            if (this.userlist[i].id === this.form.id) {
-              this.userlist[i].role = this.form.name
-            }
+      updateUser(this.form).then(_ => {
+        const l = this.userlist.length;
+        for (let i = 0; i < l; i++) {
+          if (this.userlist[i].id === this.form.id) {
+            this.userlist[i].role = this.form.name;
           }
-          this.$message.success('修改成功')
-          return
-        } else {
-          this.$message.error(resp.data.msg)
         }
-      })
-      this.dialogVisible = false
+        this.$message.success("修改成功");
+      });
+      this.dialogVisible = false;
     },
     handleClose() {
-      this.dialogVisible = false
+      this.dialogVisible = false;
     },
     getuserList() {
       userList().then(resp => {
-        if (resp.data.code === 0) {
-          this.userlist = resp.data.userlist
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-      }).catch(err => {
-        this.$message.error(err)
-      })
+        this.userlist = resp.data.userlist;
+      });
     },
     handlePermission(row) {
-      this.form = row
-      this.dialogVisible = true
+      this.form = row;
+      this.dialogVisible = true;
     },
     handleRemove(row) {
-      this.$confirm('此操作将关闭bug, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        userRemove(row.id).then(resp => {
-          if (resp.data.code === 0) {
-            const l = this.userlist.length
+      this.$confirm("此操作将关闭bug, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          userRemove(row.id).then(_ => {
+            const l = this.userlist.length;
             for (let i = 0; i < l; i++) {
               if (this.userlist[i].id === row.id) {
-                this.userlist.splice(i, 1)
+                this.userlist.splice(i, 1);
               }
             }
-            this.$message.warning('删除成功')
-            return
-          } else {
-            this.$message.error(resp.data.msg)
-          }
+            this.$message.warning("删除成功");
+          });
         })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        })
-      })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     },
     handleDisable(row) {
-      console.log(1111)
-      userDisable(row.id).then(resp => {
-        if (resp.data.code === 0) {
-          const l = this.userlist.length
-          for (let i = 0; i < l; i++) {
-            if (this.userlist[i].id === row.id) {
-              this.userlist[i].disable = Math.abs(this.userlist[i].disable - 1)
-              break
-            }
+      userDisable(row.id).then(_ => {
+        const l = this.userlist.length;
+        for (let i = 0; i < l; i++) {
+          if (this.userlist[i].id === row.id) {
+            this.userlist[i].disable = Math.abs(this.userlist[i].disable - 1);
+            break;
           }
-        } else {
-          this.$message.error(resp.data.msg)
         }
-      })
+      });
     },
     handleResetPwd(row) {
-      this.$prompt('请输入密码', '提示', {
-        cancelButtonText: '取消',
-        confirmButtonText: '确定'
-
-      }).then(({ value }) => {
-        const data = {
-          id: row.id,
-          newpassword: value
-        }
-        resetPwd(data).then(resp => {
-          if (resp.data.code === 0) {
-            this.$message({
-              type: 'success',
-              message: '你的密码是: ' + value
-            })
-            return
-          }
-          this.$message({
-            message: '密码重置失败',
-            type: 'error'
-          })
-        })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '取消输入'
-        })
+      this.$prompt("请输入密码", "提示", {
+        cancelButtonText: "取消",
+        confirmButtonText: "确定"
       })
+        .then(({ value }) => {
+          const data = {
+            id: row.id,
+            newpassword: value
+          };
+          resetPwd(data).then(_ => {
+            this.$message({
+              type: "success",
+              message: "你的密码是: " + value
+            });
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消输入"
+          });
+        });
     }
   }
-}
+};
 </script>

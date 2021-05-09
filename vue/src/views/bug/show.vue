@@ -1,17 +1,6 @@
 <template>
-
   <div>
-    <div>
-      <!--<sticky :class-name="'sub-navbar'">-->
-      <!--&lt;!&ndash;<CommentDropdown v-model="postForm.comment_disabled" />&ndash;&gt;-->
-
-      <!--&lt;!&ndash;<SourceUrlDropdown v-model="postForm.source_uri" />&ndash;&gt;-->
-      <!--<el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm">转交-->
-      <!--</el-button>-->
-      <!--&lt;!&ndash;<el-button v-loading="loading" type="warning" @click="handleModifyStatus">关闭</el-button>&ndash;&gt;-->
-      <!--&lt;!&ndash;<el-button v-loading="loading" type="warning" @click="draftForm">删除</el-button>&ndash;&gt;-->
-      <!--</sticky>-->
-    </div>
+    <div></div>
     <div class="components-container">
       <div>
         <h1 style="text-align: center">{{ bug.title }}</h1>
@@ -22,30 +11,27 @@
           <el-col :span="5">
             <span>项目名: {{ bug.projectname }}</span>
           </el-col>
-          <el-col v-if="bug.typ==1" :span="5">
+          <el-col v-if="bug.typ == 1" :span="5">
             <span>版本：{{ bug.version }}</span>
           </el-col>
-          <el-col v-if="bug.typ==1" :span="4">
+          <el-col v-if="bug.typ == 1" :span="4">
             <span>级别：{{ bug.level }}</span>
           </el-col>
-          <el-col v-if="bug.typ==1" :span="4">
+          <el-col v-if="bug.typ == 1" :span="4">
             <span>重要性：{{ bug.important }}</span>
           </el-col>
-          <el-col v-if="bug.typ==1" :span="4">
+          <el-col v-if="bug.typ == 1" :span="4">
             <span>环境：{{ bug.envname }}</span>
           </el-col>
-          
         </el-row>
-         
-         
-        <!-- <el-row> -->
-           
-          <!-- </el-row > -->
-         <!-- <span style="padding-top: 20px">URL：{{ bug.url }}</span> -->
       </el-card>
-      <el-card class="box-card" v-if="bug.typ==1" style="background-color: #8cbda4">
+      <el-card
+        class="box-card"
+        v-if="bug.typ == 1"
+        style="background-color: #8cbda4"
+      >
         <span style="padding-top: 20px">URL：{{ bug.url }}</span>
-        </el-card>
+      </el-card>
       <div id="main">
         <mavon-editor
           style="width: 100%;min-height:10px"
@@ -57,25 +43,48 @@
           :editable="false"
           :scroll-style="true"
         />
-
-        <!-- <mavon-editor ref="md" v-model="bug.content" /> -->
       </div>
-      <div v-for="(cc, index) in bug.comments" :key="index" style="margin-bottom: 5px">
+      <div
+        v-for="(cc, index) in bug.comments"
+        :key="index"
+        style="margin-bottom: 5px"
+      >
         <el-card class="box-card">
-          <p>{{ cc.date | parseTime('{y}-{m}-{d} {h}:{i}') }}由{{ cc.user }}转交给{{ cc.passuser }}</p>
+          <p>
+            {{ cc.date | parseTime("{y}-{m}-{d} {h}:{i}") }}由{{
+              cc.user
+            }}转交给{{ cc.passuser }}
+          </p>
           <span>转交原因：{{ cc.info }}</span>
         </el-card>
       </div>
-    <!--<el-tooltip placement="top" content="tooltip">-->
-      <!--<back-to-top transitionName="fade" :customStyle="myBackToTopStyle" :visibilityHeight="300" :backPosition="50"></back-to-top>-->
-    <!--</el-tooltip>-->
     </div>
 
-    <el-dialog :close-on-click-modal="false" :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+    <el-dialog
+      :close-on-click-modal="false"
+      :title="textMap[dialogStatus]"
+      :visible.sync="dialogFormVisible"
+    >
+      <el-form
+        ref="dataForm"
+        :rules="rules"
+        :model="temp"
+        label-position="left"
+        label-width="70px"
+        style="width: 400px; margin-left:50px;"
+      >
         <el-form-item label="状态">
-          <el-select v-model="bug.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="(item, index) in statusOptions" :key="index" :label="item" :value="item" />
+          <el-select
+            v-model="bug.status"
+            class="filter-item"
+            placeholder="Please select"
+          >
+            <el-option
+              v-for="(item, index) in statusOptions"
+              :key="index"
+              :label="item"
+              :value="item"
+            />
           </el-select>
         </el-form-item>
         <el-form-item style="margin-bottom: 40px;" label="任务给：">
@@ -93,7 +102,12 @@
           </el-select>
         </el-form-item>
         <el-form-item label="理由">
-          <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
+          <el-input
+            v-model="temp.remark"
+            :autosize="{ minRows: 2, maxRows: 4 }"
+            type="textarea"
+            placeholder="Please input"
+          />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -105,167 +119,149 @@
 </template>
 
 <script>
-// import BackToTop from '@/components/BackToTop'
-import { showBug, passBug } from '@/api/bugs'
-// import { getUsers, getPermStatus } from '@/api/get'
-// import Sticky from '@/components/Sticky' // 粘性header组件
-// import { getProject } from '@/utils/auth'
+import { showBug, passBug } from "@/api/bugs";
 
 export default {
-  name: 'ShowBug',
+  name: "ShowBug",
   // components: { Sticky },
   data() {
     return {
       users: [],
       loading: false,
       bug: {
-        title: '',
-        appversion: '',
-        status: '',
+        title: "",
+        appversion: "",
+        status: "",
         comments: []
       },
       statusOptions: [],
       dialogFormVisible: false,
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        update: "Edit",
+        create: "Create"
       },
-      dialogStatus: '',
+      dialogStatus: "",
       temp: {
         id: undefined,
-        remark: '',
-        status: '',
-        selectusers: ''
+        remark: "",
+        status: "",
+        selectusers: ""
       },
       myBackToTopStyle: {
-        right: '50px',
-        bottom: '50px',
-        width: '40px',
-        height: '40px',
-        'border-radius': '4px',
-        'line-height': '45px', // 请保持与高度一致以垂直居中 Please keep consistent with height to center vertically
-        background: '#e7eaf1'// 按钮的背景颜色 The background color of the button
+        right: "50px",
+        bottom: "50px",
+        width: "40px",
+        height: "40px",
+        "border-radius": "4px",
+        "line-height": "45px", // 请保持与高度一致以垂直居中 Please keep consistent with height to center vertically
+        background: "#e7eaf1" // 按钮的背景颜色 The background color of the button
       },
       rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        type: [
+          { required: true, message: "type is required", trigger: "change" }
+        ],
+        timestamp: [
+          {
+            type: "date",
+            required: true,
+            message: "timestamp is required",
+            trigger: "change"
+          }
+        ],
+        title: [
+          { required: true, message: "title is required", trigger: "blur" }
+        ]
       }
-    }
+    };
   },
   created() {
-    this.fetchData()
-    // this.getusers()
-    // this.getstatus()
-  },
-  activated() {
-    // this.getstatus()
+    this.fetchData();
   },
   methods: {
-
-    draftForm() {
-
-    },
-    submitForm() {
-      // this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      // this.$nextTick(() => {
-      //   this.$refs['dataForm'].clearValidate()
-      // })
-    },
-
     fetchData() {
-      const url = window.location.href
-      const ul = url.split('/')
-      const id = ul[ul.length - 1]
+      const url = window.location.href;
+      const ul = url.split("/");
+      const id = ul[ul.length - 1];
       if (id % 1 === 0) {
-        this.temp.id = parseInt(id)
+        this.temp.id = parseInt(id);
         showBug(id).then(resp => {
-          if (resp.data.code === 0) {
-            this.bug = resp.data
-          } else {
-            this.$message.error(resp.data.msg)
-          }
-        })
+          this.bug = resp.data;
+        });
       }
     },
     updateData() {
-      this.dialogFormVisible = true
-      this.temp.status = this.bug.status
+      this.dialogFormVisible = true;
+      this.temp.status = this.bug.status;
       passBug(this.temp).then(resp => {
-        if (resp.data.code === 0) {
-          const data = resp.data
-          this.bug.comment.push({
-            date: data.date,
-            info: data.remark,
-            user: data.user,
-            passuser: data.selectusers
-          })
-          this.temp.remark = ''
-          this.temp.status = data.status
-          this.temp.selectusers = ''
-          this.$message({
-            message: '操作成功',
-            type: 'success'
-          })
-        } else {
-          this.$message.error(resp.data.msg)
-        }
-        this.dialogFormVisible = false
-      })
+        const data = resp.data;
+        this.bug.comment.push({
+          date: data.date,
+          info: data.remark,
+          user: data.user,
+          passuser: data.selectusers
+        });
+        this.temp.remark = "";
+        this.temp.status = data.status;
+        this.temp.selectusers = "";
+        this.$message({
+          message: "操作成功",
+          type: "success"
+        });
+      });
+      this.dialogFormVisible = false;
     },
     handleDelete(row) {
       this.$notify({
-        title: '成功',
-        message: '删除成功',
-        type: 'success',
+        title: "成功",
+        message: "删除成功",
+        type: "success",
         duration: 2000
-      })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
+      });
+      const index = this.list.indexOf(row);
+      this.list.splice(index, 1);
     }
   }
-}
+};
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-  @import "src/styles/mixin.scss";
+@import "src/styles/mixin.scss";
 
-  .createPost-container {
-    position: relative;
-    .createPost-main-container {
-      padding: 40px 45px 20px 50px;
-      .postInfo-container {
-        position: relative;
-        @include clearfix;
-        margin-bottom: 10px;
-        .postInfo-container-item {
-          float: left;
-        }
-      }
-      .editor-container {
-        min-height: 500px;
-        margin: 0 0 30px;
-        .editor-upload-btn-container {
-          text-align: right;
-          margin-right: 10px;
-          .editor-upload-btn {
-            display: inline-block;
-          }
-        }
+.createPost-container {
+  position: relative;
+  .createPost-main-container {
+    padding: 40px 45px 20px 50px;
+    .postInfo-container {
+      position: relative;
+      @include clearfix;
+      margin-bottom: 10px;
+      .postInfo-container-item {
+        float: left;
       }
     }
-    .word-counter {
-      width: 40px;
-      position: absolute;
-      right: -10px;
-      top: 0px;
+    .editor-container {
+      min-height: 500px;
+      margin: 0 0 30px;
+      .editor-upload-btn-container {
+        text-align: right;
+        margin-right: 10px;
+        .editor-upload-btn {
+          display: inline-block;
+        }
+      }
     }
   }
+  .word-counter {
+    width: 40px;
+    position: absolute;
+    right: -10px;
+    top: 0px;
+  }
+}
 </style>
 <style>
-  #tinymcecontent img {
-    max-width: 800px;
-    text-align: center;
-  }
+#tinymcecontent img {
+  max-width: 800px;
+  text-align: center;
+}
 </style>
