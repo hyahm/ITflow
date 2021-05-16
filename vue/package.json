@@ -38,6 +38,7 @@
         "connect": "3.6.6",
         "driver.js": "0.9.5",
         "html-webpack-plugin": "3.2.0",
+        "lint-staged": "8.1.5",
         "plop": "2.3.0",
         "runjs": "4.3.2",
         "sass": "1.26.2",
@@ -52,35 +53,16 @@
         "> 1%",
         "last 2 versions"
     ],
-    "bugs": {
-        "url": "https://github.com/PanJiaChen/vue-element-admin/issues"
-    },
     "engines": {
         "node": ">=8.9",
         "npm": ">= 3.0.0"
     },
     "keywords": [
-        "vue",
-        "admin",
-        "dashboard",
-        "element-ui",
-        "boilerplate",
-        "admin-template",
-        "management-system"
+        "bug管理系统",
+        "ITflow"
     ],
-    "license": "MIT",
-    "lint-staged": {
-        "src/**/*.{js,vue}": [
-            "git add"
-        ]
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged"
-        }
-    },
     "repository": {
-        "type": "git",
-        "url": "git+https://github.com/PanJiaChen/vue-element-admin.git"
+        "type": "url",
+        "url": "https://github.com/hyahm/ITflow"
     }
 }

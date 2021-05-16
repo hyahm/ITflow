@@ -16,15 +16,9 @@ import mavonEditor from "mavon-editor";
 import "mavon-editor/dist/css/index.css";
 // use
 
-import * as filters from "./filters"; // global filters
-
 Vue.use(Element);
 
 Vue.use(mavonEditor);
-// register global utility filters
-// Object.keys(filters).forEach(key => {
-//   Vue.filter(key, filters[key]);
-// });
 
 Vue.filter("parseTime", function(time, cFormat) {
   if (arguments.length === 0 || !time) {
