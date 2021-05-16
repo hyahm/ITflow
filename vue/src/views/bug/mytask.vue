@@ -40,7 +40,6 @@
         />
       </el-select>
       <el-button
-        v-waves
         class="filter-item"
         type="primary"
         icon="el-icon-search"
@@ -243,13 +242,9 @@ import {
 import { passBug, changeStatus } from "@/api/bugs";
 import { searchMyTasks } from "@/api/search";
 import { statusFilter } from "@/api/status";
-import waves from "@/directive/waves"; // 水波纹指令
 
 export default {
   name: "Mytask",
-  directives: {
-    waves
-  },
   filters: {
     statusFilter(status) {
       const statusMap = {

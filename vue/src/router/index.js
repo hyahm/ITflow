@@ -1,21 +1,17 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import Vue from "vue";
+import Router from "vue-router";
 
-Vue.use(Router)
+Vue.use(Router);
 
 /* Layout */
-import Layout from '@/layout'
+import Layout from "@/layout";
 
 /* Router Modules */
-import componentsRouter from './modules/components'
-// import chartsRouter from './modules/charts'
-// import docRouter from './modules/doc'
-import system from './modules/system'
-import setting from './modules/setting'
-import userRoute from './modules/user'
-import bugRouter from './modules/bug'
-// import shareRouter from './modules/sharefile'
-// import restfulRouter from './modules/restful'
+import componentsRouter from "./modules/components";
+import system from "./modules/system";
+import setting from "./modules/setting";
+import userRoute from "./modules/user";
+import bugRouter from "./modules/bug";
 
 /** note: submenu only apppear when children.length>=1
  *  detail see  https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
@@ -37,49 +33,37 @@ import bugRouter from './modules/bug'
 **/
 export const constantRouterMap = [
   {
-    path: '/login',
-    component: () => import('@/views/login/index'),
+    path: "/login",
+    component: () => import("@/views/login/index"),
     hidden: true
   },
   {
-    path: '/authredirect',
-    component: () => import('@/views/login/authredirect'),
-    hidden: true
-  },
-  {
-    path: '',
+    path: "",
     component: Layout,
-    redirect: 'dashboard',
+    redirect: "dashboard",
     children: [
       {
-        path: 'dashboard',
-        component: () => import('@/views/dashboard/index'),
-        name: 'dashboard',
-        meta: { title: '面板', icon: 'dashboard', noCache: true }
+        path: "dashboard",
+        component: () => import("@/views/dashboard/index"),
+        name: "dashboard",
+        meta: { title: "面板", icon: "dashboard", noCache: true }
       }
     ]
   }
-
-]
+];
 
 export default new Router({
-  mode: 'history', // require service support
+  mode: "history", // require service support
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRouterMap
-})
+});
 
 export const asyncRouterMap = [
   /** When your routing table is too long, you can split it into small modules**/
   componentsRouter,
-  // chartsRouter,
-  // nestedRouter,
-  // tableRouter,
-  // docRouter,
   system,
   userRoute,
   bugRouter,
   setting,
-  // shareRouter,
-  // restfulRouter,
-  { path: '*', redirect: '/404', hidden: true }
-]
+  { path: "*", redirect: "/404", hidden: true }
+];

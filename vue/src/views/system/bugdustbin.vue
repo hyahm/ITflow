@@ -45,7 +45,6 @@
       <el-input v-model="listQuery.title" placeholder="标题" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-input v-model="listQuery.author" placeholder="作者" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" /> -->
       <el-button
-        v-waves
         class="filter-item"
         type="primary"
         icon="el-icon-search"
@@ -196,16 +195,12 @@
 </template>
 
 <script>
-import waves from "@/directive/waves"; // 水波纹指令
 import { bugFilter } from "@/api/search"; // 水波纹指令
 import { resumeBug } from "@/api/bugs";
 import { statusFilter } from "@/api/status";
 import { getProject, getLevels, getStatus, getPermStatus } from "@/api/get";
 export default {
   name: "Movebug",
-  directives: {
-    waves
-  },
   data() {
     return {
       projectnames: [],

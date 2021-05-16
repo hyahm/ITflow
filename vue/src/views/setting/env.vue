@@ -74,16 +74,12 @@ export default {
       tableData: []
     };
   },
-  activated() {
-    this.getenvname();
-  },
   created() {
     this.getenvname();
   },
   methods: {
     getenvname() {
       getEnvName().then(resp => {
-        this.$message.info("no data");
         this.tableData = resp.data.envlist;
       });
     },

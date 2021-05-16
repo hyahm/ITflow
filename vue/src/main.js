@@ -1,56 +1,79 @@
-import Vue from 'vue'
+import Vue from "vue";
+import "normalize.css/normalize.css"; // a modern alternative to CSS resets
 
-import Cookies from 'js-cookie'
+import Element from "element-ui";
+import "./styles/element-variables.scss";
 
-import 'normalize.css/normalize.css' // a modern alternative to CSS resets
+import "@/styles/index.scss"; // global css
 
-import Element from 'element-ui'
-import './styles/element-variables.scss'
-// import enLang from 'element-ui/lib/locale/lang/en' // 如果使用中文语言包请默认支持，无需额外引入，请删除该依赖
+import App from "./App";
+import store from "./store";
+import router from "./router";
 
-import '@/styles/index.scss' // global css
-
-import App from './App'
-import store from './store'
-import router from './router'
-
-import './icons' // icon
-import './permission' // permission control
-// import './utils/error-log' // error log
-import mavonEditor from 'mavon-editor'
-import 'mavon-editor/dist/css/index.css'
+import "./icons"; // icon
+import "./permission"; // permission control
+import mavonEditor from "mavon-editor";
+import "mavon-editor/dist/css/index.css";
 // use
 
-import * as filters from './filters' // global filters
+import * as filters from "./filters"; // global filters
 
-/**
- * If you don't want to use mock-server
- * you want to use MockJs for mock api
- * you can execute: mockXHR()
- *
- * Currently MockJs will be used in the production environment,
- * please remove it before going online ! ! !
- */
-// if (process.env.NODE_ENV === 'production') {
-//   const { mockXHR } = require('../mock')
-//   mockXHR()
-// }
-Vue.use(Element)
-// Vue.use(Element, {
-//     size: Cookies.get('size') || 'medium', // set element-ui default size
-//     // locale: enLang // 如果使用中文，无需设置，请删除
-// })
-Vue.use(mavonEditor)
-    // register global utility filters
-Object.keys(filters).forEach(key => {
-    Vue.filter(key, filters[key])
-})
+Vue.use(Element);
 
-Vue.config.productionTip = false
+Vue.use(mavonEditor);
+// register global utility filters
+// Object.keys(filters).forEach(key => {
+//   Vue.filter(key, filters[key]);
+// });
 
+Vue.filter("parseTime", function(time, cFormat) {
+  if (arguments.length === 0 || !time) {
+    return null;
+  }
+  const format = cFormat || "{y}-{m}-{d} {h}:{i}:{s}";
+  let date;
+  if (typeof time === "object") {
+    date = time;
+  } else {
+    if (typeof time === "string") {
+      if (/^[0-9]+$/.test(time)) {
+        time = parseInt(time);
+      } else {
+        // https://stackoverflow.com/questions/4310953/invalid-date-in-safari
+        time = time.replace(new RegExp(/-/gm), "/");
+      }
+    }
+
+    if (typeof time === "number" && time.toString().length === 10) {
+      time = time * 1000;
+    }
+    date = new Date(time);
+  }
+  const formatObj = {
+    y: date.getFullYear(),
+    m: date.getMonth() + 1,
+    d: date.getDate(),
+    h: date.getHours(),
+    i: date.getMinutes(),
+    s: date.getSeconds(),
+    a: date.getDay()
+  };
+  const time_str = format.replace(/{([ymdhisa])+}/g, (result, key) => {
+    const value = formatObj[key];
+    // Note: getDay() returns 0 on Sunday
+    if (key === "a") {
+      return ["日", "一", "二", "三", "四", "五", "六"][value];
+    }
+    return value.toString().padStart(2, "0");
+  });
+  return time_str;
+});
+
+Vue.config.productionTip = false;
+console.log(Vue);
 new Vue({
-    el: '#app',
-    router,
-    store,
-    render: h => h(App)
-})
+  el: "#app",
+  router,
+  store,
+  render: h => h(App)
+});

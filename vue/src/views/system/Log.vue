@@ -31,7 +31,6 @@
         />
 
         <el-button
-          v-waves
           class="filter-item"
           type="primary"
           icon="el-icon-search"
@@ -97,13 +96,9 @@
 </template>
 
 <script>
-import waves from "@/directive/waves"; // 水波纹指令
 import { searchLog, logClassify } from "@/api/log";
 export default {
   name: "Log",
-  directives: {
-    waves
-  },
   data() {
     return {
       list: [],
