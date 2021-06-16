@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/hyahm/golog"
-	"github.com/hyahm/gomysql"
 )
 
 type RespUpdateUserGroup struct {
@@ -34,7 +33,7 @@ func (ug *RespUpdateUserGroup) CheckUser(uid int64) error {
 
 func (ug *RespUpdateUserGroup) GetIds() (string, error) {
 	rows, err := db.Mconn.GetRowsIn("select id from user where realname in (?)",
-		(gomysql.InArgs)(ug.Users).ToInArgs())
+		ug.Users)
 	if err != nil {
 		golog.Error(err)
 		return "", err

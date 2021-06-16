@@ -12,7 +12,6 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/hyahm/golog"
-	"github.com/hyahm/gomysql"
 	"github.com/hyahm/xmux"
 )
 
@@ -20,7 +19,7 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	// data := xmux.GetData(r).Data.(*status.StatusGroup)
+	// data := xmux.GetInstance(r).Data.(*status.StatusGroup)
 
 	// isql := "insert into statusgroup(name,sids) values(?,?)"
 	// var err error
@@ -42,7 +41,7 @@ func EditBugGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	// data := xmux.GetData(r).Data.(*status.StatusGroup)
+	// data := xmux.GetInstance(r).Data.(*status.StatusGroup)
 
 	// isql := "update statusgroup set name =?,sids=? where id = ?"
 	// _, err := db.Mconn.Update(isql, data.Name, data.StatusList.ToStore(), data.Id)
@@ -180,7 +179,7 @@ func UserGroupGet(w http.ResponseWriter, r *http.Request) {
 	data := &usergroup.RespUserGroupList{
 		UserGroupList: make([]*usergroup.RespUserGroup, 0),
 	}
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	var rows *sql.Rows
 	var err error
 	if cache.SUPERID == uid {
@@ -208,7 +207,7 @@ func UserGroupGet(w http.ResponseWriter, r *http.Request) {
 		var users string
 		rows.Scan(&onegroup.Id, &onegroup.Name, &users)
 		namerows, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
-			(gomysql.InArgs)(strings.Split(users, ",")).ToInArgs())
+			strings.Split(users, ","))
 		if err != nil {
 			golog.Info(err)
 			continue
@@ -234,9 +233,9 @@ func UserGroupGet(w http.ResponseWriter, r *http.Request) {
 
 func GroupAdd(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
-	uid := xmux.GetData(r).Get("uid").(int64)
-	data := xmux.GetData(r).Data.(*usergroup.RespUserGroup)
-	rows, err := db.Mconn.GetRowsIn("select id from user where realname in (?)", gomysql.InArgs(data.Users).ToInArgs())
+	uid := xmux.GetInstance(r).Get("uid").(int64)
+	data := xmux.GetInstance(r).Data.(*usergroup.RespUserGroup)
+	rows, err := db.Mconn.GetRowsIn("select id from user where realname in (?)", data.Users)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -273,7 +272,7 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 func GroupDel(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	id := r.FormValue("id")
 	// id64, err := strconv.ParseInt(id, 10, 64)
 	// if err != nil {
@@ -366,8 +365,8 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 
 func GroupUpdate(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
-	uid := xmux.GetData(r).Get("uid").(int64)
-	data := xmux.GetData(r).Data.(*usergroup.RespUpdateUserGroup)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
+	data := xmux.GetInstance(r).Data.(*usergroup.RespUpdateUserGroup)
 	golog.Infof("%+v", *data)
 	ids, err := data.GetIds()
 	if err != nil {

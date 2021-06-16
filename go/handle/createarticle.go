@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/hyahm/golog"
-	"github.com/hyahm/gomysql"
 	"github.com/hyahm/xmux"
 	//"strings"
 )
@@ -40,7 +39,7 @@ func GetMyProject(w http.ResponseWriter, r *http.Request) {
 	myproject := &project.MyProject{
 		Name: make([]string, 0),
 	}
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 
 	w.Write(myproject.Get(uid))
 	return
@@ -49,8 +48,8 @@ func GetMyProject(w http.ResponseWriter, r *http.Request) {
 
 // 添加或编辑
 func BugCreate(w http.ResponseWriter, r *http.Request) {
-	uid := xmux.GetData(r).Get("uid").(int64)
-	data := xmux.GetData(r).Data.(*bug.EditBug)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
+	data := xmux.GetInstance(r).Data.(*bug.EditBug)
 	// createdId := cache.DefaultCreateSid
 	// if createdId == 0 {
 	// 	golog.Error("必须给定一个状态默认值")
@@ -59,7 +58,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 	// }
 	var ids = make([]string, 0)
 	rows, err := db.Mconn.GetRowsIn("select id from user where realname in (?)",
-		(gomysql.InArgs)(data.Selectusers).ToInArgs())
+		data.Selectusers)
 	if err != nil {
 		golog.Error(err)
 		w.Write(data.ErrorE(err))
@@ -81,7 +80,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 	// // bug.StatusId = createdId
-	// bug.Uid = xmux.GetData(r).Get("uid").(int64)
+	// bug.Uid = xmux.GetInstance(r).Get("uid").(int64)
 	//
 	// go datalog.InsertLog("bug", nickname+"create bug: "+data.Title, r.RemoteAddr, nickname, "create")
 	if data.Id <= 0 {
@@ -113,7 +112,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// 根据处理人的id找出邮箱地址
-		idrows, err := db.Mconn.GetRowsIn("select email from user where id in (?)", gomysql.InArgs(ids).ToInArgs())
+		idrows, err := db.Mconn.GetRowsIn("select email from user where id in (?)", ids)
 		if err != nil {
 			golog.Error(err)
 			w.Write(data.ErrorE(err))
@@ -171,7 +170,7 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 		// go datalog.InsertLog("bug", nickname+fmt.Sprintf(" update bug id: %d", data.Id), r.RemoteAddr, nickname, "update")
 
 		// 根据处理人的id找出邮箱地址
-		idrows, err := db.Mconn.GetRowsIn("select email from user where id in (?)", gomysql.InArgs(ids).ToInArgs())
+		idrows, err := db.Mconn.GetRowsIn("select email from user where id in (?)", ids)
 		if err != nil {
 			golog.Error(err)
 			w.Write(data.ErrorE(err))

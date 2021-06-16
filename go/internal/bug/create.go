@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/hyahm/golog"
-	"github.com/hyahm/gomysql"
 )
 
 // 前端编辑时需要的数据结构
@@ -70,7 +69,7 @@ func BugById(id string, uid int64) []byte {
 		return reb.Error("没有权限")
 	}
 	rows, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
-		(gomysql.InArgs)(strings.Split(spids, ",")).ToInArgs())
+		strings.Split(spids, ","))
 	if err != nil {
 		golog.Error(err)
 		return reb.ErrorE(err)

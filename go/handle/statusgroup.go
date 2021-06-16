@@ -11,19 +11,18 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/hyahm/golog"
-	"github.com/hyahm/gomysql"
 	"github.com/hyahm/xmux"
 )
 
 func AddStatusGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Insert {
 		w.Write(errorcode.Error("no perm"))
 		return
 	}
-	data := xmux.GetData(r).Data.(*status.StatusGroup)
+	data := xmux.GetInstance(r).Data.(*status.StatusGroup)
 
 	golog.Infof("%+v", *data)
 	sids, err := data.GetIds()
@@ -53,12 +52,12 @@ func AddStatusGroup(w http.ResponseWriter, r *http.Request) {
 func EditStatusGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Update {
 		w.Write(errorcode.Error("no perm"))
 		return
 	}
-	data := xmux.GetData(r).Data.(*status.StatusGroup)
+	data := xmux.GetInstance(r).Data.(*status.StatusGroup)
 
 	if data.Name == "" {
 		w.Write(errorcode.Error("名称不能为空"))
@@ -87,7 +86,7 @@ func EditStatusGroup(w http.ResponseWriter, r *http.Request) {
 func StatusGroupList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Select {
 		w.Write(errorcode.Error("no perm"))
 		return
@@ -111,7 +110,7 @@ func StatusGroupList(w http.ResponseWriter, r *http.Request) {
 		}
 
 		idrows, err := db.Mconn.GetRowsIn("select name from status where id in (?)",
-			(gomysql.InArgs)(strings.Split(ids, ",")).ToInArgs())
+			strings.Split(ids, ","))
 		if err != nil {
 			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
@@ -144,7 +143,7 @@ func StatusGroupList(w http.ResponseWriter, r *http.Request) {
 func DeleteStatusGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Delete {
 		w.Write(errorcode.Error("no perm"))
 		return

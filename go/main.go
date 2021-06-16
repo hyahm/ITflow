@@ -22,6 +22,12 @@ func main() {
 	if goconfig.ReadBool("debug", false) {
 		golog.Level = golog.DEBUG
 	}
+	if !goconfig.ReadBool("debug", false) {
+		goconfig.ReadString("log.path")
+		golog.InitLogger(goconfig.ReadString("log.path", ""),
+			goconfig.ReadInt64("log.size", 0),
+			goconfig.ReadBool("log.everyday", false))
+	}
 	// //初始化mysql
 	db.InitMysql()
 	// // // 初始化缓存表
@@ -29,10 +35,6 @@ func main() {
 	cache.LoadConfig()
 
 	// // // 初始化日志
-	if !goconfig.ReadBool("debug", false) {
-		golog.InitLogger(goconfig.ReadString("log.path", ""),
-			goconfig.ReadInt64("log.size", 0),
-			goconfig.ReadBool("log.everyday", false))
-	}
+	
 	httpserver.RunHttp()
 }

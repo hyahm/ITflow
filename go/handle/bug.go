@@ -17,7 +17,6 @@ import (
 	"time"
 
 	"github.com/hyahm/golog"
-	"github.com/hyahm/gomysql"
 	"github.com/hyahm/xmux"
 	//"strconv"
 )
@@ -55,11 +54,11 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 
 func ShowStatus(w http.ResponseWriter, r *http.Request) {
 	// 获取显示的状态名
-	// sl := xmux.GetData(r).Data.(*status.Status)
+	// sl := xmux.GetInstance(r).Data.(*status.Status)
 	sl := &status.Status{
 		CheckStatus: make([]string, 0),
 	}
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	var sids string
 	err := db.Mconn.GetOne("select showstatus from user where id=?", uid).Scan(&sids)
 	if err != nil {
@@ -73,7 +72,7 @@ func ShowStatus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rows, err := db.Mconn.GetRowsIn(`select name from status where id in (?)`,
-		(gomysql.InArgs)(strings.Split(sids, ",")).ToInArgs())
+		strings.Split(sids, ","))
 	if err != nil {
 		golog.Error(err)
 		if err == sql.ErrNoRows {
@@ -103,7 +102,7 @@ func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 	sl := &statusList{
 		StatusList: make([]string, 0),
 	}
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	var err error
 	var rows *sql.Rows
 	if uid == cache.SUPERID {
@@ -124,7 +123,7 @@ func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 		}
 
 		rows, err = db.Mconn.GetRowsIn(`select name from status where id in (?)`,
-			gomysql.InArgs(strings.Split(sids, ",")).ToInArgs())
+			strings.Split(sids, ","))
 		if err != nil {
 			golog.Error(err)
 			w.Write(sl.ErrorE(err))
@@ -152,7 +151,7 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	sl := &user.UserInfo{}
-	sl.NickName = xmux.GetData(r).Get("nickname").(string)
+	sl.NickName = xmux.GetInstance(r).Get("nickname").(string)
 	err := db.Mconn.GetOne("select email,realname from user where nickname=?", sl.NickName).Scan(&sl.Email, &sl.Realname)
 	if err != nil {
 		golog.Error(err)
@@ -168,8 +167,8 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
 
 func UpdateInfo(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
-	sl := xmux.GetData(r).Data.(*user.UserInfo)
-	uid := xmux.GetData(r).Get("uid").(int64)
+	sl := xmux.GetInstance(r).Data.(*user.UserInfo)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	// 修改用户信息
 	_, err := db.Mconn.Update("update user set email=?,realname=?,nickname=? where id=?", sl.Email, sl.Realname, sl.NickName, uid)
 	if err != nil {
@@ -188,7 +187,7 @@ func UpdateRoles(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	sl := xmux.GetData(r).Data.(*role.Role)
+	sl := xmux.GetInstance(r).Data.(*role.Role)
 	var rid int64
 	err := model.CheckRoleNameInGroup(sl.Name, &rid)
 	if err != nil {
@@ -224,7 +223,7 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	param := xmux.GetData(r).Data.(*bug.ChangeStatus)
+	param := xmux.GetInstance(r).Data.(*bug.ChangeStatus)
 
 	// sid := param.Status.Id()
 	// if sid == 0 {
@@ -252,9 +251,9 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	param := xmux.GetData(r).Data.(*status.Status)
+	param := xmux.GetInstance(r).Data.(*status.Status)
 	rows, err := db.Mconn.GetRowsIn("select id from status where name in (?)",
-		(gomysql.InArgs)(param.CheckStatus).ToInArgs())
+		param.CheckStatus)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -268,7 +267,7 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 		sids = append(sids, *sid)
 	}
 	rows.Close()
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	user := &model.User{}
 	err = user.UpdateShowStatus(strings.Join(sids, ","), uid)
 	if err != nil {
@@ -282,8 +281,8 @@ func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
 
 func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 	golog.Info("1111111111111111111111111")
-	uid := xmux.GetData(r).Get("uid").(int64)
-	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
+	mybug := xmux.GetInstance(r).Data.(*search.ReqMyBugFilter)
 	golog.Infof("%+v", *mybug)
 	// mybug.GetUsefulCondition(uid)
 	al := &model.AllArticleList{
@@ -291,7 +290,7 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 		Page: 1,
 	}
 	countsql := "select count(id) from bugs where dustbin=true and uid=? and sid in (select id from status where name in (?))"
-	err := db.Mconn.GetOneIn(countsql, uid, (gomysql.InArgs)(mybug.ShowsStatus).ToInArgs()).Scan(&al.Count)
+	err := db.Mconn.GetOneIn(countsql, uid, mybug.ShowsStatus).Scan(&al.Count)
 	if err != nil {
 		golog.Error(err)
 		w.Write(al.ErrorE(err))
@@ -329,7 +328,7 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 		realnames, err := db.Mconn.GetRows("select realname from user where id in (?)",
-			(gomysql.InArgs)(strings.Split(ids, ",")).ToInArgs())
+			strings.Split(ids, ","))
 		if err != nil {
 			golog.Error(err)
 			w.Write(al.ErrorE(err))
@@ -374,7 +373,7 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 func DeleteBug(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 	errorcode := &response.Response{}
-	if xmux.GetData(r).Get("uid").(int64) != cache.SUPERID {
+	if xmux.GetInstance(r).Get("uid").(int64) != cache.SUPERID {
 		w.Write(errorcode.Error("没有权限"))
 		return
 	}
@@ -417,7 +416,7 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	thisUid := xmux.GetData(r).Get("uid").(int64)
+	thisUid := xmux.GetInstance(r).Get("uid").(int64)
 	if uid != thisUid && uid != cache.SUPERID {
 		golog.Debug("没有权限")
 		w.Write(errorcode.Error("没有权限"))
@@ -439,7 +438,7 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 func BugEdit(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("id")
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	w.Write(bug.BugById(id, uid))
 	return
 

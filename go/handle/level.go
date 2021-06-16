@@ -20,7 +20,7 @@ func LevelGet(w http.ResponseWriter, r *http.Request) {
 	data := &model.Levels{
 		Levels: make([]*model.Level, 0),
 	}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Insert {
 		w.Write(data.Error("no perm"))
 		return
@@ -50,12 +50,12 @@ func LevelGet(w http.ResponseWriter, r *http.Request) {
 func LevelAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Insert {
 		w.Write(errorcode.Error("no perm"))
 		return
 	}
-	data := xmux.GetData(r).Data.(*model.RequestLevel)
+	data := xmux.GetInstance(r).Data.(*model.RequestLevel)
 	var err error
 	errorcode.Id, err = db.Mconn.Insert("insert into level(name) value(?)", data.Name)
 	if err != nil {
@@ -77,7 +77,7 @@ func LevelAdd(w http.ResponseWriter, r *http.Request) {
 func LevelDel(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Delete {
 		w.Write(errorcode.Error("no perm"))
 		return
@@ -126,12 +126,12 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 func LevelUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Update {
 		w.Write(errorcode.Error("no perm"))
 		return
 	}
-	data := xmux.GetData(r).Data.(*model.Update_level)
+	data := xmux.GetInstance(r).Data.(*model.Update_level)
 	gsql := "update level set name=? where id=?"
 	_, err := db.Mconn.Update(gsql, data.Name, data.Id)
 	if err != nil {

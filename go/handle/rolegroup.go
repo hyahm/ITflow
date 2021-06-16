@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/hyahm/golog"
-	"github.com/hyahm/gomysql"
 	"github.com/hyahm/xmux"
 )
 
@@ -34,7 +33,7 @@ func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 		rows.Scan(&one.Id, &one.Name, &permids)
 		golog.Info(one.Id, " ", one.Name)
 		permrows, err := db.Mconn.GetRowsIn("select find, remove, revise, increase, r.name, r.info from perm as p join roles as r on p.id in (?) and p.rid=r.id",
-			(gomysql.InArgs)(strings.Split(permids, ",")).ToInArgs())
+			strings.Split(permids, ","))
 		if err != nil {
 			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))
@@ -116,7 +115,7 @@ func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_, err = db.Mconn.DeleteIn("delete from perm where id in(?)",
-		(gomysql.InArgs)(strings.Split(permids, ",")).ToInArgs())
+		strings.Split(permids, ","))
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -139,9 +138,9 @@ func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 
 func EditRoleGroup(w http.ResponseWriter, r *http.Request) {
 
-	data := xmux.GetData(r).Data.(*rolegroup.ReqRoleGroup)
+	data := xmux.GetInstance(r).Data.(*rolegroup.ReqRoleGroup)
 
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	w.Write(data.Update(uid))
 	return
 
@@ -149,8 +148,8 @@ func EditRoleGroup(w http.ResponseWriter, r *http.Request) {
 
 func AddRoleGroup(w http.ResponseWriter, r *http.Request) {
 
-	data := xmux.GetData(r).Data.(*rolegroup.ReqRoleGroup)
-	uid := xmux.GetData(r).Get("uid").(int64)
+	data := xmux.GetInstance(r).Data.(*rolegroup.ReqRoleGroup)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	w.Write(data.Add(uid))
 	return
 

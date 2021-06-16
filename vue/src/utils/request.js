@@ -45,10 +45,13 @@ service.interceptors.response.use(
      * You can also judge the status by HTTP Status Code
      */
     response => {
+        console.log(response)
+        console.log(2222)
         if (response.data.code === -1) {
             removeToken()
             location.href = '/login'
         }
+
         if (response.data.code != 0) {
             Message({
                 message: response.data.msg,

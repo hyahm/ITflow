@@ -34,7 +34,7 @@ func DefaultSave(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	sl := xmux.GetData(r).Data.(*defaults.ReqDefaultValue)
+	sl := xmux.GetInstance(r).Data.(*defaults.ReqDefaultValue)
 	var err error
 	cache.DefaultCreateSid, cache.DefaultCompleteSid, err = sl.Update()
 	if err != nil {

@@ -23,14 +23,14 @@ type UserChecker interface {
 
 func CheckUser(w http.ResponseWriter, r *http.Request) bool {
 
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	resp := response.Response{}
-	if xmux.GetData(r).Data == nil {
+	if xmux.GetInstance(r).Data == nil {
 		err := fmt.Sprintf("must be bind data first %s", r.URL.RequestURI())
 		w.Write(resp.Error(err))
 		return true
 	}
-	err := xmux.GetData(r).Data.(UserChecker).CheckUser(uid)
+	err := xmux.GetInstance(r).Data.(UserChecker).CheckUser(uid)
 	if err != nil {
 		w.Write(resp.ErrorE(err))
 		return true
@@ -40,97 +40,97 @@ func CheckUser(w http.ResponseWriter, r *http.Request) bool {
 
 func EnvPermModule(w http.ResponseWriter, r *http.Request) bool {
 	resp := response.Response{}
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	op, err := perm.EnvPerm(uid)
 	if err != nil {
 		w.Write(resp.ErrorE(err))
 		return true
 	}
-	xmux.GetData(r).Set("perm", op)
+	xmux.GetInstance(r).Set("perm", op)
 	return false
 }
 
 func ImportantPermModule(w http.ResponseWriter, r *http.Request) bool {
 	resp := response.Response{}
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	op, err := perm.ImportantPerm(uid)
 	if err != nil {
 		w.Write(resp.ErrorE(err))
 		return true
 	}
 	golog.Info(op)
-	xmux.GetData(r).Set("perm", op)
+	xmux.GetInstance(r).Set("perm", op)
 	return false
 }
 
 func LevelPermModule(w http.ResponseWriter, r *http.Request) bool {
 	resp := response.Response{}
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	op, err := perm.LevelPerm(uid)
 	if err != nil {
 		w.Write(resp.ErrorE(err))
 		return true
 	}
-	xmux.GetData(r).Set("perm", op)
+	xmux.GetInstance(r).Set("perm", op)
 	return false
 }
 
 func PositionPermModule(w http.ResponseWriter, r *http.Request) bool {
 	resp := response.Response{}
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	op, err := perm.PositionPerm(uid)
 	if err != nil {
 		w.Write(resp.ErrorE(err))
 		return true
 	}
-	xmux.GetData(r).Set("perm", op)
+	xmux.GetInstance(r).Set("perm", op)
 	return false
 }
 
 func ProjectPermModule(w http.ResponseWriter, r *http.Request) bool {
 	resp := response.Response{}
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	op, err := perm.ProjectPerm(uid)
 	if err != nil {
 		w.Write(resp.ErrorE(err))
 		return true
 	}
-	xmux.GetData(r).Set("perm", op)
+	xmux.GetInstance(r).Set("perm", op)
 	return false
 }
 
 func StatusPermModule(w http.ResponseWriter, r *http.Request) bool {
 	resp := response.Response{}
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	op, err := perm.StatusPerm(uid)
 	if err != nil {
 		w.Write(resp.ErrorE(err))
 		return true
 	}
-	xmux.GetData(r).Set("perm", op)
+	xmux.GetInstance(r).Set("perm", op)
 	return false
 }
 
 func StatusgroupPermModule(w http.ResponseWriter, r *http.Request) bool {
 	resp := response.Response{}
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	op, err := perm.StatusgroupPerm(uid)
 	if err != nil {
 		w.Write(resp.ErrorE(err))
 		return true
 	}
-	xmux.GetData(r).Set("perm", op)
+	xmux.GetInstance(r).Set("perm", op)
 	return false
 }
 
 func VersionPermModule(w http.ResponseWriter, r *http.Request) bool {
 	resp := response.Response{}
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	op, err := perm.VersionPerm(uid)
 	if err != nil {
 		w.Write(resp.ErrorE(err))
 		return true
 	}
-	xmux.GetData(r).Set("perm", op)
+	xmux.GetInstance(r).Set("perm", op)
 	return false
 }

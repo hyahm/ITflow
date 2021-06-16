@@ -17,14 +17,14 @@ import (
 func AddVersion(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Insert {
 		w.Write(errorcode.Error("no perm"))
 		return
 	}
-	version_add := xmux.GetData(r).Data.(*version.RespVersion)
+	version_add := xmux.GetInstance(r).Data.(*version.RespVersion)
 
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	add_version_sql := "insert into version(pid,name,urlone,urltwo,createtime,createuid) values((select id from project where name=?),?,?,?,?,?)"
 	var err error
 	errorcode.UpdateTime = time.Now().Unix()
@@ -51,7 +51,7 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 	al := &version.VersionList{
 		VersionList: make([]*version.RespVersion, 0),
 	}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Select {
 		w.Write(al.Error("no perm"))
 		return
@@ -89,7 +89,7 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 func VersionRemove(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Delete {
 		w.Write(errorcode.Error("no perm"))
 		return
@@ -140,14 +140,14 @@ type updateversion struct {
 func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Update {
 		w.Write(errorcode.Error("no perm"))
 		return
 	}
-	data := xmux.GetData(r).Data.(*version.RespVersion)
+	data := xmux.GetInstance(r).Data.(*version.RespVersion)
 
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	versionsql := "update version set pid=(select id from project where name=?),name=?,urlone=?,urltwo=?,createuid=? where id=?"
 	_, err := db.Mconn.Update(versionsql, data.Project, data.Name, data.Url, data.BakUrl, uid, data.Id)
 	if err != nil {

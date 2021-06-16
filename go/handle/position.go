@@ -53,7 +53,7 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	data := xmux.GetData(r).Data.(*model.Job)
+	data := xmux.GetInstance(r).Data.(*model.Job)
 	golog.Infof("%#v", *data)
 	// 如果不存在管理层名，就参数错误
 	var hid int64
@@ -144,7 +144,7 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 func PositionUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	data := xmux.GetData(r).Data.(*model.Job)
+	data := xmux.GetInstance(r).Data.(*model.Job)
 
 	var hid int64
 	golog.Infof("%+v", *data)
@@ -190,8 +190,8 @@ type RespHypos struct {
 func GetHypos(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	// nickname := xmux.GetData(r).Get("nickname").(string)
-	uid := xmux.GetData(r).Get("uid").(int64)
+	// nickname := xmux.GetInstance(r).Get("nickname").(string)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	data := &RespHypos{
 		Hypos: make([]*Hypo, 0),
 	}
@@ -233,7 +233,7 @@ func GetPositions(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	data := &positions{}
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	var rows *sql.Rows
 	var err error
 	if uid == cache.SUPERID {
