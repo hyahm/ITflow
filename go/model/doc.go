@@ -6,6 +6,7 @@ import (
 	"itflow/db"
 	"itflow/dockercompose"
 	"itflow/utils"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -93,6 +94,15 @@ func ChecDocName(name string) error {
 func (d *Doc) NewGit() (*dockercompose.Git, error) {
 	_git := &dockercompose.Git{}
 	_git.Url = d.GitUrl
+
+	// 创建根文档目录
+	if _, err := os.Stat(goconfig.ReadPath("scs.path")); err == os.ErrNotExist {
+		e := os.MkdirAll(goconfig.ReadPath("scs.path"), 0755)
+		if e != nil {
+			return nil, e
+		}
+	}
+
 	_git.Path = filepath.Join(goconfig.ReadPath("scs.path"), d.Name)
 
 	if d.KID > 0 {
@@ -111,15 +121,7 @@ func (d *Doc) NewGit() (*dockercompose.Git, error) {
 }
 
 func (d *Doc) Insert(uid int64) (err error) {
-	// ID      int    `json:"id,omitempty"`
-	// Name    string `json:"name,omitempty"`
-	// Uid     int64  `json:"uid,omitempty"`
-	// Created int64  `json:"created,omitempty"`
-	// GitUrl  string `json:"giturl"` // git 的地址
-	// UpTime  int64  `json:"uptime"`
-	// Dir     string `json:"dir"` // docfiy 文档目录
-	// Port    int    `json:"_"`
-	// Kid     int64  `json:"kid"`
+
 	base := goconfig.ReadPath("scs.path")
 	tmp := filepath.Clean(filepath.Join(base, d.Dir))
 	golog.Info(tmp[:len(base)])

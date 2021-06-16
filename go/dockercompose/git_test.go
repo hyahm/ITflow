@@ -53,7 +53,6 @@ func TestGit(t *testing.T) {
 	-----END OPENSSH PRIVATE KEY-----
 	
 	`
-	golog.Info([]byte("b3B"))
 
 	temp := []byte(pri)
 	golog.Info(temp)
