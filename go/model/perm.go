@@ -6,7 +6,6 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/hyahm/golog"
-	"github.com/hyahm/gomysql"
 )
 
 // `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -43,7 +42,7 @@ func (perm *Perm) Update(ids string) error {
 	db.Mconn.OpenDebug()
 	_, err = db.Mconn.UpdateIn("update perm set find=?, remove=?,revise=?, increase=? where rid=? and id in (?)",
 		perm.Find, perm.Remove, perm.Revise, perm.Increase, perm.Rid,
-		(gomysql.InArgs)(strings.Split(ids, ",")).ToInArgs())
+		strings.Split(ids, ","))
 	golog.Info(db.Mconn.GetSql())
 	return err
 }

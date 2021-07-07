@@ -154,7 +154,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func IsAdmin(w http.ResponseWriter, r *http.Request) {
-	if xmux.GetData(r).Get("uid").(int64) == cache.SUPERID {
+	if xmux.GetInstance(r).Get("uid").(int64) == cache.SUPERID {
 		w.Write([]byte(`{"code": 0 , "admin": true}`))
 	} else {
 		w.Write([]byte(`{"code": 0 , "admin": false}`))
@@ -162,7 +162,7 @@ func IsAdmin(w http.ResponseWriter, r *http.Request) {
 }
 
 // func GetEmail(w http.ResponseWriter, r *http.Request) {
-// 	if xmux.GetData(r).Get("uid").(int64) == cache.SUPERID {
+// 	if xmux.GetInstance(r).Get("uid").(int64) == cache.SUPERID {
 // 		w.Write([]byte("1"))
 // 	} else {
 // 		w.Write([]byte("0"))
@@ -172,7 +172,7 @@ func IsAdmin(w http.ResponseWriter, r *http.Request) {
 
 func UpdateEmail(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
-	id := xmux.GetData(r).Get("uid")
+	id := xmux.GetInstance(r).Get("uid")
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.Write(errorcode.ErrorE(err))
@@ -190,7 +190,7 @@ func UpdateEmail(w http.ResponseWriter, r *http.Request) {
 func GetProjectUser(w http.ResponseWriter, r *http.Request) {
 	// 通过project 来获取所属用户
 	projectname := r.FormValue("name")
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	// 先要判断下， 这个用户是否有这个项目的权限
 	w.Write(project.GetUsersByProjectName(uid, projectname))
 	return
@@ -306,7 +306,7 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 	url.FileName = filename
 	url.Uploaded = 1
 	uploadimg := "update user set headimg = ? where id=?"
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	golog.Info(uid)
 	_, err = db.Mconn.Update(uploadimg, url.Url, uid)
 	if err != nil {

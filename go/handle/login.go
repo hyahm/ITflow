@@ -20,7 +20,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 	atomic.AddInt32(&loginSign, 1)
 	defer atomic.AddInt32(&loginSign, -1)
-	login := xmux.GetData(r).Data.(*user.Login)
+	login := xmux.GetInstance(r).Data.(*user.Login)
 	ipAddr := r.RemoteAddr
 
 	ip := r.Header.Get("X-Forwarded-For")
@@ -51,8 +51,8 @@ func LoginOut(w http.ResponseWriter, r *http.Request) {
 func UserInfo(w http.ResponseWriter, r *http.Request) {
 
 	userinfo := &user.UserInfo{}
-	userinfo.NickName = xmux.GetData(r).Get("nickname").(string)
-	uid := xmux.GetData(r).Get("uid").(int64)
+	userinfo.NickName = xmux.GetInstance(r).Get("nickname").(string)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	err := userinfo.GetUserInfo(uid)
 	if err != nil {
 		golog.Error(err)

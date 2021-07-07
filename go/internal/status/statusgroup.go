@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/hyahm/golog"
-	"github.com/hyahm/gomysql"
 )
 
 type StatusGroup struct {
@@ -16,7 +15,7 @@ type StatusGroup struct {
 
 func (status *StatusGroup) GetIds() (string, error) {
 	rows, err := db.Mconn.GetRowsIn("select id from status where name in (?)",
-		(gomysql.InArgs)(status.StatusList).ToInArgs())
+		status.StatusList)
 
 	if err != nil {
 		golog.Error(err)

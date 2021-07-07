@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/hyahm/golog"
-	"github.com/hyahm/gomysql"
 )
 
 type OptionPerm struct {
@@ -63,7 +62,7 @@ func perm(uid int64, rid int64) (op OptionPerm, err error) {
 		return
 	}
 	err = db.Mconn.GetOneIn("select  find, remove, revise, increase from perm where id in (?) and rid=?",
-		gomysql.InArgs(strings.Split(permids, ",")).ToInArgs(), rid).Scan(
+		strings.Split(permids, ","), rid).Scan(
 		&op.Select, &op.Delete, &op.Update, &op.Insert,
 	)
 	if err != nil {

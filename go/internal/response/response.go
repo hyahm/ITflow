@@ -38,7 +38,7 @@ func (es *Response) ErrorE(err error) []byte {
 	return send
 }
 
-func (es *Response) GetDataErr() []byte {
+func (es *Response) GetInstanceErr() []byte {
 	es.Msg = "获取请求数据失败"
 	es.Code = 1
 	send, _ := json.Marshal(es)

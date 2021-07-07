@@ -20,6 +20,5 @@ func TestMail(host, username string, password string, port int, touser, nickname
 	m.SetHeader("Subject", "验证您的邮箱是否能收到邮件")
 	m.SetBody("text/html", "恭喜， 您的邮箱可以使用")
 	// m.Attach("/home/Alex/lolcat.jpg")
-
 	return d.DialAndSend(m)
 }

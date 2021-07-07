@@ -14,16 +14,15 @@ import (
 	"time"
 
 	"github.com/hyahm/golog"
-	"github.com/hyahm/gomysql"
 	"github.com/hyahm/xmux"
 )
 
 func PassBug(w http.ResponseWriter, r *http.Request) {
 
-	ub := xmux.GetData(r).Data.(*bug.PassBug)
-	// nickname := xmux.GetData(r).Get("nickname").(string)
-	uid := xmux.GetData(r).Get("uid").(int64)
-	nickname := xmux.GetData(r).Get("nickname").(string)
+	ub := xmux.GetInstance(r).Data.(*bug.PassBug)
+	// nickname := xmux.GetInstance(r).Get("nickname").(string)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
+	nickname := xmux.GetInstance(r).Get("nickname").(string)
 	// // 获取参数
 	errorcode := &response.Response{}
 	// 判断用户是否能处理这个project
@@ -44,7 +43,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 
 	// 获取用户id
 	rows, err := db.Mconn.GetRowsIn("select id from user where realname in (?)",
-		gomysql.InArgs(ub.SelectUsers).ToInArgs())
+		ub.SelectUsers)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -134,7 +133,7 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	idrows, err := db.Mconn.GetRowsIn("select email from user where id in (?)", gomysql.InArgs(ids).ToInArgs())
+	idrows, err := db.Mconn.GetRowsIn("select email from user where id in (?)", ids)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -171,7 +170,7 @@ func TaskList(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	al := &model.AllArticleList{}
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 
 	getaritclesql := `select id,createtime,importent,s.name,title,u.realname,l.name,p.name,spusers from bugs as b 
 	join user as u 

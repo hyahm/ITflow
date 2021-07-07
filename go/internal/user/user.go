@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/hyahm/golog"
-	"github.com/hyahm/gomysql"
 )
 
 // 用户登录
@@ -106,7 +105,7 @@ func (ui *UserInfo) GetUserInfo(uid int64) error {
 		return err
 	}
 	rows, err := db.Mconn.GetRowsIn("select r.name from perm as p join roles as r on p.id in (?) and p.find=true and p.rid=r.id",
-		gomysql.InArgs(strings.Split(permids, ",")).ToInArgs())
+		strings.Split(permids, ","))
 
 	if err != nil {
 		golog.Error(err)

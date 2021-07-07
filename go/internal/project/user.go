@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/hyahm/golog"
-	"github.com/hyahm/gomysql"
 )
 
 // 通过project 获取用户
@@ -24,7 +23,7 @@ func GetUsersByProjectName(userid int64, name string) []byte {
 		return resp.ErrorE(err)
 	}
 	namessql := "select realname from user where id in (?)"
-	rows, err := db.Mconn.GetRowsIn(namessql, (gomysql.InArgs)(strings.Split(ids, ",")).ToInArgs())
+	rows, err := db.Mconn.GetRowsIn(namessql, strings.Split(ids, ","))
 	if err != nil {
 		golog.Error(err)
 		return resp.ErrorE(err)

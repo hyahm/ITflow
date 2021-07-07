@@ -20,11 +20,11 @@ import (
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	// nickname := xmux.GetData(r).Get("nickname").(string)
-	uid := xmux.GetData(r).Get("uid").(int64)
+	// nickname := xmux.GetInstance(r).Get("nickname").(string)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 
 	createTime := time.Now().Unix()
-	getuser := xmux.GetData(r).Data.(*user.GetAddUser)
+	getuser := xmux.GetInstance(r).Data.(*user.GetAddUser)
 	if strings.Contains(getuser.Nickname, "@") {
 		w.Write(errorcode.Error("昵称不能包含@符号"))
 		return
@@ -213,7 +213,7 @@ func DisableUser(w http.ResponseWriter, r *http.Request) {
 
 // 显示自己能管理的权限，不显示自己的
 func UserList(w http.ResponseWriter, r *http.Request) {
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	errorcode := &response.Response{}
 	uls := &user.UserList{}
 	if uid == cache.SUPERID {
@@ -272,13 +272,13 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 func UserUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	if cache.SUPERID != uid {
 		w.Write(errorcode.ErrorNoPermission())
 		return
 	}
 
-	uls := xmux.GetData(r).Data.(*user.User)
+	uls := xmux.GetInstance(r).Data.(*user.User)
 
 	// 0是系统管理员， 1是管理层， 2是普通用户
 	//switch level {
@@ -337,9 +337,9 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
-	getuser := xmux.GetData(r).Data.(*user.ChangePasswod)
+	getuser := xmux.GetInstance(r).Data.(*user.ChangePasswod)
 
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 
 	getaritclesql := "select count(id) from user where id=? and password=?"
 	oldpassword := encrypt.PwdEncrypt(getuser.Oldpassword, cache.Salt)
@@ -447,7 +447,7 @@ func ResetPwd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	rp := xmux.GetData(r).Data.(*user.ResetPassword)
+	rp := xmux.GetInstance(r).Data.(*user.ResetPassword)
 
 	newpassword := encrypt.PwdEncrypt(rp.Password, cache.Salt)
 

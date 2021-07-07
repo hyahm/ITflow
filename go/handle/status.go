@@ -20,7 +20,7 @@ import (
 
 func StatusList(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Select {
 		w.Write(errorcode.Error("no perm"))
 		return
@@ -33,13 +33,13 @@ func StatusList(w http.ResponseWriter, r *http.Request) {
 func StatusAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Insert {
 		w.Write(errorcode.Error("no perm"))
 		return
 	}
 	var err error
-	s := xmux.GetData(r).Data.(*bug.ReqStatus)
+	s := xmux.GetInstance(r).Data.(*bug.ReqStatus)
 	errorcode.Id, err = db.Mconn.Insert("insert into status(name) values(?)", s.Name)
 	if err != nil {
 		golog.Error(err)
@@ -60,7 +60,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 func StatusRemove(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Delete {
 		w.Write(errorcode.Error("no perm"))
 		return
@@ -127,12 +127,12 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Update {
 		w.Write(errorcode.Error("no perm"))
 		return
 	}
-	s := xmux.GetData(r).Data.(*bug.ReqStatus)
+	s := xmux.GetInstance(r).Data.(*bug.ReqStatus)
 	_, err := db.Mconn.Update("update status set name=? where id=?", s.Name, s.Id)
 	if err != nil {
 		golog.Error(err)

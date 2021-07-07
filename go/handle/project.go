@@ -12,9 +12,9 @@ import (
 )
 
 func ProjectList(w http.ResponseWriter, r *http.Request) {
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Select {
 		w.Write(errorcode.Error("no perm"))
 		return
@@ -26,10 +26,10 @@ func ProjectList(w http.ResponseWriter, r *http.Request) {
 
 func AddProject(w http.ResponseWriter, r *http.Request) {
 
-	data := xmux.GetData(r).Data.(*project.ReqProject)
-	uid := xmux.GetData(r).Get("uid").(int64)
+	data := xmux.GetInstance(r).Data.(*project.ReqProject)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Insert {
 		w.Write(errorcode.Error("no perm"))
 		return
@@ -44,10 +44,10 @@ func AddProject(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateProject(w http.ResponseWriter, r *http.Request) {
-	data := xmux.GetData(r).Data.(*project.ReqProject)
-	uid := xmux.GetData(r).Get("uid").(int64)
+	data := xmux.GetInstance(r).Data.(*project.ReqProject)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Update {
 		w.Write(errorcode.Error("no perm"))
 		return
@@ -67,7 +67,7 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 func DeleteProject(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Delete {
 		w.Write(errorcode.Error("no perm"))
 		return

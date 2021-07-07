@@ -1,16 +1,14 @@
 module itflow
 
-go 1.12
+go 1.15
 
 require (
-	github.com/fatih/color v1.10.0 // indirect
-	github.com/go-sql-driver/mysql v1.5.0
+	github.com/go-sql-driver/mysql v1.6.0
 	github.com/hyahm/cachetable v0.0.0-20200707100838-5dd5455ce3d5
-	github.com/hyahm/goconfig v0.0.0-20200814144712-bd712352a305
-	github.com/hyahm/golog v0.0.0-20210205023406-67778c69934a
-	github.com/hyahm/gomysql v0.0.0-20210201074602-081fe378c151
-	github.com/hyahm/xmux v0.0.0-20210226072608-d532aec75929
-	golang.org/x/sys v0.0.0-20210225134936-a50acf3fe073 // indirect
+	github.com/hyahm/goconfig v0.0.0-20210404042807-4f5600f37d4c
+	github.com/hyahm/golog v0.0.0-20210615084653-1c6a867c6b8b
+	github.com/hyahm/gomysql v0.0.0-20210707024426-5b0ed75170ac
+	github.com/hyahm/xmux v0.0.0-20210623095717-498e6790084e
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )

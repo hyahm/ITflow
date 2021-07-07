@@ -11,15 +11,14 @@ import (
 	"sync"
 
 	"github.com/hyahm/golog"
-	"github.com/hyahm/gomysql"
 	"github.com/hyahm/xmux"
 )
 
 func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	uidStr := strconv.FormatInt(uid, 10)
-	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
+	mybug := xmux.GetInstance(r).Data.(*search.ReqMyBugFilter)
 	al := &model.AllArticleList{
 		Al:   make([]*model.ArticleList, 0),
 		Page: 1,
@@ -59,8 +58,8 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 	golog.Info(myproject)
 	conditionsql, args := mybug.GetUsefulCondition(uid)
 	countArgs := make([]interface{}, 0)
-	countArgs = append(countArgs, (gomysql.InArgs)(statuslist).ToInArgs())
-	countArgs = append(countArgs, (gomysql.InArgs)(myproject).ToInArgs())
+	countArgs = append(countArgs, statuslist)
+	countArgs = append(countArgs, myproject)
 	countArgs = append(countArgs, args...)
 	countsql := "select count(id) from bugs where dustbin=false and sid in (?) and pid in (?)"
 	db.Mconn.OpenDebug()
@@ -77,8 +76,8 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 	page, start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
 	al.Page = page
 	searchArgs := make([]interface{}, 0)
-	searchArgs = append(searchArgs, (gomysql.InArgs)(statuslist).ToInArgs())
-	searchArgs = append(searchArgs, (gomysql.InArgs)(myproject).ToInArgs())
+	searchArgs = append(searchArgs, statuslist)
+	searchArgs = append(searchArgs, myproject)
 	searchArgs = append(searchArgs, args...)
 	searchArgs = append(searchArgs, start, end)
 	// searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs join  on dustbin=true and uid=? "
@@ -111,7 +110,7 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 		realnames, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
-			(gomysql.InArgs)(strings.Split(ids, ",")).ToInArgs())
+			strings.Split(ids, ","))
 		if err != nil {
 			golog.Error(err)
 			w.Write(al.ErrorE(err))
@@ -137,8 +136,8 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 
 func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 
-	uid := xmux.GetData(r).Get("uid").(int64)
-	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
+	mybug := xmux.GetInstance(r).Data.(*search.ReqMyBugFilter)
 	al := &model.AllArticleList{
 		Al:   make([]*model.ArticleList, 0),
 		Page: 1,
@@ -152,7 +151,7 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 
 	conditionsql, args := mybug.GetUsefulCondition(uid)
 	countArgs := make([]interface{}, 0)
-	countArgs = append(countArgs, uid, (gomysql.InArgs)(statislist).ToInArgs())
+	countArgs = append(countArgs, uid, statislist)
 	countArgs = append(countArgs, args...)
 	countsql := "select count(id) from bugs where dustbin=false and uid=? and sid in (?)"
 	err = db.Mconn.GetOneIn(countsql+conditionsql, countArgs...).Scan(&al.Count)
@@ -165,7 +164,7 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 	page, start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
 	al.Page = page
 	searchArgs := make([]interface{}, 0)
-	searchArgs = append(searchArgs, uid, (gomysql.InArgs)(statislist).ToInArgs())
+	searchArgs = append(searchArgs, uid, statislist)
 	searchArgs = append(searchArgs, args...)
 	searchArgs = append(searchArgs, start, end)
 	// searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs join  on dustbin=true and uid=? "
@@ -199,7 +198,7 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 		realnames, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
-			(gomysql.InArgs)(strings.Split(ids, ",")).ToInArgs())
+			strings.Split(ids, ","))
 		if err != nil {
 			golog.Error(err)
 			w.Write(al.ErrorE(err))
@@ -225,9 +224,9 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 
 func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 	// 查询任务者中是否有自己
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	strUid := strconv.FormatInt(uid, 10)
-	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
+	mybug := xmux.GetInstance(r).Data.(*search.ReqMyBugFilter)
 	al := &model.AllArticleList{
 		Al: make([]*model.ArticleList, 0),
 	}
@@ -240,7 +239,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 	golog.Info(statislist)
 	conditionsql, args := mybug.GetUsefulCondition(uid)
 	countArgs := make([]interface{}, 0)
-	countArgs = append(countArgs, (gomysql.InArgs)(statislist).ToInArgs())
+	countArgs = append(countArgs, statislist)
 	countArgs = append(countArgs, args...)
 
 	countsql := "select id,spusers from bugs where dustbin=false and sid in (?) order by id desc"
@@ -287,7 +286,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 	join user as u
 	 on b.uid=u.id and  dustbin=false and  b.id in (?)  order by id desc`
 	rows, err := db.Mconn.GetRowsIn(searchsql,
-		(gomysql.InArgs)(myTaskId[start:start+end]).ToInArgs())
+		myTaskId[start:start+end])
 
 	if err != nil {
 		golog.Error(err)
@@ -311,7 +310,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 		wg.Add(1)
 		go func() {
 			realnames, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
-				(gomysql.InArgs)(strings.Split(ids, ",")).ToInArgs())
+				strings.Split(ids, ","))
 			if err != nil {
 				golog.Error(err)
 				w.Write(al.ErrorE(err))
@@ -341,8 +340,8 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 
 func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 
-	uid := xmux.GetData(r).Get("uid").(int64)
-	mybug := xmux.GetData(r).Data.(*search.ReqMyBugFilter)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
+	mybug := xmux.GetInstance(r).Data.(*search.ReqMyBugFilter)
 	al := &model.AllArticleList{
 		Al: make([]*model.ArticleList, 0),
 	}
@@ -354,7 +353,7 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 	}
 
 	conditionsql, args := mybug.GetUsefulCondition(uid)
-	args = append(args, (gomysql.InArgs)(statislist).ToInArgs())
+	args = append(args, statislist)
 	countsql := "select count(id) from bugs where dustbin=true and sid in (?)"
 	err = db.Mconn.GetOneIn(countsql+conditionsql, args...).Scan(&al.Count)
 	if err != nil {
@@ -396,7 +395,7 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 		realnames, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
-			(gomysql.InArgs)(strings.Split(ids, ",")).ToInArgs())
+			strings.Split(ids, ","))
 		if err != nil {
 			golog.Error(err)
 			w.Write(al.ErrorE(err))
@@ -465,7 +464,7 @@ func managertotal(basesql string, params *bug.BugManager) (string, []interface{}
 func getbuglist(r *http.Request, countbasesql string, bugsql string, mytask bool) (*model.AllArticleList, []byte) {
 
 	// 	errorcode := &response.Response{}
-	// 	nickname := xmux.GetData(r).Get("nickname").(string)
+	// 	nickname := xmux.GetInstance(r).Get("nickname").(string)
 	// 	searchparam := &bug.SearchParam{} // 接收的参数
 	// 	searchq, err := ioutil.ReadAll(r.Body)
 	// 	if err != nil {

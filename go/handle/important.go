@@ -19,7 +19,7 @@ func ImportantGet(w http.ResponseWriter, r *http.Request) {
 	data := &model.ResposeImportant{
 		ImportantList: make([]*model.Important, 0),
 	}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Select {
 		w.Write(data.Error("no perm"))
 		return
@@ -48,12 +48,12 @@ func ImportantGet(w http.ResponseWriter, r *http.Request) {
 func ImportantAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Insert {
 		w.Write(errorcode.Error("no perm"))
 		return
 	}
-	data := xmux.GetData(r).Data.(*model.Important)
+	data := xmux.GetInstance(r).Data.(*model.Important)
 
 	var err error
 	errorcode.Id, err = db.Mconn.Insert("insert into importants(name) value(?)", data.Name)
@@ -79,7 +79,7 @@ func ImportantAdd(w http.ResponseWriter, r *http.Request) {
 func ImportantDel(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Delete {
 		w.Write(errorcode.Error("no perm"))
 		return
@@ -131,12 +131,12 @@ func ImportantDel(w http.ResponseWriter, r *http.Request) {
 func ImportantUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetData(r).Get("perm").(perm.OptionPerm)
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
 	if !perm.Update {
 		w.Write(errorcode.Error("no perm"))
 		return
 	}
-	data := xmux.GetData(r).Data.(*model.Important)
+	data := xmux.GetInstance(r).Data.(*model.Important)
 	gsql := "update importants set name=? where id=?"
 
 	_, err := db.Mconn.Update(gsql, data.Name, data.Id)

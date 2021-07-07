@@ -13,7 +13,7 @@ import (
 // 专门赋予管理层的用户权限
 func UserPerm(w http.ResponseWriter, r *http.Request) bool {
 	errorcode := &response.Response{}
-	uid := xmux.GetData(r).Get("uid").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	if uid == cache.SUPERID {
 		return false
 	}

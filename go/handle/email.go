@@ -19,7 +19,7 @@ func TestEmail(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	getemail := xmux.GetData(r).Data.(*email.Email)
+	getemail := xmux.GetInstance(r).Data.(*email.Email)
 	if getemail.Nickname == "" {
 		getemail.Nickname = strings.Split(getemail.EmailAddr, "@")[0]
 	}
@@ -39,7 +39,7 @@ func SaveEmail(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	getemail := xmux.GetData(r).Data.(*email.Email)
+	getemail := xmux.GetInstance(r).Data.(*email.Email)
 
 	if getemail.Id < 1 {
 		var err error
@@ -75,7 +75,7 @@ func SaveEmail(w http.ResponseWriter, r *http.Request) {
 func GetEmail(w http.ResponseWriter, r *http.Request) {
 	// errorcode := &response.Response{}
 
-	// id := xmux.GetData(r).Get("uid")
+	// id := xmux.GetInstance(r).Get("uid")
 	// email := &cache.Email{}
 	// var email, password, host string
 	// // email = cache.CacheEmail
@@ -99,7 +99,7 @@ func GetEmail(w http.ResponseWriter, r *http.Request) {
 func MyEmail(w http.ResponseWriter, r *http.Request) {
 	// errorcode := &response.Response{}
 
-	id := xmux.GetData(r).Get("uid")
+	id := xmux.GetInstance(r).Get("uid")
 	// email := &cache.Email{}
 	// var email, password, host string
 	// // email = cache.CacheEmail
