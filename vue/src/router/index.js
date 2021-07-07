@@ -12,6 +12,7 @@ import system from "./modules/system";
 import setting from "./modules/setting";
 import userRoute from "./modules/user";
 import bugRouter from "./modules/bug";
+import docRouter from "./modules/doc";
 
 /** note: submenu only apppear when children.length>=1
  *  detail see  https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
@@ -31,39 +32,39 @@ import bugRouter from "./modules/bug";
     noCache: true                if true ,the page will no be cached(default is false)
   }
 **/
-export const constantRouterMap = [
-  {
-    path: "/login",
-    component: () => import("@/views/login/index"),
-    hidden: true
-  },
-  {
-    path: "",
-    component: Layout,
-    redirect: "dashboard",
-    children: [
-      {
-        path: "dashboard",
-        component: () => import("@/views/dashboard/index"),
-        name: "dashboard",
-        meta: { title: "面板", icon: "dashboard", noCache: true }
-      }
-    ]
-  }
+export const constantRouterMap = [{
+        path: "/login",
+        component: () =>
+            import ("@/views/login/index"),
+        hidden: true
+    },
+    {
+        path: "",
+        component: Layout,
+        redirect: "dashboard",
+        children: [{
+            path: "dashboard",
+            component: () =>
+                import ("@/views/dashboard/index"),
+            name: "dashboard",
+            meta: { title: "面板", icon: "dashboard", noCache: true }
+        }]
+    }
 ];
 
 export default new Router({
-  mode: "history", // require service support
-  scrollBehavior: () => ({ y: 0 }),
-  routes: constantRouterMap
+    mode: "history", // require service support
+    scrollBehavior: () => ({ y: 0 }),
+    routes: constantRouterMap
 });
 
 export const asyncRouterMap = [
-  /** When your routing table is too long, you can split it into small modules**/
-  componentsRouter,
-  system,
-  userRoute,
-  bugRouter,
-  setting,
-  { path: "*", redirect: "/404", hidden: true }
+    /** When your routing table is too long, you can split it into small modules**/
+    componentsRouter,
+    system,
+    userRoute,
+    bugRouter,
+    docRouter,
+    setting,
+    { path: "*", redirect: "/404", hidden: true }
 ];

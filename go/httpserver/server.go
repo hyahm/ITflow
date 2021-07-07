@@ -31,6 +31,8 @@ func RunHttp() {
 		router.MiddleWare(GetExecTime)
 	}
 	router.AddGroup(routegroup.User) // 已完成
+	router.AddGroup(routegroup.Doc)
+	router.AddGroup(routegroup.Key)
 	router.AddGroup(routegroup.Bug)
 	router.AddGroup(routegroup.Search)
 	router.AddGroup(routegroup.DashBoard)   // 后续
