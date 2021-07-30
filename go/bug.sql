@@ -19,64 +19,64 @@
 -- Table structure for table `apilist`
 --
 
-DROP TABLE IF EXISTS `apilist`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `apilist` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) DEFAULT NULL,
-  `pid` bigint(20) DEFAULT NULL,
-  `url` varchar(200) DEFAULT NULL,
-  `information` varchar(255) DEFAULT NULL,
-  `opts` varchar(100) DEFAULT NULL,
-  `methods` varchar(100) DEFAULT NULL,
-  `resp` text,
-  `result` text,
-  `uid` bigint(20) DEFAULT NULL,
-  `hid` bigint(20) DEFAULT NULL,
-  `calltype` varchar(20) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+-- DROP TABLE IF EXISTS `apilist`;
+-- /*!40101 SET @saved_cs_client     = @@character_set_client */;
+-- /*!40101 SET character_set_client = utf8 */;
+-- CREATE TABLE `apilist` (
+--   `id` bigint(20) NOT NULL AUTO_INCREMENT,
+--   `name` varchar(100) DEFAULT NULL,
+--   `pid` bigint(20) DEFAULT NULL,
+--   `url` varchar(200) DEFAULT NULL,
+--   `information` varchar(255) DEFAULT NULL,
+--   `opts` varchar(100) DEFAULT NULL,
+--   `methods` varchar(100) DEFAULT NULL,
+--   `resp` text,
+--   `result` text,
+--   `uid` bigint(20) DEFAULT NULL,
+--   `hid` bigint(20) DEFAULT NULL,
+--   `calltype` varchar(20) DEFAULT NULL,
+--   PRIMARY KEY (`id`)
+-- ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+-- /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `apilist`
 --
 
-LOCK TABLES `apilist` WRITE;
-/*!40000 ALTER TABLE `apilist` DISABLE KEYS */;
-/*!40000 ALTER TABLE `apilist` ENABLE KEYS */;
-UNLOCK TABLES;
+-- LOCK TABLES `apilist` WRITE;
+-- /*!40000 ALTER TABLE `apilist` DISABLE KEYS */;
+-- /*!40000 ALTER TABLE `apilist` ENABLE KEYS */;
+-- UNLOCK TABLES;
 
 --
 -- Table structure for table `apiproject`
---
+-- --
 
-DROP TABLE IF EXISTS `apiproject`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `apiproject` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) NOT NULL DEFAULT '',
-  `ownerid` varchar(100) DEFAULT '0',
-  `auth` tinyint(1) DEFAULT '0',
-  `readuser` tinyint(1) DEFAULT '0',
-  `edituser` tinyint(1) DEFAULT '0',
-  `rid` tinyint(1) DEFAULT '0',
-  `eid` tinyint(1) DEFAULT '0',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+-- DROP TABLE IF EXISTS `apiproject`;
+-- /*!40101 SET @saved_cs_client     = @@character_set_client */;
+-- /*!40101 SET character_set_client = utf8 */;
+-- CREATE TABLE `apiproject` (
+--   `id` bigint(20) NOT NULL AUTO_INCREMENT,
+--   `name` varchar(50) NOT NULL DEFAULT '',
+--   `ownerid` varchar(100) DEFAULT '0',
+--   `auth` tinyint(1) DEFAULT '0',
+--   `readuser` tinyint(1) DEFAULT '0',
+--   `edituser` tinyint(1) DEFAULT '0',
+--   `rid` tinyint(1) DEFAULT '0',
+--   `eid` tinyint(1) DEFAULT '0',
+--   PRIMARY KEY (`id`),
+--   UNIQUE KEY `name` (`name`)
+-- ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
+-- /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `apiproject`
---
+-- --
+-- -- Dumping data for table `apiproject`
+-- --
 
-LOCK TABLES `apiproject` WRITE;
-/*!40000 ALTER TABLE `apiproject` DISABLE KEYS */;
-/*!40000 ALTER TABLE `apiproject` ENABLE KEYS */;
-UNLOCK TABLES;
+-- LOCK TABLES `apiproject` WRITE;
+-- /*!40000 ALTER TABLE `apiproject` DISABLE KEYS */;
+-- /*!40000 ALTER TABLE `apiproject` ENABLE KEYS */;
+-- UNLOCK TABLES;
 
 --
 -- Table structure for table `bugs`

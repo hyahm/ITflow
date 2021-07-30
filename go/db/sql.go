@@ -1,6 +1,7 @@
 package db
 
 import (
+	_ "embed"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -11,10 +12,10 @@ import (
 
 var Mconn *gomysql.Db
 
-func InitMysql() {
+func InitMysql(bugsql string) {
 	var err error
 	conf := &gomysql.Sqlconfig{
-		DbName:          goconfig.ReadString("mysql.db", "project"),
+		// DbName:          goconfig.ReadString("mysql.db", "itflow"),
 		Host:            goconfig.ReadString("mysql.host", "127.0.0.1"),
 		UserName:        goconfig.ReadString("mysql.user", "root"),
 		Password:        goconfig.ReadPassword("mysql.pwd", "123456"),
@@ -22,13 +23,25 @@ func InitMysql() {
 		Timeout:         time.Second * 5,
 		ReadTimeout:     time.Second * 30,
 		ConnMaxLifetime: time.Hour * 4,
-		MaxOpenConns:    10,
-		MaxIdleConns:    1,
+		MaxOpenConns:    5,
+		MaxIdleConns:    5,
+		MultiStatements: true,
 	}
-	Mconn, err = conf.NewDb()
+	conn, err := conf.NewDb()
 	if err != nil {
 		golog.Error(err)
 		panic(err)
 	}
 
+	Mconn, err = conn.Use(goconfig.ReadString("mysql.db", "itflow"))
+	if err != nil {
+		golog.Error(err)
+		panic(err)
+	}
+
+	_, err = Mconn.Query(bugsql)
+	if err != nil {
+		golog.Error(err)
+		panic(err)
+	}
 }

@@ -1,16 +1,16 @@
 module itflow
 
-go 1.15
+go 1.16
 
 require (
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/hyahm/cachetable v0.0.0-20200707100838-5dd5455ce3d5
-	github.com/hyahm/goconfig v0.0.0-20210404042807-4f5600f37d4c
-	github.com/hyahm/golog v0.0.0-20210615084653-1c6a867c6b8b
-	github.com/hyahm/gomysql v0.0.0-20210707024426-5b0ed75170ac
+	github.com/hyahm/goconfig v0.0.0-20210714082540-63f967230e2e
+	github.com/hyahm/golog v0.0.0-20210715081103-90f924ac73e6
+	github.com/hyahm/gomysql v0.0.0-20210721012504-8bf338b57f38
 	github.com/hyahm/scs v0.0.0-20210614143818-a9a4534bfccf
-	github.com/hyahm/xmux v0.0.0-20210623095717-498e6790084e
-	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e
+	github.com/hyahm/xmux v0.0.0-20210729041417-c826c12d5bfe
+	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )
