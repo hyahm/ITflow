@@ -37,21 +37,11 @@
 git clone https://github.com/hyahm/ITflow.git
 cd ITflow
 ```
-###### 后端(安装最新版的go， 并将其目录下的bin目录添加进环境变量, 保证有go命令),  有安装好mysql数据库   
+###### 后端(安装最新版的go >= 1.16.0， 并将其目录下的bin目录添加进环境变量, 保证有go命令),  有安装好mysql数据库   
 ```shell
 cd go
+```
 
-```
-> 创建一个库  
-
-```
-mysql> create database bug;
-```
-> 导入表  
-
-```
-mysql bug < bug.sql
-```
 > 设置代理
 ```
 export GOPROXY=https://goproxy.cn   // 国内的机器需要执行代理， 国外的机器不需要
@@ -64,6 +54,15 @@ go run cmd/makeconfig/config.go   # 自动生成默认配置文件到本目录  
 showbaseurl = http://127.0.0.1:10001/showimg/    #  127.0.0.1 换成外网的IP地址
 salt = hjkkakoweqzmbvc   # 修改salt值后   服务启动后用 curl http://127.0.0.1:10001/admin/reset?password=123 修改admin 密码
 cross=*   # 设置跨域的域名   eg:  http://127.0.0.1
+
+# mysql 配置必须正确， 会自动创建表
+[mysql]
+user = root
+pwd = "123456"
+host = 127.0.0.1
+port = 3306
+db = itflow
+
 ```  
 > 启动后端服务  
 
