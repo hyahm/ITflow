@@ -39,9 +39,5 @@ func InitMysql(bugsql string) {
 		panic(err)
 	}
 
-	_, err = Mconn.Query(bugsql)
-	if err != nil {
-		golog.Error(err)
-		panic(err)
-	}
+	Mconn.Query(bugsql)
 }
