@@ -41,7 +41,7 @@
         <el-form-item style="margin-bottom: 40px;" prop="title" label="密码:">
           <el-input
             v-model="postForm.password"
-            autocomplete="off"
+            autocomplete="new-password"
             :maxlength="100"
             placeholder="请输入密码"
             type="password"
@@ -53,6 +53,7 @@
         <el-form-item style="margin-bottom: 40px;" prop="title" label="确认:">
           <el-input
             v-model="postForm.repassword"
+            auto-complete="off"
             :maxlength="100"
             placeholder="请输入密码"
             type="password"
