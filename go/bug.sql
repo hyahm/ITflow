@@ -19,7 +19,6 @@
 -- Table structure for table `apilist`
 --
 
--- DROP TABLE IF EXISTS `apilist`;
 -- /*!40101 SET @saved_cs_client     = @@character_set_client */;
 -- /*!40101 SET character_set_client = utf8 */;
 -- CREATE TABLE `apilist` (
@@ -52,7 +51,6 @@
 -- Table structure for table `apiproject`
 -- --
 
--- DROP TABLE IF EXISTS `apiproject`;
 -- /*!40101 SET @saved_cs_client     = @@character_set_client */;
 -- /*!40101 SET character_set_client = utf8 */;
 -- CREATE TABLE `apiproject` (
@@ -82,7 +80,6 @@
 -- Table structure for table `bugs`
 --
 
-DROP TABLE IF EXISTS `bugs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `bugs` (
@@ -130,7 +127,6 @@ UNLOCK TABLES;
 -- Table structure for table `defaultvalue`
 --
 
-DROP TABLE IF EXISTS `defaultvalue`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `defaultvalue` (
@@ -153,7 +149,6 @@ UNLOCK TABLES;
 -- Table structure for table `email`
 --
 
-DROP TABLE IF EXISTS `typ`;
 --
 CREATE TABLE `typ` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -168,7 +163,6 @@ insert into typ(name) values('bug'), ('需求');
 /*!40000 ALTER TABLE `typ` ENABLE KEYS */;
 UNLOCK TABLES;
 
-DROP TABLE IF EXISTS `email`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `email` (
@@ -197,7 +191,6 @@ UNLOCK TABLES;
 -- Table structure for table `environment`
 --
 
-DROP TABLE IF EXISTS `environment`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `environment` (
@@ -221,7 +214,6 @@ UNLOCK TABLES;
 -- Table structure for table `header`
 --
 
-DROP TABLE IF EXISTS `header`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `header` (
@@ -247,7 +239,6 @@ UNLOCK TABLES;
 -- Table structure for table `headerlist`
 --
 
-DROP TABLE IF EXISTS `headerlist`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `headerlist` (
@@ -272,7 +263,6 @@ UNLOCK TABLES;
 -- Table structure for table `importants`
 --
 
-DROP TABLE IF EXISTS `importants`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `importants` (
@@ -296,7 +286,6 @@ UNLOCK TABLES;
 -- Table structure for table `informations`
 --
 
-DROP TABLE IF EXISTS `informations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `informations` (
@@ -322,7 +311,6 @@ UNLOCK TABLES;
 -- Table structure for table `jobs`
 --
 
-DROP TABLE IF EXISTS `jobs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `jobs` (
@@ -352,7 +340,6 @@ UNLOCK TABLES;
 -- Table structure for table `level`
 --
 
-DROP TABLE IF EXISTS `level`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `level` (
@@ -376,7 +363,6 @@ UNLOCK TABLES;
 -- Table structure for table `log`
 --
 
-DROP TABLE IF EXISTS `log`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `log` (
@@ -403,7 +389,6 @@ UNLOCK TABLES;
 -- Table structure for table `options`
 --
 
-DROP TABLE IF EXISTS `options`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `options` (
@@ -430,7 +415,6 @@ UNLOCK TABLES;
 -- Table structure for table `perm`
 --
 
-DROP TABLE IF EXISTS `perm`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `perm` (
@@ -457,7 +441,6 @@ UNLOCK TABLES;
 -- Table structure for table `project`
 --
 
-DROP TABLE IF EXISTS `project`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `project` (
@@ -483,7 +466,6 @@ UNLOCK TABLES;
 -- Table structure for table `restfulname`
 --
 
-DROP TABLE IF EXISTS `restfulname`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `restfulname` (
@@ -507,7 +489,6 @@ UNLOCK TABLES;
 -- Table structure for table `rolegroup`
 --
 
-DROP TABLE IF EXISTS `rolegroup`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `rolegroup` (
@@ -532,7 +513,6 @@ UNLOCK TABLES;
 -- Table structure for table `roles`
 --
 
-DROP TABLE IF EXISTS `roles`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `roles` (
@@ -558,7 +538,6 @@ UNLOCK TABLES;
 -- Table structure for table `sharefile`
 --
 
-DROP TABLE IF EXISTS `sharefile`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `sharefile` (
@@ -590,7 +569,6 @@ UNLOCK TABLES;
 -- Table structure for table `status`
 --
 
-DROP TABLE IF EXISTS `status`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `status` (
@@ -614,7 +592,6 @@ UNLOCK TABLES;
 -- Table structure for table `statusgroup`
 --
 
-DROP TABLE IF EXISTS `statusgroup`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `statusgroup` (
@@ -639,7 +616,6 @@ UNLOCK TABLES;
 -- Table structure for table `types`
 --
 
-DROP TABLE IF EXISTS `types`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `types` (
@@ -667,7 +643,6 @@ UNLOCK TABLES;
 -- Table structure for table `user`
 --
 
-DROP TABLE IF EXISTS `user`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user` (
@@ -709,7 +684,6 @@ UNLOCK TABLES;
 -- Table structure for table `usergroup`
 --
 
-DROP TABLE IF EXISTS `usergroup`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `usergroup` (
@@ -735,7 +709,6 @@ UNLOCK TABLES;
 -- Table structure for table `version`
 --
 
-DROP TABLE IF EXISTS `version`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `version` (
@@ -801,3 +774,15 @@ CREATE TABLE `doc` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=112 DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE `jobs` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) NOT NULL DEFAULT '',
+  `level` bigint(20) NOT NULL DEFAULT '2',
+  `hypo` varchar(30) NOT NULL DEFAULT '0',
+  `bugsid` int(11) NOT NULL DEFAULT '0',
+  `rid` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8

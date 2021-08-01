@@ -5,7 +5,7 @@ import (
 	"itflow/db"
 	"itflow/internal/env"
 	"itflow/internal/perm"
-	"itflow/internal/response"
+	"itflow/response"
 	"net/http"
 
 	"github.com/go-sql-driver/mysql"
@@ -57,7 +57,7 @@ func AddEnv(w http.ResponseWriter, r *http.Request) {
 
 	getaritclesql := "insert into environment(name) values(?)"
 	var err error
-	errorcode.Id, err = db.Mconn.Insert(getaritclesql, envname)
+	errorcode.ID, err = db.Mconn.Insert(getaritclesql, envname)
 	if err != nil {
 		golog.Error(err)
 		if err.(*mysql.MySQLError).Number == 1062 {

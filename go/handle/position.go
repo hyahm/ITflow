@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"itflow/cache"
 	"itflow/db"
-	"itflow/internal/response"
 	"itflow/model"
+	"itflow/response"
 	"net/http"
 
 	"github.com/go-sql-driver/mysql"
@@ -22,9 +22,9 @@ func PositionGet(w http.ResponseWriter, r *http.Request) {
 		Positions: make([]*model.Job, 0),
 	}
 
-	rows, err := db.Mconn.GetRows(`select j.id,j.name,level,hypo,IFNULL(s.name,''), IFNULL(r.name,'') from bug.jobs as j 
-	left join bug.statusgroup as s  on j.bugsid = s.id 
-	left join bug.rolegroup as r on j.rid=r.id`)
+	rows, err := db.Mconn.GetRows(`select j.id,j.name,level,hypo,IFNULL(s.name,''), IFNULL(r.name,'') from jobs as j 
+	left join statusgroup as s  on j.bugsid = s.id 
+	left join rolegroup as r on j.rid=r.id`)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -71,7 +71,7 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	errorcode.Id, err = db.Mconn.Insert(`insert into jobs(name,level,hypo,rid,bugsid) 
+	errorcode.ID, err = db.Mconn.Insert(`insert into jobs(name,level,hypo,rid,bugsid) 
 	value(?,?,?,(select id from rolegroup where name=?),(select id from statusgroup where name=?))`,
 		data.Name, data.Level, hid, data.RoleGroup, data.StatusGroup)
 	if err != nil {

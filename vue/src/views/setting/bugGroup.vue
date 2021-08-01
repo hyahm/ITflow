@@ -123,6 +123,7 @@ export default {
     },
     getlist() {
       statusGroupList().then(resp => {
+        console.log(resp);
         this.list = resp.data.departmentlist;
       });
     },
@@ -176,6 +177,8 @@ export default {
         });
       } else {
         addStatusGroup(this.form).then(resp => {
+          console.log(resp);
+          console.log(this.list);
           this.list.push({
             id: resp.data.id,
             name: this.form.name,

@@ -2,8 +2,8 @@ package rolegroup
 
 import (
 	"itflow/cache"
-	"itflow/internal/response"
 	"itflow/model"
+	"itflow/response"
 	"strconv"
 	"strings"
 
@@ -91,7 +91,7 @@ func (reqrg *ReqRoleGroup) Add(uid int64) []byte {
 		golog.Error(err)
 		return errrocode.ErrorE(err)
 	}
-	errrocode.Id = rg.ID
+	errrocode.ID = rg.ID
 	return errrocode.Success()
 }
 

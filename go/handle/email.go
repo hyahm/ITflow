@@ -6,8 +6,8 @@ import (
 	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/email"
-	"itflow/internal/response"
 	"itflow/mail"
+	"itflow/response"
 	"net/http"
 	"strings"
 
@@ -43,7 +43,7 @@ func SaveEmail(w http.ResponseWriter, r *http.Request) {
 
 	if getemail.Id < 1 {
 		var err error
-		errorcode.Id, err = db.Mconn.Insert("insert into email(email,password,port,host,enable,nickname) values(?,?,?,?,?,?)", getemail.EmailAddr,
+		errorcode.ID, err = db.Mconn.Insert("insert into email(email,password,port,host,enable,nickname) values(?,?,?,?,?,?)", getemail.EmailAddr,
 			getemail.Password, getemail.Port, getemail.Host, getemail.Enable, getemail.Nickname)
 		if err != nil {
 			golog.Error(err)
@@ -65,8 +65,8 @@ func SaveEmail(w http.ResponseWriter, r *http.Request) {
 	cache.CacheEmail.EmailAddr = getemail.EmailAddr
 	cache.CacheEmail.Port = getemail.Port
 	cache.CacheEmail.Nickname = getemail.Nickname
-	cache.CacheEmail.Id = errorcode.Id
-	errorcode.Id = getemail.Id
+	cache.CacheEmail.Id = errorcode.ID
+	errorcode.ID = getemail.Id
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
 	return

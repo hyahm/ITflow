@@ -3,8 +3,8 @@ package midware
 import (
 	"encoding/json"
 	"io/ioutil"
-	"itflow/internal/response"
 	"itflow/jwt"
+	"itflow/response"
 	"net/http"
 	"strings"
 

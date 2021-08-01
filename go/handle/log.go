@@ -5,7 +5,7 @@ import (
 	"itflow/classify"
 	"itflow/db"
 	"itflow/internal/log"
-	"itflow/internal/response"
+	"itflow/response"
 	"net/http"
 
 	"github.com/hyahm/golog"

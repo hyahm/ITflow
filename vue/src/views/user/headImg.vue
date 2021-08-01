@@ -11,7 +11,6 @@
       :url="url"
       field="upload"
       method="POST"
-      @crop-success="cropSuccess"
       @crop-upload-success="cropUploadSuccess"
       @crop-upload-fail="cropUploadFail"
     />

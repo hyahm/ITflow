@@ -3,7 +3,7 @@ package midware
 import (
 	"itflow/cache"
 	"itflow/db"
-	"itflow/internal/response"
+	"itflow/response"
 	"net/http"
 
 	"github.com/hyahm/golog"

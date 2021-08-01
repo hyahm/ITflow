@@ -2,8 +2,8 @@ package project
 
 import (
 	"errors"
-	"itflow/internal/response"
 	"itflow/model"
+	"itflow/response"
 
 	"github.com/hyahm/golog"
 )
@@ -46,6 +46,6 @@ func (rp *ReqProject) Add(userid int64) ([]byte, error) {
 		golog.Error(err)
 		return resp.ErrorE(err), err
 	}
-	resp.Id = project.Id
+	resp.ID = project.Id
 	return resp.Success(), nil
 }

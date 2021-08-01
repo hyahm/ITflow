@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"itflow/db"
 	"itflow/internal/perm"
-	"itflow/internal/response"
 	"itflow/model"
+	"itflow/response"
 	"net/http"
 	"strconv"
 
@@ -56,7 +56,7 @@ func ImportantAdd(w http.ResponseWriter, r *http.Request) {
 	data := xmux.GetInstance(r).Data.(*model.Important)
 
 	var err error
-	errorcode.Id, err = db.Mconn.Insert("insert into importants(name) value(?)", data.Name)
+	errorcode.ID, err = db.Mconn.Insert("insert into importants(name) value(?)", data.Name)
 	if err != nil {
 		golog.Error(err)
 		if err.(*mysql.MySQLError).Number == 1062 {

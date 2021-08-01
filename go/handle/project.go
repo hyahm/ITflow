@@ -4,7 +4,7 @@ import (
 	"itflow/db"
 	"itflow/internal/perm"
 	"itflow/internal/project"
-	"itflow/internal/response"
+	"itflow/response"
 	"net/http"
 
 	"github.com/hyahm/golog"

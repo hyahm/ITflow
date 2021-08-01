@@ -9,7 +9,7 @@ import (
 	"itflow/internal/bug"
 	"itflow/internal/comment"
 	"itflow/internal/project"
-	"itflow/internal/response"
+	"itflow/response"
 	"net/http"
 	"os"
 	"path"

@@ -6,9 +6,9 @@ import (
 	"itflow/cache"
 	"itflow/db"
 	"itflow/encrypt"
-	"itflow/internal/response"
 	"itflow/internal/role"
 	"itflow/internal/user"
+	"itflow/response"
 	"net/http"
 	"strings"
 	"time"
@@ -32,7 +32,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	enpassword := encrypt.PwdEncrypt(getuser.Password, cache.Salt)
 	var err error
 	db.Mconn.OpenDebug()
-	errorcode.Id, err = db.Mconn.Insert(`insert into user(nickname, password, email, createtime, createuid, realname, jid) values(
+	errorcode.ID, err = db.Mconn.Insert(`insert into user(nickname, password, email, createtime, createuid, realname, jid) values(
 		?,?,?,?,?,?, 
 		(select id from jobs where name=?))`, getuser.Nickname,
 		enpassword, getuser.Email, createTime,

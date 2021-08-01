@@ -3,8 +3,8 @@ package handle
 import (
 	"encoding/json"
 	"fmt"
-	"itflow/internal/response"
 	"itflow/model"
+	"itflow/response"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -500,7 +500,7 @@ func DocCreate(w http.ResponseWriter, r *http.Request) {
 // 		}
 // 		defer f.Close()
 // 		// 文件加入到数据库
-// 		errorcode.Id, err = varconfig.Mysql_Admin.Insert("insert into docfile(did, file) values(?,?) ", did, name)
+// 		errorcode.ID, err = varconfig.Mysql_Admin.Insert("insert into docfile(did, file) values(?,?) ", did, name)
 // 		if err != nil {
 // 			golog.Error(err.Error())
 // 			w.Write(errorcode.ErrorConnentMysql())
@@ -945,7 +945,7 @@ func DocCreate(w http.ResponseWriter, r *http.Request) {
 // 		return
 // 	}
 
-// 	errorcode.Id = did
+// 	errorcode.ID = did
 // 	errorcode.Date = date
 // 	w.Write(errorcode.Success())
 // 	return
@@ -1038,7 +1038,7 @@ func DocCreate(w http.ResponseWriter, r *http.Request) {
 // 	//	return
 // 	//}
 // 	//
-// 	//errorcode.Id = did
+// 	//errorcode.ID = did
 // 	//errorcode.Date = date
 // 	w.Write(errorcode.Success())
 // 	return

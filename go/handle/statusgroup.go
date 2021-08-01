@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"itflow/db"
 	"itflow/internal/perm"
-	"itflow/internal/response"
 	"itflow/internal/status"
+	"itflow/model"
+	"itflow/response"
 	"net/http"
-	"strings"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/hyahm/golog"
@@ -32,7 +32,7 @@ func AddStatusGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	isql := "insert into statusgroup(name,sids) values(?,?)"
-	errorcode.Id, err = db.Mconn.Insert(isql, data.Name, sids)
+	errorcode.ID, err = db.Mconn.Insert(isql, data.Name, sids)
 	if err != nil {
 		golog.Error(err)
 		if err.(*mysql.MySQLError).Number == 1062 {
@@ -91,51 +91,18 @@ func StatusGroupList(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("no perm"))
 		return
 	}
-	data := &departmentList{}
+	DepartmentList := make([]*model.StatusGroup, 0)
 	s := "select id,name,sids from statusgroup"
-	rows, err := db.Mconn.GetRows(s)
+	err := db.Mconn.Select(&DepartmentList, s)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	for rows.Next() {
-		var ids string
-		one := &department{}
-
-		err = rows.Scan(&one.Id, &one.Name, &ids)
-		if err != nil {
-			golog.Error()
-			continue
-		}
-
-		idrows, err := db.Mconn.GetRowsIn("select name from status where id in (?)",
-			strings.Split(ids, ","))
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-
-		for idrows.Next() {
-			var name string
-			err = idrows.Scan(&name)
-			if err != nil {
-				golog.Error()
-				continue
-			}
-			if name != "" {
-				one.BugstatusList = append(one.BugstatusList, name)
-			}
-
-		}
-		idrows.Close()
-		data.DepartmentList = append(data.DepartmentList, one)
+	res := &response.Response{
+		Data: DepartmentList,
 	}
-
-	rows.Close()
-	send, _ := json.Marshal(data)
-	w.Write(send)
+	w.Write(res.Marshal())
 	return
 
 }
@@ -150,7 +117,7 @@ func DeleteStatusGroup(w http.ResponseWriter, r *http.Request) {
 	}
 	id := r.FormValue("id")
 
-	ssql := "select count(id) from user where bugsid=?"
+	ssql := "select count(id) from jobs where bugsid=?"
 	var count int
 	err := db.Mconn.GetOne(ssql, id).Scan(&count)
 	if err != nil {
@@ -160,7 +127,7 @@ func DeleteStatusGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if count > 0 {
-		w.Write(errorcode.Error("有人再使用"))
+		w.Write(errorcode.Error("使用中"))
 		return
 	}
 	isql := "delete from  statusgroup where id = ?"
@@ -205,6 +172,4 @@ func GetStatusGroupName(w http.ResponseWriter, r *http.Request) {
 	send, _ := json.Marshal(data)
 	golog.Info(string(send))
 	w.Write(send)
-	return
-
 }

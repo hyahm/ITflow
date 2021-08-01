@@ -1,11 +1,6 @@
 <template>
   <div class="createPost-container">
-    <el-form
-      ref="postForm"
-      :model="postForm"
-      :rules="rules"
-      class="form-container"
-    >
+    <el-form ref="postForm" :model="postForm" class="form-container">
       <sticky :class-name="'sub-navbar ' + postForm.status">
         <!--<CommentDropdown v-model="postForm.comment_disabled" />-->
         <!--<PlatformDropdown v-model="postForm.platforms" />-->
@@ -22,7 +17,7 @@
       <div class="" style="padding: 20px">
         <el-row>
           <el-form-item label="任务类型: ">
-            <el-radio-group v-model="typ" @change="handleChangeType">
+            <el-radio-group v-model="typ">
               <el-radio v-for="(t, key) in ts" :key="key" :label="key">{{
                 t
               }}</el-radio>

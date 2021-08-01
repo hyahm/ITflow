@@ -48,7 +48,7 @@
       style="margin: 20px"
       type="success"
       size="mini"
-      @click="handleAdd"
+      @click.native="handleAdd"
       >添加角色组</el-button
     >
     <el-dialog
@@ -150,7 +150,8 @@ export default {
     getTemplate() {
       // 获取模板
       getPermTemplate().then(resp => {
-        this.templateperm = resp.template;
+        console.log(resp);
+        this.templateperm = resp.data.template;
       });
     },
     handleEdit(row) {
@@ -165,6 +166,7 @@ export default {
       });
     },
     handleAdd() {
+      console.log(1111222);
       this.form.id = -1;
       this.form.name = "";
       this.form.rolelist = deepClone(this.templateperm);

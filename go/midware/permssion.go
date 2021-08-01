@@ -3,7 +3,7 @@ package midware
 import (
 	"fmt"
 	"itflow/internal/perm"
-	"itflow/internal/response"
+	"itflow/response"
 	"net/http"
 
 	"github.com/hyahm/golog"

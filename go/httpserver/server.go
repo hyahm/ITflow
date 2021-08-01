@@ -61,7 +61,7 @@ func RunHttp() {
 
 	router.Post("/uploadimg", handle.UploadImgs).DelModule(midware.CheckToken)
 	router.Post("/upload/headimg", handle.UploadHeadImg)
-	router.Get("/showimg/{imgname}", handle.ShowImg).SetHeader("Content-Type", "image/png").DelModule(midware.CheckToken)
+	router.Get("/showimg/{string:imgname}", handle.ShowImg).SetHeader("Content-Type", "image/png").DelModule(midware.CheckToken)
 
 	router.Get("/get/expire/{token}", handle.GetExpire).DelModule(midware.CheckToken)
 	// 生产环境中， 这个要么注释， 要么

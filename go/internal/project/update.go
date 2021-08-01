@@ -1,8 +1,8 @@
 package project
 
 import (
-	"itflow/internal/response"
 	"itflow/model"
+	"itflow/response"
 
 	"github.com/hyahm/golog"
 )

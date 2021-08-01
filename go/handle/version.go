@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"itflow/db"
 	"itflow/internal/perm"
-	"itflow/internal/response"
 	"itflow/internal/version"
+	"itflow/response"
 	"net/http"
 	"time"
 
@@ -28,7 +28,7 @@ func AddVersion(w http.ResponseWriter, r *http.Request) {
 	add_version_sql := "insert into version(pid,name,urlone,urltwo,createtime,createuid) values((select id from project where name=?),?,?,?,?,?)"
 	var err error
 	errorcode.UpdateTime = time.Now().Unix()
-	errorcode.Id, err = db.Mconn.Insert(add_version_sql, version_add.Project,
+	errorcode.ID, err = db.Mconn.Insert(add_version_sql, version_add.Project,
 		version_add.Name, version_add.Url, version_add.BakUrl, errorcode.UpdateTime, uid)
 	if err != nil {
 		golog.Error(err)
@@ -110,7 +110,7 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	deletevl := "delete from version where id=?"
-	errorcode.Id, err = db.Mconn.Update(deletevl, id)
+	errorcode.ID, err = db.Mconn.Update(deletevl, id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))

@@ -5,9 +5,9 @@ import (
 	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/perm"
-	"itflow/internal/response"
 	"itflow/internal/status"
 	network "itflow/model"
+	"itflow/response"
 	"net/http"
 	"strconv"
 
@@ -40,7 +40,7 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 	}
 	var err error
 	s := xmux.GetInstance(r).Data.(*bug.ReqStatus)
-	errorcode.Id, err = db.Mconn.Insert("insert into status(name) values(?)", s.Name)
+	errorcode.ID, err = db.Mconn.Insert("insert into status(name) values(?)", s.Name)
 	if err != nil {
 		golog.Error(err)
 		if err.(*mysql.MySQLError).Number == 1062 {

@@ -5,8 +5,9 @@ import (
 	"encoding/json"
 	"itflow/cache"
 	"itflow/db"
-	"itflow/internal/response"
 	"itflow/internal/usergroup"
+	"itflow/model"
+	"itflow/response"
 	"net/http"
 	"strings"
 
@@ -23,7 +24,7 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 
 	// isql := "insert into statusgroup(name,sids) values(?,?)"
 	// var err error
-	// errorcode.Id, err = db.Mconn.Insert(isql, data.Name, data.StatusList.ToStore())
+	// errorcode.ID, err = db.Mconn.Insert(isql, data.Name, data.StatusList.ToStore())
 	// if err != nil {
 	// 	golog.Error(err)
 	// 	w.Write(errorcode.ErrorE(err))
@@ -63,16 +64,10 @@ type department struct {
 	BugstatusList []string `json:"bugstatuslist"`
 }
 
-type departmentList struct {
-	DepartmentList []*department `json:"departmentlist"`
-	Code           int           `json:"code"`
-}
-
 func BugGroupList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-
-	data := &departmentList{}
+	DepartmentList := make([]model.StatusGroup, 0)
 	s := "select id,name,sids from statusgroup"
 	rows, err := db.Mconn.GetRows(s)
 	if err != nil {
@@ -253,7 +248,7 @@ func GroupAdd(w http.ResponseWriter, r *http.Request) {
 	}
 	rows.Close()
 	gsql := "insert usergroup(name,ids,uid) values(?,?,?)"
-	errorcode.Id, err = db.Mconn.Insert(gsql, data.Name, strings.Join(ids, ","), uid)
+	errorcode.ID, err = db.Mconn.Insert(gsql, data.Name, strings.Join(ids, ","), uid)
 	if err != nil {
 		golog.Error(err)
 		if err.(*mysql.MySQLError).Number == 1062 {
