@@ -1,10 +1,7 @@
 <template>
   <div class="app-container">
     <div style="padding: 10px">
-      <el-button
-        type="success"
-        @click="handleAdd"
-      >
+      <el-button type="success" @click="handleAdd">
         增加认证
       </el-button>
     </div>
@@ -16,88 +13,64 @@
       highlight-current-row
       style="width: 100%"
     >
-      <el-table-column
-        align="center"
-        label="ID"
-        width="80"
-      >
+      <el-table-column align="center" label="ID" width="80">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column
-        width="180px"
-        align="center"
-        label="添加时间"
-      >
+      <el-table-column width="180px" align="center" label="添加时间">
         <template slot-scope="scope">
-          <span>{{ scope.row.created | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{
+            scope.row.created | parseTime("{y}-{m}-{d} {h}:{i}")
+          }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column
-        width="180px"
-        align="center"
-        label="更新时间"
-      >
+      <el-table-column width="180px" align="center" label="更新时间">
         <template slot-scope="scope">
-          <span v-if="scope.row.uptime>0">{{ scope.row.uptime | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span v-if="scope.row.uptime > 0">{{
+            scope.row.uptime | parseTime("{y}-{m}-{d} {h}:{i}")
+          }}</span>
           <span v-else>无更新</span>
         </template>
       </el-table-column>
 
-      <el-table-column
-        width="120"
-        align="center"
-        label="认证名"
-      >
+      <el-table-column width="120" align="center" label="认证名">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column
-        width="120"
-        align="center"
-        label="认证方式"
-      >
+      <el-table-column width="120" align="center" label="认证方式">
         <template slot-scope="scope">
           <span>{{ auths[scope.row.typ] }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column
-        align="left"
-        label="Actions"
-        width="200"
-      >
+      <el-table-column align="left" label="Actions" width="200">
         <template slot-scope="scope">
           <el-button
             type="primary"
             size="small"
             icon="el-icon-update"
             @click="handleUpdate(scope.row)"
-          >更新</el-button>
+            >更新</el-button
+          >
           <el-button
             type="danger"
             size="small"
             icon="el-icon-delete"
             @click="handleDeleteKey(scope.row.id)"
-          >删除</el-button>
+            >删除</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
 
-    <el-dialog
-      title="创建文档"
-      :visible.sync="dialogFormVisible"
-    >
+    <el-dialog title="创建文档" :visible.sync="dialogFormVisible">
       <el-form>
-        <el-form-item
-          label="认证名："
-          :label-width="formLabelWidth"
-        >
+        <el-form-item label="认证名：" :label-width="formLabelWidth">
           <el-input
             v-model="form.name"
             autocomplete="off"
@@ -105,72 +78,43 @@
           />
         </el-form-item>
         <el-form-item :label-width="formLabelWidth">
-          <el-radio-group
-            v-model="form.typ"
-            @change="handleAuthMethod"
-          >
+          <el-radio-group v-model="form.typ" @change="handleAuthMethod">
             <el-radio :label="user">账号密码认证</el-radio>
             <el-radio :label="key">key认证</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item
-          v-if="form.typ==2"
+          v-if="form.typ == 2"
           label="私钥："
           :label-width="formLabelWidth"
         >
-          <el-input
-            type="textarea"
-            v-model="form.pri"
-            placeholder=""
-          />
+          <el-input type="textarea" v-model="form.pri" placeholder="" />
         </el-form-item>
         <el-form-item
-          v-if="form.typ==2"
+          v-if="form.typ == 2"
           label="公钥："
           :label-width="formLabelWidth"
         >
-          <el-input
-            type="textarea"
-            v-model="form.pub"
-            placeholder=""
-          />
+          <el-input type="textarea" v-model="form.pub" placeholder="" />
         </el-form-item>
-        <el-form-item
-          label="用户："
-          :label-width="formLabelWidth"
-        >
-          <el-input
-            v-model="form.user"
-            placeholder=""
-          />
+        <el-form-item label="用户：" :label-width="formLabelWidth">
+          <el-input v-model="form.user" placeholder="" />
         </el-form-item>
-        <el-form-item
-          label="密码："
-          :label-width="formLabelWidth"
-        >
-          <el-input
-            v-model="form.password"
-            placeholder=""
-          />
+        <el-form-item label="密码：" :label-width="formLabelWidth">
+          <el-input v-model="form.password" placeholder="" />
         </el-form-item>
       </el-form>
 
-      <div
-        slot="footer"
-        class="dialog-footer"
-      >
+      <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button
-          type="primary"
-          @click="handleAddDoc"
-        >确 定</el-button>
+        <el-button type="primary" @click="handleAddDoc">确 定</el-button>
       </div>
     </el-dialog>
 
     <div class="pagination-container">
       <el-pagination
         :current-page="listQuery.page"
-        :page-sizes="[10,20,30, 50]"
+        :page-sizes="[10, 20, 30, 50]"
         :page-size="listQuery.limit"
         :total="total"
         background
@@ -179,7 +123,6 @@
         @current-change="handleCurrentChange"
       />
     </div>
-
   </div>
 </template>
 
@@ -204,7 +147,7 @@ export default {
       newname: "",
       listQuery: {
         page: 1,
-        limit: 20,
+        limit: 20
       },
       form: {
         id: 0,
@@ -215,8 +158,8 @@ export default {
         user: "",
         created: 0,
         uptime: 0,
-        password: "",
-      },
+        password: ""
+      }
     };
   },
   created() {
@@ -224,7 +167,7 @@ export default {
   },
   mounted() {
     this.headers = {
-      "X-Token": getToken(),
+      "X-Token": getToken()
     };
   },
   methods: {
@@ -238,33 +181,29 @@ export default {
         user: "",
         created: 0,
         uptime: 0,
-        password: "",
+        password: ""
       };
       this.dialogFormVisible = true;
     },
     handleUpdate(row) {
-      console.log(row);
-
       this.form = row;
       this.dialogFormVisible = true;
     },
     handleDomain(val) {
       // 判断子域名是否被使用
-      checkName(val).then((resp) => {
+      checkName(val).then(resp => {
         if (resp.data.code !== 0) {
           this.$message.error("name 重复");
         }
       });
     },
     handleAuthMethod(val) {
-      console.log(val);
       this.form.auth = val;
     },
 
     handleAddDoc() {
-      console.log(this.form);
       this.form.typ = parseInt(this.form.typ);
-      addKey(this.form).then((resp) => {
+      addKey(this.form).then(resp => {
         if (this.form.id > 0) {
           for (let i = 0; i < this.list.length; i++) {
             if (this.list[i].id == this.form.id) {
@@ -276,19 +215,17 @@ export default {
         } else {
           this.form.id = resp.data.id;
           this.form.created = resp.data.time;
-          console.log(this.form)
           this.list.push(this.form);
         }
       });
 
       this.dialogFormVisible = false;
-      this.$message.success("更新成功")
+      this.$message.success("更新成功");
     },
     getList() {
       this.listLoading = true;
-      fetchList(this.listQuery).then((response) => {
+      fetchList(this.listQuery).then(response => {
         const data = response.data;
-        console.log(data)
         this.list = data.keys;
         this.total = data.total;
         this.listLoading = false;
@@ -306,11 +243,10 @@ export default {
       this.$confirm("此操作将永久删除该文档, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning",
+        type: "warning"
       })
         .then(() => {
-          delKey(id).then((resp) => {
-            console.log(resp.data);
+          delKey(id).then(resp => {
             if (resp.data.code === 0) {
               const l = this.list.length;
               for (let i = 0; i < l; i++) {
@@ -321,7 +257,7 @@ export default {
               }
               this.$message({
                 type: "success",
-                message: "删除成功!",
+                message: "删除成功!"
               });
             }
           });
@@ -329,11 +265,11 @@ export default {
         .catch(() => {
           this.$message({
             type: "info",
-            message: "已取消删除",
+            message: "已取消删除"
           });
         });
-    },
-  },
+    }
+  }
 };
 </script>
 

@@ -36,7 +36,6 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password })
         .then(response => {
-          console.log(response);
           const { data } = response;
           if (data.code === 0) {
             commit("SET_TOKEN", data.token);

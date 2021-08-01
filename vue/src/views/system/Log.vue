@@ -125,7 +125,6 @@ export default {
   methods: {
     classifylist() {
       logClassify().then(resp => {
-        console.log(resp);
         this.classifys = resp.data.classify;
       });
     },

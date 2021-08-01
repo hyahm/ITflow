@@ -91,9 +91,7 @@ export default {
      * [param] status    server api return error status, like 500
      * [param] field
      */
-    cropUploadFail(status, field) {
-      console.log("field: " + field);
-    }
+    cropUploadFail(status, field) {}
   }
 };
 </script>

@@ -78,7 +78,6 @@ export default {
       this.$store.dispatch("app/toggleSideBar");
     },
     logout() {
-      console.log(1111);
       this.$store
         .dispatch("user/logout")
         .then((location.href = `/login`))
