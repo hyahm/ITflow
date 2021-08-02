@@ -81,12 +81,14 @@ export default {
   methods: {
     getstatus() {
       getStatusList().then(resp => {
-        this.tableData = resp.data.statuslist;
+        console.log(resp.data);
+        this.tableData = resp.data.data;
       });
     },
     confirm() {
       if (this.form.id === -1) {
         addStatus(this.form).then(resp => {
+          console.log(resp);
           this.tableData.push({
             id: resp.data.id,
             name: this.form.name

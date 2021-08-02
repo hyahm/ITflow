@@ -8,10 +8,11 @@ import (
 )
 
 type Response struct {
-	Code int         `json:"code"`
-	Msg  string      `json:"msg"`
-	ID   int64       `json:"id"`
-	Data interface{} `json:"data"`
+	Code       int         `json:"code"`
+	Msg        string      `json:"msg"`
+	ID         int64       `json:"id"`
+	UpdateTime int64       `json:"update_time"`
+	Data       interface{} `json:"data,omitemtpy"`
 }
 
 func (r *Response) Marshal() []byte {

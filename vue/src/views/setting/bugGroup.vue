@@ -25,7 +25,7 @@
 
       <el-table-column label="状态权限" width="500" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.bugstatuslist }}</span>
+          <span>{{ toname(scope.row.sids) }}</span>
         </template>
       </el-table-column>
 
@@ -71,10 +71,13 @@
             clearable
           />
         </el-form-item>
-        <el-checkbox-group v-model="form.checklist">
-          <div v-for="(status, index) in statuslist" :key="index">
-            <el-checkbox :label="status" />
-          </div>
+        <el-checkbox-group v-model="form.sids">
+          <el-checkbox
+            v-for="status in statuslist"
+            :label="status.id"
+            :key="status.id"
+            >{{ status.name }}</el-checkbox
+          >
         </el-checkbox-group>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -98,13 +101,14 @@ export default {
   data() {
     return {
       statuslist: [],
+      statusMap: new Map(),
       dialogVisible: false,
       listLoading: false,
       list: [],
       form: {
         id: -1,
         name: "",
-        checklist: []
+        sids: []
       }
     };
   },
@@ -116,22 +120,31 @@ export default {
     this.getlist();
   },
   methods: {
+    toname(ids) {
+      let names = [];
+      for (let id of ids) {
+        for (let v of this.statuslist) {
+          if (id === v.id) {
+            names.push(v.name);
+          }
+        }
+      }
+      return names.join(", ");
+    },
     handleEdit(row) {
-      this.form.id = row.id;
-      this.form.name = row.name;
+      this.form = row;
       this.dialogVisible = true;
     },
     getlist() {
       statusGroupList().then(resp => {
-        console.log(resp);
-        this.list = resp.data.departmentlist;
+        this.list = resp.data.data;
       });
     },
     handleAdd() {
       this.form = {
-        id: -1,
+        id: 0,
         name: "",
-        checklist: []
+        sids: []
       };
       this.dialogVisible = true;
     },
@@ -153,7 +166,10 @@ export default {
     },
     getstatus() {
       getStatus().then(resp => {
-        this.statuslist = resp.data.statuslist;
+        this.statuslist = resp.data.data;
+        for (let v of this.statuslist) {
+          this.statusMap.set(v.id, v.name);
+        }
       });
     },
     handleClose() {
@@ -164,7 +180,9 @@ export default {
         this.$message.error("名称不能为空");
         return;
       }
+
       if (this.form.id > 0) {
+        console.log(this.form);
         editStatusGroup(this.form).then(resp => {
           const l = this.list.length;
           for (let i = 0; i < l; i++) {
@@ -177,8 +195,6 @@ export default {
         });
       } else {
         addStatusGroup(this.form).then(resp => {
-          console.log(resp);
-          console.log(this.list);
           this.list.push({
             id: resp.data.id,
             name: this.form.name,

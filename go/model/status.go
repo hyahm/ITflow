@@ -9,8 +9,8 @@ import (
 )
 
 type Status struct {
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
+	ID   int64  `json:"id" db:"id,default"`
+	Name string `json:"name" db:"name"`
 }
 
 func (status *Status) Names() ([]string, error) {
@@ -31,19 +31,13 @@ func (status *Status) Names() ([]string, error) {
 	return names, nil
 }
 
-func (status *Status) List() ([]*Status, error) {
+func GetStatusList() ([]*Status, error) {
 	ss := make([]*Status, 0)
-	rows, err := db.Mconn.GetRows("select id,name from status")
+	err := db.Mconn.Select(&ss, "select * from status")
 	if err != nil {
 		golog.Error(err)
 		return ss, err
 	}
-	for rows.Next() {
-		st := &Status{}
-		rows.Scan(&st.ID, &st.Name)
-		ss = append(ss, st)
-	}
-	rows.Close()
 	return ss, nil
 }
 

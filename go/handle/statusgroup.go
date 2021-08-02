@@ -4,12 +4,10 @@ import (
 	"encoding/json"
 	"itflow/db"
 	"itflow/internal/perm"
-	"itflow/internal/status"
 	"itflow/model"
 	"itflow/response"
 	"net/http"
 
-	"github.com/go-sql-driver/mysql"
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
@@ -22,30 +20,21 @@ func AddStatusGroup(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("no perm"))
 		return
 	}
-	data := xmux.GetInstance(r).Data.(*status.StatusGroup)
-
-	golog.Infof("%+v", *data)
-	sids, err := data.GetIds()
+	data := xmux.GetInstance(r).Data.(*model.StatusGroup)
+	if data.ID < 0 {
+		golog.Error("id not found")
+		w.Write(errorcode.Error("id not found"))
+		return
+	}
+	isql := "insert into statusgroup($key) values($value)"
+	ids, err := db.Mconn.InsertInterfaceWithID(data, isql)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	isql := "insert into statusgroup(name,sids) values(?,?)"
-	errorcode.ID, err = db.Mconn.Insert(isql, data.Name, sids)
-	if err != nil {
-		golog.Error(err)
-		if err.(*mysql.MySQLError).Number == 1062 {
-			w.Write(errorcode.ErrorE(db.DuplicateErr))
-			return
-		}
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
-	return
+	errorcode.ID = ids[0]
+	w.Write(errorcode.Marshal())
 
 }
 
@@ -57,20 +46,10 @@ func EditStatusGroup(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("no perm"))
 		return
 	}
-	data := xmux.GetInstance(r).Data.(*status.StatusGroup)
+	sg := xmux.GetInstance(r).Data.(*model.StatusGroup)
 
-	if data.Name == "" {
-		w.Write(errorcode.Error("名称不能为空"))
-		return
-	}
-	sids, err := data.GetIds()
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	isql := "update statusgroup set name =?,sids=? where id = ?"
-	_, err = db.Mconn.Update(isql, data.Name, sids, data.Id)
+	isql := "update statusgroup set $set where id = ?"
+	_, err := db.Mconn.UpdateInterface(sg, isql, sg.ID)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
@@ -79,7 +58,6 @@ func EditStatusGroup(w http.ResponseWriter, r *http.Request) {
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
-	return
 
 }
 

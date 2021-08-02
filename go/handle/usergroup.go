@@ -6,7 +6,6 @@ import (
 	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/usergroup"
-	"itflow/model"
 	"itflow/response"
 	"net/http"
 	"strings"
@@ -64,49 +63,50 @@ type department struct {
 	BugstatusList []string `json:"bugstatuslist"`
 }
 
-func BugGroupList(w http.ResponseWriter, r *http.Request) {
+// bug状态组
+// func BugGroupList(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
-	DepartmentList := make([]model.StatusGroup, 0)
-	s := "select id,name,sids from statusgroup"
-	rows, err := db.Mconn.GetRows(s)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	for rows.Next() {
-		var ids string
-		one := &department{}
-		rows.Scan(&one.Id, &one.Name, &ids)
-		idrows, err := db.Mconn.GetRowsIn("select name from status where id in (?)", strings.Split(ids, ","))
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
+// 	errorcode := &response.Response{}
+// 	DepartmentList := make([]model.StatusGroup, 0)
+// 	s := "select id,name,sids from statusgroup"
+// 	rows, err := db.Mconn.GetRows(s)
+// 	if err != nil {
+// 		golog.Error(err)
+// 		w.Write(errorcode.ErrorE(err))
+// 		return
+// 	}
+// 	for rows.Next() {
+// 		var ids string
+// 		one := &department{}
+// 		rows.Scan(&one.Id, &one.Name, &ids)
+// 		idrows, err := db.Mconn.GetRowsIn("select name from status where id in (?)", strings.Split(ids, ","))
+// 		if err != nil {
+// 			golog.Error(err)
+// 			w.Write(errorcode.ErrorE(err))
+// 			return
+// 		}
 
-		for idrows.Next() {
-			var name string
-			err = idrows.Scan(&name)
-			if err != nil {
-				golog.Error()
-				continue
-			}
-			if name != "" {
-				one.BugstatusList = append(one.BugstatusList, name)
-			}
+// 		for idrows.Next() {
+// 			var name string
+// 			err = idrows.Scan(&name)
+// 			if err != nil {
+// 				golog.Error()
+// 				continue
+// 			}
+// 			if name != "" {
+// 				one.BugstatusList = append(one.BugstatusList, name)
+// 			}
 
-		}
-		idrows.Close()
-		data.DepartmentList = append(data.DepartmentList, one)
-	}
-	rows.Close()
-	send, _ := json.Marshal(data)
-	w.Write(send)
-	return
+// 		}
+// 		idrows.Close()
+// 		DepartmentList = append(DepartmentList, one)
+// 	}
+// 	rows.Close()
+// 	send, _ := json.Marshal(data)
+// 	w.Write(send)
+// 	return
 
-}
+// }
 
 func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 

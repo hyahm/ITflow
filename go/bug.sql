@@ -597,7 +597,7 @@ UNLOCK TABLES;
 CREATE TABLE `statusgroup` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL DEFAULT '',
-  `sids` varchar(200) DEFAULT '',
+  `sids` json,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;

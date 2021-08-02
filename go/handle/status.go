@@ -5,7 +5,7 @@ import (
 	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/perm"
-	"itflow/internal/status"
+	"itflow/model"
 	network "itflow/model"
 	"itflow/response"
 	"net/http"
@@ -25,9 +25,15 @@ func StatusList(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("no perm"))
 		return
 	}
-	w.Write(status.StatusList())
-	return
-
+	res := &response.Response{}
+	statuss, err := model.GetStatusList()
+	if err != nil {
+		golog.Error(err)
+		w.Write(res.ErrorE(err))
+		return
+	}
+	res.Data = statuss
+	w.Write(res.Marshal())
 }
 
 func StatusAdd(w http.ResponseWriter, r *http.Request) {

@@ -47,9 +47,15 @@ func (sl *statusList) ErrorE(err error) []byte {
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
 	// 获取状态名
-	w.Write(status.GetNames())
-	return
-
+	res := &response.Response{}
+	statuss, err := model.GetStatusList()
+	if err != nil {
+		golog.Error(err)
+		w.Write(res.ErrorE(err))
+		return
+	}
+	res.Data = statuss
+	w.Write(res.Marshal())
 }
 
 func ShowStatus(w http.ResponseWriter, r *http.Request) {

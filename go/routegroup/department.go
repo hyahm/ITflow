@@ -25,6 +25,6 @@ func init() {
 
 	Department.Post("/department/edit", handle.EditBugGroup).
 		Bind(&status.StatusGroup{}).AddModule(midware.JsonToStruct)
-	Department.Post("/department/list", handle.BugGroupList)
+	// Department.Post("/department/list", handle.BugGroupList)
 	Department.Get("/department/remove", handle.BugGroupDel)
 }

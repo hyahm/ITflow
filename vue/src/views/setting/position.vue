@@ -152,7 +152,7 @@ export default {
       leveltwo: 2,
       manager: [],
       form: {
-        id: -1,
+        id: 0,
         name: "",
         level: 2,
         hyponame: "",
@@ -190,7 +190,7 @@ export default {
       });
     },
     confirm() {
-      if (this.form.id === -1) {
+      if (this.form.id === 0) {
         addPosition(this.form).then(resp => {
           this.tableData.push({
             id: resp.data.id,
@@ -263,7 +263,7 @@ export default {
     },
     addposition() {
       this.dialogFormVisible = true;
-      this.form.id = -1;
+      this.form.id = 0;
       this.form.level = 2;
       this.form.hyponame = "";
       this.form.name = "";
