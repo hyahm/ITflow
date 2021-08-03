@@ -132,7 +132,7 @@ export default {
       },
       total: 0,
       form: {
-        id: -1,
+        id: 0,
         name: "",
         url: "",
         bakurl: "",
@@ -159,7 +159,7 @@ export default {
       });
     },
     add() {
-      this.form.id = -1;
+      this.form.id = 0;
       this.form.name = "";
       this.form.url = "";
       this.form.bakurl = "";

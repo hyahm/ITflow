@@ -78,7 +78,7 @@ export default {
       dialogFormVisible: false,
       list: [],
       form: {
-        id: -1,
+        id: 0,
         name: "",
         users: []
       },
@@ -105,7 +105,7 @@ export default {
     },
     handleAdd() {
       this.form = {
-        id: -1,
+        id: 0,
         name: "",
         users: []
       };

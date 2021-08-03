@@ -163,7 +163,7 @@ export default {
   },
   data() {
     return {
-      uid: -1,
+      uid: 0,
       rolelist: [],
       dialogVisible: false,
       rolegrouplist: [],
@@ -173,7 +173,7 @@ export default {
       userlist: [],
       admin: false,
       form: {
-        id: -1,
+        id: 0,
         name: ""
       },
       statusgroup: [],

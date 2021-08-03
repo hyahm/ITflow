@@ -99,7 +99,7 @@ export default {
       form: {
         projectname: "",
         groupname: "",
-        id: -1
+        id: 0
       },
       usergroups: [],
       formLabelWidth: "120px",
@@ -130,7 +130,7 @@ export default {
       });
     },
     addProject() {
-      this.form.id = -1;
+      this.form.id = 0;
       this.form.projectname = "";
       this.form.groupname = "";
       this.dialogFormVisible = true;
@@ -198,7 +198,7 @@ export default {
     cancel() {
       this.dialogFormVisible = false;
       this.form.name = "";
-      this.form.id = -1;
+      this.form.id = 0;
     }
   }
 };

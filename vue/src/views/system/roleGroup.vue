@@ -126,7 +126,7 @@ export default {
       listLoading: false,
       list: [],
       form: {
-        id: -1,
+        id: 0,
         name: "",
         rolelist: []
       },
@@ -166,8 +166,7 @@ export default {
       });
     },
     handleAdd() {
-      console.log(1111222);
-      this.form.id = -1;
+      this.form.id = 0;
       this.form.name = "";
       this.form.rolelist = deepClone(this.templateperm);
       this.dialogVisible = true;

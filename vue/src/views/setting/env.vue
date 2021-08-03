@@ -68,7 +68,7 @@ export default {
       form: {
         envname: "",
         delivery: false,
-        id: -1
+        id: 0
       },
       formLabelWidth: "120px",
       tableData: []
@@ -84,7 +84,7 @@ export default {
       });
     },
     handleAdd() {
-      this.form.id = -1;
+      this.form.id = 0;
       this.form.envname = "";
       this.dialogFormVisible = true;
     },
@@ -120,7 +120,7 @@ export default {
     },
     confirm() {
       this.dialogFormVisible = false;
-      if (this.form.id === -1) {
+      if (this.form.id === 0) {
         addEnvName(this.form.envname).then(resp => {
           this.tableData.push({
             id: resp.data.id,
@@ -144,7 +144,7 @@ export default {
     cancel() {
       this.dialogFormVisible = false;
       this.form.envname = "";
-      this.form.id = -1;
+      this.form.id = 0;
     }
   }
 };

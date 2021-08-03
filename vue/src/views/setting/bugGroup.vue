@@ -106,7 +106,7 @@ export default {
       listLoading: false,
       list: [],
       form: {
-        id: -1,
+        id: 0,
         name: "",
         sids: []
       }

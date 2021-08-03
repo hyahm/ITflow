@@ -11,10 +11,10 @@
         @change="handleCreated"
       >
         <el-option
-          v-for="(status, index) in statuslist"
-          :key="index"
-          :label="status"
-          :value="status"
+          v-for="status in statuslist"
+          :key="status.id"
+          :label="status.name"
+          :value="status.id"
         />
       </el-select>
     </div>
@@ -26,23 +26,14 @@
         @change="handleCompleted"
       >
         <el-option
-          v-for="(status, index) in statuslist"
-          :key="index"
-          :label="status"
-          :value="status"
+          v-for="status in statuslist"
+          :key="status.id"
+          :label="status.name"
+          :value="status.id"
         />
       </el-select>
     </div>
-    <!-- <div style="margin: 10px 0 10px 10px"> 严重级别:
-      <el-select v-model="form.defaultlevel" placeholder="Select" @change="handleChangeLevel">
-        <el-option
-          v-for="(important, index) in levels"
-          :key="index"
-          :label="important"
-          :value="important"
-        />
-      </el-select>
-    </div> -->
+
     <el-button style="margin-top: 20px" type="primary" plain @click="handleSave"
       >保存</el-button
     >
@@ -57,8 +48,8 @@ export default {
   data() {
     return {
       form: {
-        created: "",
-        completed: ""
+        created: undefined,
+        completed: undefined
       },
 
       statuslist: [],
@@ -93,13 +84,13 @@ export default {
     },
     getdefaultstatus() {
       status().then(resp => {
-        this.form.created = resp.data.created;
-        this.form.completed = resp.data.completed;
+        this.form.created = resp.data.data.created;
+        this.form.completed = resp.data.data.completed;
       });
     },
     getstatuslist() {
       getStatus().then(resp => {
-        this.statuslist = resp.data.statuslist;
+        this.statuslist = resp.data.data;
       });
     },
     handleCompleted(e) {

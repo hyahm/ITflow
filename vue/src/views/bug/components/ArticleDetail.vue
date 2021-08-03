@@ -172,7 +172,7 @@ const defaultForm = {
   // status: 'draft',
   title: "", // 文章题目
   content: "", // 文章内容
-  id: -1,
+  id: 0,
   selectuser: [],
   projectname: "",
   level: "",
@@ -364,7 +364,7 @@ export default {
         if (valid) {
           this.postForm.typ = parseInt(this.typ);
           createBug(this.postForm).then(resp => {
-            if (this.postForm.id === -1) {
+            if (this.postForm.id === 0) {
               this.$notify({
                 title: "成功",
                 message: "发布成功",

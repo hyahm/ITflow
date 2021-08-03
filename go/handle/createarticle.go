@@ -50,12 +50,6 @@ func GetMyProject(w http.ResponseWriter, r *http.Request) {
 func BugCreate(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 	data := xmux.GetInstance(r).Data.(*bug.EditBug)
-	// createdId := cache.DefaultCreateSid
-	// if createdId == 0 {
-	// 	golog.Error("必须给定一个状态默认值")
-	// 	w.Write(errorcode.Error("必须给定一个状态默认值")
-	// 	return
-	// }
 	var ids = make([]string, 0)
 	rows, err := db.Mconn.GetRowsIn("select id from user where realname in (?)",
 		data.Selectusers)
@@ -74,15 +68,6 @@ func BugCreate(w http.ResponseWriter, r *http.Request) {
 		ids = append(ids, id)
 	}
 	rows.Close()
-	// bug, err := data.ToBug()
-	// if err != nil {
-	// 	w.Write(errorcode.ErrorE(err))
-	// 	return
-	// }
-	// // bug.StatusId = createdId
-	// bug.Uid = xmux.GetInstance(r).Get("uid").(int64)
-	//
-	// go datalog.InsertLog("bug", nickname+"create bug: "+data.Title, r.RemoteAddr, nickname, "create")
 	if data.Id <= 0 {
 		// 插入bug
 		// err = bug.CreateBug()

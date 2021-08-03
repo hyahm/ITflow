@@ -63,7 +63,7 @@ export default {
       dialogFormVisible: false,
       status: "",
       form: {
-        id: -1,
+        id: 0,
         name: ""
       }
     };
@@ -85,7 +85,7 @@ export default {
       });
     },
     confirm() {
-      if (this.form.id === -1) {
+      if (this.form.id === 0) {
         addLevel(this.form).then(resp => {
           this.tableData.push({
             id: resp.data.id,
@@ -133,7 +133,7 @@ export default {
     },
     addstatus() {
       this.dialogFormVisible = true;
-      this.form.id = -1;
+      this.form.id = 0;
       this.form.name = "";
     },
     handleUpdate(row) {

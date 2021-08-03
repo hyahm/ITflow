@@ -52,7 +52,7 @@ export default {
       form: {
         osname: "",
         delivery: false,
-        id: -1
+        id: 0
       },
       formLabelWidth: "120px",
       tableData: []
@@ -68,7 +68,7 @@ export default {
       });
     },
     addp() {
-      this.form.id = -1;
+      this.form.id = 0;
       this.dialogFormVisible = true;
     },
     handleDelete(id) {
@@ -89,7 +89,7 @@ export default {
     },
     confirm() {
       this.dialogFormVisible = false;
-      if (this.form.id === -1) {
+      if (this.form.id === 0) {
         addOSName(this.form.osname).then(resp => {
           this.tableData.push({
             id: resp.data.id,
@@ -111,7 +111,7 @@ export default {
     cancel() {
       this.dialogFormVisible = false;
       this.form.name = "";
-      this.form.id = -1;
+      this.form.id = 0;
     }
   }
 };

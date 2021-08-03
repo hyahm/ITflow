@@ -2,8 +2,7 @@ package routegroup
 
 import (
 	"itflow/handle"
-	"itflow/internal/defaults"
-	"itflow/midware"
+	"itflow/model"
 
 	"github.com/hyahm/xmux"
 )
@@ -15,7 +14,6 @@ func init() {
 	DefaultValue = xmux.NewGroupRoute().ApiCreateGroup("defaultvalue", "默认值相关", "默认值")
 	DefaultValue.Post("/default/status", handle.DefaultStatus).ApiDescribe("获取默认值(已完成)")
 
-	DefaultValue.Post("/default/save", handle.DefaultSave).Bind(&defaults.ReqDefaultValue{}).
-		AddModule(midware.JsonToStruct).ApiDescribe("保存默认值(已完成)")
+	DefaultValue.Post("/default/save", handle.DefaultSave).BindJson(&model.DefaultValue{})
 
 }
