@@ -1,16 +1,13 @@
 package handle
 
 import (
-	"database/sql"
 	"encoding/json"
-	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/usergroup"
+	"itflow/model"
 	"itflow/response"
 	"net/http"
-	"strings"
 
-	"github.com/go-sql-driver/mysql"
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
@@ -33,7 +30,6 @@ func AddBugGroup(w http.ResponseWriter, r *http.Request) {
 	// 添加缓存
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
-	return
 
 }
 
@@ -138,7 +134,6 @@ func BugGroupDel(w http.ResponseWriter, r *http.Request) {
 	//更新缓存
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
-	return
 
 }
 
@@ -153,6 +148,7 @@ func GroupNamesGet(w http.ResponseWriter, r *http.Request) {
 		w.Write(data.ErrorE(err))
 		return
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var name string
 		err = rows.Scan(&name)
@@ -162,106 +158,60 @@ func GroupNamesGet(w http.ResponseWriter, r *http.Request) {
 		}
 		data.UserGroupNames = append(data.UserGroupNames, name)
 	}
-	rows.Close()
-	w.Write(data.Marshal())
-	return
 
+	w.Write(data.Marshal())
 }
 
 func UserGroupGet(w http.ResponseWriter, r *http.Request) {
 	// 可以获取所有用户组
-
-	data := &usergroup.RespUserGroupList{
-		UserGroupList: make([]*usergroup.RespUserGroup, 0),
-	}
 	uid := xmux.GetInstance(r).Get("uid").(int64)
-	var rows *sql.Rows
-	var err error
-	if cache.SUPERID == uid {
-		gsql := "select id,name,ifnull(ids,'') from usergroup"
-		rows, err = db.Mconn.GetRows(gsql)
-		if err != nil {
-			golog.Error(err)
-			w.Write(data.ErrorE(err))
-			return
-		}
-	} else {
-		gsql := "select id,name,ids from usergroup where uid=?"
-		rows, err = db.Mconn.GetRows(gsql, uid)
-		if err != nil {
-			golog.Error(err)
-			w.Write(data.ErrorE(err))
-			return
-		}
+	usergroups, err := model.GetUserGroupList(uid)
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
+		return
 	}
-	realname := new(string)
-	for rows.Next() {
-		onegroup := &usergroup.RespUserGroup{
-			Users: make([]string, 0),
-		}
-		var users string
-		rows.Scan(&onegroup.Id, &onegroup.Name, &users)
-		namerows, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
-			strings.Split(users, ","))
-		if err != nil {
-			golog.Info(err)
-			continue
-		}
-
-		for namerows.Next() {
-			err = namerows.Scan(realname)
-			if err != nil {
-				golog.Error(err)
-				continue
-			}
-			onegroup.Users = append(onegroup.Users, *realname)
-		}
-		namerows.Close()
-		data.UserGroupList = append(data.UserGroupList, onegroup)
+	res := response.Response{
+		Data: usergroups,
 	}
-	rows.Close()
-	send, _ := json.Marshal(data)
-	w.Write(send)
-	return
+	w.Write(res.Marshal())
 
 }
 
 func GroupAdd(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
-	uid := xmux.GetInstance(r).Get("uid").(int64)
-	data := xmux.GetInstance(r).Data.(*usergroup.RespUserGroup)
-	rows, err := db.Mconn.GetRowsIn("select id from user where realname in (?)", data.Users)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	ids := make([]string, 0)
-	id := new(string)
-	for rows.Next() {
-		err = rows.Scan(id)
-		if err != nil {
-			golog.Info(err)
-			continue
-		}
-		ids = append(ids, *id)
-	}
-	rows.Close()
-	gsql := "insert usergroup(name,ids,uid) values(?,?,?)"
-	errorcode.ID, err = db.Mconn.Insert(gsql, data.Name, strings.Join(ids, ","), uid)
-	if err != nil {
-		golog.Error(err)
-		if err.(*mysql.MySQLError).Number == 1062 {
-			w.Write(errorcode.ErrorE(db.DuplicateErr))
-			return
-		}
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+	// uid := xmux.GetInstance(r).Get("uid").(int64)
+	// data := xmux.GetInstance(r).Data.(*model.UserGroup)
+	// rows, err := db.Mconn.GetRowsIn("select id from user where realname in (?)", data.Users)
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
+	// ids := make([]string, 0)
+	// id := new(string)
+	// for rows.Next() {
+	// 	err = rows.Scan(id)
+	// 	if err != nil {
+	// 		golog.Info(err)
+	// 		continue
+	// 	}
+	// 	ids = append(ids, *id)
+	// }
+	// rows.Close()
+	// gsql := "insert usergroup(name,ids,uid) values(?,?,?)"
+	// errorcode.ID, err = db.Mconn.Insert(gsql, data.Name, strings.Join(ids, ","), uid)
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	if err.(*mysql.MySQLError).Number == 1062 {
+	// 		w.Write(errorcode.ErrorE(db.DuplicateErr))
+	// 		return
+	// 	}
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
 
 	w.Write(errorcode.Success())
-	return
-
 }
 
 func GroupDel(w http.ResponseWriter, r *http.Request) {
@@ -354,31 +304,19 @@ func GroupDel(w http.ResponseWriter, r *http.Request) {
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
-	return
-
 }
 
 func GroupUpdate(w http.ResponseWriter, r *http.Request) {
-	errorcode := &response.Response{}
-	uid := xmux.GetInstance(r).Get("uid").(int64)
-	data := xmux.GetInstance(r).Data.(*usergroup.RespUpdateUserGroup)
-	golog.Infof("%+v", *data)
-	ids, err := data.GetIds()
+	// uid := xmux.GetInstance(r).Get("uid").(int64)
+
+	ug := xmux.GetInstance(r).Data.(*model.UserGroup)
+	err := ug.Update()
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	golog.Info(ids)
-	updatesql := "update usergroup set name=?, ids=?, uid=? where id=?"
-	_, err = db.Mconn.Update(updatesql, data.Name, ids, uid, data.Id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		response.ErrorE(err)
 		return
 	}
 
-	w.Write(errorcode.Success())
-	return
+	w.Write(response.Success())
 
 }

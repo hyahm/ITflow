@@ -64,6 +64,30 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func ProjectKeys(w http.ResponseWriter, r *http.Request) {
+
+	errorcode := &response.Response{}
+	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
+	if !perm.Delete {
+		w.Write(errorcode.Error("no perm"))
+		return
+	}
+	id := r.FormValue("id")
+	golog.Info(id)
+	// 判断有没有bug在使用这个
+	var count int
+	// kn := make([]model.KeyName, 0)
+	err := db.Mconn.GetOne("select count(id) from bugs where pid=?", id).Scan(&count)
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+
+	w.Write(errorcode.Success())
+
+}
+
 func DeleteProject(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}

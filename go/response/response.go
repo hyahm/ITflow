@@ -105,3 +105,15 @@ func (es *Response) LoginFailed() []byte {
 	send, _ := json.Marshal(es)
 	return send
 }
+
+func Error(msg string) []byte {
+	return []byte(fmt.Sprintf(`{"code": 1, "msg": "%s"}`, msg))
+}
+
+func ErrorE(err error) []byte {
+	return Error(err.Error())
+}
+
+func Success() []byte {
+	return []byte(`{"code": 0}`)
+}

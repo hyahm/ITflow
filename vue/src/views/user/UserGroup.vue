@@ -16,7 +16,7 @@
       </el-table-column>
       <el-table-column label="成员" width="500">
         <template slot-scope="scope">
-          <span style="margin-left: 10px">{{ scope.row.users }}</span>
+          <span style="margin-left: 10px">{{ scope.row.uids | toname }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作">
@@ -50,12 +50,17 @@
           <el-input v-model="form.name" auto-complete="off" />
         </el-form-item>
         <el-form-item label="用户">
-          <el-select v-model="form.users" multiple placeholder="请选择">
+          <el-select
+            v-model="form.uids"
+            multiple
+            placeholder="请选择"
+            @change="aaaa"
+          >
             <el-option
-              v-for="(user, index) in users"
-              :key="index"
-              :label="user"
-              :value="user"
+              v-for="value in userkeys"
+              :key="value.id"
+              :label="value.name"
+              :value="value.id"
             />
           </el-select>
         </el-form-item>
@@ -70,9 +75,24 @@
 
 <script>
 import { getGroup, addGroup, updateGroup, delGroup } from "@/api/group";
-import { getUsers } from "@/api/get";
+import { getUserKeyName } from "@/api/get";
+let that;
 export default {
   name: "Group",
+  filters: {
+    toname(uids) {
+      let names = [];
+      for (let v of uids) {
+        names.push(that.userMap.get(v));
+      }
+      return names.join(", ");
+    }
+  },
+  created() {
+    this.getuserkey();
+    this.getgroup();
+    that = this;
+  },
   data() {
     return {
       dialogFormVisible: false,
@@ -80,45 +100,50 @@ export default {
       form: {
         id: 0,
         name: "",
-        users: []
+        uids: []
       },
-      users: []
+      userkeys: [],
+      userMap: new Map()
     };
   },
   activated() {
-    this.getuser();
-  },
-  mounted() {
-    this.getgroup();
-    this.getuser();
+    this.getuserkey();
   },
   methods: {
-    getuser() {
-      getUsers().then(resp => {
-        this.users = resp.data.users;
+    aaaa() {
+      console.log(this.form);
+    },
+    getuserkey() {
+      getUserKeyName().then(resp => {
+        this.userkeys = resp.data.data;
+        for (let v of this.userkeys) {
+          this.userMap.set(v.id, v.name);
+        }
       });
     },
     getgroup() {
       getGroup().then(resp => {
-        this.list = resp.data.usergrouplist;
+        this.list = resp.data.data;
       });
     },
     handleAdd() {
       this.form = {
         id: 0,
         name: "",
-        users: []
+        uids: []
       };
+
       this.dialogFormVisible = true;
     },
     confirm() {
       if (this.form.id > 0) {
+        console.log(this.form.uids);
         updateGroup(this.form).then(_ => {
           const l = this.list.length;
           for (let i = 0; i < l; i++) {
             if (this.list[i].id === this.form.id) {
               this.list[i].name = this.form.name;
-              this.list[i].users = this.form.users;
+              this.list[i].uids = this.form.uids;
             }
           }
           this.$message.success("修改成功");
@@ -129,7 +154,7 @@ export default {
           this.list.push({
             id: resp.data.id,
             name: this.form.name,
-            users: this.form.users
+            uids: this.form.uids
           });
           this.$message.success("添加用户组成功");
         });
@@ -139,14 +164,14 @@ export default {
     cancel() {
       this.form = {
         name: "",
-        users: []
+        uids: []
       };
       this.dialogFormVisible = false;
     },
     handleUpdate(row) {
       this.dialogFormVisible = true;
       this.form.id = row.id;
-      this.form.users = row.users;
+      this.form.uids = row.uids;
       this.form.name = row.name;
     },
     handleDelete(id) {

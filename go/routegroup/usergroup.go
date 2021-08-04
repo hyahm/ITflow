@@ -4,6 +4,7 @@ import (
 	"itflow/handle"
 	"itflow/internal/usergroup"
 	"itflow/midware"
+	"itflow/model"
 
 	"github.com/hyahm/xmux"
 )
@@ -27,7 +28,5 @@ func init() {
 	UserGroup.Post("/group/add", handle.GroupAdd).Bind(&usergroup.RespUserGroup{}).AddModule(midware.JsonToStruct)
 	UserGroup.Get("/group/del", handle.GroupDel).ApiDescribe("删除用户组，只有创建者和admin才能操作")
 
-	UserGroup.Post("/group/update", handle.GroupUpdate).Bind(&usergroup.RespUpdateUserGroup{}).
-		AddModule(midware.JsonToStruct).AddModule(midware.CheckUser).
-		ApiDescribe("编辑用户组，只有创建者和admin才能操作").ApiRequestTemplate(`{"id":7,"name":"aa","users":["admin","cander"]}`)
+	UserGroup.Post("/group/update", handle.GroupUpdate).BindJson(&model.UserGroup{})
 }

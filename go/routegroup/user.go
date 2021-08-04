@@ -50,4 +50,5 @@ func init() {
 	User.Post("/is/admin", handle.IsAdmin).ApiDescribe("判断是都是管理员")
 	// User.Post("/email/get", handle.GetEmail).ApiDescribe("获取邮箱")
 	User.Post("/email/update", handle.UpdateEmail).ApiDescribe("修改邮箱")
+	User.Post("/user/keyname", handle.UserKeyName).ApiDescribe("修改邮箱")
 }

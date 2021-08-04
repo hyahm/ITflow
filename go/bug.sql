@@ -689,7 +689,7 @@ UNLOCK TABLES;
 CREATE TABLE `usergroup` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL DEFAULT '',
-  `ids` varchar(200) DEFAULT '',
+  `uids` json,
   `uid` bigint(20) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
