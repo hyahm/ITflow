@@ -5,41 +5,61 @@ import (
 	"errors"
 	"itflow/cache"
 	"itflow/db"
-	"time"
 
 	"github.com/hyahm/goconfig"
+	"github.com/hyahm/golog"
 )
 
 type User struct {
-	ID         int64
-	NickName   string
-	Password   string
-	Email      string
-	HeadImg    string
-	CreateTime int64
-	CreateId   int64
-	RealName   string
-	ShowStatus int64
-	Disable    bool  // 是否是垃圾箱
-	BugGroupId int64 // 可以查看的bug状态
-	// Level      int   // 是否是管理员， 无效
-	Roleid int64 // 角色权限
-	Jobid  int64 // 职位
+	ID         int64   `json:"id" db:"id,default"`
+	NickName   string  `json:"nickname" db:"nickname"`
+	Password   string  `json:"password" db:"password"`
+	Email      string  `json:"email" db:"email"`
+	HeadImg    string  `json:"headimg" db:"headimg"`
+	CreateTime int64   `json:"createtime" db:"createtime"`
+	CreateUId  int64   `json:"createuid" db:"createuid"`
+	RealName   string  `json:"realname" db:"realname"`
+	ShowStatus []int64 `json:"showstatus" db:"showstatus"` // 查看的状态
+	Disable    bool    `json:"disable" db:"disable"`       // 是否是垃圾箱
+	Jobid      int64   `json:"jid" db:"jid"`               // 职位
+}
+
+func GetJobIdByUid(uid int64) (int64, error) {
+	var jid int64
+	err := db.Mconn.GetOne("select jid from user where id=?", uid).Scan(&jid)
+	return jid, err
+}
+
+// 获取所有用户信息
+func GetUsers(jobs []int64) ([]User, error) {
+	users := make([]User, 0)
+	err := db.Mconn.SelectIn(&users, "select * from user where jid in (?)", jobs)
+	return users, err
+}
+
+func GetShowStatus(uid int64) ([]int64, error) {
+	user := User{}
+	err := db.Mconn.Select(&user, "select showstatus from user where id=?", uid)
+	if err != nil {
+		golog.Error(err)
+		return nil, err
+	}
+	return user.ShowStatus, nil
 }
 
 func (user *User) Create() error {
-	user.HeadImg = goconfig.ReadString("defaulthead")
+	// user.HeadImg = goconfig.ReadString("defaulthead")
 
-	var err error
-	createusersql := "insert into user(nickname,password,email,headimg,createtime,createuid,realname,showstatus,disable,bugsid,rid,jid) values(?,?,?,?,?,?,?,?,?,?,?,?)"
-	user.ID, err = db.Mconn.Insert(createusersql,
-		user.NickName, user.Password, user.Email,
-		user.HeadImg, time.Now().Unix(), user.CreateId,
-		user.RealName, user.ShowStatus, false,
-		user.BugGroupId, user.Roleid, user.Jobid,
-	)
+	// var err error
+	// createusersql := "insert into user(nickname,password,email,headimg,createtime,createuid,realname,showstatus,disable,bugsid,rid,jid) values(?,?,?,?,?,?,?,?,?,?,?,?)"
+	// user.ID, err = db.Mconn.Insert(createusersql,
+	// 	user.NickName, user.Password, user.Email,
+	// 	user.HeadImg, time.Now().Unix(), user.CreateId,
+	// 	user.RealName, user.ShowStatus, false,
+	// 	user.BugGroupId, user.Roleid, user.Jobid,
+	// )
 
-	return err
+	return nil
 }
 
 func (user *User) CheckHaveAdminUser() error {
@@ -63,19 +83,58 @@ func (user *User) UpdateAdminPassword(password string) error {
 
 }
 
-func (user *User) UpdateShowStatus(showstatus, uid interface{}) error {
-	basesql := "update user set showstatus=? where id=?"
-	_, err := db.Mconn.Update(basesql, showstatus, uid)
-	if err != nil {
-		return err
-	}
-	return nil
+func (user *User) Update() error {
+	basesql := "update user set $set where id=?"
+	_, err := db.Mconn.UpdateInterface(user, basesql, user.ID)
+	return err
 }
 
-func NewUserById(id interface{}) (*User, error) {
-	user := &User{}
-	err := db.Mconn.GetOne("select id, nickname,email,headimg,createtime,createuid,realname,showstatus,disable,bugsid,rid,jid from user where id=?", id).
-		Scan(&user.ID, &user.NickName, &user.Email, &user.HeadImg, &user.CreateTime, &user.CreateId, &user.RealName, &user.ShowStatus,
-			&user.Disable, &user.BugGroupId, &user.Roleid, &user.Jobid)
-	return user, err
+func GetUserKeyNameByProjectId(projectId int64) ([]KeyName, error) {
+	// 获取用户ids
+	ug := UserGroup{}
+	err := db.Mconn.Select(&ug, "select uids from usergroup where id=( select ugid from project where id=?)", projectId)
+	if err != nil {
+		golog.Error(err)
+		return nil, err
+	}
+	golog.Info(ug.Uids)
+	rows, err := db.Mconn.GetRowsIn(" select id,realname from user where id in (?)", ug.Uids)
+	if err != nil {
+		golog.Error(err)
+		return nil, err
+	}
+	defer rows.Close()
+	kns := make([]KeyName, 0)
+	for rows.Next() {
+		kn := KeyName{}
+		err = rows.Scan(&kn.ID, &kn.Name)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		kns = append(kns, kn)
+	}
+	return kns, nil
+}
+
+func GetAllUserKeyName() ([]KeyName, error) {
+	// 获取用户ids
+
+	rows, err := db.Mconn.GetRowsIn(" select id,realname from user")
+	if err != nil {
+		golog.Error(err)
+		return nil, err
+	}
+	defer rows.Close()
+	kns := make([]KeyName, 0)
+	for rows.Next() {
+		kn := KeyName{}
+		err = rows.Scan(&kn.ID, &kn.Name)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		kns = append(kns, kn)
+	}
+	return kns, nil
 }

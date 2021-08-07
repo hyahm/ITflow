@@ -56,7 +56,6 @@ export default {
           message: "修改密码成功",
           type: "success"
         });
-        this.clean();
       });
     }
   }

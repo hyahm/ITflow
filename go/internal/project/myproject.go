@@ -46,7 +46,7 @@ func (mp *MyProject) Get(uid int64) []byte {
 
 	for _, p := range pl {
 		var uids string
-		err = db.Mconn.GetOne("select ids from usergroup where id=?", p.Gid).Scan(&uids)
+		err = db.Mconn.GetOne("select ids from usergroup where id=?", p.UGid).Scan(&uids)
 		if err != nil {
 			golog.Info(err)
 			continue

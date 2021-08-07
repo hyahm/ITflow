@@ -7,7 +7,6 @@
     </div>
 
     <el-table
-      :key="tableKey"
       v-loading="listLoading"
       :data="userlist"
       border
@@ -74,7 +73,7 @@
           <el-button
             size="mini"
             type="danger"
-            @click="handlePermission(scope.row)"
+            @click="handleChangeInfo(scope.row)"
             >更改信息
           </el-button>
           <el-button size="mini" type="danger" @click="handleRemove(scope.row)"
@@ -121,17 +120,17 @@
         <el-form-item label="职位：">
           <el-select v-model="form.position" placeholder="Select">
             <el-option
-              v-for="(role, index) in positionlist"
-              :key="index"
-              :label="role"
-              :value="role"
+              v-for="item in positionlist"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="cancel">取 消</el-button>
-        <el-button type="primary" @click="HandlerUpdateRoles">确 定</el-button>
+        <el-button type="primary" @click="HandlerUpdate">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -145,9 +144,7 @@ import {
   userRemove,
   userDisable
 } from "@/api/user";
-import { getRoleGroup } from "@/api/rolegroup";
-import { getStatusGroupName } from "@/api/statusgroup";
-import { getPositions } from "@/api/position";
+import { getPositionKeyName } from "@/api/position";
 
 export default {
   name: "Usermanager",
@@ -166,12 +163,8 @@ export default {
       uid: 0,
       rolelist: [],
       dialogVisible: false,
-      rolegrouplist: [],
-      statusgrouplist: [],
       positionlist: [],
-      tableKey: 0,
       userlist: [],
-      admin: false,
       form: {
         id: 0,
         name: ""
@@ -191,25 +184,20 @@ export default {
     // 获取项目名
 
     this.getuserList();
-    this.getgrouplist();
+    this.getPosition();
   },
   methods: {
-    getgrouplist() {
-      getRoleGroup().then(resp => {
-        this.rolegrouplist = resp.data.rolelist;
-      });
-      getStatusGroupName().then(resp => {
-        this.statusgrouplist = resp.data.names;
-      });
-      getPositions().then(resp => {
-        this.positionlist = resp.data.positions;
+    getPosition() {
+      getPositionKeyName().then(resp => {
+        this.positionlist = resp.data.data;
       });
     },
 
     cancel() {
       this.dialogVisible = false;
     },
-    HandlerUpdateRoles() {
+    HandlerUpdate() {
+      console.log(this.form);
       updateUser(this.form).then(_ => {
         const l = this.userlist.length;
         for (let i = 0; i < l; i++) {
@@ -229,7 +217,8 @@ export default {
         this.userlist = resp.data.userlist;
       });
     },
-    handlePermission(row) {
+    handleChangeInfo(row) {
+      console.log(row);
       this.form = row;
       this.dialogVisible = true;
     },

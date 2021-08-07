@@ -40,15 +40,15 @@
           label="项目名称："
         >
           <el-select
-            v-model="postForm.projectname"
+            v-model="postForm.pid"
+            @change="changeProject"
             placeholder="请选择"
-            @change="changeProject(postForm.projectname)"
           >
             <el-option
-              v-for="(item, index) in projectnames"
-              :key="index"
-              :label="item"
-              :value="item"
+              v-for="item in projects"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
@@ -58,12 +58,12 @@
           style="display: inline-block;width: 400px"
           label="运行环境："
         >
-          <el-select v-model="postForm.envname" placeholder="请选择">
+          <el-select v-model="postForm.eid" placeholder="请选择">
             <el-option
-              v-for="(item, index) in envnames"
-              :key="index"
-              :label="item"
-              :value="item"
+              v-for="item in envnames"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
@@ -73,12 +73,12 @@
           style="display: inline-block;width: 400px"
           label="应用版本："
         >
-          <el-select v-model="postForm.version" placeholder="请选择">
+          <el-select v-model="postForm.vid" placeholder="请选择">
             <el-option
-              v-for="(item, index) in versions"
-              :key="index"
-              :label="item"
-              :value="item"
+              v-for="item in versions"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
@@ -88,12 +88,12 @@
           style="display: inline-block;width: 400px"
           label="优先级别："
         >
-          <el-select v-model="postForm.level" placeholder="请选择">
+          <el-select v-model="postForm.lid" placeholder="请选择">
             <el-option
-              v-for="(item, index) in levels"
-              :key="index"
-              :label="item"
-              :value="item"
+              v-for="item in levels"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
@@ -106,12 +106,12 @@
           style="display: inline-block;width: 400px"
           label="重要性："
         >
-          <el-select v-model="postForm.important" placeholder="请选择">
+          <el-select v-model="postForm.iid" placeholder="请选择">
             <el-option
-              v-for="(important, index) in importants"
-              :key="index"
-              :label="important"
-              :value="important"
+              v-for="important in importants"
+              :key="important.id"
+              :label="important.name"
+              :value="important.id"
             />
           </el-select>
         </el-form-item>
@@ -120,16 +120,12 @@
           style="display: inline-block;width: 400px"
           label="分配任务："
         >
-          <el-select
-            v-model="postForm.selectuser"
-            multiple
-            placeholder="分配任务"
-          >
+          <el-select v-model="postForm.spusers" multiple placeholder="分配任务">
             <el-option
-              v-for="(item, index) in users"
-              :key="index"
-              :label="item"
-              :value="item"
+              v-for="item in users"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
@@ -160,11 +156,12 @@ import Sticky from "@/components/Sticky"; // 粘性header组件
 import { fetchBug, createBug } from "@/api/bugs";
 import { uploadImg } from "@/api/uploadimg";
 import {
-  getEnv,
-  getMyProject,
+  getEnvKeyName,
+  getProjectKeyName,
   getLevels,
   getImportants,
-  getProjectUser,
+  getUserKeyName,
+  getVersionKeyName,
   getTyp
 } from "@/api/get";
 
@@ -173,13 +170,13 @@ const defaultForm = {
   title: "", // 文章题目
   content: "", // 文章内容
   id: 0,
-  selectuser: [],
-  projectname: "",
-  level: "",
-  envname: "",
-  important: "",
-  version: "",
-  typ: 1
+  spusers: [],
+  pid: undefined,
+  lid: undefined,
+  eid: undefined,
+  iid: undefined,
+  vid: undefined,
+  tid: 1
 };
 
 export default {
@@ -198,13 +195,15 @@ export default {
     return {
       postForm: Object.assign({}, defaultForm),
       ispub: false,
-      versions: [],
+      versions: [], // 随项目变化的版本号
       importants: [],
       levels: [],
       oses: [],
+      users: [], // 随项目变化的用户
+      projects: [],
       users: [],
-      projectnames: [],
       envnames: [],
+
       ts: [],
       typ: "1"
     };
@@ -218,7 +217,6 @@ export default {
   created() {
     this.getimportants();
     this.getproject();
-    // this.getversion()
     this.getlevels();
     this.getenv();
     this.gettyp();
@@ -231,64 +229,63 @@ export default {
     }
   },
   methods: {
+    getversionMap(projectid) {
+      getVersionKeyName({ project_id: projectid }).then(resp => {
+        this.versions = resp.data.data;
+      });
+    },
+    getuserMap(projectid) {
+      getUserKeyName({ project_id: projectid }).then(resp => {
+        console.log(resp.data.data);
+        this.users = resp.data.data;
+      });
+    },
     gettyp() {
       getTyp().then(resp => {
         this.ts = resp.data.ts;
       });
     },
-    changeProject(name) {
+    changeProject() {
       // 选择不用项目会显示不同的用户
-      this.users = [];
-      getProjectUser(name).then(resp => {
-        this.users = resp.data.name;
-        this.versions = resp.data.versions;
-        this.postForm.version = "";
-        this.postForm.selectuser = [];
-        //
-      });
+      this.getuserMap(this.postForm.pid);
+      this.getversionMap(this.postForm.pid);
+
+      //
     },
 
-    editProject(name) {
-      // 选择不用项目会显示不同的用户
-      this.users = [];
-      getProjectUser(name).then(resp => {
-        this.users = resp.data.name;
-        this.versions = resp.data.versions;
-      });
-    },
     getimportants() {
       getImportants().then(resp => {
-        this.importants = resp.data.importants;
+        this.importants = resp.data.data;
       });
     },
     getlevels() {
       getLevels().then(resp => {
-        this.levels = resp.data.levels;
+        this.levels = resp.data.data;
       });
     },
     getenv() {
-      getEnv().then(resp => {
-        this.envnames = resp.data.envlist;
+      getEnvKeyName().then(resp => {
+        this.envnames = resp.data.data;
       });
     },
     getproject() {
-      getMyProject().then(resp => {
-        this.projectnames = resp.data.name;
+      getProjectKeyName().then(resp => {
+        this.projects = resp.data.data;
       });
     },
 
     fetchData(id) {
       fetchBug(id).then(resp => {
         const dd = resp.data;
-        this.editProject(dd.projectname);
+        this.editProject(dd.project_id);
         this.postForm.title = dd.title;
         this.postForm.content = dd.content;
-        this.postForm.important = dd.important;
+        this.postForm.iid = dd.important;
         this.postForm.version = dd.version;
-        this.postForm.selectuser = dd.selectuser;
+        this.postForm.user_id = dd.user_id;
         this.postForm.envname = dd.envname;
         this.postForm.level = dd.level;
-        this.postForm.projectname = dd.projectname;
+        this.postForm.pid = dd.project_id;
         this.typ = dd.typ + "";
         // 第一次获取数据， 请求到当前项目关联的版本和用户
       });
@@ -304,7 +301,7 @@ export default {
         this.ispub = false;
         return;
       }
-      if (this.postForm.selectuser.length < 1) {
+      if (this.postForm.spusers.length < 1) {
         this.$message({
           message: "请选择指定给谁",
           type: "error"
@@ -312,7 +309,7 @@ export default {
         this.ispub = false;
         return;
       }
-      if (this.postForm.projectname.length < 1) {
+      if (this.postForm.pid == undefined) {
         this.$message({
           message: "请选择项目名称",
           type: "error"
@@ -320,7 +317,7 @@ export default {
         this.ispub = false;
         return;
       }
-      if (this.typ === 1 && this.postForm.level.length < 1) {
+      if (this.typ === 1 && this.postForm.lid == undefined) {
         this.$message({
           message: "请选择项目级别",
           type: "error"
@@ -328,7 +325,7 @@ export default {
         this.ispub = false;
         return;
       }
-      if (this.typ === 1 && this.postForm.important.length < 1) {
+      if (this.typ === 1 && this.postForm.iid == undefined) {
         this.$message({
           message: "请选择项目严重程度",
           type: "error"
@@ -344,7 +341,7 @@ export default {
         this.ispub = false;
         return;
       }
-      if (this.typ === 1 && this.postForm.envname.length < 1) {
+      if (this.typ === 1 && this.postForm.eid == undefined) {
         this.$message({
           message: "请选择运行环境",
           type: "error"
@@ -352,7 +349,7 @@ export default {
         this.ispub = false;
         return;
       }
-      if (this.typ === 1 && this.postForm.version.length < 1) {
+      if (this.typ === 1 && this.postForm.vid == undefined) {
         this.$message({
           message: "请选择版本",
           type: "error"
@@ -362,7 +359,7 @@ export default {
       }
       this.$refs.postForm.validate(valid => {
         if (valid) {
-          this.postForm.typ = parseInt(this.typ);
+          this.postForm.tid = parseInt(this.tid);
           createBug(this.postForm).then(resp => {
             if (this.postForm.id === 0) {
               this.$notify({

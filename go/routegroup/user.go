@@ -32,23 +32,7 @@ func init() {
 		ApiResStruct(response.Response{}).
 		ApiSupplement("返回码是大部分公用的")
 
-	User.Get("/user/info", handle.UserInfo).
-		ApiDescribe("获取用户信息").
-		ApiResStruct(user.UserInfo{}).
-		ApiResponseTemplate(`{"roles": ["admin"], "code": 0, "avatar":"http://xxxx/aaaa.png", "nickname": "admin"}`)
-
-	User.Post("/user/create", handle.CreateUser).Bind(&user.GetAddUser{}).AddModule(midware.UserPerm).
-		AddModule(midware.JsonToStruct).ApiDescribe("添加用户").
-		ApiRequestTemplate(`{"nickname":"cander","email":"yifan@uupoweremail.com","password":"123456","repassword":"123456","realname":"cander","rolegroup":"all","statusgroup":"aaa","level":2,"position":"aaaaa"}`)
-
-	User.Post("/password/update", handle.ChangePassword).Bind(&user.ChangePasswod{}).
-		AddModule(midware.JsonToStruct)
-
 	User.Post("/get/user", handle.GetUser).ApiDescribe("获取所有用户的真实名")
-	User.Get("/get/project/user", handle.GetProjectUser).ApiDescribe("根据项目获取关联用户和版本")
 
-	User.Post("/is/admin", handle.IsAdmin).ApiDescribe("判断是都是管理员")
-	// User.Post("/email/get", handle.GetEmail).ApiDescribe("获取邮箱")
-	User.Post("/email/update", handle.UpdateEmail).ApiDescribe("修改邮箱")
-	User.Post("/user/keyname", handle.UserKeyName).ApiDescribe("修改邮箱")
+	User.Post("/is/admin", handle.IsAdmin).ApiDescribe("判断是不是管理员")
 }

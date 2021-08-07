@@ -1,80 +1,35 @@
 package model
 
 import (
-	"encoding/json"
 	"html"
 	"itflow/db"
-
-	"github.com/hyahm/golog"
 )
 
-type ArticleList struct {
-	ID          int      `json:"id"`
-	Date        int64    `json:"date"`
-	Author      string   `json:"author"`
-	Importance  string   `json:"important"`
-	Status      string   `json:"status"`
-	Title       string   `json:"title"`
-	Action      string   `json:"action"`
-	Dustbin     int      `json:"dustbin"`
-	Level       string   `json:"level"`
-	Projectname string   `json:"projectname"`
-	Env         string   `json:"env"`
-	Handle      []string `json:"handle"`
-}
-
-type AllArticleList struct {
-	Al    []*ArticleList `json:"articlelist"`
-	Code  int            `json:"code"`
-	Count int            `json:"total"`
-	Page  int            `json:"page"`
-	Msg   string         `json:"msg"`
-}
-
-func (al *AllArticleList) Marshal() []byte {
-	send, err := json.Marshal(al)
-	if err != nil {
-		golog.Error(err)
-	}
-	return send
-}
-
-func (al *AllArticleList) Error(msg string) []byte {
-	al.Code = 1
-	al.Msg = msg
-	return al.Marshal()
-}
-
-func (al *AllArticleList) ErrorE(err error) []byte {
-	return al.Error(err.Error())
-}
-
 type Bug struct {
-	ID           int64
-	Uid          int64
-	StatusId     int64 // sid
-	Title        string
-	Content      string
-	ImportanceId int64
-	CreateTime   int64
-	VersionId    int64
-	OprateUsers  int64
-	LevelId      int64
-	EnvId        int64
-	ProjectId    int64
-	UpdateTime   int64
-	Dustbin      bool
+	ID         int64   `json:"id" db:"id,default"`
+	UID        int64   `json:"uid" db:"uid"`
+	Title      string  `json:"title" db:"title"`
+	Sid        int64   `json:"sid" db:"sid"` // bug状态id
+	Content    string  `json:"content" db:"content"`
+	OwnerId    int64   `json:"ownerid" db:"ownerid"` // 创建者
+	Iid        int64   `json:"iid" db:"iid"`         // import id
+	CreateTime int64   `json:"createtime" db:"createtime"`
+	Uids       []int64 `json:"spusers" db:"spusers"` // users id
+	Lid        int64   `json:"lid" db:"lid"`         // level id
+	Eid        int64   `json:"eid" db:"eid"`         // env id
+	Tid        int64   `json:"tid" db:"tid"`         // type id
+	Pid        int64   `json:"pid" db:"pid"`         // project id
+	UpdateTime int64   `json:"updatetime" db:"updatetime"`
+	Dustbin    bool    `json:"dustbin" db:"dustbin"`
 }
 
-func NewBugById(id interface{}) (*Bug, error) {
+func GetBugById(id interface{}, uid int64) (*Bug, error) {
 	bug := &Bug{}
-
-	err := db.Mconn.GetOne("select id, uid,title,sid,content,iid,createtime,vid,spusers,lid,eid,pid,updatetime from bugs where dustbin=true and id=?", id).Scan(
-		&bug.ID, &bug.Uid, &bug.Title, &bug.StatusId, &bug.Content, &bug.ImportanceId, &bug.CreateTime, &bug.VersionId, &bug.OprateUsers,
-		&bug.LevelId, &bug.EnvId, &bug.ProjectId, &bug.UpdateTime,
-	)
-	bug.Content = html.UnescapeString(bug.Content)
-	return bug, err
+	err := db.Mconn.Select(&bug, "select * from bugs where id=? and ownerid=?", id, uid)
+	if err != nil {
+		return nil, err
+	}
+	return bug, nil
 }
 
 func GetCreatedCountByTime(start, end int64) (int, error) {
@@ -106,20 +61,18 @@ func (bug *Bug) Delete(id interface{}) error {
 }
 
 func (bug *Bug) CreateBug() (err error) {
-	insertsql := "insert into bugs(uid,title,sid,content,iid,createtime,lid,pid,eid,spusers,vid,dustbin) values(?,?,?,?,?,?,?,?,?,?,?,true)"
-	bug.ID, err = db.Mconn.Insert(insertsql,
-		bug.Uid, bug.Title, bug.StatusId, html.EscapeString(bug.Content),
-		bug.ImportanceId, bug.CreateTime, bug.LevelId,
-		bug.ProjectId, bug.EnvId, bug.OprateUsers, bug.VersionId)
-
+	insertsql := "insert into bugs($key) values($value)"
+	ids, err := db.Mconn.InsertInterfaceWithID(bug, insertsql)
+	if err != nil {
+		return
+	}
+	bug.ID = ids[0]
 	return
 }
 
 func (bug *Bug) EditBug() (err error) {
-	insertsql := "update bugs set title=?,content=?,iid=?,updatetime=?,lid=?,pid=?,eid=?,spusers=?,vid=? where id=?"
-
-	_, err = db.Mconn.Update(insertsql, bug.Title, html.EscapeString(bug.Content), bug.ImportanceId,
-		bug.UpdateTime, bug.LevelId, bug.ProjectId, bug.EnvId, bug.OprateUsers, bug.VersionId, bug.ID)
-
+	bug.Content = html.EscapeString(bug.Content)
+	insertsql := "update bugs set  $set where id=?"
+	_, err = db.Mconn.UpdateInterface(bug, insertsql, bug.ID)
 	return
 }

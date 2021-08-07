@@ -4,6 +4,7 @@ import (
 	"itflow/db"
 	"itflow/internal/perm"
 	"itflow/internal/project"
+	"itflow/model"
 	"itflow/response"
 	"net/http"
 
@@ -65,26 +66,17 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 }
 
 func ProjectKeys(w http.ResponseWriter, r *http.Request) {
-
-	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Delete {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
-	id := r.FormValue("id")
-	golog.Info(id)
-	// 判断有没有bug在使用这个
-	var count int
-	// kn := make([]model.KeyName, 0)
-	err := db.Mconn.GetOne("select count(id) from bugs where pid=?", id).Scan(&count)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
+	pkn, err := model.GetProjectKeyName(uid)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		w.Write(response.ErrorE(err))
 		return
 	}
-
-	w.Write(errorcode.Success())
+	res := response.Response{
+		Data: pkn,
+	}
+	w.Write(res.Marshal())
 
 }
 

@@ -2,8 +2,10 @@ package routegroup
 
 import (
 	"itflow/handle"
+	"itflow/handle/usercontroller"
 	"itflow/internal/user"
 	"itflow/midware"
+	"itflow/routegroup/usermanager"
 
 	"github.com/hyahm/xmux"
 )
@@ -18,13 +20,20 @@ func init() {
 		ApiCodeField("code").ApiCodeMsg("1", "其他错误,请查看返回的msg").
 		ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
+	// 用户组页面
+	UserManager.AddGroup(usermanager.UserGroupPage)
+
+	// 修改密码页面
 	UserManager.Post("/password/reset", handle.ResetPwd).Bind(&user.ResetPassword{}).AddModule(midware.UserPerm).
 		AddModule(midware.JsonToStruct).ApiDescribe("修改密码")
+	// 修改邮箱页面
+	UserManager.AddGroup(usermanager.UpdateEmailPage)
+	// 上传头像页面
+	UserManager.Post("/upload/headimg", handle.UploadHeadImg)
+	// 修改密码页面
+	UserManager.Post("/password/update", usercontroller.ChangePassword).Bind(&user.ChangePasswod{}).
+		AddModule(midware.JsonToStruct)
+	// 用户列表管理页面
+	UserManager.AddGroup(usermanager.UserListPage)
 
-	UserManager.Get("/user/remove", handle.RemoveUser).ApiDescribe("删除用户").AddModule(midware.UserPerm)
-
-	UserManager.Get("/user/disable", handle.DisableUser).ApiDescribe("禁用用户").AddModule(midware.UserPerm)
-	UserManager.Post("/user/list", handle.UserList).ApiDescribe("获取用户列表").AddModule(midware.UserPerm)
-	UserManager.Post("/user/update", handle.UserUpdate).Bind(&user.User{}).AddModule(midware.UserPerm).AddModule(midware.JsonToStruct).
-		ApiDescribe("修改用户").ApiRequestTemplate(`{"id":3,"createtime":1594094022,"realname":"test","nickname":"test","email":"test@qq.com","disable":0,"statusgroup":"验证","rolegroup":"test","position":"python"}`)
 }

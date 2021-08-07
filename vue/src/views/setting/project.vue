@@ -62,9 +62,9 @@
 
         <el-form-item
           style="display: inline-block;width: 300px"
-          label="参与者："
+          label="参与组: "
         >
-          <el-select v-model="form.groupname" placeholder="参与者">
+          <el-select v-model="form.groupname" placeholder="参与组">
             <el-option
               v-for="(item, index) in usergroups"
               :key="index"

@@ -65,10 +65,10 @@
         <el-form-item style="margin-bottom: 40px;" prop="title" label="职位名:">
           <el-select v-model="postForm.position" placeholder="Select">
             <el-option
-              v-for="(position, index) in positions"
-              :key="index"
-              :label="position"
-              :value="position"
+              v-for="position in positions"
+              :key="position.id"
+              :label="position.name"
+              :value="position.id"
             />
           </el-select>
         </el-form-item>
@@ -96,7 +96,7 @@
 
 <script>
 import { createUser } from "@/api/user";
-import { getPositions } from "@/api/position";
+import { getPositionKeyName } from "@/api/position";
 export default {
   name: "Adduser",
   data() {
@@ -136,8 +136,9 @@ export default {
   },
   methods: {
     getpositions() {
-      getPositions().then(resp => {
-        this.positions = resp.data.positions;
+      getPositionKeyName().then(resp => {
+        this.positions = resp.data.data;
+        console.log(this.positions);
       });
     },
 

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"itflow/cache"
 	"itflow/db"
 
 	"github.com/hyahm/goconfig"
@@ -13,10 +14,28 @@ type UserGroup struct {
 	Uid  int64   `json:"uid" db:"uid"`
 }
 
-func (ug *UserGroup) Update() error {
-	gsql := "update usergroup set $set where id=? "
-	_, err := db.Mconn.UpdateInterface(ug, gsql, ug.Id)
-	return err
+func (ug *UserGroup) Delete(id interface{}) (err error) {
+
+	if cache.SUPERID == ug.Uid {
+		gsql := "delete from usergroup where id=? "
+		_, err = db.Mconn.Delete(gsql, id)
+	} else {
+		gsql := "delete from  usergroup where id=? and uid=?"
+		_, err = db.Mconn.Delete(gsql, id, ug.Uid)
+	}
+	return
+}
+
+func (ug *UserGroup) Update() (err error) {
+
+	if cache.SUPERID == ug.Uid {
+		gsql := "update usergroup set $set where id=? "
+		_, err = db.Mconn.UpdateInterface(ug, gsql, ug.Id)
+	} else {
+		gsql := "update usergroup set $set where id=? and uid=?"
+		_, err = db.Mconn.UpdateInterface(ug, gsql, ug.Id, ug.Uid)
+	}
+	return
 }
 
 func (ug *UserGroup) Create() error {
@@ -34,4 +53,28 @@ func GetUserGroupList(uid int64) ([]UserGroup, error) {
 	gsql := "select * from usergroup where uid=? or uid=? or json_contains(uids,json_array(?))"
 	err := db.Mconn.Select(&ug, gsql, uid, goconfig.ReadInt64("adminid", 1), uid)
 	return ug, err
+}
+
+func GetUserGroupIds(uid int64) ([]int64, error) {
+
+	gsql := "select id from usergroup where uid=? or uid=? or json_contains(uids,json_array(?))"
+	rows, err := db.Mconn.GetRows(gsql, uid, goconfig.ReadInt64("adminid", 1), uid)
+	if err != nil {
+		return nil, err
+	}
+	ids := make([]int64, 0)
+	defer rows.Close()
+	for rows.Next() {
+		var id int64
+		err = rows.Scan(&id)
+		if err != nil {
+			continue
+		}
+		ids = append(ids, id)
+	}
+	return ids, nil
+}
+
+func (ug *UserGroup) GetUserIds() error {
+	return db.Mconn.Select(&ug, "select uids from usergroup where id=?", ug.Id)
 }

@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql"
+	"itflow/cache"
 	"itflow/db"
 	"strings"
 
@@ -39,6 +40,28 @@ func GetStatusList() ([]*Status, error) {
 		return ss, err
 	}
 	return ss, nil
+}
+
+func GetStatusIDsByUid(uid int64) ([]*Status, error) {
+
+	if uid == cache.SUPERID {
+		return GetStatusList()
+	} else {
+		// 获取statusids 通过uid
+		sids, err := getStatusIDsByUid(uid)
+		if err != nil {
+			golog.Error(err)
+			return nil, err
+		}
+		ss := make([]*Status, 0)
+		err = db.Mconn.SelectIn(&ss, "select * from status where id in (?)", sids)
+		if err != nil {
+			golog.Error(err)
+			return ss, err
+		}
+		return ss, nil
+
+	}
 }
 
 func GetMyStatusList(id interface{}) ([]string, error) {

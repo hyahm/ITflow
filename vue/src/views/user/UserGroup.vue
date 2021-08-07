@@ -50,14 +50,9 @@
           <el-input v-model="form.name" auto-complete="off" />
         </el-form-item>
         <el-form-item label="用户">
-          <el-select
-            v-model="form.uids"
-            multiple
-            placeholder="请选择"
-            @change="aaaa"
-          >
+          <el-select v-model="form.uids" multiple placeholder="请选择">
             <el-option
-              v-for="value in userkeys"
+              v-for="value in users"
               :key="value.id"
               :label="value.name"
               :value="value.id"
@@ -74,7 +69,13 @@
 </template>
 
 <script>
-import { getGroup, addGroup, updateGroup, delGroup } from "@/api/group";
+import {
+  getAllUserKeyName,
+  getUserGroups,
+  createUserGroups,
+  deleteUserGroups,
+  updateUserGroup
+} from "@/api/usermanager/usergroup";
 import { getUserKeyName } from "@/api/get";
 let that;
 export default {
@@ -102,7 +103,7 @@ export default {
         name: "",
         uids: []
       },
-      userkeys: [],
+      users: [],
       userMap: new Map()
     };
   },
@@ -110,19 +111,18 @@ export default {
     this.getuserkey();
   },
   methods: {
-    aaaa() {
-      console.log(this.form);
-    },
     getuserkey() {
-      getUserKeyName().then(resp => {
-        this.userkeys = resp.data.data;
-        for (let v of this.userkeys) {
+      getAllUserKeyName().then(resp => {
+        console.log(resp.data.data);
+        this.users = resp.data.data;
+        for (let v of this.users) {
           this.userMap.set(v.id, v.name);
         }
       });
     },
     getgroup() {
-      getGroup().then(resp => {
+      getUserGroups().then(resp => {
+        console.log(resp.data.data);
         this.list = resp.data.data;
       });
     },
@@ -137,20 +137,17 @@ export default {
     },
     confirm() {
       if (this.form.id > 0) {
-        console.log(this.form.uids);
-        updateGroup(this.form).then(_ => {
+        updateUserGroup(this.form).then(_ => {
           const l = this.list.length;
           for (let i = 0; i < l; i++) {
             if (this.list[i].id === this.form.id) {
-              this.list[i].name = this.form.name;
-              this.list[i].uids = this.form.uids;
+              this.list[i] = this.form;
             }
           }
           this.$message.success("修改成功");
-          return;
         });
       } else {
-        addGroup(this.form).then(resp => {
+        createUserGroups(this.form).then(resp => {
           this.list.push({
             id: resp.data.id,
             name: this.form.name,
@@ -181,7 +178,8 @@ export default {
         type: "warning"
       })
         .then(() => {
-          delGroup(id).then(_ => {
+          console.log("88888");
+          deleteUserGroups(id).then(_ => {
             for (let i in this.list) {
               if (this.list[i].id === id) {
                 this.list.splice(i, 1);

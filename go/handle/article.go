@@ -8,7 +8,7 @@ import (
 	"itflow/db"
 	"itflow/internal/bug"
 	"itflow/internal/comment"
-	"itflow/internal/project"
+	"itflow/model"
 	"itflow/response"
 	"net/http"
 	"os"
@@ -170,31 +170,41 @@ func IsAdmin(w http.ResponseWriter, r *http.Request) {
 // 	return
 // }
 
-func UpdateEmail(w http.ResponseWriter, r *http.Request) {
-	errorcode := &response.Response{}
-	id := xmux.GetInstance(r).Get("uid")
-	b, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	_, err = db.Mconn.Update("update user set email=? where id=?", string(b), id)
-	if err != nil {
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	w.Write(errorcode.Success())
-	return
-}
-
 func GetProjectUser(w http.ResponseWriter, r *http.Request) {
 	// 通过project 来获取所属用户
-	projectname := r.FormValue("name")
-	uid := xmux.GetInstance(r).Get("uid").(int64)
-	// 先要判断下， 这个用户是否有这个项目的权限
-	w.Write(project.GetUsersByProjectName(uid, projectname))
-	return
+	pid := xmux.Var(r)["id"]
+	projectId, err := strconv.ParseInt(pid, 10, 64)
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
+		return
+	}
+	res := response.Response{}
+	// 通过project_id 获取对应的version_ids
+	res.VersionIds, err = model.GetVersionIdsByProjectId(projectId)
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
+		return
+	}
+	// 通过project_id 获取对应的user_id
+	// 获取usergroupid
+	ug := model.UserGroup{}
+	ug.Id, err = model.GetUserGroupId(projectId)
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
+		return
+	}
 
+	err = ug.GetUserIds()
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
+		return
+	}
+	res.UserIds = ug.Uids
+	w.Write(res.Marshal())
 }
 
 type versionList struct {

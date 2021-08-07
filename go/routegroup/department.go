@@ -1,10 +1,6 @@
 package routegroup
 
 import (
-	"itflow/handle"
-	"itflow/internal/status"
-	"itflow/midware"
-
 	"github.com/hyahm/xmux"
 )
 
@@ -20,11 +16,11 @@ func init() {
 	Department.ApiCodeField("code").ApiCodeMsg("其他错误", "请查看返回的msg")
 	Department.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
-	Department.Post("/department/add", handle.AddBugGroup).
-		Bind(&status.StatusGroup{}).AddModule(midware.JsonToStruct)
+	// Department.Post("/department/add", handle.AddBugGroup).
+	// 	Bind(&status.StatusGroup{}).AddModule(midware.JsonToStruct)
 
-	Department.Post("/department/edit", handle.EditBugGroup).
-		Bind(&status.StatusGroup{}).AddModule(midware.JsonToStruct)
-	// Department.Post("/department/list", handle.BugGroupList)
-	Department.Get("/department/remove", handle.BugGroupDel)
+	// Department.Post("/department/edit", handle.EditBugGroup).
+	// 	Bind(&status.StatusGroup{}).AddModule(midware.JsonToStruct)
+	// // Department.Post("/department/list", handle.BugGroupList)
+	// Department.Get("/department/remove", handle.BugGroupDel)
 }

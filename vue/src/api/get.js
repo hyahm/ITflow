@@ -28,6 +28,13 @@ export function getProject() {
   });
 }
 
+export function getProjectKeyName() {
+  return request({
+    url: "/project/keyname",
+    method: "post"
+  });
+}
+
 export function getMyProject() {
   return request({
     url: "/get/myproject",
@@ -45,10 +52,19 @@ export function getUsers(data) {
 }
 
 // 获取某项目的用户真实姓名
-export function getUserKeyName() {
+export function getUserKeyName(data) {
   return request({
     url: "/user/keyname",
-    method: "post"
+    method: "post",
+    data
+  });
+}
+// 获取某项目的用户真实姓名
+export function getVersionKeyName(data) {
+  return request({
+    url: "/version/keyname",
+    method: "post",
+    data
   });
 }
 
@@ -62,6 +78,13 @@ export function getVersion() {
 export function getOs() {
   return request({
     url: "/get/os",
+    method: "post"
+  });
+}
+
+export function getEnvKeyName() {
+  return request({
+    url: "/env/keyname",
     method: "post"
   });
 }
@@ -97,23 +120,22 @@ export function getThisRole(id) {
 
 export function getImportants() {
   return request({
-    url: "/get/importants",
+    url: "/important/keyname",
     method: "post"
   });
 }
 
 export function getLevels() {
   return request({
-    url: "/get/levels",
+    url: "/level/keyname",
     method: "post"
   });
 }
 
-export function getProjectUser(name) {
+export function getProjectUser(id) {
   return request({
-    url: "/get/project/user",
-    method: "get",
-    params: { name }
+    url: `/project/user/${id}`,
+    method: "get"
   });
 }
 

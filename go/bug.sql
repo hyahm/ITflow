@@ -654,7 +654,7 @@ CREATE TABLE `user` (
   `createtime` bigint(20) DEFAULT '0',
   `createuid` bigint(20) DEFAULT '0',
   `realname` varchar(30) NOT NULL,
-  `showstatus` varchar(200) DEFAULT '',
+  `showstatus` json,
   `disable` tinyint(1) DEFAULT '0',
   `jid` bigint(20) DEFAULT '0',
 
@@ -662,11 +662,8 @@ CREATE TABLE `user` (
   UNIQUE KEY `nickname` (`nickname`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `realname` (`realname`),
-
   KEY `jid` (`jid`),
   KEY `createuid` (`createuid`),
-  KEY `disable` (`disable`),
-  KEY `showstatus` (`showstatus`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

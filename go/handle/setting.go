@@ -270,7 +270,8 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 }
 
 func UserUpdate(w http.ResponseWriter, r *http.Request) {
-
+	// 跟 userlist 一样，
+	// 根据uid 查找
 	errorcode := &response.Response{}
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 	if cache.SUPERID != uid {
@@ -280,36 +281,6 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 
 	uls := xmux.GetInstance(r).Data.(*user.User)
 
-	// 0是系统管理员， 1是管理层， 2是普通用户
-	//switch level {
-	//case 0:
-
-	// var hasstatusgroup bool
-	// var rid int64
-	// var bsid int64
-
-	// err := model.CheckRoleNameInGroup(uls.RoleGroup, &rid)
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(errorcode.ErrorE(err))
-	// 	return
-	// }
-
-	// for k, v := range cache.CacheSgidGroup {
-	// 	if v == uls.StatusGroup {
-	// 		bsid = k
-	// 		hasstatusgroup = true
-	// 		break
-	// 	}
-	// }
-	// if _, ok := cache.CacheJobnameJid[uls.Position]; !ok {
-	// 	w.Write(errorcode.Error("没有找到职位"))
-	// 	return
-	// }
-	// if !hasstatusgroup {
-	// 	w.Write(errorcode.Error("没有找到status"))
-	// 	return
-	// }
 	if strings.Contains(uls.Nickname, "@") {
 		w.Write(errorcode.Error("昵称不能包含@符号"))
 		return
@@ -332,38 +303,6 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 	w.Write(send)
 	return
 
-}
-
-func ChangePassword(w http.ResponseWriter, r *http.Request) {
-	errorcode := &response.Response{}
-
-	getuser := xmux.GetInstance(r).Data.(*user.ChangePasswod)
-
-	uid := xmux.GetInstance(r).Get("uid").(int64)
-
-	getaritclesql := "select count(id) from user where id=? and password=?"
-	oldpassword := encrypt.PwdEncrypt(getuser.Oldpassword, cache.Salt)
-	var n int
-	err := db.Mconn.GetOne(getaritclesql, uid, oldpassword).Scan(&n)
-	if err != nil || n != 1 {
-		golog.Error(err)
-		w.Write(errorcode.ErrorNoPermission())
-		return
-	}
-
-	newpassword := encrypt.PwdEncrypt(getuser.Newpassword, cache.Salt)
-	chpwdsql := "update user set password=? where id=?"
-
-	_, err = db.Mconn.Update(chpwdsql, newpassword, uid)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
-	return
 }
 
 func GetRoles(w http.ResponseWriter, r *http.Request) {

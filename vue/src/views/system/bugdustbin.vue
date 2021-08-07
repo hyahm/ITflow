@@ -68,11 +68,11 @@
             @change="HandleChange"
           >
             <el-checkbox
-              v-for="(item, index) in allStatus"
-              :key="index"
-              :label="item"
+              v-for="item in allStatus"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             >
-              {{ item }}
             </el-checkbox>
           </el-checkbox-group>
         </el-dropdown-menu>
@@ -217,6 +217,7 @@ export default {
       showstatus: [],
       total: 0,
       allStatus: [],
+      statusMap: new Map(),
       statuslength: 0
     };
   },
@@ -234,7 +235,10 @@ export default {
   methods: {
     getstatus() {
       getStatus().then(resp => {
-        this.allStatus = resp.data.statuslist;
+        this.allStatus = resp.data.data;
+        for (let v of this.allStatus) {
+          this.statusMap.set(v.name, v.id);
+        }
       });
       // 可以修改的权限
       getPermStatus().then(resp => {
@@ -253,8 +257,16 @@ export default {
       });
     },
     HandleChange() {
+      let sids = this.showstatus.map(m => {
+        return this.statusMap.get(m);
+      });
+      if (sids.length == 0) {
+        this.$message.error("至少选中一个状态");
+        return;
+      }
+
       const data = {
-        checkstatus: this.showstatus
+        showstatus: this.sids
       };
       statusFilter(data).then(_ => {
         this.statuslength = this.showstatus.length;

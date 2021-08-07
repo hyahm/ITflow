@@ -4,8 +4,8 @@ import (
 	"itflow/handle"
 	"itflow/internal/bug"
 	"itflow/internal/search"
-	"itflow/internal/status"
 	"itflow/midware"
+	"itflow/model"
 
 	"github.com/hyahm/xmux"
 )
@@ -22,20 +22,13 @@ func init() {
 	Bug.Post("/bug/pass", handle.PassBug).Bind(&bug.PassBug{}).
 		AddModule(midware.JsonToStruct).ApiDescribe("转交bug").ApiReqStruct(&bug.PassBug{})
 
-	Bug.Post("/bug/create", handle.BugCreate).Bind(&bug.EditBug{}).
-		AddModule(midware.JsonToStruct)
-
-	Bug.Get("/bug/edit", handle.BugEdit).
-		ApiDescribe("页面编辑获取数据").
-		ApiResponseTemplate(`{"title":"metu","content":"<p>反反复复</p>","id":-1,"selectuser":["sdfsadf"],"projectname":"123","level":"2","envname":"axi","important":"一般ee","version":"V 1.5"}`)
-
 	Bug.Post("/bug/mybugs", handle.GetMyBugs).Bind(&search.ReqMyBugFilter{})
 
 	Bug.Get("/bug/close", handle.CloseBug)
 	Bug.Post("/bug/changestatus", handle.ChangeBugStatus).Bind(&bug.ChangeStatus{}).
 		AddModule(midware.JsonToStruct)
 
-	Bug.Post("/status/filter", handle.ChangeFilterStatus).Bind(&status.Status{}).
+	Bug.Post("/status/filter", handle.ChangeFilterStatus).Bind(&model.User{}).
 		AddModule(midware.JsonToStruct).ApiDescribe("修改显示bug的状态")
 
 	Bug.Get("/bug/show", handle.BugShow).

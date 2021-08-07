@@ -26,6 +26,7 @@ func GetList(uid int64) []byte {
 	}
 	ps, err := model.NewProjectListCheckId(uid)
 	if err != nil {
+		golog.Error(err)
 		rpl.Code = 1
 		rpl.Msg = err.Error()
 		return rpl.Marshal()
@@ -35,7 +36,7 @@ func GetList(uid int64) []byte {
 			ProjectName: p.Name,
 		}
 		rp.Id = p.Id
-		err = db.Mconn.GetOne("select name from usergroup where id=?", p.Gid).Scan(&rp.GroupName)
+		err = db.Mconn.GetOne("select name from usergroup where id=?", p.UGid).Scan(&rp.GroupName)
 		if err != nil {
 			golog.Info(err)
 			continue

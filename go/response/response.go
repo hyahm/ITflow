@@ -12,7 +12,9 @@ type Response struct {
 	Msg        string      `json:"msg"`
 	ID         int64       `json:"id"`
 	UpdateTime int64       `json:"update_time"`
-	Data       interface{} `json:"data,omitemtpy"`
+	UserIds    []int64     `json:"user_ids"`
+	VersionIds []int64     `json:"version_ids"`
+	Data       interface{} `json:"data"`
 }
 
 func (r *Response) Marshal() []byte {
