@@ -31,8 +31,6 @@ func init() {
 	Project.Get("/project/delete", handle.DeleteProject).
 		ApiDescribe("删除项目")
 
-		// 获取项目列表索引
-	Project.Post("/project/keyname", handle.ProjectKeys)
 	Project.Post("/get/project", handle.GetProject).ApiDescribe("获取所有项目名")
 	Project.Post("/get/myproject", handle.GetMyProject).ApiDescribe("获取自己权限的项目名")
 }

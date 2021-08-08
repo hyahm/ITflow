@@ -1,8 +1,15 @@
 package handle
 
 import (
+	"fmt"
 	"itflow/internal/bug"
+	"itflow/internal/search"
+	"itflow/model"
+	"itflow/response"
 	"net/http"
+
+	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
@@ -127,90 +134,46 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 
 func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 
-	// uid := xmux.GetInstance(r).Get("uid").(int64)
-	// mybug := xmux.GetInstance(r).Data.(*search.ReqMyBugFilter)
-	// al := &model.AllArticleList{
-	// 	Al:   make([]*model.ArticleList, 0),
-	// 	Page: 1,
-	// }
-	// statislist, err := model.GetMyStatusList(uid)
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(al.ErrorE(err))
-	// 	return
-	// }
+	uid := xmux.GetInstance(r).Get("uid").(int64)
+	search := xmux.GetInstance(r).Data.(*search.ReqMyBugFilter)
+	sql, args := search.GetUsefulCondition(uid)
+	if len(sql) > 0 {
+		sql = " and " + sql
+	}
+	countsql := "select count(id) from bugs where dustbin=false " + sql
+	golog.Info(countsql)
+	// 获取总数
+	count, err := model.GetCount(countsql, args...)
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
+		return
+	}
 
-	// conditionsql, args := mybug.GetUsefulCondition(uid)
-	// countArgs := make([]interface{}, 0)
-	// countArgs = append(countArgs, uid, statislist)
-	// countArgs = append(countArgs, args...)
-	// countsql := "select count(id) from bugs where dustbin=false and uid=? and sid in (?)"
-	// err = db.Mconn.GetOneIn(countsql+conditionsql, countArgs...).Scan(&al.Count)
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(al.ErrorE(err))
-	// 	return
-	// }
+	res := response.Response{
+		Count: count,
+		Page:  search.Page,
+	}
+	if count == 0 {
+		res.Data = make([]int64, 0)
+		w.Write(res.Marshal())
+		return
+	}
+	// 获取数据库的limit
+	page, start, end := xmux.GetLimit(count, search.Page, search.Limit)
+	res.Page = page
+	pager := fmt.Sprintf(" limit %d,%d", start, end)
+	listsql := "select * from bugs where dustbin=false " + sql + pager
+	golog.Info(listsql)
 
-	// page, start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
-	// al.Page = page
-	// searchArgs := make([]interface{}, 0)
-	// searchArgs = append(searchArgs, uid, statislist)
-	// searchArgs = append(searchArgs, args...)
-	// searchArgs = append(searchArgs, start, end)
-	// // searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs join  on dustbin=true and uid=? "
-	// searchsql := `select b.id,b.createtime, ifnull(i.name, ''), ifnull(s.name, ''),title,
-	// ifnull(l.name, ''), ifnull(p.name, ''), ifnull(e.name, ''),spusers, ifnull(u.realname,'') from bugs as b
-	// left join importants as i on b.iid = i.id
-	// left join status as s on b.sid = s.id
-	// left join level as l on b.lid = l.id
-	// left join project as p on b.pid=p.id
-	// left join environment as e on b.eid = e.id
-	// left join user as u on  b.uid=u.id
-	// where dustbin=false  and b.uid=? and sid in (?)`
-	// rows, err := db.Mconn.GetRowsIn(searchsql+conditionsql+" order by id desc limit ?,?", searchArgs...)
-
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(al.ErrorE(err))
-	// 	return
-	// }
-
-	// for rows.Next() {
-	// 	bug := &model.ArticleList{
-	// 		Handle: make([]string, 0),
-	// 	}
-	// 	var ids string
-	// 	err = rows.Scan(&bug.ID,
-	// 		&bug.Date, &bug.Importance, &bug.Status, &bug.Title, &bug.Level, &bug.Projectname,
-	// 		&bug.Env, &ids, &bug.Author)
-	// 	if err != nil {
-	// 		golog.Info(err)
-	// 		continue
-	// 	}
-	// 	realnames, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
-	// 		strings.Split(ids, ","))
-	// 	if err != nil {
-	// 		golog.Error(err)
-	// 		w.Write(al.ErrorE(err))
-	// 		return
-	// 	}
-	// 	for realnames.Next() {
-	// 		var name string
-	// 		err = realnames.Scan(&name)
-	// 		if err != nil {
-	// 			golog.Error(err)
-	// 			continue
-	// 		}
-	// 		bug.Handle = append(bug.Handle, name)
-	// 	}
-	// 	realnames.Close()
-	// 	al.Al = append(al.Al, bug)
-	// }
-
-	// rows.Close()
-	// w.Write(al.Marshal())
-
+	bugs, err := model.GetAllBug(listsql, args...)
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
+		return
+	}
+	res.Data = bugs
+	w.Write(res.Marshal())
 }
 
 func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
@@ -331,84 +294,45 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 
 func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 
-	// uid := xmux.GetInstance(r).Get("uid").(int64)
-	// mybug := xmux.GetInstance(r).Data.(*search.ReqMyBugFilter)
-	// al := &model.AllArticleList{
-	// 	Al: make([]*model.ArticleList, 0),
-	// }
-	// statislist, err := model.GetMyStatusList(uid)
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(al.ErrorE(err))
-	// 	return
-	// }
+	uid := xmux.GetInstance(r).Get("uid").(int64)
+	search := xmux.GetInstance(r).Data.(*search.ReqMyBugFilter)
+	sql, args := search.GetUsefulCondition(uid)
+	if len(sql) > 0 {
+		sql = " and " + sql
+	}
+	countsql := "select count(id) from bugs where dustbin=true " + sql
+	// 获取总数
+	count, err := model.GetCount(countsql, args...)
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
+		return
+	}
 
-	// conditionsql, args := mybug.GetUsefulCondition(uid)
-	// args = append(args, statislist)
-	// countsql := "select count(id) from bugs where dustbin=true and sid in (?)"
-	// err = db.Mconn.GetOneIn(countsql+conditionsql, args...).Scan(&al.Count)
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(al.ErrorE(err))
-	// 	return
-	// }
+	res := response.Response{
+		Count: count,
+		Page:  search.Page,
+	}
+	if count == 0 {
+		res.Data = make([]int64, 0)
+		w.Write(res.Marshal())
+		return
+	}
+	// 获取数据库的limit
+	page, start, end := xmux.GetLimit(count, search.Page, search.Limit)
+	res.Page = page
+	pager := fmt.Sprintf(" limit %d,%d", start, end)
+	listsql := "select * from bugs where dustbin=true " + sql + pager
+	golog.Info(listsql)
 
-	// page, start, end := xmux.GetLimit(al.Count, mybug.Page, mybug.Limit)
-	// al.Page = page
-	// args = append(args, start, end)
-	// // searchsql := "select id,createtime,iid,sid,title,lid,pid,eid,spusers from bugs join  on dustbin=true and uid=? "
-	// searchsql := `select b.id,b.createtime,i.name,s.name,title,l.name,p.name,e.name,spusers,u.realname from bugs as b
-	// join importants as i
-	// join status as s
-	// join level as l
-	// join project as p
-	// join environment as e
-	// join user as u
-	// on dustbin=true and b.iid = i.id and b.sid = s.id and b.lid = l.id and b.pid=p.id and b.eid = e.id and b.uid=u.id and sid in (?)`
-	// rows, err := db.Mconn.GetRowsIn(searchsql+conditionsql+" limit ?,?", args...)
-
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(al.ErrorE(err))
-	// 	return
-	// }
-
-	// for rows.Next() {
-	// 	bug := &model.ArticleList{
-	// 		Handle: make([]string, 0),
-	// 	}
-	// 	var ids string
-	// 	err = rows.Scan(&bug.ID,
-	// 		&bug.Date, &bug.Importance, &bug.Status, &bug.Title, &bug.Level, &bug.Projectname,
-	// 		&bug.Env, &ids, &bug.Author)
-	// 	if err != nil {
-	// 		golog.Info(err)
-	// 		continue
-	// 	}
-	// 	realnames, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
-	// 		strings.Split(ids, ","))
-	// 	if err != nil {
-	// 		golog.Error(err)
-	// 		w.Write(al.ErrorE(err))
-	// 		return
-	// 	}
-	// 	for realnames.Next() {
-	// 		var name string
-	// 		err = realnames.Scan(&name)
-	// 		if err != nil {
-	// 			golog.Error(err)
-	// 			continue
-	// 		}
-	// 		bug.Handle = append(bug.Handle, name)
-	// 	}
-	// 	realnames.Close()
-	// 	al.Al = append(al.Al, bug)
-	// }
-
-	// rows.Close()
-	// w.Write(al.Marshal())
-	// return
-
+	bugs, err := model.GetAllBug(listsql, args...)
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
+		return
+	}
+	res.Data = bugs
+	w.Write(res.Marshal())
 }
 
 // 返回搜索的字符串 和 参数

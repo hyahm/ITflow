@@ -97,7 +97,6 @@ func GetUserKeyNameByProjectId(projectId int64) ([]KeyName, error) {
 		golog.Error(err)
 		return nil, err
 	}
-	golog.Info(ug.Uids)
 	rows, err := db.Mconn.GetRowsIn(" select id,realname from user where id in (?)", ug.Uids)
 	if err != nil {
 		golog.Error(err)

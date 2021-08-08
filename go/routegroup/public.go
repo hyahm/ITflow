@@ -4,6 +4,8 @@ import (
 	"itflow/handle"
 	"itflow/handle/publiccontroller"
 	"itflow/internal/user"
+	"itflow/midware"
+	"itflow/model"
 
 	"github.com/hyahm/xmux"
 )
@@ -13,10 +15,13 @@ var Public *xmux.GroupRoute
 
 func init() {
 	Public = xmux.NewGroupRoute()
-	// 根据项目获取版本
-	Public.Post("/version/keyname", publiccontroller.GetVersionKeyName).BindJson(publiccontroller.RequestProject{})
+	// 我的project
+	Public.Post("/project/keyname", publiccontroller.GetProjectKeyName)
+	Public.Post("/version/keyname/byproject", publiccontroller.GetVersionKeyNameByProject).BindJson(publiccontroller.RequestProject{})
 	// 根据项目获取用户
-	Public.Post("/user/keyname", publiccontroller.GetUserKeyName).BindJson(publiccontroller.RequestProject{})
+	Public.Post("/user/keyname/byproject", publiccontroller.GetUserKeyNameByProject).BindJson(publiccontroller.RequestProject{})
+	// 获取用户
+	Public.Post("/user/keyname", publiccontroller.GetUserKeyName)
 	// 获取运行环境
 	Public.Post("/env/keyname", publiccontroller.GetEnvKeyName)
 	// 获取有限级别
@@ -32,6 +37,9 @@ func init() {
 	// 获取自己能管理的bug状态
 	Public.Post("/get/status", handle.GetStatus)
 	// 获取自己先择显示的状态
-	Public.Post("/status/show", publiccontroller.ShowStatus).
-		ApiDescribe("查询可以查看的状态")
+	Public.Post("/status/show", publiccontroller.ShowStatus)
+	// 修改显示的状态的bug
+	Bug.Post("/status/save", handle.ChangeShowStatus).Bind(&model.User{}).
+		AddModule(midware.JsonToStruct).ApiDescribe("修改显示bug的状态")
+
 }

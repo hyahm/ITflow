@@ -52,19 +52,34 @@ export function getUsers(data) {
 }
 
 // 获取某项目的用户真实姓名
-export function getUserKeyName(data) {
+export function getUserKeyNameByProject(data) {
   return request({
-    url: "/user/keyname",
+    url: "/user/keyname/byproject",
     method: "post",
     data
   });
 }
-// 获取某项目的用户真实姓名
-export function getVersionKeyName(data) {
+
+// 获取用户真实姓名
+export function getUserKeyName() {
   return request({
-    url: "/version/keyname",
+    url: "/user/keyname",
+    method: "post"
+  });
+}
+// 获取某项目的用户真实姓名
+export function getVersionKeyNameByProject(data) {
+  return request({
+    url: "/version/keyname/byproject",
     method: "post",
     data
+  });
+}
+
+export function getVersionKeyName() {
+  return request({
+    url: "/version/keyname",
+    method: "post"
   });
 }
 

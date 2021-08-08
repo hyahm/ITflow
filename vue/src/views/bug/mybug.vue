@@ -3,7 +3,9 @@
     <p class="warn-content">
       如果没看到需要的bug, 请勾选需要显示的状态 ,永久保存，多页面生效
     </p>
-    <div class="filter-container">
+
+    <bug-search :pageType="2" />
+    <!-- <div class="filter-container">
       <el-input
         v-model="listQuery.title"
         placeholder="标题"
@@ -74,7 +76,6 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
-    <!--<PlatformDropdown v-model="listQuery.status" />-->
     <el-table
       v-loading="listLoading"
       :data="list"
@@ -144,12 +145,12 @@
       <el-table-column label="任务者" align="center" width="300">
         <template slot-scope="scope">
           <span>{{ scope.row.handle }}</span>
-          <!--<span v-if="scope.row.handle" class="link-type" @click='handleFetchPv(scope.row.pageviews)'>{{scope.row.pageviews}}</span>-->
-          <!--<span v-else>0</span>-->
-        </template>
-      </el-table-column>
+          <span v-if="scope.row.handle" class="link-type" @click='handleFetchPv(scope.row.pageviews)'>{{scope.row.pageviews}}</span>-->
+    <!--<span v-else>0</span>-->
+    <!-- </template>
+      </el-table-column> -->
 
-      <el-table-column
+    <!-- <el-table-column
         label="操作"
         align="center"
         width="230"
@@ -166,9 +167,9 @@
           >
         </template>
       </el-table-column>
-    </el-table>
+    </el-table> -->
 
-    <div class="pagination-container">
+    <!-- <div class="pagination-container">
       <el-pagination
         :current-page="listQuery.page"
         :page-sizes="[10]"
@@ -179,14 +180,14 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
 import { closeBug, changeStatus } from "@/api/bugs";
-import { searchMyBugs } from "@/api/search";
-import { statusFilter } from "@/api/status";
+
+import BugSearch from "@/views/bug/components/Search";
 import {
   getMyProject,
   getStatus,
@@ -195,161 +196,152 @@ import {
   getLevels
 } from "@/api/get";
 
-const calendarTypeOptions = [
-  { key: "CN", display_name: "China" },
-  { key: "US", display_name: "USA" },
-  { key: "JP", display_name: "Japan" },
-  { key: "EU", display_name: "Eurozone" }
-];
-
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name;
-  return acc;
-}, {});
-
 export default {
   name: "ArticleList",
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: "success",
-        draft: "info",
-        deleted: "danger"
-      };
-      return statusMap[status];
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type];
-    }
+  components: {
+    BugSearch
   },
+  // filters: {
+  //   statusFilter(status) {
+  //     const statusMap = {
+  //       published: "success",
+  //       draft: "info",
+  //       deleted: "danger"
+  //     };
+  //     return statusMap[status];
+  //   },
+  //   typeFilter(type) {
+  //     return calendarTypeKeyValue[type];
+  //   }
+  // },
   data() {
     return {
-      list: null,
-      total: 0,
-      listLoading: true,
-      listQuery: {
-        page: 1,
-        limit: 10,
-        level: "",
-        project: "",
-        title: "",
-        showstatus: []
-      },
-      projectnames: [],
-      platformsOptions: [],
-      statuslist: [],
-      levels: [],
-      statuslength: 0
+      // list: null,
+      // total: 0,
+      // listLoading: true,
+      // listQuery: {
+      //   page: 1,
+      //   limit: 10,
+      //   level: "",
+      //   project: "",
+      //   title: "",
+      //   showstatus: []
+      // },
+      // projectnames: [],
+      // platformsOptions: [],
+      // statuslist: [],
+      // levels: [],
+      // statuslength: 0
     };
-  },
-  mounted() {
-    this.getstatus();
-    this.getpname();
-    this.getlevels();
-    this.handleFilter();
-    this.getmystatus();
-  },
-  activated() {
-    this.getmystatus();
-    this.getpname();
-    this.getstatus();
-    this.getlevels();
-  },
-
-  methods: {
-    getlevels() {
-      getLevels().then(resp => {
-        this.levels = resp.data.levels;
-      });
-    },
-    HandleChange() {
-      const data = {
-        checkstatus: this.listQuery.showstatus
-      };
-
-      statusFilter(data).then(_ => {
-        this.statuslength = this.listQuery.showstatus.length;
-        this.handleFilter();
-      });
-    },
-    getstatus() {
-      getStatus().then(resp => {
-        this.platformsOptions = resp.data.statuslist;
-      });
-      // 可以修改的权限
-      getPermStatus().then(resp => {
-        this.statuslist = resp.data.statuslist;
-      });
-    },
-    //
-    getmystatus() {
-      // 需要显示的状态
-      getShowStatus().then(resp => {
-        this.listQuery.showstatus = resp.data.checkstatus;
-        this.statuslength = this.listQuery.showstatus.length;
-      });
-    },
-    getpname() {
-      getMyProject().then(resp => {
-        this.projectnames = resp.data.name;
-      });
-    },
-    handleClose(row) {
-      this.$confirm("此操作将关闭bug, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          closeBug(row.id).then(_ => {
-            this.list = this.list.filter(items => {
-              return items.id !== row.id;
-            });
-            this.$message({
-              message: "已关闭",
-              type: "success"
-            });
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除"
-          });
-        });
-    },
-    changestatus(row) {
-      const param = {
-        id: row.id,
-        status: row.status
-      };
-      changeStatus(param).then(response => {
-        this.$notify({
-          title: "成功",
-          message: "修改成功",
-          type: "success"
-        });
-      });
-    },
-    handleFilter() {
-      // 获取过滤后的bug
-      this.listLoading = true;
-      searchMyBugs(this.listQuery).then(resp => {
-        this.list = resp.data.articlelist;
-        this.total = resp.data.total;
-        this.listQuery.page = resp.data.page;
-      });
-      this.listLoading = false;
-    },
-    handleSizeChange(val) {
-      this.listQuery.limit = val;
-      this.handleFilter();
-    },
-    handleCurrentChange(val) {
-      this.listQuery.page = val;
-      this.handleFilter();
-    }
   }
+  // mounted() {
+  //   this.getstatus();
+  //   this.getpname();
+  //   this.getlevels();
+  //   this.handleFilter();
+  //   this.getmystatus();
+  // },
+  // activated() {
+  //   this.getmystatus();
+  //   this.getpname();
+  //   this.getstatus();
+  //   this.getlevels();
+  // },
+
+  // methods: {
+  //   getlevels() {
+  //     getLevels().then(resp => {
+  //       this.levels = resp.data.levels;
+  //     });
+  //   },
+  //   HandleChange() {
+  //     const data = {
+  //       checkstatus: this.listQuery.showstatus
+  //     };
+
+  //     statusFilter(data).then(_ => {
+  //       this.statuslength = this.listQuery.showstatus.length;
+  //       this.handleFilter();
+  //     });
+  //   },
+  //   getstatus() {
+  //     getStatus().then(resp => {
+  //       this.platformsOptions = resp.data.statuslist;
+  //     });
+  //     // 可以修改的权限
+  //     getPermStatus().then(resp => {
+  //       this.statuslist = resp.data.statuslist;
+  //     });
+  //   },
+  //   //
+  //   getmystatus() {
+  //     // 需要显示的状态
+  //     getShowStatus().then(resp => {
+  //       this.listQuery.showstatus = resp.data.checkstatus;
+  //       this.statuslength = this.listQuery.showstatus.length;
+  //     });
+  //   },
+  //   getpname() {
+  //     getMyProject().then(resp => {
+  //       this.projectnames = resp.data.name;
+  //     });
+  //   },
+  //   handleClose(row) {
+  //     this.$confirm("此操作将关闭bug, 是否继续?", "提示", {
+  //       confirmButtonText: "确定",
+  //       cancelButtonText: "取消",
+  //       type: "warning"
+  //     })
+  //       .then(() => {
+  //         closeBug(row.id).then(_ => {
+  //           this.list = this.list.filter(items => {
+  //             return items.id !== row.id;
+  //           });
+  //           this.$message({
+  //             message: "已关闭",
+  //             type: "success"
+  //           });
+  //         });
+  //       })
+  //       .catch(() => {
+  //         this.$message({
+  //           type: "info",
+  //           message: "已取消删除"
+  //         });
+  //       });
+  //   },
+  //   changestatus(row) {
+  //     const param = {
+  //       id: row.id,
+  //       status: row.status
+  //     };
+  //     changeStatus(param).then(response => {
+  //       this.$notify({
+  //         title: "成功",
+  //         message: "修改成功",
+  //         type: "success"
+  //       });
+  //     });
+  //   },
+  //   handleFilter() {
+  //     // 获取过滤后的bug
+  //     this.listLoading = true;
+  //     searchMyBugs(this.listQuery).then(resp => {
+  //       this.list = resp.data.articlelist;
+  //       this.total = resp.data.total;
+  //       this.listQuery.page = resp.data.page;
+  //     });
+  //     this.listLoading = false;
+  //   },
+  //   handleSizeChange(val) {
+  //     this.listQuery.limit = val;
+  //     this.handleFilter();
+  //   },
+  //   handleCurrentChange(val) {
+  //     this.listQuery.page = val;
+  //     this.handleFilter();
+  //   }
+  // }
 };
 </script>
 

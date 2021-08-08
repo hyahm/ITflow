@@ -5,7 +5,6 @@ import (
 	"itflow/internal/bug"
 	"itflow/internal/search"
 	"itflow/midware"
-	"itflow/model"
 
 	"github.com/hyahm/xmux"
 )
@@ -27,9 +26,6 @@ func init() {
 	Bug.Get("/bug/close", handle.CloseBug)
 	Bug.Post("/bug/changestatus", handle.ChangeBugStatus).Bind(&bug.ChangeStatus{}).
 		AddModule(midware.JsonToStruct)
-
-	Bug.Post("/status/filter", handle.ChangeFilterStatus).Bind(&model.User{}).
-		AddModule(midware.JsonToStruct).ApiDescribe("修改显示bug的状态")
 
 	Bug.Get("/bug/show", handle.BugShow).
 		ApiDescribe("获取此bug信息").ApiReqParams("id", "6").ApiResponseTemplate(`{

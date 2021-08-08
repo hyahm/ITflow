@@ -9,20 +9,16 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-func ShowStatus(w http.ResponseWriter, r *http.Request) {
-	// 获取显示的状态id
-	// sl := xmux.GetInstance(r).Data.(*status.Status)
-
+func GetProjectKeyName(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetInstance(r).Get("uid").(int64)
-	ss, err := model.GetShowStatus(uid)
+	pkns, err := model.GetProjectKeyName(uid)
 	if err != nil {
 		golog.Error(err)
 		w.Write(response.ErrorE(err))
 		return
 	}
-	golog.Info(ss)
 	res := response.Response{
-		Data: ss,
+		Data: pkns,
 	}
 	w.Write(res.Marshal())
 }

@@ -76,3 +76,15 @@ func (bug *Bug) EditBug() (err error) {
 	_, err = db.Mconn.UpdateInterface(bug, insertsql, bug.ID)
 	return
 }
+
+func GetCount(sql string, args ...interface{}) (int, error) {
+	var count int
+	err := db.Mconn.GetOneIn(sql, args...).Scan(&count)
+	return count, err
+}
+
+func GetAllBug(sql string, args ...interface{}) ([]Bug, error) {
+	bugs := make([]Bug, 0)
+	err := db.Mconn.SelectIn(&bugs, sql, args...)
+	return bugs, err
+}

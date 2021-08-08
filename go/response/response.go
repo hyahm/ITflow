@@ -15,6 +15,8 @@ type Response struct {
 	UserIds    []int64     `json:"user_ids"`
 	VersionIds []int64     `json:"version_ids"`
 	Data       interface{} `json:"data"`
+	Count      int         `json:"count,empty"`
+	Page       int         `json:"page,empty"`
 }
 
 func (r *Response) Marshal() []byte {

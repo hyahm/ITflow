@@ -206,9 +206,20 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 	w.Write(send)
 }
 
-func ChangeFilterStatus(w http.ResponseWriter, r *http.Request) {
+func ChangeShowStatus(w http.ResponseWriter, r *http.Request) {
 	// 更新自己的显示状态
 	user := xmux.GetInstance(r).Data.(*model.User)
+	m := make(map[int64]struct{})
+	for _, v := range user.ShowStatus {
+		if v <= 0 {
+			continue
+		}
+		m[v] = struct{}{}
+	}
+	user.ShowStatus = make([]int64, 0, len(m))
+	for k := range m {
+		user.ShowStatus = append(user.ShowStatus, k)
+	}
 	user.ID = xmux.GetInstance(r).Get("uid").(int64)
 	err := user.Update()
 	if err != nil {

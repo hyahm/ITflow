@@ -13,7 +13,7 @@ type RequestProject struct {
 	ProjectId int64 `json:"project_id"`
 }
 
-func GetVersionKeyName(w http.ResponseWriter, r *http.Request) {
+func GetVersionKeyNameByProject(w http.ResponseWriter, r *http.Request) {
 	rvkn := xmux.GetInstance(r).Data.(*RequestProject)
 	vkns, err := model.GetVersionKeyNameByProjectId(rvkn.ProjectId)
 	if err != nil {
