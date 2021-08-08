@@ -14,13 +14,16 @@ import (
 
 func ProjectList(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetInstance(r).Get("uid").(int64)
-	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Select {
-		w.Write(errorcode.Error("no perm"))
+	projects, err := model.GetAllProjects(uid)
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
 		return
 	}
-	w.Write(project.GetList(uid))
+	res := response.Response{
+		Data: projects,
+	}
+	w.Write(res.Marshal())
 	return
 
 }
@@ -45,23 +48,15 @@ func AddProject(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateProject(w http.ResponseWriter, r *http.Request) {
-	data := xmux.GetInstance(r).Data.(*project.ReqProject)
+	project := xmux.GetInstance(r).Data.(*model.Project)
 	uid := xmux.GetInstance(r).Get("uid").(int64)
-	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Update {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
-	_, err := db.Mconn.Update("update project set name=?, ugid=(select ifnull(min(id),0) from usergroup where name=?) where id=? and uid=?",
-		data.ProjectName, data.GroupName, data.Id, uid)
-
+	err := project.Update(uid)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		w.Write(response.ErrorE(err))
 		return
 	}
-	w.Write(errorcode.Success())
+	w.Write(response.Success())
 
 }
 

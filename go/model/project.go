@@ -75,20 +75,29 @@ func NewProjectById(id interface{}) (*Project, error) {
 	return p, err
 }
 
-func NewProjectListCheckId(uid int64) ([]*Project, error) {
+func GetAllProjects(uid int64) ([]*Project, error) {
 	// 获取此用户的项目组
 	ps := make([]*Project, 0)
-	// 如果是管理员或者创建者，都能看到
-	err := db.Mconn.Select(&ps, `select * from project where uid=? or uid=? or 
-		ugid in (select id from usergroup where json_contains(ugid, json_array(?)))`, uid, cache.SUPERID, uid)
+	if uid == cache.SUPERID {
+		err := db.Mconn.Select(&ps, `select * from project`)
+		return ps, err
+	} else {
+		// 如果是管理员或者创建者，都能看到
+		err := db.Mconn.Select(&ps, `select * from project where uid=? or uid=? or 
+ugid in (select id from usergroup where json_contains(ugid, json_array(?)))`, uid, cache.SUPERID, uid)
 
-	return ps, err
+		return ps, err
+	}
+
 }
 
-func (p *Project) Update(groupname string) error {
-	golog.Infof("%+v", p)
-	_, err := db.Mconn.Update("update project set name=?,ugid=(select ifnull(min(id),0) from usergroup where name=?) where id=? and uid=?", p.Name, groupname, p.Id, p.Uid)
-	return err
+func (p *Project) Update(uid int64) (err error) {
+	if uid == cache.SUPERID {
+		_, err = db.Mconn.UpdateInterface(p, "update project set $set where id=?", p.Id)
+	} else {
+		_, err = db.Mconn.UpdateInterface(p, "update project set $set where id=? and uid=?", p.Id, uid)
+	}
+	return
 }
 
 func (p *Project) Delete() error {

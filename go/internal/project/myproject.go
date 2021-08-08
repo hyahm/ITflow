@@ -2,10 +2,6 @@ package project
 
 import (
 	"encoding/json"
-	"itflow/db"
-	"itflow/model"
-	"strconv"
-	"strings"
 
 	"github.com/hyahm/golog"
 )
@@ -35,35 +31,35 @@ func (mp *MyProject) ErrorE(err error) []byte {
 	return mp.Error(err.Error())
 }
 
-func (mp *MyProject) Get(uid int64) []byte {
-	golog.Debug(uid)
-	pl, err := model.NewProjectListCheckId(uid)
-	if err != nil {
-		mp.Code = 1
-		mp.Msg = err.Error()
-		return mp.Marshal()
-	}
+// func (mp *MyProject) Get(uid int64) []byte {
+// 	golog.Debug(uid)
+// 	pl, err := model.NewProjectListCheckId(uid)
+// 	if err != nil {
+// 		mp.Code = 1
+// 		mp.Msg = err.Error()
+// 		return mp.Marshal()
+// 	}
 
-	for _, p := range pl {
-		var uids string
-		err = db.Mconn.GetOne("select ids from usergroup where id=?", p.UGid).Scan(&uids)
-		if err != nil {
-			golog.Error(err)
-			continue
-		}
+// 	for _, p := range pl {
+// 		var uids string
+// 		err = db.Mconn.GetOne("select ids from usergroup where id=?", p.UGid).Scan(&uids)
+// 		if err != nil {
+// 			golog.Error(err)
+// 			continue
+// 		}
 
-		for _, v := range strings.Split(uids, ",") {
-			uid64, err := strconv.ParseInt(v, 10, 64)
-			if err != nil {
-				continue
-			}
-			if uid64 == uid {
-				mp.Name = append(mp.Name, p.Name)
-				break
-			}
+// 		for _, v := range strings.Split(uids, ",") {
+// 			uid64, err := strconv.ParseInt(v, 10, 64)
+// 			if err != nil {
+// 				continue
+// 			}
+// 			if uid64 == uid {
+// 				mp.Name = append(mp.Name, p.Name)
+// 				break
+// 			}
 
-		}
+// 		}
 
-	}
-	return mp.Marshal()
-}
+// 	}
+// 	return mp.Marshal()
+// }

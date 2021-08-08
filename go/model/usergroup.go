@@ -5,6 +5,7 @@ import (
 	"itflow/db"
 
 	"github.com/hyahm/goconfig"
+	"github.com/hyahm/golog"
 )
 
 type UserGroup struct {
@@ -77,4 +78,23 @@ func GetUserGroupIds(uid int64) ([]int64, error) {
 
 func (ug *UserGroup) GetUserIds() error {
 	return db.Mconn.Select(&ug, "select uids from usergroup where id=?", ug.Id)
+}
+
+func GetUserGroupKeyNameByUid() ([]KeyName, error) {
+	rows, err := db.Mconn.GetRows("select id,name from usergroup")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	kns := make([]KeyName, 0)
+	for rows.Next() {
+		kn := KeyName{}
+		err = rows.Scan(&kn.ID, &kn.Name)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		kns = append(kns, kn)
+	}
+	return kns, nil
 }

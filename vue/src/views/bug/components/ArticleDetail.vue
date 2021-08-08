@@ -160,9 +160,9 @@ import {
   getProjectKeyName,
   getLevels,
   getImportants,
-  getUserKeyName,
-  getVersionKeyName,
-  getTyp
+  getTyp,
+  getUserKeyNameByProject,
+  getVersionKeyNameByProject
 } from "@/api/get";
 
 const defaultForm = {
@@ -230,13 +230,12 @@ export default {
   },
   methods: {
     getversionMap(projectid) {
-      getVersionKeyName({ project_id: projectid }).then(resp => {
+      getVersionKeyNameByProject({ project_id: projectid }).then(resp => {
         this.versions = resp.data.data;
       });
     },
     getuserMap(projectid) {
-      getUserKeyName({ project_id: projectid }).then(resp => {
-        console.log(resp.data.data);
+      getUserKeyNameByProject({ project_id: projectid }).then(resp => {
         this.users = resp.data.data;
       });
     },

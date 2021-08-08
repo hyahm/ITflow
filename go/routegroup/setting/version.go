@@ -4,6 +4,7 @@ import (
 	"itflow/handle"
 	"itflow/internal/version"
 	"itflow/midware"
+	"itflow/model"
 
 	"github.com/hyahm/xmux"
 )
@@ -23,7 +24,7 @@ func init() {
 	Version.ApiCodeField("code").ApiCodeMsg("20", "token过期")
 	Version.ApiCodeField("code").ApiCodeMsg("1", "其他错误,请查看返回的msg")
 	Version.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
-	Version.Post("/version/add", handle.AddVersion).Bind(&version.RespVersion{}).AddModule(midware.JsonToStruct).
+	Version.Post("/version/add", handle.AddVersion).Bind(&model.Version{}).AddModule(midware.JsonToStruct).
 		ApiDescribe("添加版本")
 
 	Version.Post("/version/list", handle.VersionList).ApiDescribe("显示版本")

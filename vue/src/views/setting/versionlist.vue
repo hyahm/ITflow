@@ -25,12 +25,14 @@
       </el-table-column>
       <el-table-column label="日期" width="150px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.date | parseTime("{y}-{m}-{d} {h}:{i}") }}</span>
+          <span>{{
+            scope.row.createtime | parseTime("{y}-{m}-{d} {h}:{i}")
+          }}</span>
         </template>
       </el-table-column>
       <el-table-column label="项目名" width="150px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.project }}</span>
+          <span>{{ scope.row.pid | toName(projectMap) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="版本号" width="90px" align="center">
@@ -41,13 +43,13 @@
       </el-table-column>
       <el-table-column label="地址一" width="130px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.url }}</span>
+          <span>{{ scope.row.urlone }}</span>
           <!--<svg-icon v-for="n in +scope.row.importance" icon-class="star" class="meta-item__icon" :key="n"></svg-icon>-->
         </template>
       </el-table-column>
       <el-table-column label="地址二" class-name="status-col" width="150">
         <template slot-scope="scope">
-          <span>{{ scope.row.bakurl }}</span>
+          <span>{{ scope.row.urltwo }}</span>
           <!--<el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>-->
         </template>
       </el-table-column>
@@ -82,12 +84,12 @@
     >
       <el-form :model="form">
         <el-form-item label-width="100" label="项目名">
-          <el-select v-model="form.project" placeholder="请选择">
+          <el-select v-model="form.pid" placeholder="请选择">
             <el-option
-              v-for="(item, index) in projects"
-              :key="index"
-              :label="item"
-              :value="item"
+              v-for="item in projects"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
@@ -95,10 +97,10 @@
           <el-input v-model="form.name" auto-complete="off" />
         </el-form-item>
         <el-form-item label-width="100" label="地址一">
-          <el-input v-model="form.url" auto-complete="off" />
+          <el-input v-model="form.urlone" auto-complete="off" />
         </el-form-item>
         <el-form-item label-width="100" label="地址二">
-          <el-input v-model="form.bakurl" auto-complete="off" />
+          <el-input v-model="form.urltwo" auto-complete="off" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -116,15 +118,21 @@ import {
   updateVersion,
   addVersion
 } from "@/api/version";
-import { getMyProject } from "@/api/get";
+import { getProjectKeyName } from "@/api/get";
 export default {
   name: "Versionlist",
+  filters: {
+    toName(id, projectMap) {
+      return projectMap.get(id);
+    }
+  },
   data() {
     return {
       list: [],
       dialogFormVisible: false,
       listLoading: false,
       projects: [],
+      projectMap: new Map(),
       tableKey: 0,
       listQuery: {
         page: 1,
@@ -134,28 +142,26 @@ export default {
       form: {
         id: 0,
         name: "",
-        url: "",
-        bakurl: "",
-        project: ""
+        urltwo: "",
+        urlone: "",
+        pid: undefined
       }
     };
   },
   activated() {
     this.getproject();
-    this.getversionlist();
   },
   created() {
-    this.getversionlist();
     this.getproject();
   },
   methods: {
     getproject() {
-      getMyProject().then(resp => {
-        if (resp.data.code === 0) {
-          this.projects = resp.data.name;
-        } else {
-          this.$message.error(resp.data.msg);
+      getProjectKeyName().then(resp => {
+        this.projects = resp.data.data;
+        for (let v of this.projects) {
+          this.projectMap.set(v.id, v.name);
         }
+        this.getversionlist();
       });
     },
     add() {
@@ -168,12 +174,9 @@ export default {
     },
     getversionlist() {
       getVersion().then(resp => {
-        if (resp.data.code === 0) {
-          this.list = resp.data.versionlist;
-          this.total = resp.data.versionlist.length;
-        } else {
-          this.$message.error(resp.data.msg);
-        }
+        this.list = resp.data.data;
+        console.log(this.list);
+        this.total = resp.data.versionlist.length;
       });
     },
     handleSizeChange(val) {
@@ -185,21 +188,17 @@ export default {
       this.getList();
     },
     handleModifyStatus(row) {
+      console.log(row);
       this.dialogFormVisible = true;
-      this.form.id = row.id;
-      this.form.name = row.name;
-      this.form.url = row.url;
-      this.form.bakurl = row.bakurl;
-      this.form.project = row.project;
+      this.form = row;
     },
     confirm() {
       if (this.form.id <= 0) {
         addVersion(this.form)
           .then(response => {
             this.form.id = response.data.id;
-            this.form.date = response.data.updatetime;
-
-            this.list.unshift(this.form);
+            this.form.create_time = response.data.create_time;
+            this.list.push(this.form);
             this.$message.success("添加成功");
           })
           .catch();

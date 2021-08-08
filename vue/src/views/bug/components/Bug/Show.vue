@@ -37,13 +37,13 @@
 
       <el-table-column label="重要性" width="100px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.important }}</span>
+          <span>{{ scope.row.iid | toImportantName(importantMap) }}</span>
         </template>
       </el-table-column>
 
       <el-table-column label="处理者" width="100px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.handle }}</span>
+          <span>{{ scope.row.spusers | toUserName(userMap) }}</span>
         </template>
       </el-table-column>
 
@@ -101,6 +101,16 @@ export default {
     },
     toStatusName(id, statusMap) {
       return statusMap.get(id);
+    },
+    toImportantName(id, importantMap) {
+      return importantMap.get(id);
+    },
+    toUserName(ids, userMap) {
+      let names = [];
+      for (let id of ids) {
+        names.push(userMap.get(id));
+      }
+      return names.join(", ");
     }
   },
   props: {
@@ -126,7 +136,8 @@ export default {
   data() {
     return {
       listLoading: false,
-      importantMap: new Map()
+      importantMap: new Map(),
+      userMap: new Map()
     };
   },
   created() {
@@ -143,7 +154,9 @@ export default {
     },
     getUsers() {
       getUserKeyName().then(resp => {
-        console.log(resp.data);
+        for (let v of resp.data.data) {
+          this.userMap.set(v.id, v.name);
+        }
       });
     }
   }

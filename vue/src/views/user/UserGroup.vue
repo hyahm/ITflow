@@ -113,7 +113,6 @@ export default {
   methods: {
     getuserkey() {
       getAllUserKeyName().then(resp => {
-        console.log(resp.data.data);
         this.users = resp.data.data;
         for (let v of this.users) {
           this.userMap.set(v.id, v.name);
@@ -122,7 +121,6 @@ export default {
     },
     getgroup() {
       getUserGroups().then(resp => {
-        console.log(resp.data.data);
         this.list = resp.data.data;
       });
     },

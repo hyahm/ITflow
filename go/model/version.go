@@ -2,6 +2,7 @@ package model
 
 import (
 	"itflow/db"
+	"time"
 
 	"github.com/hyahm/golog"
 )
@@ -14,6 +15,27 @@ type Version struct {
 	BakUrl     string `json:"urltwo" db:"urltwo"`
 	CreateTime int64  `json:"createtime" db:"createtime"`
 	CreateUid  int64  `json:"createuid" db:"createuid"`
+}
+
+func GetAllVersion() ([]Version, error) {
+	vs := make([]Version, 0)
+	err := db.Mconn.Select(&vs, "select * from version")
+	return vs, err
+}
+
+func (v *Version) Update() error {
+	_, err := db.Mconn.UpdateInterface(v, "update version set $set where id=?", v.Id)
+	return err
+}
+
+func (v *Version) Create() error {
+	v.CreateTime = time.Now().Unix()
+	ids, err := db.Mconn.InsertInterfaceWithID(v, "insert into version($key) values($value)")
+	if err != nil {
+		return err
+	}
+	v.Id = ids[0]
+	return nil
 }
 
 func (v *Version) GetProjectNameByPid(pid interface{}) ([]string, error) {

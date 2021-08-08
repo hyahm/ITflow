@@ -2,10 +2,7 @@ package handle
 
 import (
 	"encoding/json"
-	"itflow/internal/project"
 	"net/http"
-
-	"github.com/hyahm/xmux"
 	//"strings"
 )
 
@@ -27,13 +24,13 @@ func GetProject(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func GetMyProject(w http.ResponseWriter, r *http.Request) {
-	myproject := &project.MyProject{
-		Name: make([]string, 0),
-	}
-	uid := xmux.GetInstance(r).Get("uid").(int64)
+// func GetMyProject(w http.ResponseWriter, r *http.Request) {
+// 	myproject := &project.MyProject{
+// 		Name: make([]string, 0),
+// 	}
+// 	uid := xmux.GetInstance(r).Get("uid").(int64)
 
-	w.Write(myproject.Get(uid))
-	return
+// 	w.Write(myproject.Get(uid))
+// 	return
 
-}
+// }

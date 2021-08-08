@@ -30,6 +30,8 @@ func init() {
 	Public.Post("/important/keyname", publiccontroller.GetImportantKeyName)
 	// 职位
 	Public.Post("/position/keyname", publiccontroller.GetPositionKeyName)
+	// 用户组
+	Public.Post("/usergroup/keyname", publiccontroller.GetUserGroupKeyName)
 	// 获取用户信息， 所有页面都会用到
 	Public.Get("/user/info", handle.UserInfo).
 		ApiDescribe("获取用户信息").

@@ -17,13 +17,15 @@
       </el-table-column>
       <el-table-column label="项目名" width="180">
         <template slot-scope="scope">
-          <span style="margin-left: 10px">{{ scope.row.projectname }}</span>
+          <span style="margin-left: 10px">{{ scope.row.name }}</span>
         </template>
       </el-table-column>
 
       <el-table-column label="用户组" width="800">
         <template slot-scope="scope">
-          <span style="margin-left: 10px">{{ scope.row.groupname }}</span>
+          <span style="margin-left: 10px">{{
+            scope.row.ugid | toUserGroupName(usergroupMap)
+          }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="200">
@@ -53,23 +55,19 @@
     >
       <el-form :model="form">
         <el-form-item label="项目名">
-          <el-input
-            v-model="form.projectname"
-            width="200"
-            auto-complete="off"
-          />
+          <el-input v-model="form.name" width="200" auto-complete="off" />
         </el-form-item>
 
         <el-form-item
           style="display: inline-block;width: 300px"
           label="参与组: "
         >
-          <el-select v-model="form.groupname" placeholder="参与组">
+          <el-select v-model="form.ugid" placeholder="参与组">
             <el-option
-              v-for="(item, index) in usergroups"
-              :key="index"
-              :label="item"
-              :value="item"
+              v-for="item in usergroups"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
@@ -93,17 +91,23 @@ import {
 import { deepClone } from "@/utils";
 export default {
   name: "Addproject",
+  filters: {
+    toUserGroupName(id, usergroupMap) {
+      return usergroupMap.get(id);
+    }
+  },
   data() {
     return {
       dialogFormVisible: false,
       form: {
-        projectname: "",
-        groupname: "",
+        ugid: undefined,
+        name: "",
         id: 0
       },
       usergroups: [],
       formLabelWidth: "120px",
-      tableData: []
+      tableData: [],
+      usergroupMap: new Map()
     };
   },
   activated() {
@@ -117,22 +121,22 @@ export default {
   methods: {
     getusergroup() {
       getUserGroupNames().then(resp => {
-        this.usergroups = resp.data.usergroupnames;
+        this.usergroups = resp.data.data;
+        console.log(this.usergroups);
+        for (let v of this.usergroups) {
+          this.usergroupMap.set(v.id, v.name);
+        }
       });
     },
     getproject() {
       getProjectName().then(resp => {
-        if (resp.data.code === 0) {
-          this.tableData = resp.data.projectlist;
-        } else {
-          this.$message.error(resp.data.msg);
-        }
+        this.tableData = resp.data.data;
       });
     },
     addProject() {
       this.form.id = 0;
-      this.form.projectname = "";
-      this.form.groupname = "";
+      this.form.ugid = undefined;
+      this.form.name = "";
       this.dialogFormVisible = true;
     },
     handleDelete(id) {
@@ -161,6 +165,7 @@ export default {
         });
     },
     updatep(row) {
+      console.log(row);
       this.form = row;
       this.dialogFormVisible = true;
     },

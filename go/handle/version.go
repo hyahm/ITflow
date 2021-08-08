@@ -5,84 +5,42 @@ import (
 	"itflow/db"
 	"itflow/internal/perm"
 	"itflow/internal/version"
+	"itflow/model"
 	"itflow/response"
 	"net/http"
-	"time"
 
-	"github.com/go-sql-driver/mysql"
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
 
 func AddVersion(w http.ResponseWriter, r *http.Request) {
-
-	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Insert {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
-	version_add := xmux.GetInstance(r).Data.(*version.RespVersion)
-
-	uid := xmux.GetInstance(r).Get("uid").(int64)
-	add_version_sql := "insert into version(pid,name,urlone,urltwo,createtime,createuid) values((select id from project where name=?),?,?,?,?,?)"
-	var err error
-	errorcode.UpdateTime = time.Now().Unix()
-	errorcode.ID, err = db.Mconn.Insert(add_version_sql, version_add.Project,
-		version_add.Name, version_add.Url, version_add.BakUrl, errorcode.UpdateTime, uid)
+	version := xmux.GetInstance(r).Data.(*model.Version)
+	version.CreateUid = xmux.GetInstance(r).Get("uid").(int64)
+	err := version.Create()
 	if err != nil {
 		golog.Error(err)
-		if err.(*mysql.MySQLError).Number == 1062 {
-			w.Write(errorcode.ErrorE(db.DuplicateErr))
-			return
-		}
-		w.Write(errorcode.ErrorE(err))
+		w.Write(response.ErrorE(err))
 		return
 	}
-
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
-	return
+	res := response.Response{
+		ID:         version.Id,
+		CreateTime: version.CreateTime,
+	}
+	w.Write(res.Marshal())
 
 }
 
 func VersionList(w http.ResponseWriter, r *http.Request) {
-
-	al := &version.VersionList{
-		VersionList: make([]*version.RespVersion, 0),
-	}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Select {
-		w.Write(al.Error("no perm"))
-		return
-	}
-	get_version_sql := `select v.id, ifnull(p.name,''), v.name, v.urlone, v.urltwo, v.createtime 
-	from version as v  
-	left join 
-	project as p  
-	on v.pid =p.id 
-	order by v.id desc;`
-
-	rows, err := db.Mconn.GetRows(get_version_sql)
+	vs, err := model.GetAllVersion()
 	if err != nil {
 		golog.Error(err)
-		w.Write(al.ErrorE(err))
+		w.Write(response.ErrorE(err))
 		return
 	}
-
-	for rows.Next() {
-		rl := &version.RespVersion{}
-		err = rows.Scan(&rl.Id, &rl.Project, &rl.Name, &rl.Url, &rl.BakUrl, &rl.Date)
-		if err != nil {
-			golog.Info(err)
-			continue
-		}
-		al.VersionList = append(al.VersionList, rl)
+	res := response.Response{
+		Data: vs,
 	}
-	rows.Close()
-	send, _ := json.Marshal(al)
-	w.Write(send)
-	return
+	w.Write(res.Marshal())
 
 }
 
