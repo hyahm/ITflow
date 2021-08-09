@@ -63,7 +63,7 @@
         </el-form-item>
 
         <el-form-item style="margin-bottom: 40px;" prop="title" label="职位名:">
-          <el-select v-model="postForm.position" placeholder="Select">
+          <el-select v-model="postForm.jid" placeholder="Select">
             <el-option
               v-for="position in positions"
               :key="position.id"
@@ -107,8 +107,6 @@ export default {
         password: "",
         repassword: "",
         realname: "",
-        rolegroup: "",
-        statusgroup: "",
         level: 2
       },
       number: {
@@ -118,21 +116,16 @@ export default {
       positions: [],
       checkAll: false,
       rolegroups: [],
-      statusgroups: [],
       checkedRoles: [],
       isIndeterminate: true,
       groups: null
     };
   },
   activated() {
-    this.getrolegroups();
-    this.getstatusgroups();
     this.getpositions();
   },
   created() {
-    // this.getrolegroups()
     this.getpositions();
-    // this.getstatusgroups()
   },
   methods: {
     getpositions() {
@@ -192,9 +185,7 @@ export default {
         nickname: "",
         email: "",
         password: "",
-        repassword: "",
-        rolegroup: "",
-        statusgroup: ""
+        repassword: ""
       };
     }
   }

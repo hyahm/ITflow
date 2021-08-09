@@ -40,7 +40,7 @@
 
       <el-table-column label="职位" width="110px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.position }}</span>
+          <span>{{ scope.row.jid | toJobName(positionMap) }}</span>
         </template>
       </el-table-column>
 
@@ -76,7 +76,10 @@
             @click="handleChangeInfo(scope.row)"
             >更改信息
           </el-button>
-          <el-button size="mini" type="danger" @click="handleRemove(scope.row)"
+          <el-button
+            size="mini"
+            type="danger"
+            @click="handleRemove(scope.row.id)"
             >删除
           </el-button>
           <el-button
@@ -118,7 +121,7 @@
         </el-form-item>
 
         <el-form-item label="职位：">
-          <el-select v-model="form.position" placeholder="Select">
+          <el-select v-model="form.jid" placeholder="Select">
             <el-option
               v-for="item in positionlist"
               :key="item.id"
@@ -156,6 +159,9 @@ export default {
         deleted: "danger"
       };
       return statusMap[status];
+    },
+    toJobName(id, positionMap) {
+      return positionMap.get(id);
     }
   },
   data() {
@@ -170,6 +176,7 @@ export default {
         name: ""
       },
       statusgroup: [],
+      positionMap: new Map(),
       listLoading: false,
       sortOptions: [
         { label: "ID Ascending", key: "+id" },
@@ -190,6 +197,9 @@ export default {
     getPosition() {
       getPositionKeyName().then(resp => {
         this.positionlist = resp.data.data;
+        for (let v of this.positionlist) {
+          this.positionMap.set(v.id, v.name);
+        }
       });
     },
 
@@ -197,7 +207,6 @@ export default {
       this.dialogVisible = false;
     },
     HandlerUpdate() {
-      console.log(this.form);
       updateUser(this.form).then(_ => {
         const l = this.userlist.length;
         for (let i = 0; i < l; i++) {
@@ -214,7 +223,7 @@ export default {
     },
     getuserList() {
       userList().then(resp => {
-        this.userlist = resp.data.userlist;
+        this.userlist = resp.data.data;
       });
     },
     handleChangeInfo(row) {
@@ -222,17 +231,17 @@ export default {
       this.form = row;
       this.dialogVisible = true;
     },
-    handleRemove(row) {
+    handleRemove(id) {
       this.$confirm("此操作将关闭bug, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       })
         .then(() => {
-          userRemove(row.id).then(_ => {
+          userRemove(id).then(_ => {
             const l = this.userlist.length;
             for (let i = 0; i < l; i++) {
-              if (this.userlist[i].id === row.id) {
+              if (this.userlist[i].id === id) {
                 this.userlist.splice(i, 1);
               }
             }

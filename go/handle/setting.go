@@ -8,6 +8,7 @@ import (
 	"itflow/encrypt"
 	"itflow/internal/role"
 	"itflow/internal/user"
+	"itflow/model"
 	"itflow/response"
 	"net/http"
 	"strings"
@@ -18,171 +19,84 @@ import (
 )
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-
-	errorcode := &response.Response{}
-	// nickname := xmux.GetInstance(r).Get("nickname").(string)
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 
-	createTime := time.Now().Unix()
-	getuser := xmux.GetInstance(r).Data.(*user.GetAddUser)
-	if strings.Contains(getuser.Nickname, "@") {
-		w.Write(errorcode.Error("昵称不能包含@符号"))
+	getuser := xmux.GetInstance(r).Data.(*model.User)
+	if strings.Contains(getuser.NickName, "@") {
+		w.Write(response.Error("昵称不能包含@符号"))
 		return
 	}
-	enpassword := encrypt.PwdEncrypt(getuser.Password, cache.Salt)
-	var err error
-	db.Mconn.OpenDebug()
-	errorcode.ID, err = db.Mconn.Insert(`insert into user(nickname, password, email, createtime, createuid, realname, jid) values(
-		?,?,?,?,?,?, 
-		(select id from jobs where name=?))`, getuser.Nickname,
-		enpassword, getuser.Email, createTime,
-		uid, getuser.RealName, getuser.Position)
-	golog.Info(db.Mconn.GetSql())
+	getuser.Password = encrypt.PwdEncrypt(getuser.Password, cache.Salt)
+	getuser.CreateTime = time.Now().Unix()
+	getuser.CreateUId = uid
+	err := getuser.Create()
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		w.Write(response.ErrorE(err))
 		return
 	}
 	cache.CacheEmail.SendMail("成功创建用户",
-		fmt.Sprintf(`<html><body><h1>已成功创建用户<h1>登录网址:<a href="%s">%s</a></br>用户名: %s</br> 密码: %s</br>邮箱: %s</body></html>`, r.Referer(), r.Referer(), getuser.Nickname, getuser.Password, getuser.Email),
+		fmt.Sprintf(`<html><body><h1>已成功创建用户<h1>登录网址:<a href="%s">%s</a></br>用户名: %s</br> 密码: %s</br>邮箱: %s</body></html>`,
+			r.Referer(), r.Referer(), getuser.NickName, getuser.Password, getuser.Email),
 		getuser.Email)
-	// // 验证组和职位不能为空
-	// if getuser.StatusGroup == "" || getuser.RoleGroup == "" || getuser.Position == "" {
-	// 	w.Write(errorcode.Error("验证组和职位不能为空"))
-	// 	return
-	// }
-	// //1，先要验证nickname 是否有重复的
-	// if _, ok := cache.CacheNickNameUid[getuser.Nickname]; ok {
-	// 	w.Write(errorcode.Error("nickname 重复"))
-	// 	return
-	// }
 
-	// //验证邮箱 是否有重复的
-	// var hasemail bool
-	// for _, v := range cache.CacheUidEmail {
-	// 	if v == getuser.Email {
-	// 		hasemail = true
-	// 	}
-	// }
-	// if hasemail {
-	// 	w.Write(errorcode.Error("email 重复"))
-	// 	return
-	// }
-
-	// ids := make([]string, 0)
-	// for k := range cache.CacheSidStatus {
-	// 	ids = append(ids, strconv.FormatInt(k.ToInt64(), 10))
-	// }
-
-	// var sgid int64
-	// var hassggroup bool
-
-	// for k, v := range cache.CacheSgidGroup {
-	// 	if v == getuser.StatusGroup {
-	// 		sgid = k
-	// 		hassggroup = true
-	// 		break
-	// 	}
-	// }
-
-	// var rid int64
-	// err := model.CheckRoleNameInGroup(getuser.RoleGroup, &rid)
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(errorcode.ErrorE(err))
-	// 	return
-	// }
-	// if !hassggroup {
-	// 	w.Write(errorcode.Error("没有找到权限"))
-	// 	return
-	// }
-	// // 获取级别,如果这个职位不存在，就返回错误
-	// var jid int64
-	// var ok bool
-	// if jid, ok = cache.CacheJobnameJid[getuser.Position]; !ok {
-	// 	w.Write(errorcode.Error("职位不存在"))
-	// 	return
-	// }
-
-	// // 增加用户
-
-	// user := model.User{
-	// 	NickName:   getuser.Nickname,
-	// 	RealName:   getuser.RealName,
-	// 	Password:   enpassword,
-	// 	Email:      getuser.Email,
-	// 	CreateId:   uid,
-	// 	ShowStatus: cache.StoreLevelId(strings.Join(ids, ",")),
-	// 	BugGroupId: sgid,
-	// 	Roleid:     rid,
-	// 	Jobid:      jid,
-	// }
-	// err = user.Create()
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(errorcode.ErrorE(err))
-	// 	return
-	// }
-	// //更新缓存
-
-	// send, _ := json.Marshal(errorcode)
-	w.Write(errorcode.Success())
-	return
-
+	res := response.Response{
+		ID: getuser.ID,
+	}
+	w.Write(res.Marshal())
 }
 
 func RemoveUser(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
-
 	id := r.FormValue("id")
+	err := model.DeleteUser(id)
 	// 判断是否有bug
-	var count int
-	err := db.Mconn.GetOne("select count(id) from bugs where uid=?", id).Scan(&count)
+	// var count int
+	// err := db.Mconn.GetOne("select count(id) from bugs where uid=?", id).Scan(&count)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		w.Write(response.ErrorE(err))
 		return
 	}
+	w.Write(response.Success())
+	// if count > 0 {
+	// 	golog.Error("uid:%v,has bugs,can not remove")
+	// 	w.Write(errorcode.IsUse())
+	// 	return
+	// }
+	// // 查看用户组是否存在此用户
+	// userrows, err := db.Mconn.GetRows("select ids from usergroup")
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
+	// var hasgroup bool
+	// for userrows.Next() {
+	// 	var ids string
+	// 	userrows.Scan(&ids)
+	// 	for _, v := range strings.Split(ids, ",") {
+	// 		if v == id {
+	// 			hasgroup = true
+	// 			break
+	// 		}
+	// 	}
+	// 	if hasgroup {
+	// 		w.Write(errorcode.Error("还有group"))
+	// 		return
+	// 	}
+	// }
+	// userrows.Close()
+	// _, err = db.Mconn.Update("delete from user where id=?", id)
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
 
-	if count > 0 {
-		golog.Error("uid:%v,has bugs,can not remove")
-		w.Write(errorcode.IsUse())
-		return
-	}
-	// 查看用户组是否存在此用户
-	userrows, err := db.Mconn.GetRows("select ids from usergroup")
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	var hasgroup bool
-	for userrows.Next() {
-		var ids string
-		userrows.Scan(&ids)
-		for _, v := range strings.Split(ids, ",") {
-			if v == id {
-				hasgroup = true
-				break
-			}
-		}
-		if hasgroup {
-			w.Write(errorcode.Error("还有group"))
-			return
-		}
-	}
-	userrows.Close()
-	_, err = db.Mconn.Update("delete from user where id=?", id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
-	return
+	// send, _ := json.Marshal(errorcode)
+	// w.Write(send)
+	// return
 
 }
 
@@ -207,66 +121,22 @@ func DisableUser(w http.ResponseWriter, r *http.Request) {
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
-	return
 
 }
 
 // 显示自己能管理的权限，不显示自己的
 func UserList(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetInstance(r).Get("uid").(int64)
-	errorcode := &response.Response{}
-	uls := &user.UserList{}
-	if uid == cache.SUPERID {
-		getallsql := `select u.id,createtime,realname,nickname,email,disable,j.name from 
-		user as u 
-		join jobs as j 
-		on u.jid = j.id and u.id<>?`
-		adminrows, err := db.Mconn.GetRows(getallsql, cache.SUPERID)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-		for adminrows.Next() {
-			ul := &user.User{}
-			err = adminrows.Scan(&ul.Id, &ul.Createtime, &ul.Realname, &ul.Nickname, &ul.Email,
-				&ul.Disable, &ul.Position)
-			if err != nil {
-				golog.Info(err)
-				continue
-			}
-			uls.Userlist = append(uls.Userlist, ul)
-		}
-		adminrows.Close()
-		send, _ := json.Marshal(uls)
-		w.Write(send)
-		return
-	} else {
-		getallsql := `select u.id,createtime,realname,nickname,email,disable, j.name from 
-		user as u  join jobs as j 
-		on u.jid in (select id from jobs where hypo=(select jid from user where id=?))`
-		adminrows, err := db.Mconn.GetRows(getallsql, uid)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-		for adminrows.Next() {
-			ul := &user.User{}
-			err = adminrows.Scan(&ul.Id, &ul.Createtime, &ul.Realname, &ul.Nickname, &ul.Email,
-				&ul.Disable, &ul.RoleGroup, &ul.StatusGroup, &ul.Position)
-			if err != nil {
-				golog.Info(err)
-				continue
-			}
-			uls.Userlist = append(uls.Userlist, ul)
-		}
-		adminrows.Close()
-		send, _ := json.Marshal(uls)
-		w.Write(send)
+	us, err := model.GetAllUsers(uid)
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
 		return
 	}
-
+	res := response.Response{
+		Data: us,
+	}
+	w.Write(res.Marshal())
 }
 
 func UserUpdate(w http.ResponseWriter, r *http.Request) {
@@ -279,30 +149,15 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uls := xmux.GetInstance(r).Data.(*user.User)
+	user := xmux.GetInstance(r).Data.(*model.User)
 
-	if strings.Contains(uls.Nickname, "@") {
-		w.Write(errorcode.Error("昵称不能包含@符号"))
-		return
-	}
-	getallsql := `update user set 
-	 realname=?,	nickname=?,	email=?,
-	 jid=(select coalesce(min(id),0) from jobs where name=?) 
-	 where id=?`
-	_, err := db.Mconn.Update(getallsql,
-		uls.Realname, uls.Nickname, uls.Email, uls.Position,
-		uls.Id,
-	)
+	err := user.Update()
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		w.Write(response.ErrorE(err))
 		return
 	}
-
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
-	return
-
+	w.Write(response.Success())
 }
 
 func GetRoles(w http.ResponseWriter, r *http.Request) {

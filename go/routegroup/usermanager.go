@@ -5,6 +5,7 @@ import (
 	"itflow/handle/usercontroller"
 	"itflow/internal/user"
 	"itflow/midware"
+	"itflow/model"
 	"itflow/routegroup/usermanager"
 
 	"github.com/hyahm/xmux"
@@ -31,9 +32,14 @@ func init() {
 	// 上传头像页面
 	UserManager.Post("/upload/headimg", handle.UploadHeadImg)
 	// 修改密码页面
-	UserManager.Post("/password/update", usercontroller.ChangePassword).Bind(&user.ChangePasswod{}).
+	UserManager.Post("/password/update", usercontroller.ChangePassword).Bind(&usercontroller.ChangePasswod{}).
 		AddModule(midware.JsonToStruct)
 	// 用户列表管理页面
 	UserManager.AddGroup(usermanager.UserListPage)
+	// 用户创建
+	// 添加用户操作
+	UserManager.Post("/user/create", handle.CreateUser).
+		Bind(&model.User{}).AddModule(midware.UserPerm).
+		AddModule(midware.JsonToStruct)
 
 }

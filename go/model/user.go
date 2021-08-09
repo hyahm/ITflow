@@ -24,10 +24,38 @@ type User struct {
 	Jobid      int64   `json:"jid" db:"jid"`               // 职位
 }
 
+func (user *User) UpdatePassword(old string) error {
+
+	_, err := db.Mconn.Update("update user set password=? where password=? and id=?", user.Password, old, user.ID)
+
+	return err
+}
+
+func GetAllUsers(uid int64) ([]User, error) {
+	us := make([]User, 0)
+	if uid == cache.SUPERID {
+		err := db.Mconn.Select(&us, "select * from user")
+		return us, err
+	}
+	return nil, errors.New("no permission")
+}
+
 func GetJobIdByUid(uid int64) (int64, error) {
 	var jid int64
 	err := db.Mconn.GetOne("select jid from user where id=?", uid).Scan(&jid)
 	return jid, err
+}
+
+func DeleteUser(id interface{}) error {
+	effect, err := db.Mconn.Delete("delete from user where id=?", id)
+	if err != nil {
+		golog.Error(err)
+		return err
+	}
+	if effect == 0 {
+		return errors.New("delete failed")
+	}
+	return nil
 }
 
 // 获取所有用户信息
@@ -49,16 +77,12 @@ func GetShowStatus(uid int64) ([]int64, error) {
 
 func (user *User) Create() error {
 	// user.HeadImg = goconfig.ReadString("defaulthead")
-
-	// var err error
-	// createusersql := "insert into user(nickname,password,email,headimg,createtime,createuid,realname,showstatus,disable,bugsid,rid,jid) values(?,?,?,?,?,?,?,?,?,?,?,?)"
-	// user.ID, err = db.Mconn.Insert(createusersql,
-	// 	user.NickName, user.Password, user.Email,
-	// 	user.HeadImg, time.Now().Unix(), user.CreateId,
-	// 	user.RealName, user.ShowStatus, false,
-	// 	user.BugGroupId, user.Roleid, user.Jobid,
-	// )
-
+	ids, err := db.Mconn.InsertInterfaceWithID(user, "insert into user($key) values($value)")
+	if err != nil {
+		golog.Error(err)
+		return err
+	}
+	user.ID = ids[0]
 	return nil
 }
 
