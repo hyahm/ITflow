@@ -72,6 +72,7 @@
 
     <show
       :list="list"
+      :pageType="pageType"
       :statusMap="statusidMap"
       :projectMap="projectMap"
       :levelMap="levelMap"
@@ -93,7 +94,12 @@
 </template>
 
 <script>
-import { bugFilter, searchMyBugs } from "@/api/search"; // 水波纹指令
+import {
+  bugFilter,
+  searchMyBugs,
+  searchAllBugs,
+  searchMyTasks
+} from "@/api/search"; // 水波纹指令
 import { resumeBug } from "@/api/bugs";
 import { statusFilter } from "@/api/status";
 import Show from "./Bug/Show";
@@ -103,14 +109,13 @@ import {
   getShowStatus,
   getStatus
 } from "@/api/get";
-import { number } from "echarts/lib/export";
 export default {
   name: "BugSearch",
   components: {
     Show
   },
   props: {
-    // 1, 2, 3, 4,5  对应5种类型页面
+    // 1, 2, 3, 4  对应5种类型页面
     pageType: {
       type: Number,
       default: 1
@@ -222,6 +227,21 @@ export default {
             this.total = resp.data.total;
             this.listQuery.page = resp.data.page;
           });
+          break;
+        case 3:
+          searchAllBugs(this.listQuery).then(resp => {
+            this.list = resp.data.data;
+            this.total = resp.data.total;
+            this.listQuery.page = resp.data.page;
+          });
+          break;
+        case 4:
+          searchMyTasks(this.listQuery).then(resp => {
+            this.list = resp.data.data;
+            this.total = resp.data.total;
+            this.listQuery.page = resp.data.page;
+          });
+          break;
       }
     },
     searchHandle() {

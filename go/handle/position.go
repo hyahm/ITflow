@@ -4,12 +4,26 @@ import (
 	"encoding/json"
 	"itflow/cache"
 	"itflow/db"
+	"itflow/model"
 	"itflow/response"
 	"net/http"
 
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
+
+func PositionList(w http.ResponseWriter, r *http.Request) {
+	jobs, err := model.GetAllPositions()
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
+		return
+	}
+	res := response.Response{
+		Data: jobs,
+	}
+	w.Write(res.Marshal())
+}
 
 func PositionGet(w http.ResponseWriter, r *http.Request) {
 

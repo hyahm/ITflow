@@ -9,12 +9,18 @@ import (
 )
 
 type Job struct {
-	Id          int64  `json:"id"`
-	Name        string `json:"name"`
-	Level       int    `json:"level"`  // 1 是管理者， 2 是普通员工
-	HypoName    int64  `json:"hypo"`   //  管理者id
-	StatusGroup int64  `json:"bugsid"` // 状态组
-	RoleGroup   int64  `json:"rid"`    // 角色组
+	Id          int64  `json:"id" db:"id,default"`
+	Name        string `json:"name" db:"name"`
+	Level       int    `json:"level" db:"level"`   // 1 是管理者， 2 是普通员工
+	HypoName    int64  `json:"hypo" db:"hypo"`     //  管理者id
+	StatusGroup int64  `json:"bugsid" db:"bugsid"` // 状态组
+	RoleGroup   int64  `json:"rid" db:"rid"`       // 角色组
+}
+
+func GetAllPositions() ([]Job, error) {
+	jobs := make([]Job, 0)
+	err := db.Mconn.Select(&jobs, "select * from jobs")
+	return jobs, err
 }
 
 func GetJobIdsByJobId(jid int64) ([]int64, error) {

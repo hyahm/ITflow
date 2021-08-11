@@ -47,9 +47,38 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="状态" align="center" width="110">
+      <el-table-column
+        label="状态"
+        v-if="pageType != 4"
+        align="center"
+        width="110"
+      >
         <template slot-scope="scope">
           <span>{{ scope.row.sid | toStatusName(statusMap) }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column
+        label="状态"
+        v-if="pageType == 4"
+        class-name="status-col"
+        width="120"
+      >
+        <template slot-scope="scope">
+          <el-select
+            v-model="scope.row.status"
+            class="filter-item"
+            placeholder="修改状态"
+            @change="changestatus(scope.row)"
+          >
+            <el-option
+              v-for="item in statusMap"
+              :key="item[0]"
+              :label="item[1]"
+              :value="item[0]"
+            />
+          </el-select>
+          <!--<el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>-->
         </template>
       </el-table-column>
 
@@ -69,26 +98,109 @@
         label="操作"
         align="center"
         width="230"
+        v-if="pageType != 3"
         class-name="small-padding fixed-width"
       >
         <template slot-scope="scope">
-          <el-button type="primary" size="mini"
+          <el-button type="primary" size="mini" v-if="pageType == 2"
             ><router-link :to="'/bug/edit/' + scope.row.id"
               >编辑</router-link
             ></el-button
           >
-          <el-button type="success" size="mini" @click="resume(scope.row.id)"
+
+          <el-button
+            type="success"
+            size="mini"
+            v-if="pageType == 3"
+            @click="resume(scope.row.id)"
             >恢复</el-button
           >
-          <!--<el-button type="danger" size="mini" @click="handleRemove(scope.row)">{{ $t('list.remove') }}</el-button>-->
+          <el-button
+            type="danger"
+            v-if="pageType == 2"
+            size="mini"
+            @click="handleRemove(scope.row)"
+            >删除</el-button
+          >
+          <el-button
+            type="primary"
+            v-if="pageType == 4"
+            size="mini"
+            @click="handlePass(scope.row)"
+            >转交</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
+
+    <el-dialog
+      v-if="pageType == 4"
+      :close-on-click-modal="false"
+      title="任务完成转交"
+      :visible.sync="dialogFormVisible"
+    >
+      <el-form
+        ref="dataForm"
+        :model="temp"
+        label-position="left"
+        label-width="70px"
+        style="width: 400px; margin-left:50px;"
+      >
+        <el-form-item label="状态:">
+          <el-select
+            v-model="temp.status"
+            class="filter-item"
+            placeholder="Please select"
+          >
+            <el-option
+              v-for="item in statusMap"
+              :key="item[0]"
+              :label="item[1]"
+              :value="item[0]"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item style="margin-bottom: 40px;" label="任务给：">
+          <el-select
+            v-model="temp.spusers"
+            filterable
+            multiple
+            allow-create
+            default-first-option
+            placeholder="请选择指定的用户"
+          >
+            <el-option
+              v-for="item in userMap"
+              :key="item[0]"
+              :label="item[1]"
+              :value="item[0]"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="说明:">
+          <el-input
+            v-model="temp.remark"
+            :autosize="{ minRows: 2, maxRows: 4 }"
+            type="textarea"
+            placeholder="Please input"
+          />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="updateData">确认</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getImportants, getUserKeyName } from "@/api/get";
+import {
+  getImportants,
+  getUserKeyName,
+  getUserKeyNameByProject
+} from "@/api/get";
+import { passBug } from "@/api/bugs";
 
 export default {
   name: "Show",
@@ -131,13 +243,25 @@ export default {
     statusMap: {
       type: Map,
       require: true
+    },
+    pageType: {
+      type: Number,
+      require: true
     }
   },
   data() {
     return {
+      dialogFormVisible: false,
       listLoading: false,
       importantMap: new Map(),
-      userMap: new Map()
+      userMap: new Map(),
+      temp: {
+        id: undefined,
+        remark: "",
+        status: "新建",
+        spusers: "",
+        projectname: ""
+      }
     };
   },
   created() {
@@ -145,6 +269,23 @@ export default {
     this.getUsers();
   },
   methods: {
+    updateData() {
+      if (this.temp.spusers.length === 0) {
+        this.$message.error("至少选择一个处理人");
+        return;
+      }
+      passBug(this.temp).then(resp => {
+        const data = resp.data;
+        this.temp.remark = "";
+        this.temp.status = data.status;
+        this.temp.spusers = "";
+        this.$message({
+          message: "操作成功",
+          type: "success"
+        });
+      });
+      this.dialogFormVisible = false;
+    },
     getImportant() {
       getImportants().then(resp => {
         for (let v of resp.data.data) {
@@ -158,6 +299,24 @@ export default {
           this.userMap.set(v.id, v.name);
         }
       });
+    },
+    handlePass(row) {
+      this.temp.id = parseInt(row.id); // copy obj
+      this.temp.status = row.status;
+      this.temp.projectname = row.projectname;
+      this.temp.spusers = [];
+      this.users = [];
+      getUserKeyNameByProject(row.projectname).then(resp => {
+        this.users = resp.data.name;
+        for (var i = 0; i < this.users.length; i++) {
+          for (var j = 0; j < row.handle.length; j++) {
+            if (this.temp.spusers[j] === this.users[i]) {
+              this.temp.spusers.push(this.users[i]);
+            }
+          }
+        }
+      });
+      this.dialogFormVisible = true;
     }
   }
 };

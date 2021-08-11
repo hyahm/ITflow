@@ -3,7 +3,7 @@
     <p class="warn-content">
       可以改变bug的所有信息, 必须搜索才有显示
     </p>
-    <bug-search />
+    <bug-search :pageType="1" />
   </div>
 </template>
 

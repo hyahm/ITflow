@@ -169,7 +169,7 @@ export default {
   methods: {
     getrolegroups() {
       getRoleGroup().then(resp => {
-        this.rolegroups = resp.data.rolelist;
+        this.rolegroups = resp.data.data;
       });
     },
     handleGetHypos(id) {
@@ -181,7 +181,7 @@ export default {
     },
     getlist() {
       PositionsList().then(resp => {
-        this.tableData = resp.data.positions;
+        this.tableData = resp.data.data;
         for (let i = 0; i < this.tableData.length; i++) {
           if (this.tableData[i].level === 1) {
             this.manager.push(this.tableData[i].name);

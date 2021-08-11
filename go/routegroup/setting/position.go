@@ -20,7 +20,7 @@ func init() {
 	Position.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 
 	Position.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
-	Position.Post("/position/list", handle.PositionGet)
+	Position.Post("/position/list", handle.PositionList)
 
 	Position.Post("/position/add", handle.PositionAdd).Bind(&model.Job{}).AddModule(midware.JsonToStruct)
 

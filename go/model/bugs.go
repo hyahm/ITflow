@@ -52,6 +52,14 @@ func (bug *Bug) Resume(id interface{}) error {
 	return err
 }
 
+func (bug *Bug) Update() error {
+	getlistsql := "update bugs set $set where id=?"
+
+	_, err := db.Mconn.Update(getlistsql, bug.ID)
+
+	return err
+}
+
 func (bug *Bug) Delete(id interface{}) error {
 	getlistsql := "delete from bugs  where id=?"
 

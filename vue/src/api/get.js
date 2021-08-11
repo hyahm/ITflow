@@ -35,12 +35,12 @@ export function getProjectKeyName() {
   });
 }
 
-export function getMyProject() {
-  return request({
-    url: "/get/myproject",
-    method: "post"
-  });
-}
+// export function getProjectKeyName() {
+//   return request({
+//     url: "/get/myproject",
+//     method: "post"
+//   });
+// }
 
 // 获取某项目的用户真实姓名
 export function getUsers(data) {

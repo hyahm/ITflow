@@ -5,6 +5,7 @@ import (
 	"itflow/internal/bug"
 	"itflow/internal/search"
 	"itflow/midware"
+	"itflow/model"
 
 	"github.com/hyahm/xmux"
 )
@@ -18,7 +19,9 @@ func init() {
 	Bug.ApiCodeField("code").ApiCodeMsg("20", "token过期")
 	Bug.ApiCodeField("code").ApiCodeMsg("1", "其他错误,请查看返回的msg")
 	Bug.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
-	Bug.Post("/bug/pass", handle.PassBug).Bind(&bug.PassBug{}).
+
+	///  -------
+	Bug.Post("/bug/pass", handle.PassBug).Bind(&model.Bug{}).
 		AddModule(midware.JsonToStruct).ApiDescribe("转交bug").ApiReqStruct(&bug.PassBug{})
 
 	Bug.Post("/bug/mybugs", handle.GetMyBugs).Bind(&search.ReqMyBugFilter{})
