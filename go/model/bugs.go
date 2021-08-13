@@ -2,12 +2,12 @@ package model
 
 import (
 	"html"
+	"itflow/cache"
 	"itflow/db"
 )
 
 type Bug struct {
 	ID         int64   `json:"id" db:"id,default"`
-	UID        int64   `json:"uid" db:"uid"`
 	Title      string  `json:"title" db:"title"`
 	Sid        int64   `json:"sid" db:"sid"` // bug状态id
 	Content    string  `json:"content" db:"content"`
@@ -15,6 +15,7 @@ type Bug struct {
 	Iid        int64   `json:"iid" db:"iid"`         // import id
 	CreateTime int64   `json:"createtime" db:"createtime"`
 	Uids       []int64 `json:"spusers" db:"spusers"` // users id
+	Vid        int64   `json:"vid" db:"vid"`         // version id
 	Lid        int64   `json:"lid" db:"lid"`         // level id
 	Eid        int64   `json:"eid" db:"eid"`         // env id
 	Tid        int64   `json:"tid" db:"tid"`         // type id
@@ -60,12 +61,17 @@ func (bug *Bug) Update() error {
 	return err
 }
 
-func (bug *Bug) Delete(id interface{}) error {
-	getlistsql := "delete from bugs  where id=?"
+func (bug *Bug) Delete(uid, id interface{}) error {
+	if uid == cache.SUPERID {
+		getlistsql := "delete from bugs  where id=?"
+		_, err := db.Mconn.Update(getlistsql, id)
+		return err
+	} else {
+		getlistsql := "delete from bugs  where id=? and ownerid=?"
+		_, err := db.Mconn.Update(getlistsql, id, uid)
+		return err
+	}
 
-	_, err := db.Mconn.Update(getlistsql, id)
-
-	return err
 }
 
 func (bug *Bug) CreateBug() (err error) {

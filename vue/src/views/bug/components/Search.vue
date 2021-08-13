@@ -209,12 +209,13 @@ export default {
       const data = {
         showstatus: sids
       };
-      statusFilter(data).then(_ => {});
+      statusFilter(data).then(() => {});
     },
     handleFilter() {
       this.listQuery.showstatus = this.getSidByShowStatus();
       switch (this.pageType) {
         case 1:
+          // 垃圾箱
           bugFilter(this.listQuery).then(resp => {
             this.list = resp.data.data;
             this.total = resp.data.total;
@@ -222,6 +223,7 @@ export default {
           });
           break;
         case 2:
+          // 我创建的bug
           searchMyBugs(this.listQuery).then(resp => {
             this.list = resp.data.data;
             this.total = resp.data.total;
@@ -229,6 +231,7 @@ export default {
           });
           break;
         case 3:
+          // 所有的bug
           searchAllBugs(this.listQuery).then(resp => {
             this.list = resp.data.data;
             this.total = resp.data.total;
@@ -236,6 +239,7 @@ export default {
           });
           break;
         case 4:
+          // 我的任务
           searchMyTasks(this.listQuery).then(resp => {
             this.list = resp.data.data;
             this.total = resp.data.total;

@@ -323,21 +323,15 @@ func GetMyBugs(w http.ResponseWriter, r *http.Request) {
 
 func DeleteBug(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
-	errorcode := &response.Response{}
-	if xmux.GetInstance(r).Get("uid").(int64) != cache.SUPERID {
-		w.Write(errorcode.Error("没有权限"))
-		return
-	}
-
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	bug := &model.Bug{}
-	err := bug.Delete(id)
+	err := bug.Delete(uid, id)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		w.Write(response.ErrorE(err))
 		return
 	}
-	w.Write(errorcode.Success())
-	return
+	w.Write(response.Success())
 }
 
 func ResumeBug(w http.ResponseWriter, r *http.Request) {

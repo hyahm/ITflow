@@ -67,7 +67,9 @@ func RunHttp() {
 		doc := router.ShowApi("/docs").DelModule(midware.CheckToken)
 		router.AddGroup(doc)
 	}
-
+	router.Get("/", func(rw http.ResponseWriter, r *http.Request) {
+		rw.Write([]byte("hello world"))
+	}).DelModule(midware.CheckToken)
 	listenaddr := goconfig.ReadString("listenaddr", ":10001")
 
 	fmt.Println("listen on " + listenaddr)

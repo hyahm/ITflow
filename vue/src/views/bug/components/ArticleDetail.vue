@@ -150,8 +150,6 @@
 </template>
 
 <script>
-// import Tinymce from '@/components/Tinymce'
-
 import Sticky from "@/components/Sticky"; // 粘性header组件
 import { fetchBug, createBug } from "@/api/bugs";
 import { uploadImg } from "@/api/uploadimg";
@@ -201,9 +199,7 @@ export default {
       oses: [],
       users: [], // 随项目变化的用户
       projects: [],
-      users: [],
       envnames: [],
-
       ts: [],
       typ: "1"
     };
@@ -248,8 +244,6 @@ export default {
       // 选择不用项目会显示不同的用户
       this.getuserMap(this.postForm.pid);
       this.getversionMap(this.postForm.pid);
-
-      //
     },
 
     getimportants() {
@@ -275,18 +269,10 @@ export default {
 
     fetchData(id) {
       fetchBug(id).then(resp => {
-        const dd = resp.data;
-        this.editProject(dd.project_id);
-        this.postForm.title = dd.title;
-        this.postForm.content = dd.content;
-        this.postForm.iid = dd.important;
-        this.postForm.version = dd.version;
-        this.postForm.user_id = dd.user_id;
-        this.postForm.envname = dd.envname;
-        this.postForm.level = dd.level;
-        this.postForm.pid = dd.project_id;
-        this.typ = dd.typ + "";
-        // 第一次获取数据， 请求到当前项目关联的版本和用户
+        const dd = resp.data.data;
+        this.postForm = dd;
+        this.getuserMap(this.postForm.pid);
+        this.getversionMap(this.postForm.pid);
       });
     },
     submitForm() {

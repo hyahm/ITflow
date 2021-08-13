@@ -119,7 +119,7 @@
             type="danger"
             v-if="pageType == 2"
             size="mini"
-            @click="handleRemove(scope.row)"
+            @click="handleRemove(scope.row.id)"
             >删除</el-button
           >
           <el-button
@@ -200,7 +200,7 @@ import {
   getUserKeyName,
   getUserKeyNameByProject
 } from "@/api/get";
-import { passBug } from "@/api/bugs";
+import { passBug, delBug } from "@/api/bugs";
 
 export default {
   name: "Show",
@@ -269,6 +269,11 @@ export default {
     this.getUsers();
   },
   methods: {
+    handleRemove(id) {
+      delBug(id).then(resp => {
+        this.list = this.list.filter(m => m.id != id);
+      });
+    },
     updateData() {
       if (this.temp.spusers.length === 0) {
         this.$message.error("至少选择一个处理人");
