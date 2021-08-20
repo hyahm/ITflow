@@ -200,7 +200,6 @@ export default {
     getlist() {
       PositionsList().then((resp) => {
         this.tableData = resp.data.data;
-        console.log(this.tableData);
       });
     },
     confirm() {
@@ -219,21 +218,13 @@ export default {
         });
       } else {
         updatePosition(this.form).then((resp) => {
-          console.log(this.form);
           this.tableData.map((m) => {
             if (m.id === this.form.id) {
               m = this.form;
             }
             return m;
           });
-          // for (let i = 0; i < l; i++) {
-          //   if (this.tableData[i].id === this.form.id) {
-          //     console.log(this.form.id);
-          //     this.tableData[i] = Object.assign({}, this.form);
-          //     console.log(this.tableData[i]);
-          //     break;
-          //   }
-          // }
+
           if (this.form.level === 1) {
             for (let i = 0; i < this.manager.length; i++) {
               if (this.manager[i] === this.changeName) {

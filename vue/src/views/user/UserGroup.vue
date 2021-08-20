@@ -1,9 +1,7 @@
 <template>
   <div class="group" style="padding-left: 20px">
-    <p class="warn-content">
-      只有创建才能删除， 管理员和创建者可以查看编辑
-    </p>
-    <el-table :data="list" height="250" style="width: 100%;">
+    <p class="warn-content">只有创建才能删除， 管理员和创建者可以查看编辑</p>
+    <el-table :data="list" height="250" style="width: 100%">
       <el-table-column label="Id" width="180">
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.id }}</span>
@@ -21,20 +19,15 @@
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button size="mini" @click="handleUpdate(scope.row)"
-            >修改</el-button
-          >
-          <el-button
-            size="mini"
-            type="danger"
-            @click="handleDelete(scope.row.id)"
+          <el-button size="mini" @click="handleUpdate(scope.row)">修改</el-button>
+          <el-button size="mini" type="danger" @click="handleDelete(scope.row.id)"
             >删除</el-button
           >
         </template>
       </el-table-column>
     </el-table>
     <el-button
-      style="margin-top: 10px;margin-left: 10px"
+      style="margin-top: 10px; margin-left: 10px"
       type="success"
       @click="handleAdd"
       >添加组</el-button
@@ -74,7 +67,7 @@ import {
   getUserGroups,
   createUserGroups,
   deleteUserGroups,
-  updateUserGroup
+  updateUserGroup,
 } from "@/api/usermanager/usergroup";
 import { getUserKeyName } from "@/api/get";
 let that;
@@ -87,7 +80,7 @@ export default {
         names.push(that.userMap.get(v));
       }
       return names.join(", ");
-    }
+    },
   },
   created() {
     this.getuserkey();
@@ -101,10 +94,10 @@ export default {
       form: {
         id: 0,
         name: "",
-        uids: []
+        uids: [],
       },
       users: [],
-      userMap: new Map()
+      userMap: new Map(),
     };
   },
   activated() {
@@ -112,7 +105,7 @@ export default {
   },
   methods: {
     getuserkey() {
-      getAllUserKeyName().then(resp => {
+      getAllUserKeyName().then((resp) => {
         this.users = resp.data.data;
         for (let v of this.users) {
           this.userMap.set(v.id, v.name);
@@ -120,7 +113,7 @@ export default {
       });
     },
     getgroup() {
-      getUserGroups().then(resp => {
+      getUserGroups().then((resp) => {
         this.list = resp.data.data;
       });
     },
@@ -128,14 +121,14 @@ export default {
       this.form = {
         id: 0,
         name: "",
-        uids: []
+        uids: [],
       };
 
       this.dialogFormVisible = true;
     },
     confirm() {
       if (this.form.id > 0) {
-        updateUserGroup(this.form).then(_ => {
+        updateUserGroup(this.form).then((_) => {
           const l = this.list.length;
           for (let i = 0; i < l; i++) {
             if (this.list[i].id === this.form.id) {
@@ -145,11 +138,11 @@ export default {
           this.$message.success("修改成功");
         });
       } else {
-        createUserGroups(this.form).then(resp => {
+        createUserGroups(this.form).then((resp) => {
           this.list.push({
             id: resp.data.id,
             name: this.form.name,
-            uids: this.form.uids
+            uids: this.form.uids,
           });
           this.$message.success("添加用户组成功");
         });
@@ -159,7 +152,7 @@ export default {
     cancel() {
       this.form = {
         name: "",
-        uids: []
+        uids: [],
       };
       this.dialogFormVisible = false;
     },
@@ -173,11 +166,10 @@ export default {
       this.$confirm("此操作将关闭bug, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
-          console.log("88888");
-          deleteUserGroups(id).then(_ => {
+          deleteUserGroups(id).then((_) => {
             for (let i in this.list) {
               if (this.list[i].id === id) {
                 this.list.splice(i, 1);
@@ -191,10 +183,10 @@ export default {
         .catch(() => {
           this.$message({
             type: "info",
-            message: "已取消删除"
+            message: "已取消删除",
           });
         });
-    }
-  }
+    },
+  },
 };
 </script>

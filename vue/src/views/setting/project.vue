@@ -3,13 +3,7 @@
     <p class="warn-content">
       如果删除的此项目的某参与者， 在他任务里面还是会显示，只不过没操作权限
     </p>
-    <el-table
-      :data="tableData"
-      fit
-      border
-      highlight-current-row
-      style="width: 100%"
-    >
+    <el-table :data="tableData" fit border highlight-current-row style="width: 100%">
       <el-table-column label="Id" width="180">
         <template slot-scope="scope">
           <span style="margin-left: 10px">{{ scope.row.id }}</span>
@@ -31,20 +25,13 @@
       <el-table-column label="操作" width="200">
         <template slot-scope="scope">
           <el-button size="mini" @click="updatep(scope.row)">修改</el-button>
-          <el-button
-            size="mini"
-            type="danger"
-            @click="handleDelete(scope.row.id)"
+          <el-button size="mini" type="danger" @click="handleDelete(scope.row.id)"
             >删除</el-button
           >
         </template>
       </el-table-column>
     </el-table>
-    <el-button
-      style="margin: 20px"
-      type="success"
-      size="mini"
-      @click="addProject"
+    <el-button style="margin: 20px" type="success" size="mini" @click="addProject"
       >添加项目名</el-button
     >
     <el-dialog
@@ -58,10 +45,7 @@
           <el-input v-model="form.name" width="200" auto-complete="off" />
         </el-form-item>
 
-        <el-form-item
-          style="display: inline-block;width: 300px"
-          label="参与组: "
-        >
+        <el-form-item style="display: inline-block; width: 300px" label="参与组: ">
           <el-select v-model="form.ugid" placeholder="参与组">
             <el-option
               v-for="item in usergroups"
@@ -86,7 +70,7 @@ import {
   getProjectName,
   addProjectName,
   updateProjectName,
-  deleteProjectName
+  deleteProjectName,
 } from "@/api/project";
 import { deepClone } from "@/utils";
 export default {
@@ -94,7 +78,7 @@ export default {
   filters: {
     toUserGroupName(id, usergroupMap) {
       return usergroupMap.get(id);
-    }
+    },
   },
   data() {
     return {
@@ -102,12 +86,12 @@ export default {
       form: {
         ugid: undefined,
         name: "",
-        id: 0
+        id: 0,
       },
       usergroups: [],
       formLabelWidth: "120px",
       tableData: [],
-      usergroupMap: new Map()
+      usergroupMap: new Map(),
     };
   },
   activated() {
@@ -120,16 +104,15 @@ export default {
   },
   methods: {
     getusergroup() {
-      getUserGroupNames().then(resp => {
+      getUserGroupNames().then((resp) => {
         this.usergroups = resp.data.data;
-        console.log(this.usergroups);
         for (let v of this.usergroups) {
           this.usergroupMap.set(v.id, v.name);
         }
       });
     },
     getproject() {
-      getProjectName().then(resp => {
+      getProjectName().then((resp) => {
         this.tableData = resp.data.data;
       });
     },
@@ -143,10 +126,10 @@ export default {
       this.$confirm("此操作将关闭bug, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
-          deleteProjectName(id).then(_ => {
+          deleteProjectName(id).then((_) => {
             const fl = this.tableData.length;
             for (let i = 0; i < fl; i++) {
               if (this.tableData[i].id === id) {
@@ -160,12 +143,11 @@ export default {
         .catch(() => {
           this.$message({
             type: "info",
-            message: "已取消删除"
+            message: "已取消删除",
           });
         });
     },
     updatep(row) {
-      console.log(row);
       this.form = row;
       this.dialogFormVisible = true;
     },
@@ -178,13 +160,13 @@ export default {
         this.$message.success("请选择用户组");
       }
       if (this.form.id <= 0) {
-        addProjectName(this.form).then(resp => {
+        addProjectName(this.form).then((resp) => {
           this.form.id = resp.data.id;
           this.tableData.push(deepClone(this.form));
           this.$message.success("添加成功");
         });
       } else {
-        updateProjectName(this.form).then(resp => {
+        updateProjectName(this.form).then((resp) => {
           if (resp.data.id === 0) {
             this.$message.warning("存在项目名");
             return;
@@ -204,8 +186,8 @@ export default {
       this.dialogFormVisible = false;
       this.form.name = "";
       this.form.id = 0;
-    }
-  }
+    },
+  },
 };
 </script>
 

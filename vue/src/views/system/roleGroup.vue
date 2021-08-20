@@ -10,7 +10,7 @@
       border
       fit
       highlight-current-row
-      style="width: 100%;padding: 10px"
+      style="width: 100%; padding: 10px"
     >
       <el-table-column label="id" align="center" width="50">
         <template slot-scope="scope">
@@ -34,21 +34,14 @@
           <el-button type="primary" size="mini" @click="handleEdit(scope.row)"
             >编辑</el-button
           >
-          <el-button
-            type="success"
-            size="mini"
-            @click="handleRemove(scope.row.id)"
+          <el-button type="success" size="mini" @click="handleRemove(scope.row.id)"
             >删除</el-button
           >
           <!--<el-button type="danger" size="mini" @click="handleRemove(scope.row)">{{ $t('list.remove') }}</el-button>-->
         </template>
       </el-table-column>
     </el-table>
-    <el-button
-      style="margin: 20px"
-      type="success"
-      size="mini"
-      @click.native="handleAdd"
+    <el-button style="margin: 20px" type="success" size="mini" @click.native="handleAdd"
       >添加角色组</el-button
     >
     <el-dialog
@@ -73,29 +66,29 @@
           <!-- <el-checkbox v-model="role.checked" :label="role.name" style="width:150px" @change="changeChecked(role)" /> -->
           <el-checkbox
             v-model="role.select"
-            style="width:50px"
+            style="width: 50px"
             label="select"
             @change="changeChecked(role)"
           />
           <el-checkbox
             v-model="role.add"
             :disabled="!role.select"
-            style="width:50px"
+            style="width: 50px"
             label="add"
           />
           <el-checkbox
             v-model="role.update"
             :disabled="!role.select"
-            style="width:50px"
+            style="width: 50px"
             label="update"
           />
           <el-checkbox
             v-model="role.remove"
             :disabled="!role.select"
-            style="width:50px"
+            style="width: 50px"
             label="remove"
           />
-          <label style="padding-left: 100px;width:50px">{{ role.info }}</label>
+          <label style="padding-left: 100px; width: 50px">{{ role.info }}</label>
         </div>
         <!-- </el-checkbox-group> -->
         <!--<el-button type="success" round @click="HandlerAddGroup">添加部门</el-button>-->
@@ -109,13 +102,7 @@
 </template>
 
 <script>
-import {
-  roleList,
-  addRole,
-  editRole,
-  removeRole,
-  getPermTemplate
-} from "@/api/role";
+import { roleList, addRole, editRole, removeRole, getPermTemplate } from "@/api/role";
 import { deepClone } from "@/utils";
 export default {
   name: "RoleGroup",
@@ -128,9 +115,9 @@ export default {
       form: {
         id: 0,
         name: "",
-        rolelist: []
+        rolelist: [],
       },
-      templateperm: []
+      templateperm: [],
     };
   },
 
@@ -149,8 +136,7 @@ export default {
     },
     getTemplate() {
       // 获取模板
-      getPermTemplate().then(resp => {
-        console.log(resp);
+      getPermTemplate().then((resp) => {
         this.templateperm = resp.data.template;
       });
     },
@@ -161,7 +147,7 @@ export default {
       this.dialogVisible = true;
     },
     getlist() {
-      roleList().then(resp => {
+      roleList().then((resp) => {
         this.list = resp.data.rolelist;
       });
     },
@@ -173,8 +159,8 @@ export default {
     },
     handleRemove(id) {
       this.$confirm("确认关闭？")
-        .then(_ => {
-          removeRole(id).then(resp => {
+        .then((_) => {
+          removeRole(id).then((resp) => {
             const l = this.list.length;
             for (let i = 0; i < l; i++) {
               if (this.list[i].id === id) {
@@ -184,7 +170,7 @@ export default {
             this.$message.success("删除成功");
           });
         })
-        .catch(_ => {});
+        .catch((_) => {});
     },
     handleClose() {
       this.dialogVisible = false;
@@ -195,7 +181,7 @@ export default {
       }
       // return
       if (this.form.id > 0) {
-        editRole(this.form).then(_ => {
+        editRole(this.form).then((_) => {
           // 成功后赋值到源数据
           const l = this.list.length;
           for (let i = 0; i < l; i++) {
@@ -207,19 +193,19 @@ export default {
           this.$message.success("修改成功");
         });
       } else {
-        addRole(this.form).then(resp => {
+        addRole(this.form).then((resp) => {
           this.list.push({
             id: resp.data.id,
             name: this.form.name,
-            rolelist: this.form.rolelist
+            rolelist: this.form.rolelist,
           });
           this.$message.success("添加成功");
         });
       }
 
       this.dialogVisible = false;
-    }
-  }
+    },
+  },
 };
 </script>
 

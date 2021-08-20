@@ -163,7 +163,6 @@ export default {
     },
     getversionlist() {
       getVersion().then((resp) => {
-        console.log();
         this.list = resp.data.data;
       });
     },
@@ -183,7 +182,6 @@ export default {
       if (this.form.id <= 0) {
         addVersion(this.form)
           .then((response) => {
-            console.log(response.data);
             this.form.id = response.data.id;
             this.form.createtime = response.data.create_time;
             this.list.push(this.form);

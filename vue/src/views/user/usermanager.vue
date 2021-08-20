@@ -12,7 +12,7 @@
       border
       fit
       highlight-current-row
-      style="width: 100%;"
+      style="width: 100%"
     >
       <el-table-column label="id" align="center" width="65">
         <template slot-scope="scope">
@@ -21,9 +21,7 @@
       </el-table-column>
       <el-table-column label="日期" width="150px" align="center">
         <template slot-scope="scope">
-          <span>{{
-            scope.row.createtime | parseTime("{y}-{m}-{d} {h}:{i}")
-          }}</span>
+          <span>{{ scope.row.createtime | parseTime("{y}-{m}-{d} {h}:{i}") }}</span>
         </template>
       </el-table-column>
 
@@ -64,22 +62,13 @@
         class-name="small-padding fixed-width"
       >
         <template slot-scope="scope">
-          <el-button
-            type="primary"
-            size="mini"
-            @click="handleResetPwd(scope.row)"
+          <el-button type="primary" size="mini" @click="handleResetPwd(scope.row)"
             >修改密码</el-button
           >
-          <el-button
-            size="mini"
-            type="danger"
-            @click="handleChangeInfo(scope.row)"
+          <el-button size="mini" type="danger" @click="handleChangeInfo(scope.row)"
             >更改信息
           </el-button>
-          <el-button
-            size="mini"
-            type="danger"
-            @click="handleRemove(scope.row.id)"
+          <el-button size="mini" type="danger" @click="handleRemove(scope.row.id)"
             >删除
           </el-button>
           <el-button
@@ -89,11 +78,7 @@
             @click="handleDisable(scope.row)"
             >启用
           </el-button>
-          <el-button
-            v-else
-            size="mini"
-            type="danger"
-            @click="handleDisable(scope.row)"
+          <el-button v-else size="mini" type="danger" @click="handleDisable(scope.row)"
             >禁用
           </el-button>
         </template>
@@ -140,13 +125,7 @@
 </template>
 
 <script>
-import {
-  userList,
-  resetPwd,
-  updateUser,
-  userRemove,
-  userDisable
-} from "@/api/user";
+import { userList, resetPwd, updateUser, userRemove, userDisable } from "@/api/user";
 import { getPositionKeyName } from "@/api/position";
 
 export default {
@@ -156,13 +135,13 @@ export default {
       const statusMap = {
         published: "success",
         draft: "info",
-        deleted: "danger"
+        deleted: "danger",
       };
       return statusMap[status];
     },
     toJobName(id, positionMap) {
       return positionMap.get(id);
-    }
+    },
   },
   data() {
     return {
@@ -173,15 +152,15 @@ export default {
       userlist: [],
       form: {
         id: 0,
-        name: ""
+        name: "",
       },
       statusgroup: [],
       positionMap: new Map(),
       listLoading: false,
       sortOptions: [
         { label: "ID Ascending", key: "+id" },
-        { label: "ID Descending", key: "-id" }
-      ]
+        { label: "ID Descending", key: "-id" },
+      ],
     };
   },
   activated() {
@@ -195,7 +174,7 @@ export default {
   },
   methods: {
     getPosition() {
-      getPositionKeyName().then(resp => {
+      getPositionKeyName().then((resp) => {
         this.positionlist = resp.data.data;
         for (let v of this.positionlist) {
           this.positionMap.set(v.id, v.name);
@@ -207,7 +186,7 @@ export default {
       this.dialogVisible = false;
     },
     HandlerUpdate() {
-      updateUser(this.form).then(_ => {
+      updateUser(this.form).then((_) => {
         const l = this.userlist.length;
         for (let i = 0; i < l; i++) {
           if (this.userlist[i].id === this.form.id) {
@@ -222,12 +201,11 @@ export default {
       this.dialogVisible = false;
     },
     getuserList() {
-      userList().then(resp => {
+      userList().then((resp) => {
         this.userlist = resp.data.data;
       });
     },
     handleChangeInfo(row) {
-      console.log(row);
       this.form = row;
       this.dialogVisible = true;
     },
@@ -235,10 +213,10 @@ export default {
       this.$confirm("此操作将关闭bug, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
-          userRemove(id).then(_ => {
+          userRemove(id).then((_) => {
             const l = this.userlist.length;
             for (let i = 0; i < l; i++) {
               if (this.userlist[i].id === id) {
@@ -251,12 +229,12 @@ export default {
         .catch(() => {
           this.$message({
             type: "info",
-            message: "已取消删除"
+            message: "已取消删除",
           });
         });
     },
     handleDisable(row) {
-      userDisable(row.id).then(_ => {
+      userDisable(row.id).then((_) => {
         const l = this.userlist.length;
         for (let i = 0; i < l; i++) {
           if (this.userlist[i].id === row.id) {
@@ -269,27 +247,27 @@ export default {
     handleResetPwd(row) {
       this.$prompt("请输入密码", "提示", {
         cancelButtonText: "取消",
-        confirmButtonText: "确定"
+        confirmButtonText: "确定",
       })
         .then(({ value }) => {
           const data = {
             id: row.id,
-            newpassword: value
+            newpassword: value,
           };
-          resetPwd(data).then(_ => {
+          resetPwd(data).then((_) => {
             this.$message({
               type: "success",
-              message: "你的密码是: " + value
+              message: "你的密码是: " + value,
             });
           });
         })
         .catch(() => {
           this.$message({
             type: "info",
-            message: "取消输入"
+            message: "取消输入",
           });
         });
-    }
-  }
+    },
+  },
 };
 </script>
