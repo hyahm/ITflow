@@ -28,8 +28,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if ip != "" {
 		ipAddr = ip
 	}
-	golog.Info(ip)
-	golog.Info(ipAddr)
 	resp, err := login.Check()
 	if err != nil {
 		golog.Error(err)

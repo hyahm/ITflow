@@ -10,6 +10,7 @@ import (
 var Hook *xmux.GroupRoute
 
 func init() {
+	Hook = xmux.NewGroupRoute()
 	Hook.AddModule(midware.JsonToStruct)
 	Hook.Post("/gitlab/{name}", handle.Gitlab).DelModule(midware.CheckToken).AddModule(midware.JsonToStruct)
 	Hook.Post("/gitee/{name}", handle.Gitee).DelModule(midware.CheckToken).AddModule(midware.JsonToStruct)

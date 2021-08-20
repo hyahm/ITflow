@@ -307,34 +307,7 @@ LOCK TABLES `informations` WRITE;
 /*!40000 ALTER TABLE `informations` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `jobs`
---
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `jobs` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(30) NOT NULL DEFAULT '',
-  `level` bigint(20) NOT NULL DEFAULT '2',
-  `hypo` varchar(30) NOT NULL DEFAULT '0',
-  `rid` bigint(20) DEFAULT '0',
-  `bugsid` bigint(20) DEFAULT '0',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`),
-  KEY `rid` (`rid`),
-  KEY `bugsid` (`bugsid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `jobs`
---
-
-LOCK TABLES `jobs` WRITE;
-/*!40000 ALTER TABLE `jobs` DISABLE KEYS */;
-/*!40000 ALTER TABLE `jobs` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `level`
@@ -663,7 +636,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `realname` (`realname`),
   KEY `jid` (`jid`),
-  KEY `createuid` (`createuid`),
+  KEY `createuid` (`createuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -673,7 +646,8 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'admin','69ad5117e7553ecfa7f918a223426dd8da08a57f','admin@qq.com','http://120.26.164.125:10001/showimg/1594376285974981434.png',1557131883,0,'admin','',0,0);
+INSERT INTO `user` VALUES (1,'admin','69ad5117e7553ecfa7f918a223426dd8da08a57f',
+'admin@qq.com','http://120.26.164.125:10001/showimg/1594376285974981434.png',unix_timestamp(now()),0,'admin','[]',0,0);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -782,4 +756,4 @@ CREATE TABLE `jobs` (
   `rid` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

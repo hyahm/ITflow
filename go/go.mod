@@ -10,7 +10,7 @@ require (
 	github.com/hyahm/golog v0.0.0-20210804025002-78ae6da11f3a
 	github.com/hyahm/gomysql v0.0.0-20210807101015-1067553f5d7e
 	github.com/hyahm/scs v0.0.0-20210811062835-c3155dde9918
-	github.com/hyahm/xmux v0.0.0-20210819023026-5d06b0366c0b
+	github.com/hyahm/xmux v0.0.0-20210820062049-7686bd932d52
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )

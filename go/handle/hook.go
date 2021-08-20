@@ -4,12 +4,9 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"itflow/internal/response"
+	"itflow/model"
 	"net/http"
-	"strconv"
-	"time"
 
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
@@ -109,19 +106,19 @@ func Github(w http.ResponseWriter, r *http.Request) {
 }
 
 func RandomHook(w http.ResponseWriter, r *http.Request) {
-	uid := xmux.GetInstance(r).Get("uid").(int64)
-	errorcode := &response.Response{}
-	rand := strconv.FormatInt(time.Now().UnixNano(), 10)
-	s1 := sha1.New()
-	io.WriteString(s1, rand)
-	hook := fmt.Sprintf("%x", s1.Sum(nil))
-	fmt.Println(hook)
-	err := model.SetHookById(hook, uid)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.Error(err))
-		return
-	}
-	w.Write([]byte(fmt.Sprintf(`{"code" : 0, "hook": "%s"}`, hook)))
-	return
+	// 	uid := xmux.GetInstance(r).Get("uid").(int64)
+	// 	errorcode := &response.Response{}
+	// 	rand := strconv.FormatInt(time.Now().UnixNano(), 10)
+	// 	s1 := sha1.New()
+	// 	io.WriteString(s1, rand)
+	// 	hook := fmt.Sprintf("%x", s1.Sum(nil))
+	// 	fmt.Println(hook)
+	// 	err := model.SetHookById(hook, uid)
+	// 	if err != nil {
+	// 		golog.Error(err)
+	// 		w.Write(errorcode.Error(err))
+	// 		return
+	// 	}
+	// 	w.Write([]byte(fmt.Sprintf(`{"code" : 0, "hook": "%s"}`, hook)))
+	// 	return
 }
