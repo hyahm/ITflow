@@ -16,13 +16,13 @@ import (
 )
 
 func Gitee(w http.ResponseWriter, r *http.Request) {
-	hook := xmux.GetData(r).Get("hook").(string)
+	hook := xmux.GetInstance(r).Get("hook").(string)
 	if hook != r.Header.Get("X-Gitee-Token") {
 		w.WriteHeader(http.StatusNetworkAuthenticationRequired)
 		return
 	}
-	did := xmux.GetData(r).Get("did").(int64)
-	uid := xmux.GetData(r).Get("uid").(int64)
+	did := xmux.GetInstance(r).Get("did").(int64)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	doc, err := model.NewDocById(did, uid)
 	if err != nil {
 		w.WriteHeader(http.StatusNetworkAuthenticationRequired)

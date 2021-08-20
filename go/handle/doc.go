@@ -631,20 +631,20 @@ func DocCreate(w http.ResponseWriter, r *http.Request) {
 // 	file, _, err := r.FormFile("file")
 // 	if err != nil {
 // 		golog.Error(err.Error())
-// 		w.Write(errorcode.ErrorGetData())
+// 		w.Write(errorcode.ErrorGetInstance())
 // 		return
 // 	}
 // 	data, err := ioutil.ReadAll(file)
 // 	if err != nil {
 // 		golog.Error(err.Error())
-// 		w.Write(errorcode.ErrorGetData())
+// 		w.Write(errorcode.ErrorGetInstance())
 // 		return
 // 	}
 // 	//保存文件
 // 	savefile := filepath.Join("/", domain+".tar")
 // 	if err := ioutil.WriteFile(savefile, data, 0644); err != nil {
 // 		golog.Error(err.Error())
-// 		w.Write(errorcode.ErrorGetData())
+// 		w.Write(errorcode.ErrorGetInstance())
 // 		return
 // 	}
 // 	d := command.NewDocker(domain)
@@ -655,7 +655,7 @@ func DocCreate(w http.ResponseWriter, r *http.Request) {
 // 	nfm.SrcDir = fn
 // 	if err := nfm.UnTar(); err != nil {
 // 		golog.Error(err.Error())
-// 		w.Write(errorcode.ErrorGetData())
+// 		w.Write(errorcode.ErrorGetInstance())
 // 		return
 // 	}
 // 	w.Write(errorcode.Success())
@@ -867,7 +867,7 @@ func DocCreate(w http.ResponseWriter, r *http.Request) {
 // 	bd, err := ioutil.ReadAll(r.Body)
 // 	if err != nil {
 // 		golog.Error(err.Error())
-// 		w.Write(errorcode.ErrorGetData())
+// 		w.Write(errorcode.ErrorGetInstance())
 // 		return
 // 	}
 // 	golog.Debug(string(bd))
@@ -881,7 +881,7 @@ func DocCreate(w http.ResponseWriter, r *http.Request) {
 // 	ok, err := regexp.MatchString("^[a-z]{1}[a-z0-9]{1,20}$", name)
 // 	if err != nil || !ok {
 // 		golog.Error("string %s not format", name)
-// 		w.Write(errorcode.ErrorGetData())
+// 		w.Write(errorcode.ErrorGetInstance())
 // 		return
 // 	}
 
@@ -962,7 +962,7 @@ func DocCreate(w http.ResponseWriter, r *http.Request) {
 // 	//ok, err := regexp.MatchString("^[a-z]{1}[a-z0-9]{1,20}$", name)
 // 	//if err != nil || !ok {
 // 	//	golog.Error(err.Error())
-// 	//	w.Write(errorcode.ErrorGetData())
+// 	//	w.Write(errorcode.ErrorGetInstance())
 // 	//	return
 // 	//}
 // 	//如果存在配置文件就return
