@@ -25,7 +25,7 @@
 
       <el-table-column label="状态权限" width="500" align="center">
         <template slot-scope="scope">
-          <span>{{ toname(scope.row.sids) }}</span>
+          <span>{{ scope.row.sids | toname(statusMap) }}</span>
         </template>
       </el-table-column>
 
@@ -98,6 +98,11 @@ import {
 } from "@/api/statusgroup";
 export default {
   name: "BugGroup",
+  filters: {
+    toname(ids, statusMap) {
+      return ids.map(m =>    statusMap.get(m)      ).join(", ")
+    }
+  },
   data() {
     return {
       statuslist: [],
@@ -120,17 +125,6 @@ export default {
     this.getlist();
   },
   methods: {
-    toname(ids) {
-      let names = [];
-      for (let id of ids) {
-        for (let v of this.statuslist) {
-          if (id === v.id) {
-            names.push(v.name);
-          }
-        }
-      }
-      return names.join(", ");
-    },
     handleEdit(row) {
       this.form = row;
       this.dialogVisible = true;
@@ -180,15 +174,13 @@ export default {
         this.$message.error("名称不能为空");
         return;
       }
-
       if (this.form.id > 0) {
-        console.log(this.form);
         editStatusGroup(this.form).then(resp => {
           const l = this.list.length;
           for (let i = 0; i < l; i++) {
             if (this.list[i].id === this.form.id) {
               this.list[i].name = this.form.name;
-              this.list[i].bugstatuslist = this.form.checklist;
+              this.list[i].sids = this.form.sids;
             }
           }
           this.$message.success("修改成功");
@@ -198,7 +190,7 @@ export default {
           this.list.push({
             id: resp.data.id,
             name: this.form.name,
-            bugstatuslist: this.form.checklist
+            sids: this.form.sids
           });
           this.$message.success("添加成功");
         });
