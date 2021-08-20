@@ -2,8 +2,6 @@ package handle
 
 import (
 	"itflow/db"
-	"itflow/internal/perm"
-	"itflow/internal/project"
 	"itflow/model"
 	"itflow/response"
 	"net/http"
@@ -24,26 +22,24 @@ func ProjectList(w http.ResponseWriter, r *http.Request) {
 		Data: projects,
 	}
 	w.Write(res.Marshal())
-	return
 
 }
 
 func AddProject(w http.ResponseWriter, r *http.Request) {
 
-	data := xmux.GetInstance(r).Data.(*project.ReqProject)
+	project := xmux.GetInstance(r).Data.(*model.Project)
 	uid := xmux.GetInstance(r).Get("uid").(int64)
-	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Insert {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
-	send, err := data.Add(uid)
+	project.Uid = uid
+	err := project.Insert()
 	if err != nil {
-		w.Write(send)
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
 		return
 	}
-	w.Write(send)
+	res := response.Response{
+		ID: project.Id,
+	}
+	w.Write(res.Marshal())
 
 }
 
@@ -78,11 +74,6 @@ func ProjectKeys(w http.ResponseWriter, r *http.Request) {
 func DeleteProject(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Delete {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
 	id := r.FormValue("id")
 	golog.Info(id)
 	// 判断有没有bug在使用这个

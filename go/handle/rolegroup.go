@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"itflow/db"
 	"itflow/internal/rolegroup"
+	"itflow/model"
 	"itflow/response"
 	"net/http"
 	"strings"
@@ -55,36 +56,21 @@ func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 	rows.Close()
 	send, _ := json.Marshal(data)
 	w.Write(send)
-	return
 
 }
 
 func GetRoleGroupName(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
-
-	s := "select name from rolegroup"
-	rows, err := db.Mconn.GetRows(s)
+	kns, err := model.GetRoleKeyName()
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		w.Write(response.ErrorE(err))
 		return
 	}
-	resp := &struct {
-		Code     int      `json:"code"`
-		RoleList []string `json:"rolelist"`
-	}{
-		RoleList: make([]string, 0),
+	errorcode := &response.Response{
+		Data: kns,
 	}
-	for rows.Next() {
-		var name string
-		rows.Scan(&name)
-		resp.RoleList = append(resp.RoleList, name)
-
-	}
-
-	send, _ := json.Marshal(resp)
-	w.Write(send)
+	w.Write(errorcode.Marshal())
 }
 
 func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
@@ -132,7 +118,6 @@ func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
-	return
 
 }
 
@@ -142,7 +127,6 @@ func EditRoleGroup(w http.ResponseWriter, r *http.Request) {
 
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 	w.Write(data.Update(uid))
-	return
 
 }
 
@@ -151,7 +135,6 @@ func AddRoleGroup(w http.ResponseWriter, r *http.Request) {
 	data := xmux.GetInstance(r).Data.(*rolegroup.ReqRoleGroup)
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 	w.Write(data.Add(uid))
-	return
 
 }
 
@@ -192,5 +175,4 @@ func RoleTemplate(w http.ResponseWriter, r *http.Request) {
 	}
 	rows.Close()
 	w.Write(data.Marshal())
-
 }

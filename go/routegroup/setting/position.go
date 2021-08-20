@@ -29,7 +29,5 @@ func init() {
 	Position.Post("/position/update", handle.PositionUpdate).
 		Bind(&model.Job{}).AddModule(midware.JsonToStruct)
 
-	Position.Get("/get/hypos", handle.GetHypos)
-
 	// Position.Post("/get/positions", handle.GetPositions).AddModule(midware.UserPerm)
 }

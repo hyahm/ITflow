@@ -1,4 +1,4 @@
-package routegroup
+package document
 
 import (
 	"itflow/handle"
@@ -17,5 +17,4 @@ func init() {
 	Key.Get("/keys/delete", handle.DeleteKey)
 	Key.Get("/keys/check/name", handle.CheckKeyName)
 	Key.Post("/keys/get/me", handle.GetMykeys)
-
 }

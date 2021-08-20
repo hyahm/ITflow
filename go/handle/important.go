@@ -3,7 +3,6 @@ package handle
 import (
 	"encoding/json"
 	"itflow/db"
-	"itflow/internal/perm"
 	"itflow/model"
 	"itflow/response"
 	"net/http"
@@ -19,11 +18,7 @@ func ImportantGet(w http.ResponseWriter, r *http.Request) {
 	data := &model.ResposeImportant{
 		ImportantList: make([]*model.Important, 0),
 	}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Select {
-		w.Write(data.Error("no perm"))
-		return
-	}
+
 	rows, err := db.Mconn.GetRows("select id,name from importants")
 	if err != nil {
 		golog.Error(err)
@@ -41,18 +36,12 @@ func ImportantGet(w http.ResponseWriter, r *http.Request) {
 	}
 	rows.Close()
 	w.Write(data.Marshal())
-	return
-
 }
 
 func ImportantAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Insert {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
+
 	data := xmux.GetInstance(r).Data.(*model.Important)
 
 	var err error
@@ -72,18 +61,12 @@ func ImportantAdd(w http.ResponseWriter, r *http.Request) {
 	//更新缓存
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
-	return
-
 }
 
 func ImportantDel(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Delete {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
+
 	id := r.FormValue("id")
 	id32, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
@@ -124,18 +107,13 @@ func ImportantDel(w http.ResponseWriter, r *http.Request) {
 	// 删除缓存
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
-	return
 
 }
 
 func ImportantUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Update {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
+
 	data := xmux.GetInstance(r).Data.(*model.Important)
 	gsql := "update importants set name=? where id=?"
 
@@ -150,7 +128,6 @@ func ImportantUpdate(w http.ResponseWriter, r *http.Request) {
 
 	// 删除strings key
 	w.Write(errorcode.Success())
-	return
 
 }
 

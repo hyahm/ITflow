@@ -3,7 +3,6 @@ package handle
 import (
 	"encoding/json"
 	"itflow/db"
-	"itflow/internal/perm"
 	"itflow/model"
 	"itflow/response"
 	"net/http"
@@ -15,11 +14,7 @@ import (
 func AddStatusGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Insert {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
+
 	data := xmux.GetInstance(r).Data.(*model.StatusGroup)
 	if data.ID < 0 {
 		golog.Error("id not found")
@@ -41,11 +36,7 @@ func AddStatusGroup(w http.ResponseWriter, r *http.Request) {
 func EditStatusGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Update {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
+
 	sg := xmux.GetInstance(r).Data.(*model.StatusGroup)
 
 	isql := "update statusgroup set $set where id = ?"
@@ -64,11 +55,7 @@ func EditStatusGroup(w http.ResponseWriter, r *http.Request) {
 func StatusGroupList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Select {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
+
 	DepartmentList := make([]*model.StatusGroup, 0)
 	s := "select id,name,sids from statusgroup"
 	err := db.Mconn.Select(&DepartmentList, s)
@@ -81,18 +68,12 @@ func StatusGroupList(w http.ResponseWriter, r *http.Request) {
 		Data: DepartmentList,
 	}
 	w.Write(res.Marshal())
-	return
-
 }
 
 func DeleteStatusGroup(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Delete {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
+
 	id := r.FormValue("id")
 
 	ssql := "select count(id) from jobs where bugsid=?"
@@ -119,35 +100,18 @@ func DeleteStatusGroup(w http.ResponseWriter, r *http.Request) {
 	//更新缓存
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
-	return
-
 }
 
 func GetStatusGroupName(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
-	data := &struct {
-		Names []string `json:"names"`
-		Code  int      `json:"code"`
-	}{
-		Names: make([]string, 0),
-	}
-	s := "select name from statusgroup"
-	rows, err := db.Mconn.GetRows(s)
+	kns, err := model.GetStatusGroupKeyName()
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		w.Write(response.ErrorE(err))
 		return
 	}
-
-	for rows.Next() {
-		var name string
-		rows.Scan(&name)
-		data.Names = append(data.Names, name)
-
+	errorcode := &response.Response{
+		Data: kns,
 	}
-	rows.Close()
-	send, _ := json.Marshal(data)
-	golog.Info(string(send))
-	w.Write(send)
+	w.Write(errorcode.Marshal())
 }

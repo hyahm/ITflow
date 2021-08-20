@@ -3,7 +3,6 @@ package handle
 import (
 	"encoding/json"
 	"itflow/db"
-	"itflow/internal/perm"
 	"itflow/internal/version"
 	"itflow/model"
 	"itflow/response"
@@ -47,11 +46,6 @@ func VersionList(w http.ResponseWriter, r *http.Request) {
 func VersionRemove(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Delete {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
 	id := r.FormValue("id")
 	var bugcount int
 
@@ -84,25 +78,12 @@ func VersionRemove(w http.ResponseWriter, r *http.Request) {
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
-	return
 
-}
-
-type updateversion struct {
-	Id       int    `json:"id"`
-	Name     string `json:"name"`
-	Iphone   string `json:"iphone"`
-	NoIphone string `json:"noiphone"`
 }
 
 func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Update {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
 	data := xmux.GetInstance(r).Data.(*version.RespVersion)
 
 	uid := xmux.GetInstance(r).Get("uid").(int64)
@@ -116,6 +97,4 @@ func VersionUpdate(w http.ResponseWriter, r *http.Request) {
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
-	return
-
 }

@@ -38,9 +38,10 @@ func RunHttp() {
 	// 用户管理菜单
 	router.AddGroup(routegroup.UserManager)
 	// 任务管理菜单
+
 	router.AddGroup(routegroup.TaskManager)
 	// 文档管理菜单
-
+	router.AddGroup(routegroup.Document)
 	// 设置中心菜单
 	router.AddGroup(routegroup.SettingCenter)
 	// 公共部分接口

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"itflow/cache"
 	"itflow/db"
-	"itflow/internal/perm"
 	"itflow/model"
 	network "itflow/model"
 	"itflow/response"
@@ -19,12 +18,6 @@ import (
 )
 
 func StatusList(w http.ResponseWriter, r *http.Request) {
-	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Select {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
 	res := &response.Response{}
 	statuss, err := model.GetStatusList()
 	if err != nil {
@@ -39,11 +32,7 @@ func StatusList(w http.ResponseWriter, r *http.Request) {
 func StatusAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Insert {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
+
 	var err error
 	s := xmux.GetInstance(r).Data.(*bug.ReqStatus)
 	errorcode.ID, err = db.Mconn.Insert("insert into status(name) values(?)", s.Name)
@@ -59,18 +48,12 @@ func StatusAdd(w http.ResponseWriter, r *http.Request) {
 
 	// 更新缓存
 	w.Write(errorcode.Success())
-	return
-
 }
 
 func StatusRemove(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Delete {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
+
 	id := r.FormValue("id")
 	sid, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
@@ -126,18 +109,12 @@ func StatusRemove(w http.ResponseWriter, r *http.Request) {
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
-	return
-
 }
 
 func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Update {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
+
 	s := xmux.GetInstance(r).Data.(*bug.ReqStatus)
 	_, err := db.Mconn.Update("update status set name=? where id=?", s.Name, s.Id)
 	if err != nil {
@@ -150,7 +127,6 @@ func StatusUpdate(w http.ResponseWriter, r *http.Request) {
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
-	return
 }
 
 func StatusGroupName(w http.ResponseWriter, r *http.Request) {

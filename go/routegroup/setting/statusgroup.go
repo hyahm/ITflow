@@ -21,5 +21,5 @@ func init() {
 	StatusGroup.Post("/statusgroup/list", handle.StatusGroupList)
 
 	StatusGroup.Get("/statusgroup/remove", handle.DeleteStatusGroup)
-	StatusGroup.Post("/statusgroup/name", handle.GetStatusGroupName)
+	StatusGroup.Post("/statusgroup/keyname", handle.GetStatusGroupName)
 }

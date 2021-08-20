@@ -1,4 +1,4 @@
-package routegroup
+package document
 
 import (
 	"itflow/handle"

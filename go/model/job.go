@@ -5,16 +5,41 @@ import (
 	"itflow/cache"
 	"itflow/db"
 
+	"github.com/hyahm/goconfig"
 	"github.com/hyahm/golog"
 )
 
 type Job struct {
 	Id          int64  `json:"id" db:"id,default"`
 	Name        string `json:"name" db:"name"`
-	Level       int    `json:"level" db:"level"`   // 1 是管理者， 2 是普通员工
-	HypoName    int64  `json:"hypo" db:"hypo"`     //  管理者id
-	StatusGroup int64  `json:"bugsid" db:"bugsid"` // 状态组
-	RoleGroup   int64  `json:"rid" db:"rid"`       // 角色组
+	Level       int    `json:"level" db:"level"`        // 1 是管理者， 2 是普通员工
+	HypoName    int64  `json:"hypo" db:"hypo"`          //  管理者id
+	StatusGroup int64  `json:"statusgroup" db:"bugsid"` // 状态组
+	RoleGroup   int64  `json:"rolegroup" db:"rid"`      // 角色组
+}
+
+func (job *Job) Insert() error {
+	ids, err := db.Mconn.InsertInterfaceWithID(job, "insert into jobs($key) values($value)")
+	if err != nil {
+		return err
+	}
+	job.Id = ids[0]
+	return nil
+}
+
+func DeleteJob(id, uid interface{}) (err error) {
+	if uid == goconfig.ReadInt64("adminid", 1) {
+		_, err = db.Mconn.Delete("delete from jobs where id=?", id)
+	} else {
+		_, err = db.Mconn.Delete("delete from jobs where id=? and hypo=?", id, uid)
+	}
+
+	return
+}
+
+func (job *Job) Update() error {
+	_, err := db.Mconn.UpdateInterface(job, "update jobs set $set where id=?", job.Id)
+	return err
 }
 
 func GetAllPositions() ([]Job, error) {
@@ -57,6 +82,32 @@ func GetJobKeyNameByUid(uid int64) ([]KeyName, error) {
 	} else {
 		rows, err = db.Mconn.GetRows("select id,name from jobs where hypo=?", uid)
 	}
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	kns := make([]KeyName, 0)
+	for rows.Next() {
+		kn := KeyName{}
+		err = rows.Scan(&kn.ID, &kn.Name)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		kns = append(kns, kn)
+	}
+	return kns, nil
+}
+
+func GetManagerKeyName(uid int64) ([]KeyName, error) {
+	var err error
+	var rows *sql.Rows
+	if uid == goconfig.ReadInt64("adminid") {
+		rows, err = db.Mconn.GetRows("select id,name from jobs where level=1")
+	} else {
+		rows, err = db.Mconn.GetRows("select id,name from jobs where level=1 and uid=?", uid)
+	}
+
 	if err != nil {
 		return nil, err
 	}

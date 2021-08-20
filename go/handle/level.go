@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"itflow/db"
-	"itflow/internal/perm"
 	"itflow/model"
 	"itflow/response"
 	"net/http"
@@ -20,11 +19,7 @@ func LevelGet(w http.ResponseWriter, r *http.Request) {
 	data := &model.Levels{
 		Levels: make([]*model.Level, 0),
 	}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Insert {
-		w.Write(data.Error("no perm"))
-		return
-	}
+
 	rows, err := db.Mconn.GetRows("select id,name from level")
 	if err != nil {
 		golog.Error(err)
@@ -43,18 +38,12 @@ func LevelGet(w http.ResponseWriter, r *http.Request) {
 	}
 	rows.Close()
 	w.Write(data.Marshal())
-	return
-
 }
 
 func LevelAdd(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Insert {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
+
 	data := xmux.GetInstance(r).Data.(*model.RequestLevel)
 	var err error
 	errorcode.ID, err = db.Mconn.Insert("insert into level(name) value(?)", data.Name)
@@ -70,18 +59,12 @@ func LevelAdd(w http.ResponseWriter, r *http.Request) {
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
-	return
-
 }
 
 func LevelDel(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Delete {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
+
 	id := r.FormValue("id")
 	id64, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
@@ -119,18 +102,13 @@ func LevelDel(w http.ResponseWriter, r *http.Request) {
 	// 删除缓存
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
-	return
 
 }
 
 func LevelUpdate(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
-	perm := xmux.GetInstance(r).Get("perm").(perm.OptionPerm)
-	if !perm.Update {
-		w.Write(errorcode.Error("no perm"))
-		return
-	}
+
 	data := xmux.GetInstance(r).Data.(*model.Update_level)
 	gsql := "update level set name=? where id=?"
 	_, err := db.Mconn.Update(gsql, data.Name, data.Id)
@@ -142,8 +120,6 @@ func LevelUpdate(w http.ResponseWriter, r *http.Request) {
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
-	return
-
 }
 
 type levels struct {

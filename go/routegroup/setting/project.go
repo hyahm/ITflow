@@ -2,7 +2,6 @@ package setting
 
 import (
 	"itflow/handle"
-	"itflow/internal/project"
 	"itflow/midware"
 	"itflow/model"
 
@@ -16,7 +15,7 @@ func init() {
 	Project = xmux.NewGroupRoute()
 	Project.Post("/project/list", handle.ProjectList).ApiDescribe("获取所有列表").ApiSupplement("只有跟项目有关的参与者才能看到项目")
 
-	Project.Post("/project/add", handle.AddProject).Bind(&project.ReqProject{}).
+	Project.Post("/project/add", handle.AddProject).Bind(&model.Project{}).
 		AddModule(midware.JsonToStruct).
 		ApiDescribe("增加项目")
 

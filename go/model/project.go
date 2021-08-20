@@ -4,10 +4,6 @@ import (
 	"errors"
 	"itflow/cache"
 	"itflow/db"
-	"strings"
-
-	"github.com/go-sql-driver/mysql"
-	"github.com/hyahm/golog"
 )
 
 type Project struct {
@@ -39,32 +35,14 @@ func GetProjectKeyName(uid int64) ([]KeyName, error) {
 	return kns, nil
 }
 
-func (p *Project) Insert(groupname string) error {
+func (p *Project) Insert() error {
 
-	rows, err := db.Mconn.GetRows("select id from usergroup where name=?", groupname)
+	ids, err := db.Mconn.InsertInterfaceWithID(p, "insert into project($key) values($value)")
 	if err != nil {
-		golog.Error(err)
 		return err
 	}
-	ids := make([]string, 0)
-	for rows.Next() {
-		var id string
-		err = rows.Scan(&id)
-		if err != nil {
-			golog.Info(err)
-			continue
-		}
-		ids = append(ids, id)
-	}
-	rows.Close()
-	p.Id, err = db.Mconn.Insert("insert into project(name,ugid,uid) values(?,?,?)", p.Name, strings.Join(ids, ","), p.Uid)
-	if err != nil {
-		if err.(*mysql.MySQLError).Number == 1062 {
-			return db.DuplicateErr
-		}
-
-	}
-	return err
+	p.Id = ids[0]
+	return nil
 }
 
 func NewProjectById(id interface{}) (*Project, error) {
