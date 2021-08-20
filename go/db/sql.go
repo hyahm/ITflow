@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"time"
 
+	"github.com/go-sql-driver/mysql"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/hyahm/goconfig"
 	"github.com/hyahm/golog"
@@ -32,16 +33,19 @@ func InitMysql(bugsql string) {
 		golog.Error(err)
 		panic(err)
 	}
-
 	Mconn, err = conn.Use(goconfig.ReadString("mysql.db", "itflow"))
 	if err != nil {
-		golog.Error(err)
-		panic(err)
+		if err.(*mysql.MySQLError).Number != 1050 {
+			panic(err)
+		}
 	}
-
 	rows, err := Mconn.Query(bugsql)
 	if err != nil {
-		panic(err)
+		if err.(*mysql.MySQLError).Number != 1050 {
+			panic(err)
+		}
+	} else {
+		rows.Close()
 	}
-	rows.Close()
+
 }
