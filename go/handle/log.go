@@ -14,7 +14,7 @@ import (
 
 func SearchLog(w http.ResponseWriter, r *http.Request) {
 
-	alllog := xmux.GetInstance(r).Data.(*log.Search_log)
+	alllog := xmux.GetInstance(r).Data.(*log.SearchLog)
 	listlog := &log.Loglist{}
 	args := make([]interface{}, 0)
 
@@ -87,7 +87,7 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 
-	sl := xmux.GetInstance(r).Data.(*log.Search_log)
+	sl := xmux.GetInstance(r).Data.(*log.SearchLog)
 
 	var count int
 	countsql := "select count(id) from log"

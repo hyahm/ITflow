@@ -2,7 +2,7 @@ package log
 
 import "encoding/json"
 
-type Search_log struct {
+type SearchLog struct {
 	StartTime int64  `json:"starttime" type:"int" need:"否" default:"0" information:"起始时间"`
 	Page      int    `json:"page" type:"int" need:"是" default:"0" information:"第几页"`
 	Limit     int    `json:"limit" type:"int" need:"是" default:"0" information:"每页显示的个数"`
