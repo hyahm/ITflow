@@ -16,7 +16,7 @@
       border
       fit
       highlight-current-row
-      style="width: 100%;"
+      style="width: 100%"
     >
       <el-table-column label="id" align="center" width="65">
         <template slot-scope="scope">
@@ -25,9 +25,7 @@
       </el-table-column>
       <el-table-column label="日期" width="150px" align="center">
         <template slot-scope="scope">
-          <span>{{
-            scope.row.createtime | parseTime("{y}-{m}-{d} {h}:{i}")
-          }}</span>
+          <span>{{ scope.row.createtime | parseTime("{y}-{m}-{d} {h}:{i}") }}</span>
         </template>
       </el-table-column>
       <el-table-column label="项目名" width="150px" align="center">
@@ -60,10 +58,7 @@
         class-name="small-padding fixed-width"
       >
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="success"
-            @click="handleModifyStatus(scope.row)"
+          <el-button size="mini" type="success" @click="handleModifyStatus(scope.row)"
             >修改
           </el-button>
           <el-button
@@ -112,19 +107,14 @@
 </template>
 
 <script>
-import {
-  getVersion,
-  removeVersion,
-  updateVersion,
-  addVersion
-} from "@/api/version";
+import { getVersion, removeVersion, updateVersion, addVersion } from "@/api/version";
 import { getProjectKeyName } from "@/api/get";
 export default {
   name: "Versionlist",
   filters: {
     toName(id, projectMap) {
       return projectMap.get(id);
-    }
+    },
   },
   data() {
     return {
@@ -136,16 +126,15 @@ export default {
       tableKey: 0,
       listQuery: {
         page: 1,
-        limit: 15
+        limit: 15,
       },
-      total: 0,
       form: {
         id: 0,
         name: "",
         urltwo: "",
         urlone: "",
-        pid: undefined
-      }
+        pid: undefined,
+      },
     };
   },
   activated() {
@@ -156,7 +145,7 @@ export default {
   },
   methods: {
     getproject() {
-      getProjectKeyName().then(resp => {
+      getProjectKeyName().then((resp) => {
         this.projects = resp.data.data;
         for (let v of this.projects) {
           this.projectMap.set(v.id, v.name);
@@ -173,10 +162,9 @@ export default {
       this.dialogFormVisible = true;
     },
     getversionlist() {
-      getVersion().then(resp => {
+      getVersion().then((resp) => {
+        console.log();
         this.list = resp.data.data;
-        console.log(this.list);
-        this.total = resp.data.versionlist.length;
       });
     },
     handleSizeChange(val) {
@@ -188,22 +176,22 @@ export default {
       this.getList();
     },
     handleModifyStatus(row) {
-      console.log(row);
       this.dialogFormVisible = true;
       this.form = row;
     },
     confirm() {
       if (this.form.id <= 0) {
         addVersion(this.form)
-          .then(response => {
+          .then((response) => {
+            console.log(response.data);
             this.form.id = response.data.id;
-            this.form.create_time = response.data.create_time;
+            this.form.createtime = response.data.create_time;
             this.list.push(this.form);
             this.$message.success("添加成功");
           })
           .catch();
       } else {
-        updateVersion(this.form).then(_ => {
+        updateVersion(this.form).then((_) => {
           this.$message.success("修改成功");
           const l = this.list.length;
           for (let i = 0; i < l; i++) {
@@ -229,10 +217,10 @@ export default {
       this.$confirm("此操作将关闭bug, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
-          removeVersion(row.id).then(_ => {
+          removeVersion(row.id).then((_) => {
             const l = this.list.length;
             for (let i = 0; i < l; i++) {
               if (this.list[i].id === row.id) {
@@ -245,11 +233,11 @@ export default {
         .catch(() => {
           this.$message({
             type: "info",
-            message: "已取消删除"
+            message: "已取消删除",
           });
         });
-    }
-  }
+    },
+  },
 };
 </script>
 

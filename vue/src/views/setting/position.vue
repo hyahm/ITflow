@@ -1,7 +1,7 @@
 <template>
   <div style="padding-left: 20px">
     <p class="warn-content">
-      职位，在管理的时候，上级有管理下级的权限，级别只有普通员工和管理者，管理者也可以被其他管理者管理（从属于），一个员工只能被一个管理者管理
+      职位，在管理的时候，上级有管理下级的权限，普通管理者创建的职位默认为自己的下级
     </p>
     <div>
       <el-button type="success" plain style="margin: 20px" @click="addposition"
@@ -26,25 +26,23 @@
       </el-table-column>
       <el-table-column label="从属于" width="180">
         <template slot-scope="scope">
-          <span>{{ scope.row.hyponame }}</span>
+          <span>{{ scope.row.hypo | toManager(managerMap) }}</span>
         </template>
       </el-table-column>
 
       <el-table-column label="角色组" width="100px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.rolegroup }}</span>
+          <span>{{ scope.row.rolegroup | toRoleName(roleMap) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="状态组" width="110px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.statusgroup }}</span>
+          <span>{{ scope.row.statusgroup | toStatusName(statusMap) }}</span>
         </template>
       </el-table-column>
       <el-table-column width="200" label="操作">
         <template slot-scope="scope">
-          <el-button size="mini" @click="handleUpdate(scope.row)"
-            >修改</el-button
-          >
+          <el-button size="mini" @click="handleUpdate(scope.row)">修改</el-button>
           <el-button size="mini" type="danger" @click="handleDelete(scope.row)"
             >删除</el-button
           >
@@ -68,43 +66,35 @@
           <el-input v-model="form.name" />
         </el-form-item>
 
-        <el-form-item style="margin-bottom: 40px;" label="状态组:">
-          <el-select
-            v-model="form.statusgroup"
-            class="filter-item"
-            style="width: 130px"
-          >
+        <el-form-item style="margin-bottom: 40px" label="状态组:">
+          <el-select v-model="form.statusgroup" class="filter-item" style="width: 130px">
             <el-option
-              v-for="(s, index) in statusgroups"
-              :key="index"
-              :label="s"
-              :value="s"
+              v-for="statusgroup in statusgroups"
+              :key="statusgroup.id"
+              :label="statusgroup.name"
+              :value="statusgroup.id"
             />
           </el-select>
         </el-form-item>
-        <el-form-item style="margin-bottom: 40px;" label="角色组:">
-          <el-select
-            v-model="form.rolegroup"
-            class="filter-item"
-            style="width: 130px"
-          >
+        <el-form-item style="margin-bottom: 40px" label="角色组:">
+          <el-select v-model="form.rolegroup" class="filter-item" style="width: 130px">
             <el-option
-              v-for="(role, index) in rolegroups"
-              :key="index"
-              :label="role"
-              :value="role"
+              v-for="role in rolegroups"
+              :key="role.id"
+              :label="role.name"
+              :value="role.id"
             />
           </el-select>
         </el-form-item>
         <!-- <el-form style="margin-top: 10px"> -->
         <!--从属于哪个管理者-->
-        <el-form-item label="从属于:">
-          <el-select v-model="form.hyponame" clearable placeholder="Select">
+        <el-form-item label="从属于:" v-if="isadmin">
+          <el-select v-model="form.hypo" clearable placeholder="Select">
             <el-option
-              v-for="(hypo, index) in manager"
-              :key="index"
-              :label="hypo"
-              :value="hypo"
+              v-for="item in manager"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
@@ -122,22 +112,32 @@ import {
   addPosition,
   updatePosition,
   delPosition,
-  getHypos,
-  PositionsList
+  PositionsList,
+  getManagerKeyName,
 } from "@/api/position";
+import { isAdmin } from "@/api/get";
 import { getRoleGroup } from "@/api/rolegroup";
 import { getStatusGroupName } from "@/api/statusgroup";
 export default {
   name: "Position",
   filters: {
-    level: function(value) {
+    level: function (value) {
       switch (value) {
         case 1:
           return "管理者";
         default:
           return "普通员工";
       }
-    }
+    },
+    toStatusName(sid, statusMap) {
+      return statusMap.get(sid);
+    },
+    toRoleName(rid, roleMap) {
+      return roleMap.get(rid);
+    },
+    toManager(mid, managerMap) {
+      return managerMap.get(mid);
+    },
   },
   data() {
     return {
@@ -145,58 +145,72 @@ export default {
       tableData: [],
       statuslist: [],
       statusgroups: [],
+      statusMap: new Map(),
+      roleMap: new Map(),
       rolegroups: [],
       dialogFormVisible: false,
       status: "",
       levelone: 1,
       leveltwo: 2,
+      isadmin: false,
       manager: [],
+      managerMap: new Map(),
       form: {
         id: 0,
         name: "",
         level: 2,
-        hyponame: "",
-        rolegroup: "",
-        statusgroup: ""
-      }
+        hypo: 0,
+        rolegroup: 0,
+        statusgroup: 0,
+      },
     };
   },
   created() {
-    this.getlist();
-    this.getrolegroups();
-    this.getstatusgroups();
+    this.checkAdmin();
+    this.init();
   },
   methods: {
-    getrolegroups() {
-      getRoleGroup().then(resp => {
-        this.rolegroups = resp.data.data;
+    checkAdmin() {
+      isAdmin().then((resp) => {
+        this.isadmin = resp.data.admin;
       });
     },
-    handleGetHypos(id) {
-      getHypos(id).then(resp => {
-        for (let i = 0; i < resp.data.length; i++) {
-          this.manager.push(resp.data.hypos[i].name);
-        }
-      });
+    async init() {
+      const role = await getRoleGroup();
+      this.rolegroups = role.data.data;
+      for (let v of this.rolegroups) {
+        this.roleMap.set(v.id, v.name);
+      }
+
+      const status = await getStatusGroupName();
+      this.statusgroups = status.data.data;
+
+      for (let v of this.statusgroups) {
+        this.statusMap.set(v.id, v.name);
+      }
+
+      const mg = await getManagerKeyName();
+      this.manager = mg.data.data;
+      for (let v of this.manager) {
+        this.managerMap.set(v.id, v.name);
+      }
+      this.getlist();
     },
+
     getlist() {
-      PositionsList().then(resp => {
+      PositionsList().then((resp) => {
         this.tableData = resp.data.data;
-        for (let i = 0; i < this.tableData.length; i++) {
-          if (this.tableData[i].level === 1) {
-            this.manager.push(this.tableData[i].name);
-          }
-        }
+        console.log(this.tableData);
       });
     },
     confirm() {
       if (this.form.id === 0) {
-        addPosition(this.form).then(resp => {
+        addPosition(this.form).then((resp) => {
           this.tableData.push({
             id: resp.data.id,
             name: this.form.name,
-            hyponame: this.form.hyponame,
-            level: this.form.level
+            hypo: this.form.hypo,
+            level: this.form.level,
           });
 
           if (this.form.level === 1) {
@@ -204,13 +218,23 @@ export default {
           }
         });
       } else {
-        updatePosition(this.form).then(resp => {
-          const l = this.tableData.length;
-          for (let i = 0; i < l; i++) {
-            if (this.tableData[i].id === this.form.id) {
-              this.tableData[i].name = this.form.name;
-              break;
+        updatePosition(this.form).then((resp) => {
+          console.log(this.form);
+          this.tableData.map((m) => {
+            if (m.id === this.form.id) {
+              m = this.form;
             }
+            return m;
+          });
+          // for (let i = 0; i < l; i++) {
+          //   if (this.tableData[i].id === this.form.id) {
+          //     console.log(this.form.id);
+          //     this.tableData[i] = Object.assign({}, this.form);
+          //     console.log(this.tableData[i]);
+          //     break;
+          //   }
+          // }
+          if (this.form.level === 1) {
             for (let i = 0; i < this.manager.length; i++) {
               if (this.manager[i] === this.changeName) {
                 this.manager[i] = this.form.name;
@@ -225,19 +249,15 @@ export default {
     cancel() {
       this.dialogFormVisible = false;
     },
-    getstatusgroups() {
-      getStatusGroupName().then(resp => {
-        this.statusgroups = resp.data.names;
-      });
-    },
+
     handleDelete(row) {
       this.$confirm("此操作将关闭bug, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
-          delPosition(row.id).then(resp => {
+          delPosition(row.id).then((resp) => {
             const l = this.tableData.length;
             for (let i = 0; i < l; i++) {
               if (this.tableData[i].id === row.id) {
@@ -257,7 +277,7 @@ export default {
         .catch(() => {
           this.$message({
             type: "info",
-            message: "已取消删除"
+            message: "已取消删除",
           });
         });
     },
@@ -265,19 +285,17 @@ export default {
       this.dialogFormVisible = true;
       this.form.id = 0;
       this.form.level = 2;
-      this.form.hyponame = "";
+      this.form.hypo = 0;
       this.form.name = "";
-      this.form.rolegroup = "";
-      this.form.statusgroup = "";
+      this.form.rolegroup = 0;
+      this.form.statusgroup = 0;
     },
     handleUpdate(row) {
       this.form = row;
       this.changeName = row.name;
-
       this.dialogFormVisible = true;
-      this.handleGetHypos(row.id);
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -33,7 +33,7 @@ export function removeStatusGroup(id) {
 
 export function getStatusGroupName() {
   return request({
-    url: '/statusgroup/name',
+    url: '/statusgroup/keyname',
     method: 'post'
   })
 }

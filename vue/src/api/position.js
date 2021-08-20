@@ -21,6 +21,13 @@ export function getPositionKeyName() {
   });
 }
 
+export function getManagerKeyName() {
+  return request({
+    url: "/manager/keyname",
+    method: "post"
+  });
+}
+
 export function addPosition(data) {
   return request({
     url: "/position/add",
@@ -45,10 +52,4 @@ export function updatePosition(data) {
   });
 }
 
-export function getHypos(id) {
-  return request({
-    url: "/get/hypos",
-    method: "get",
-    params: { id }
-  });
-}
+
