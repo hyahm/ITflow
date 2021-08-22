@@ -392,10 +392,7 @@ UNLOCK TABLES;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `perm` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `find` tinyint(1) NOT NULL DEFAULT '0',
-  `remove` tinyint(1) NOT NULL DEFAULT '0',
-  `revise` tinyint(1) NOT NULL DEFAULT '0',
-  `increase` tinyint(1) NOT NULL DEFAULT '0',
+  `pv` int(8) NOT NULL DEFAULT '0',
   `rid` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -503,7 +500,14 @@ CREATE TABLE `roles` (
 
 LOCK TABLES `roles` WRITE;
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
-INSERT INTO `roles` VALUES (1,'env','环境页面'),(2,'important','重要性页面'),(3,'level','优先级别页面'),(5,'position','职位页面'),(6,'project','项目页面'),(7,'status','bug状态流程页面'),(8,'statusgroup','状态组页面'),(9,'version','版本页面');
+INSERT INTO `roles` VALUES (1,'env','环境页面'),
+(2,'important','重要性页面'),
+(3,'level','优先级别页面'),
+(4,'position','职位页面'),
+(5,'project','项目页面'),
+(6,'status','bug状态流程页面'),
+(7,'statusgroup','状态组页面'),
+(8,'version','版本页面');
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 UNLOCK TABLES;
 

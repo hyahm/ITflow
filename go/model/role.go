@@ -1,6 +1,10 @@
 package model
 
-import "itflow/db"
+import (
+	"itflow/db"
+
+	"github.com/hyahm/golog"
+)
 
 type Role struct {
 	Id   int64  `json:"id,omitempty"`
@@ -8,14 +12,15 @@ type Role struct {
 	Info string `json:"info"`
 }
 
-func AllRole() ([]*Role, error) {
-	rs := make([]*Role, 0)
+func AllRole() ([]Role, error) {
+	rs := make([]Role, 0)
 	rows, err := db.Mconn.GetRows("select name,info from roles")
 	if err != nil {
+		golog.Error(err)
 		return nil, err
 	}
 	for rows.Next() {
-		rl := &Role{}
+		rl := Role{}
 		rows.Scan(&rl.Role, &rl.Info)
 		rs = append(rs, rl)
 	}

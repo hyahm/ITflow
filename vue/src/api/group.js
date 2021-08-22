@@ -49,7 +49,7 @@ export function getOs() {
   });
 }
 
-export function getRoles() {
+export function getGroupRoles() {
   return request({
     url: "/group/role",
     method: "post"

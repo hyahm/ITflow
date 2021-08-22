@@ -61,16 +61,18 @@
           />
         </el-form-item>
         <!-- <el-checkbox-group v-model="perm"> -->
-        <div v-for="(role, index) in form.rolelist" :key="index">
+        <div v-for="(item, index) in permlist" :key="index">
           <!-- <label class="name">{{ role.name }}</label> -->
           <!-- <el-checkbox v-model="role.checked" :label="role.name" style="width:150px" @change="changeChecked(role)" /> -->
           <el-checkbox
-            v-model="role.select"
+            v-for="role in item"
+            :key="role.value"
+            :value="role.value"
             style="width: 50px"
-            label="select"
+            :label="role.label"
             @change="changeChecked(role)"
           />
-          <el-checkbox
+          <!-- <el-checkbox
             v-model="role.add"
             :disabled="!role.select"
             style="width: 50px"
@@ -87,8 +89,8 @@
             :disabled="!role.select"
             style="width: 50px"
             label="remove"
-          />
-          <label style="padding-left: 100px; width: 50px">{{ role.info }}</label>
+          /> -->
+          <label style="padding-left: 100px; width: 50px">{{ pages[index].info }}</label>
         </div>
         <!-- </el-checkbox-group> -->
         <!--<el-button type="success" round @click="HandlerAddGroup">添加部门</el-button>-->
@@ -102,7 +104,7 @@
 </template>
 
 <script>
-import { roleList, addRole, editRole, removeRole, getPermTemplate } from "@/api/role";
+import { roleList, addRole, editRole, removeRole, getPermTemplate,getRoles } from "@/api/role";
 import { deepClone } from "@/utils";
 export default {
   name: "RoleGroup",
@@ -118,29 +120,62 @@ export default {
         rolelist: [],
       },
       templateperm: [],
+      pages: [],
+      permlist: [],
+      defaultPerm: 
+        [
+          {
+            label: "read",
+            value: 1,
+          },
+          {
+            label: "create",
+            value: 2,
+          },
+          {
+            label: "update",
+            value: 4,
+          },
+          {
+            label: "delete",
+            value:8,
+          }
+        ]
+      
     };
   },
 
   created() {
-    // this.getroles()
+    this.getroles()
     this.getlist();
-    this.getTemplate();
+    // this.getTemplate();
   },
   methods: {
+    getroles() {
+      getRoles().then(resp => {
+        this.pages = resp.data.data
+        for (let index in this.pages) {
+          this.permlist.push(this.defaultPerm)
+        }
+      })
+    },
+
     changeChecked(row) {
-      if (!row.select) {
-        row.add = false;
-        row.remove = false;
-        row.update = false;
-      }
+      console.log(row)
+      // if (!row.select) {
+      //   row.add = false;
+      //   row.remove = false;
+      //   row.update = false;
+      // }
     },
-    getTemplate() {
-      // 获取模板
-      getPermTemplate().then((resp) => {
-        this.templateperm = resp.data.template;
-      });
-    },
+    // getTemplate() {
+    //   // 获取模板
+    //   getPermTemplate().then((resp) => {
+    //     this.templateperm = resp.data.template;
+    //   });
+    // },
     handleEdit(row) {
+      // 请求权限
       this.form.id = row.id;
       this.form.name = row.name;
       this.form.rolelist = row.rolelist;

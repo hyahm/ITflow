@@ -20,37 +20,37 @@ func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 		RoleList: make([]*rolegroup.ReqRoleGroup, 0),
 	}
 
-	rows, err := db.Mconn.GetRows("select id,name,permids from rolegroup")
+	rows, err := db.Mconn.GetRows("select id, name from rolegroup")
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
 	for rows.Next() {
-		var permids string // 保存perm表的所有id
+		// var permids string // 保存perm表的所有id
 		one := &rolegroup.ReqRoleGroup{
 			RoleList: make([]*rolegroup.PermRole, 0),
 		}
-		rows.Scan(&one.Id, &one.Name, &permids)
+		rows.Scan(&one.Id, &one.Name)
 		golog.Info(one.Id, " ", one.Name)
-		permrows, err := db.Mconn.GetRowsIn("select find, remove, revise, increase, r.name, r.info from perm as p join roles as r on p.id in (?) and p.rid=r.id",
-			strings.Split(permids, ","))
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
-			return
-		}
-		for permrows.Next() {
-			rp := &rolegroup.PermRole{}
-			err = permrows.Scan(&rp.Select, &rp.Remove, &rp.Update, &rp.Add, &rp.Name, &rp.Info)
-			if err != nil {
-				golog.Error(err)
-				w.Write(errorcode.ErrorE(err))
-				return
-			}
-			one.RoleList = append(one.RoleList, rp)
-		}
-		permrows.Close()
+		// permrows, err := db.Mconn.GetRowsIn("select find, remove, revise, increase, r.name, r.info from perm as p join roles as r on p.id in (?) and p.rid=r.id",
+		// 	strings.Split(permids, ","))
+		// if err != nil {
+		// 	golog.Error(err)
+		// 	w.Write(errorcode.ErrorE(err))
+		// 	return
+		// }
+		// for permrows.Next() {
+		// 	rp := &rolegroup.PermRole{}
+		// 	err = permrows.Scan(&rp.Select, &rp.Remove, &rp.Update, &rp.Add, &rp.Name, &rp.Info)
+		// 	if err != nil {
+		// 		golog.Error(err)
+		// 		w.Write(errorcode.ErrorE(err))
+		// 		return
+		// 	}
+		// 	one.RoleList = append(one.RoleList, rp)
+		// }
+		// permrows.Close()
 		data.RoleList = append(data.RoleList, one)
 	}
 	rows.Close()

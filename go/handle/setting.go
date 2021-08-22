@@ -6,7 +6,6 @@ import (
 	"itflow/cache"
 	"itflow/db"
 	"itflow/encrypt"
-	"itflow/internal/role"
 	"itflow/internal/user"
 	"itflow/model"
 	"itflow/response"
@@ -161,12 +160,15 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetRoles(w http.ResponseWriter, r *http.Request) {
-
-	rl := &role.RespRoles{}
-
-	w.Write(rl.List())
-	return
-
+	res := response.Response{}
+	ar, err := model.AllRole()
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
+		return
+	}
+	res.Data = ar
+	w.Write(res.Marshal())
 }
 
 // func GetThisRoles(w http.ResponseWriter, r *http.Request) {
