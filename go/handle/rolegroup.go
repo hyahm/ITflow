@@ -28,11 +28,11 @@ func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 	}
 	for rows.Next() {
 		// var permids string // 保存perm表的所有id
-		one := &rolegroup.ReqRoleGroup{
-			RoleList: make([]*rolegroup.PermRole, 0),
-		}
-		rows.Scan(&one.Id, &one.Name)
-		golog.Info(one.Id, " ", one.Name)
+		// one := &rolegroup.ReqRoleGroup{
+		// 	RoleList: make([]*rolegroup.PermRole, 0),
+		// }
+		// rows.Scan(&one.Id, &one.Name)
+		// golog.Info(one.Id, " ", one.Name)
 		// permrows, err := db.Mconn.GetRowsIn("select find, remove, revise, increase, r.name, r.info from perm as p join roles as r on p.id in (?) and p.rid=r.id",
 		// 	strings.Split(permids, ","))
 		// if err != nil {
@@ -51,7 +51,7 @@ func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 		// 	one.RoleList = append(one.RoleList, rp)
 		// }
 		// permrows.Close()
-		data.RoleList = append(data.RoleList, one)
+		// data.RoleList = append(data.RoleList, one)
 	}
 	rows.Close()
 	send, _ := json.Marshal(data)
@@ -134,6 +134,15 @@ func AddRoleGroup(w http.ResponseWriter, r *http.Request) {
 
 	data := xmux.GetInstance(r).Data.(*rolegroup.ReqRoleGroup)
 	uid := xmux.GetInstance(r).Get("uid").(int64)
+	golog.Infof("%#v", *data)
+	// 先插入perm表
+	permids, err := model.InsertManyPerm(data.Perms)
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
+		return
+	}
+	// 插入到rolegroup表
 	w.Write(data.Add(uid))
 
 }

@@ -464,7 +464,7 @@ UNLOCK TABLES;
 CREATE TABLE `rolegroup` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL DEFAULT '',
-  `permids` varchar(50) NOT NULL DEFAULT '',
+  `permids` json,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

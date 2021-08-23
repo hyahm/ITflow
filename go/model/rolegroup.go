@@ -12,9 +12,9 @@ import (
 
 // RoleGroup: 角色组表， 由管理员分配， 管理可以操作的页面, 与用户rid关联
 type RoleGroup struct {
-	ID      int64  `json:"id" db:"id,default"`
-	Name    string `json:"name"`
-	Permids string `json:"permids"`
+	ID      int64   `json:"id" db:"id,default"`
+	Name    string  `json:"name" db:"name,default"`
+	Permids []int64 `json:"permids" db:"permids"	`
 }
 
 func GetRoleKeyName() ([]KeyName, error) {
