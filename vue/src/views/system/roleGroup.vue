@@ -64,33 +64,16 @@
         <div v-for="(item, index) in permlist" :key="index">
           <!-- <label class="name">{{ role.name }}</label> -->
           <!-- <el-checkbox v-model="role.checked" :label="role.name" style="width:150px" @change="changeChecked(role)" /> -->
-          <el-checkbox
-            v-for="role in item"
-            :key="role.value"
-            :value="role.value"
-            style="width: 50px"
-            :label="role.label"
-            @change="changeChecked(role)"
-          />
-          <!-- <el-checkbox
-            v-model="role.add"
-            :disabled="!role.select"
-            style="width: 50px"
-            label="add"
-          />
-          <el-checkbox
-            v-model="role.update"
-            :disabled="!role.select"
-            style="width: 50px"
-            label="update"
-          />
-          <el-checkbox
-            v-model="role.remove"
-            :disabled="!role.select"
-            style="width: 50px"
-            label="remove"
-          /> -->
-          <label style="padding-left: 100px; width: 50px">{{ pages[index].info }}</label>
+          <div class="env-title">{{ pages[index].info }}</div>
+          <el-checkbox-group :key="index" v-model="item.value" class="rolegroup">
+            <el-checkbox v-for="city in item.label" :label="city" :key="city">{{
+              city
+            }}</el-checkbox>
+            <!-- <el-checkbox v-model="item" style="width: 50px" label="read" />
+          <el-checkbox v-model="item" style="width: 50px" label="add" />
+          <el-checkbox v-model="item" style="width: 50px" label="update" />
+          <el-checkbox v-model="item" style="width: 50px" label="remove" /> -->
+          </el-checkbox-group>
         </div>
         <!-- </el-checkbox-group> -->
         <!--<el-button type="success" round @click="HandlerAddGroup">添加部门</el-button>-->
@@ -104,7 +87,14 @@
 </template>
 
 <script>
-import { roleList, addRole, editRole, removeRole, getPermTemplate,getRoles } from "@/api/role";
+import {
+  roleList,
+  addRole,
+  editRole,
+  removeRole,
+  getPermTemplate,
+  getRoles,
+} from "@/api/role";
 import { deepClone } from "@/utils";
 export default {
   name: "RoleGroup",
@@ -119,55 +109,41 @@ export default {
         name: "",
         rolelist: [],
       },
+      checkboxGroup1: [],
       templateperm: [],
       pages: [],
       permlist: [],
-      defaultPerm: 
-        [
-          {
-            label: "read",
-            value: 1,
-          },
-          {
-            label: "create",
-            value: 2,
-          },
-          {
-            label: "update",
-            value: 4,
-          },
-          {
-            label: "delete",
-            value:8,
-          }
-        ]
-      
+      permValue: new Map(),
+      defaultPerm: ["read", "create", "update", "delete"],
     };
   },
 
   created() {
-    this.getroles()
+    this.getroles();
     this.getlist();
+    this.permValue.set("read", 1);
+    this.permValue.set("create", 2);
+    this.permValue.set("update", 4);
+    this.permValue.set("delete", 8);
     // this.getTemplate();
   },
   methods: {
     getroles() {
-      getRoles().then(resp => {
-        this.pages = resp.data.data
-        for (let index in this.pages) {
-          this.permlist.push(this.defaultPerm)
+      getRoles().then((resp) => {
+        this.pages = resp.data.data;
+        console.log(this.pages);
+        for (let v of this.pages) {
+          this.templateperm.push({
+            id: 0,
+            rid: v.id,
+            label: this.defaultPerm,
+            value: [],
+            info: v.info,
+          });
         }
-      })
+      });
     },
 
-    changeChecked(row) {
-      console.log(row)
-      // if (!row.select) {
-      //   row.add = false;
-      //   row.remove = false;
-      //   row.update = false;
-      // }
-    },
     // getTemplate() {
     //   // 获取模板
     //   getPermTemplate().then((resp) => {
@@ -189,7 +165,7 @@ export default {
     handleAdd() {
       this.form.id = 0;
       this.form.name = "";
-      this.form.rolelist = deepClone(this.templateperm);
+      this.permlist = deepClone(this.templateperm);
       this.dialogVisible = true;
     },
     handleRemove(id) {
@@ -214,29 +190,44 @@ export default {
       if (this.form.name.length < 1) {
         this.$message.error("name no be need");
       }
-      // return
-      if (this.form.id > 0) {
-        editRole(this.form).then((_) => {
-          // 成功后赋值到源数据
-          const l = this.list.length;
-          for (let i = 0; i < l; i++) {
-            if (this.list[i].id === this.form.id) {
-              this.list[i].name = this.form.name;
-              this.list[i].rolelist = this.form.rolelist;
-            }
-          }
-          this.$message.success("修改成功");
-        });
-      } else {
-        addRole(this.form).then((resp) => {
-          this.list.push({
-            id: resp.data.id,
-            name: this.form.name,
-            rolelist: this.form.rolelist,
-          });
-          this.$message.success("添加成功");
+      this.form.rolelist = [];
+      for (let v of this.permlist) {
+        let pv = 0;
+        for (let row of v.value) {
+          pv += this.permValue.get(row);
+        }
+
+        this.form.rolelist.push({
+          id: v.id,
+          pv: pv,
+          rid: v.rid,
         });
       }
+
+      // 计算每一行的值， 填充到form里面
+      // console.log(this.permlist);
+      // return
+      // if (this.form.id > 0) {
+      //   editRole(this.form).then((_) => {
+      //     // 成功后赋值到源数据
+      //     const l = this.list.length;
+      //     for (let i = 0; i < l; i++) {
+      //       if (this.list[i].id === this.form.id) {
+      //         this.list[i].name = this.form.name;
+      //         this.list[i].rolelist = this.form.rolelist;
+      //       }
+      //     }
+      //     this.$message.success("修改成功");
+      //   });
+      // } else {
+      addRole(this.form).then((resp) => {
+        this.list.push({
+          id: resp.data.id,
+          name: this.form.name,
+        });
+        this.$message.success("添加成功");
+      });
+      // }
 
       this.dialogVisible = false;
     },
@@ -245,6 +236,14 @@ export default {
 </script>
 
 <style scoped type="text/css">
+.env-title {
+  display: inline-block;
+  width: 120px;
+  text-align: right;
+}
+.rolegroup {
+  display: inline-block;
+}
 label {
   padding: 10px;
 }
