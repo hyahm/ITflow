@@ -3,18 +3,19 @@ package model
 import (
 	"database/sql"
 	"errors"
+	"itflow/cache"
 	"itflow/db"
 	"strings"
 
-	"github.com/go-sql-driver/mysql"
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 // RoleGroup: 角色组表， 由管理员分配， 管理可以操作的页面, 与用户rid关联
 type RoleGroup struct {
 	ID      int64   `json:"id" db:"id,default"`
 	Name    string  `json:"name" db:"name,default"`
-	Permids []int64 `json:"permids" db:"permids"	`
+	PermIds []int64 `json:"permids" db:"permids"`
 }
 
 func GetRoleKeyName() ([]KeyName, error) {
@@ -39,38 +40,77 @@ func GetRoleKeyName() ([]KeyName, error) {
 	return kns, nil
 }
 
-func NewRoleGroup(uid int64) (*RoleGroup, error) {
+func (rg *RoleGroup) GetRoleGroupById(id interface{}) (interface{}, error) {
 	// 通过uid 来获取rid
-	rg := &RoleGroup{}
-	err := db.Mconn.GetOne("select r.name, r.permids from rolegroup as r join user as u on u.id=? and u.rid=r.id", uid).Scan(&rg.Name, &rg.Permids)
+	err := db.Mconn.Select(&rg, "select * from rolegroup where id=?", id)
 	if err != nil {
-		golog.Error(err)
 		return nil, err
 	}
 
-	return rg, nil
+	// 需要特殊返回值
+	//  id: 0,
+	// rid: v.id,
+	// label: this.defaultPerm,
+	// value: [],
+	// info: v.info,
+	type perm struct {
+		ID    int64    `json:"id"`
+		Label []string `json:"label"`
+		Value []string `json:"value"`
+		Rid   int64    `json:"rid"`
+		Info  string   `json:"info"`
+	}
+
+	rows, err := db.Mconn.GetRowsIn("select id, pv, rid from perm where id in (?)", rg.PermIds)
+	if err != nil {
+		return nil, err
+	}
+	editPerm := make([]perm, 0, len(cache.CacheRoleID))
+	defer rows.Close()
+	for rows.Next() {
+		p := perm{
+			Label: []string{"read", "create", "update", "delete"},
+			Value: make([]string, 0, 4),
+		}
+		var pv uint8
+		err = rows.Scan(&p.ID, &pv, &p.Rid)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		p.Info = cache.CacheRoleID[p.Rid].Info
+		result := xmux.GetPerm(p.Label, pv)
+		for i, v := range result {
+			if v {
+				p.Value = append(p.Value, p.Label[i])
+			}
+		}
+		editPerm = append(editPerm, p)
+	}
+	return editPerm, nil
+}
+
+func RoleGroupList() ([]RoleGroup, error) {
+	// 通过uid 来获取rid
+	rg := make([]RoleGroup, 0)
+	err := db.Mconn.Select(&rg, "select * from rolegroup")
+	return rg, err
 }
 
 func (rg *RoleGroup) Insert() error {
-	var err error
-	rg.ID, err = db.Mconn.Insert("insert into rolegroup(name,permids) values(?,?)", rg.Name, rg.Permids)
+	ids, err := db.Mconn.InsertInterfaceWithID(rg, "insert into rolegroup($key) values($value)")
 	if err != nil {
-		if err.(*mysql.MySQLError).Number == 1062 {
-			return db.DuplicateErr
-		}
-
+		return err
 	}
-	return err
+	rg.ID = ids[0]
+	return nil
 }
 
 func (rg *RoleGroup) Update() (err error) {
-	golog.Infof("%+v", rg)
-	_, err = db.Mconn.Update("update rolegroup set name=? where id=?", rg.Name, rg.ID)
+	_, err = db.Mconn.UpdateInterface(rg, "update rolegroup set $set where id=?", rg.ID)
 	if err != nil {
 		return
 	}
-	// 查询到permids
-	err = db.Mconn.GetOne("select permids from rolegroup where id=?", rg.ID).Scan(&rg.Permids)
 	return
 }
 

@@ -9,54 +9,23 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/hyahm/goconfig"
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
 
 func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
-	data := &rolegroup.RespRoleGroup{
-		RoleList: make([]*rolegroup.ReqRoleGroup, 0),
-	}
-
-	rows, err := db.Mconn.GetRows("select id, name from rolegroup")
+	rgs, err := model.RoleGroupList()
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		w.Write(response.ErrorE(err))
 		return
 	}
-	for rows.Next() {
-		// var permids string // 保存perm表的所有id
-		// one := &rolegroup.ReqRoleGroup{
-		// 	RoleList: make([]*rolegroup.PermRole, 0),
-		// }
-		// rows.Scan(&one.Id, &one.Name)
-		// golog.Info(one.Id, " ", one.Name)
-		// permrows, err := db.Mconn.GetRowsIn("select find, remove, revise, increase, r.name, r.info from perm as p join roles as r on p.id in (?) and p.rid=r.id",
-		// 	strings.Split(permids, ","))
-		// if err != nil {
-		// 	golog.Error(err)
-		// 	w.Write(errorcode.ErrorE(err))
-		// 	return
-		// }
-		// for permrows.Next() {
-		// 	rp := &rolegroup.PermRole{}
-		// 	err = permrows.Scan(&rp.Select, &rp.Remove, &rp.Update, &rp.Add, &rp.Name, &rp.Info)
-		// 	if err != nil {
-		// 		golog.Error(err)
-		// 		w.Write(errorcode.ErrorE(err))
-		// 		return
-		// 	}
-		// 	one.RoleList = append(one.RoleList, rp)
-		// }
-		// permrows.Close()
-		// data.RoleList = append(data.RoleList, one)
+	res := &response.Response{
+		Data: rgs,
 	}
-	rows.Close()
-	send, _ := json.Marshal(data)
-	w.Write(send)
-
+	w.Write(res.Marshal())
 }
 
 func GetRoleGroupName(w http.ResponseWriter, r *http.Request) {
@@ -124,16 +93,43 @@ func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 func EditRoleGroup(w http.ResponseWriter, r *http.Request) {
 
 	data := xmux.GetInstance(r).Data.(*rolegroup.ReqRoleGroup)
+	// uid := xmux.GetInstance(r).Get("uid").(int64)
+	// w.Write(data.Update(uid))
+	// 先修改perm表里面的
 
-	uid := xmux.GetInstance(r).Get("uid").(int64)
-	w.Write(data.Update(uid))
+	for _, perm := range data.Perms {
+		err := perm.Update()
+		if err != nil {
+			golog.Error(err)
+			w.Write(response.ErrorE(err))
+			return
+		}
+	}
 
+	// 修改rolegroup的
+	rolegroup := model.RoleGroup{
+		ID:      data.Id,
+		Name:    data.Name,
+		PermIds: nil,
+	}
+	err := rolegroup.Update()
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
+		return
+	}
+	w.Write(response.Success())
 }
 
 func AddRoleGroup(w http.ResponseWriter, r *http.Request) {
 
 	data := xmux.GetInstance(r).Data.(*rolegroup.ReqRoleGroup)
 	uid := xmux.GetInstance(r).Get("uid").(int64)
+	if uid != goconfig.ReadInt64("server.adminId", 1) {
+		golog.Error("no permission")
+		w.Write(response.Error("no permission"))
+		return
+	}
 	golog.Infof("%#v", *data)
 	// 先插入perm表
 	permids, err := model.InsertManyPerm(data.Perms)
@@ -143,7 +139,21 @@ func AddRoleGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 插入到rolegroup表
-	w.Write(data.Add(uid))
+	rolegroup := model.RoleGroup{
+		ID:      data.Id,
+		Name:    data.Name,
+		PermIds: permids,
+	}
+	err = rolegroup.Insert()
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
+		return
+	}
+	res := response.Response{
+		ID: rolegroup.ID,
+	}
+	w.Write(res.Marshal())
 
 }
 

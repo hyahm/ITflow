@@ -33,15 +33,10 @@ func InsertManyPerm(perms []Perm) ([]int64, error) {
 	return db.Mconn.InsertInterfaceWithID(perms, "insert into perm($key) values($value)")
 }
 
-// func (perm *Perm) Update(ids string) error {
-// 	var err error
-// 	db.Mconn.OpenDebug()
-// 	_, err = db.Mconn.UpdateIn("update perm set find=?, remove=?,revise=?, increase=? where rid=? and id in (?)",
-// 		perm.Find, perm.Remove, perm.Revise, perm.Increase, perm.Rid,
-// 		strings.Split(ids, ","))
-// 	golog.Info(db.Mconn.GetSql())
-// 	return err
-// }
+func (perm *Perm) Update() error {
+	_, err := db.Mconn.UpdateInterface(perm, "update perm set $set where id=?", perm.Id)
+	return err
+}
 
 // func NewPerm(id interface{}) (*Perm, error) {
 // 	var err error

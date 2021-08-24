@@ -14,7 +14,7 @@ var Status *xmux.GroupRoute
 func init() {
 	Status = xmux.NewGroupRoute().
 		ApiCreateGroup("bugstatus", "bug 状态管理", "bug状态").
-		ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf").AddModule(midware.StatusPermModule)
+		ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf")
 	Status.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 	Status.ApiCodeField("code").ApiCodeMsg("0", "成功")
 	Status.ApiCodeField("code").ApiCodeMsg("20", "token过期")

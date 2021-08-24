@@ -14,41 +14,6 @@ var PermissionMap = map[string]int{
 // 获取所有用户对应权限
 
 type PageInfo struct {
-	Page string
+	Name string
 	Info string
-}
-
-var PageAndRole = []PageInfo{
-	{
-		Page: "env",
-		Info: "环境页面",
-	},
-	{
-		Page: "important",
-		Info: "重要性页面",
-	},
-	{
-		Page: "level",
-		Info: "优先级别页面",
-	},
-	{
-		Page: "position",
-		Info: "职位页面",
-	},
-	{
-		Page: "project",
-		Info: "项目页面",
-	},
-	{
-		Page: "status",
-		Info: "bug状态流程页面",
-	},
-	{
-		Page: "statusgroup",
-		Info: "状态组页面",
-	},
-	{
-		Page: "version",
-		Info: "版本页面",
-	},
 }

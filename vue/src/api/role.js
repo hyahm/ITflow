@@ -15,6 +15,14 @@ export function addRole(data) {
   })
 }
 
+
+export function getRoleGroupPerm(id) {
+  return request({
+    url: `/rolegroup/perm/get?id=${id}`,
+    method: 'get'
+  })
+}
+
 export function editRole(data) {
   return request({
     url: '/rolegroup/edit',

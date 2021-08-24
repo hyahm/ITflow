@@ -12,7 +12,7 @@ import (
 var StatusGroup *xmux.GroupRoute
 
 func init() {
-	StatusGroup = xmux.NewGroupRoute().AddModule(midware.StatusgroupPermModule)
+	StatusGroup = xmux.NewGroupRoute()
 
 	StatusGroup.Post("/statusgroup/add", handle.AddStatusGroup).BindJson(&model.StatusGroup{})
 

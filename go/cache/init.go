@@ -11,13 +11,13 @@ import (
 // 生成初始化本地缓存
 
 var (
-	CacheRoleRid map[string]int64
-	ImgDir       string
-	PrivateKey   string
-	ShowBaseUrl  string
-	Salt         string
-	Expirontion  time.Duration
-	ShareDir     string
+	// CacheRoleRid map[string]int64
+	ImgDir      string
+	PrivateKey  string
+	ShowBaseUrl string
+	Salt        string
+	Expirontion time.Duration
+	ShareDir    string
 )
 
 type UG struct {
@@ -53,7 +53,7 @@ func LoadConfig() {
 		panic(err)
 	}
 
-	CacheRoleRid = make(map[string]int64, 0)
+	// CacheRoleRid = make(map[string]int64, 0)
 
 	Expirontion = goconfig.ReadDuration("expiration", 120*time.Minute)
 	golog.Info("cookie过期时间为：", Expirontion)

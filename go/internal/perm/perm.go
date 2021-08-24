@@ -15,37 +15,37 @@ type OptionPerm struct {
 	Delete bool
 }
 
-func EnvPerm(uid int64) (op OptionPerm, err error) {
-	return perm(uid, cache.CacheRoleRid["env"])
-}
+// func EnvPerm(uid int64) (op OptionPerm, err error) {
+// 	return perm(uid, cache.CacheRoleRid["env"])
+// }
 
-func ImportantPerm(uid int64) (op OptionPerm, err error) {
-	return perm(uid, cache.CacheRoleRid["important"])
-}
+// func ImportantPerm(uid int64) (op OptionPerm, err error) {
+// 	return perm(uid, cache.CacheRoleRid["important"])
+// }
 
-func LevelPerm(uid int64) (op OptionPerm, err error) {
-	return perm(uid, cache.CacheRoleRid["level"])
-}
+// func LevelPerm(uid int64) (op OptionPerm, err error) {
+// 	return perm(uid, cache.CacheRoleRid["level"])
+// }
 
-func PositionPerm(uid int64) (op OptionPerm, err error) {
-	return perm(uid, cache.CacheRoleRid["position"])
-}
+// func PositionPerm(uid int64) (op OptionPerm, err error) {
+// 	return perm(uid, cache.CacheRoleRid["position"])
+// }
 
-func ProjectPerm(uid int64) (op OptionPerm, err error) {
-	return perm(uid, cache.CacheRoleRid["project"])
-}
+// func ProjectPerm(uid int64) (op OptionPerm, err error) {
+// 	return perm(uid, cache.CacheRoleRid["project"])
+// }
 
-func StatusPerm(uid int64) (op OptionPerm, err error) {
-	return perm(uid, cache.CacheRoleRid["status"])
-}
+// func StatusPerm(uid int64) (op OptionPerm, err error) {
+// 	return perm(uid, cache.CacheRoleRid["status"])
+// }
 
-func StatusgroupPerm(uid int64) (op OptionPerm, err error) {
-	return perm(uid, cache.CacheRoleRid["statusgroup"])
-}
+// func StatusgroupPerm(uid int64) (op OptionPerm, err error) {
+// 	return perm(uid, cache.CacheRoleRid["statusgroup"])
+// }
 
-func VersionPerm(uid int64) (op OptionPerm, err error) {
-	return perm(uid, cache.CacheRoleRid["version"])
-}
+// func VersionPerm(uid int64) (op OptionPerm, err error) {
+// 	return perm(uid, cache.CacheRoleRid["version"])
+// }
 
 func perm(uid int64, rid int64) (op OptionPerm, err error) {
 	if uid == cache.SUPERID {

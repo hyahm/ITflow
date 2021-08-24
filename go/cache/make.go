@@ -5,17 +5,23 @@ import (
 	"itflow/db"
 )
 
-func initCache() {
+var CacheRoleID map[int64]PageInfo
 
-	rolerows, err := db.Mconn.GetRows("select id, name from roles")
+func initCache() {
+	CacheRoleID = make(map[int64]PageInfo)
+	rolerows, err := db.Mconn.GetRows("select id, name,info from roles")
 	if err != nil {
 		panic(err)
 	}
 	for rolerows.Next() {
 		var id int64
-		var name string
-		rolerows.Scan(&id, &name)
-		CacheRoleRid[name] = id
+		var name, info string
+		rolerows.Scan(&id, &name, &info)
+		CacheRoleID[id] = PageInfo{
+			Name: name,
+			Info: info,
+		}
+		// CacheRoleRid[name] = id
 	}
 	rolerows.Close()
 	// 	//默认值

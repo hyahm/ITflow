@@ -64,7 +64,7 @@
         <div v-for="(item, index) in permlist" :key="index">
           <!-- <label class="name">{{ role.name }}</label> -->
           <!-- <el-checkbox v-model="role.checked" :label="role.name" style="width:150px" @change="changeChecked(role)" /> -->
-          <div class="env-title">{{ pages[index].info }}</div>
+          <div class="env-title">{{ item.info }}</div>
           <el-checkbox-group :key="index" v-model="item.value" class="rolegroup">
             <el-checkbox v-for="city in item.label" :label="city" :key="city">{{
               city
@@ -93,6 +93,7 @@ import {
   editRole,
   removeRole,
   getPermTemplate,
+  getRoleGroupPerm,
   getRoles,
 } from "@/api/role";
 import { deepClone } from "@/utils";
@@ -151,15 +152,22 @@ export default {
     //   });
     // },
     handleEdit(row) {
+      // 请求拿到权限数据
       // 请求权限
-      this.form.id = row.id;
-      this.form.name = row.name;
-      this.form.rolelist = row.rolelist;
+      getRoleGroupPerm(row.id).then((resp) => {
+        console.log(resp.data);
+        this.permlist = resp.data.data;
+        this.form.name = row.name;
+        this.form.id = row.id;
+      });
+      // this.form.id = row.id;
+      // this.form.name = row.name;
+      // this.form.rolelist = row.rolelist;
       this.dialogVisible = true;
     },
     getlist() {
       roleList().then((resp) => {
-        this.list = resp.data.rolelist;
+        this.list = resp.data.data;
       });
     },
     handleAdd() {
@@ -207,27 +215,27 @@ export default {
       // 计算每一行的值， 填充到form里面
       // console.log(this.permlist);
       // return
-      // if (this.form.id > 0) {
-      //   editRole(this.form).then((_) => {
-      //     // 成功后赋值到源数据
-      //     const l = this.list.length;
-      //     for (let i = 0; i < l; i++) {
-      //       if (this.list[i].id === this.form.id) {
-      //         this.list[i].name = this.form.name;
-      //         this.list[i].rolelist = this.form.rolelist;
-      //       }
-      //     }
-      //     this.$message.success("修改成功");
-      //   });
-      // } else {
-      addRole(this.form).then((resp) => {
-        this.list.push({
-          id: resp.data.id,
-          name: this.form.name,
+      if (this.form.id > 0) {
+        editRole(this.form).then((_) => {
+          // 成功后赋值到源数据
+          const l = this.list.length;
+          for (let i = 0; i < l; i++) {
+            if (this.list[i].id === this.form.id) {
+              this.list[i].name = this.form.name;
+              this.list[i].rolelist = this.form.rolelist;
+            }
+          }
+          this.$message.success("修改成功");
         });
-        this.$message.success("添加成功");
-      });
-      // }
+      } else {
+        addRole(this.form).then((resp) => {
+          this.list.push({
+            id: resp.data.id,
+            name: this.form.name,
+          });
+          this.$message.success("添加成功");
+        });
+      }
 
       this.dialogVisible = false;
     },

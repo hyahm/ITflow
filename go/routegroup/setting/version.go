@@ -19,7 +19,7 @@ func init() {
 	// 请求头
 	// 后面是api接口的次要处理
 	// 最后是错误码
-	Version = xmux.NewGroupRoute().ApiCreateGroup("version", "版本相关", "版本列表").AddModule(midware.VersionPermModule)
+	Version = xmux.NewGroupRoute().ApiCreateGroup("version", "版本相关", "版本列表")
 	Version.ApiCodeField("code").ApiCodeMsg("0", "成功")
 	Version.ApiCodeField("code").ApiCodeMsg("20", "token过期")
 	Version.ApiCodeField("code").ApiCodeMsg("1", "其他错误,请查看返回的msg")

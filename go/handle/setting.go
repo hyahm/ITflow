@@ -171,6 +171,23 @@ func GetRoles(w http.ResponseWriter, r *http.Request) {
 	w.Write(res.Marshal())
 }
 
+func GetRoleGroupPerm(w http.ResponseWriter, r *http.Request) {
+	id := r.FormValue("id")
+
+	rg := model.RoleGroup{}
+	data, err := rg.GetRoleGroupById(id)
+	// ar, err := model.AllRole()
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
+		return
+	}
+	// 通过permids 来获取详细权限
+	res := response.Response{}
+	res.Data = data
+	w.Write(res.Marshal())
+}
+
 // func GetThisRoles(w http.ResponseWriter, r *http.Request) {
 
 // 	errorcode := &response.Response{}
