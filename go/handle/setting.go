@@ -175,7 +175,7 @@ func GetRoleGroupPerm(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 
 	rg := model.RoleGroup{}
-	data, err := rg.GetRoleGroupById(id)
+	data, err := rg.GetEditDataById(id)
 	// ar, err := model.AllRole()
 	if err != nil {
 		golog.Error(err)

@@ -40,13 +40,21 @@ func GetRoleKeyName() ([]KeyName, error) {
 	return kns, nil
 }
 
-func (rg *RoleGroup) GetRoleGroupById(id interface{}) (interface{}, error) {
+func (rg *RoleGroup) Delete() error {
+	_, err := db.Mconn.Delete("delete from rolegroup where id=?", rg.ID)
+	return err
+}
+
+func (rg *RoleGroup) GetRoleGroupById(id interface{}) error {
+	return db.Mconn.Select(&rg, "select * from rolegroup where id=?", id)
+}
+
+func (rg *RoleGroup) GetEditDataById(id interface{}) (interface{}, error) {
 	// 通过uid 来获取rid
-	err := db.Mconn.Select(&rg, "select * from rolegroup where id=?", id)
+	err := rg.GetRoleGroupById(id)
 	if err != nil {
 		return nil, err
 	}
-
 	// 需要特殊返回值
 	//  id: 0,
 	// rid: v.id,

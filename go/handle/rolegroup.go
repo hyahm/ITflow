@@ -7,7 +7,6 @@ import (
 	"itflow/model"
 	"itflow/response"
 	"net/http"
-	"strings"
 
 	"github.com/hyahm/goconfig"
 	"github.com/hyahm/golog"
@@ -61,32 +60,32 @@ func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("有用户在使用， 无法删除"))
 		return
 	}
-	// 需要用到事务
-	var permids string
-	err = db.Mconn.GetOne("select permids from rolegroup where id=?", id).Scan(&permids)
+	// 先删除perm
+	// 获取 permids
+	rolegroup := model.RoleGroup{}
+	err = rolegroup.GetRoleGroupById(id)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	_, err = db.Mconn.DeleteIn("delete from perm where id in(?)",
-		strings.Split(permids, ","))
+	err = model.DeletePerms(rolegroup.PermIds...)
 	if err != nil {
 		golog.Error(err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	isql := "delete from rolegroup where id = ?"
-	_, err = db.Mconn.Update(isql, id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	// perm 里面的也要删除
 
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
+	// 然后删除rolegroup
+	err = rolegroup.Delete()
+	// perm 里面的也要删除
+	if err != nil {
+		golog.Error(err)
+		w.Write(errorcode.ErrorE(err))
+		return
+	}
+
+	w.Write(response.Success())
 
 }
 

@@ -46,8 +46,7 @@ func (perm *Perm) Update() error {
 // 	return perm, err
 // }
 
-func (perm *Perm) Delete() error {
-	var err error
-	_, err = db.Mconn.Delete("delete from perm where id=?", perm.Id)
+func DeletePerms(ids ...int64) error {
+	_, err := db.Mconn.DeleteIn("delete from perm where id in (?)", ids)
 	return err
 }

@@ -92,7 +92,6 @@ import {
   addRole,
   editRole,
   removeRole,
-  getPermTemplate,
   getRoleGroupPerm,
   getRoles,
 } from "@/api/role";
@@ -178,8 +177,8 @@ export default {
     },
     handleRemove(id) {
       this.$confirm("确认关闭？")
-        .then((_) => {
-          removeRole(id).then((resp) => {
+        .then(() => {
+          removeRole(id).then(() => {
             const l = this.list.length;
             for (let i = 0; i < l; i++) {
               if (this.list[i].id === id) {
