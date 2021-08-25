@@ -756,8 +756,8 @@ CREATE TABLE `jobs` (
   `name` varchar(30) NOT NULL DEFAULT '',
   `level` bigint(20) NOT NULL DEFAULT '2',
   `hypo` varchar(30) NOT NULL DEFAULT '0',
-  `bugsid` int(11) NOT NULL DEFAULT '0',
-  `rid` int(11) NOT NULL DEFAULT '0',
+  `sgid` int(11) NOT NULL DEFAULT '0',
+  `rgid` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

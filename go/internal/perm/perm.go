@@ -56,7 +56,7 @@ func perm(uid int64, rid int64) (op OptionPerm, err error) {
 		return
 	}
 	var permids string
-	err = db.Mconn.GetOne("select permids from rolegroup where id = (select rid from jobs where id=(select jid from user where id=?))", uid).Scan(&permids)
+	err = db.Mconn.GetOne("select permids from rolegroup where id = (select rgid from jobs where id=(select jid from user where id=?))", uid).Scan(&permids)
 	if err != nil {
 		golog.Info(err)
 		return

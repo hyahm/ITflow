@@ -2,6 +2,8 @@ package model
 
 import (
 	"itflow/db"
+
+	"github.com/hyahm/golog"
 )
 
 // `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -49,4 +51,24 @@ func (perm *Perm) Update() error {
 func DeletePerms(ids ...int64) error {
 	_, err := db.Mconn.DeleteIn("delete from perm where id in (?)", ids)
 	return err
+}
+
+func GetPermsionPageAndPVById(permids []int64) (map[string]uint8, error) {
+	rows, err := db.Mconn.GetRowsIn("select name,pv from perm join roles on perm.rid=roles.id and perm.id in (?) ", permids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	pagekey := make(map[string]uint8)
+	for rows.Next() {
+		var name string
+		var pv uint8
+		err = rows.Scan(&name, &pv)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		pagekey[name] = pv
+	}
+	return pagekey, nil
 }

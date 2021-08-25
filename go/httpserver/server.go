@@ -63,11 +63,11 @@ func RunHttp() {
 	router.Get("/showimg/{string:imgname}", handle.ShowImg).SetHeader("Content-Type", "image/png").DelModule(midware.CheckToken)
 
 	router.Get("/get/expire/{token}", handle.GetExpire).DelModule(midware.CheckToken)
-	// 生产环境中， 这个要么注释， 要么
-	if goconfig.ReadBool("debug", false) {
-		doc := router.ShowApi("/docs").DelModule(midware.CheckToken)
-		router.AddGroup(doc)
-	}
+	// // 生产环境中， 这个要么注释， 要么
+	// if goconfig.ReadBool("debug", false) {
+	// 	doc := router.ShowApi("/docs").DelModule(midware.CheckToken)
+	// 	router.AddGroup(doc)
+	// }
 	router.Get("/", func(rw http.ResponseWriter, r *http.Request) {
 		rw.Write([]byte("hello world"))
 	}).DelModule(midware.CheckToken)

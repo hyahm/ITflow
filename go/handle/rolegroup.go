@@ -47,7 +47,7 @@ func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("id")
 	golog.Info(id)
-	ssql := "select count(id) from jobs where rid=?"
+	ssql := "select count(id) from jobs where rgid=?"
 	var count int
 	err := db.Mconn.GetOne(ssql, id).Scan(&count)
 	if err != nil {

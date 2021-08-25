@@ -99,7 +99,7 @@ func (ui *UserInfo) GetUserInfo(uid int64) error {
 
 	var permids string
 	golog.Info(uid)
-	err = db.Mconn.GetOne("select permids from rolegroup where id = (select rid from jobs where id=(select jid from user where id=?))", uid).Scan(&permids)
+	err = db.Mconn.GetOne("select permids from rolegroup where id = (select rgid from jobs where id=(select jid from user where id=?))", uid).Scan(&permids)
 	if err != nil {
 		golog.Error(err)
 		return err

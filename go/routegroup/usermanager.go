@@ -40,6 +40,6 @@ func init() {
 	// 添加用户操作
 	UserManager.Post("/user/create", handle.CreateUser).
 		Bind(&model.User{}).AddModule(midware.UserPerm).
-		AddModule(midware.JsonToStruct)
+		AddModule(midware.JsonToStruct).AddPageKeys("admin", "user").AddModule(midware.CheckRole)
 
 }

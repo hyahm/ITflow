@@ -76,7 +76,7 @@ func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		var sids string
-		err := db.Mconn.GetOne("select sids from statusgroup where id = (select bugsid from jobs where id=(select jid from user where id=?))", uid).Scan(&sids)
+		err := db.Mconn.GetOne("select sids from statusgroup where id = (select sgid from jobs where id=(select jid from user where id=?))", uid).Scan(&sids)
 		if err != nil {
 			golog.Error(err)
 			w.Write(sl.ErrorE(err))
@@ -103,7 +103,6 @@ func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 	}
 	rows.Close()
 	w.Write(sl.Marshal())
-	return
 
 }
 
@@ -122,7 +121,6 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
 
 	send, _ := json.Marshal(sl)
 	w.Write(send)
-	return
 
 }
 
@@ -165,19 +163,7 @@ func UpdateRoles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(errorcode.Success())
-	return
 
-}
-
-type getAllBugSearchParam struct {
-	Page    int      `json:"page"`
-	Limit   int      `json:"limit"`
-	Level   string   `json:"level"`
-	Project string   `json:"project"`
-	Title   string   `json:"title"`
-	Status  string   `json:"status"`
-	Total   int      `json:"total"`
-	Handle  []string `json:"handle"`
 }
 
 func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
@@ -228,7 +214,6 @@ func ChangeShowStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write(response.Success())
-	return
 }
 
 func GetMyBugs(w http.ResponseWriter, r *http.Request) {
@@ -345,7 +330,6 @@ func ResumeBug(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write(errorcode.Success())
-	return
 }
 
 func CloseBug(w http.ResponseWriter, r *http.Request) {
@@ -376,6 +360,4 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
-	return
-
 }

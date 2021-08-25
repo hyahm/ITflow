@@ -12,10 +12,10 @@ import (
 type Job struct {
 	Id          int64  `json:"id" db:"id,default"`
 	Name        string `json:"name" db:"name"`
-	Level       int    `json:"level" db:"level"`        // 1 是管理者， 2 是普通员工
-	HypoName    int64  `json:"hypo" db:"hypo"`          //  管理者id
-	StatusGroup int64  `json:"statusgroup" db:"bugsid"` // 状态组
-	RoleGroup   int64  `json:"rolegroup" db:"rid"`      // 角色组
+	Level       int    `json:"level" db:"level"`      // 1 是管理者， 2 是普通员工
+	HypoName    int64  `json:"hypo" db:"hypo"`        //  管理者id
+	StatusGroup int64  `json:"statusgroup" db:"sgid"` // 状态组
+	RoleGroup   int64  `json:"rolegroup" db:"rgid"`   // 角色组
 }
 
 func (job *Job) Insert() error {

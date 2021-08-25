@@ -76,7 +76,7 @@ func DeleteStatusGroup(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("id")
 
-	ssql := "select count(id) from jobs where bugsid=?"
+	ssql := "select count(id) from jobs where sgid=?"
 	var count int
 	err := db.Mconn.GetOne(ssql, id).Scan(&count)
 	if err != nil {

@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"itflow/cache"
 	"itflow/db"
@@ -133,4 +134,23 @@ func CheckRoleNameInGroup(name string, rid *int64) error {
 	}
 
 	return nil
+}
+
+// 获取用户组里面的 permids
+func GetPermIdsByUid(uid interface{}) ([]int64, error) {
+	var perms []byte
+	err := db.Mconn.GetOne("select permids from rolegroup where id=(select rgid from jobs where id=(select jid from user where id=?))", uid).Scan(
+		&perms,
+	)
+	if err != nil {
+		golog.Error(err)
+		return nil, err
+	}
+	permids := make([]int64, 0)
+	err = json.Unmarshal(perms, &permids)
+	if err != nil {
+		golog.Error(err)
+		return nil, err
+	}
+	return permids, nil
 }

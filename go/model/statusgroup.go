@@ -14,7 +14,7 @@ type StatusGroup struct {
 
 func getStatusIDsByUid(uid int64) ([]int64, error) {
 	sg := StatusGroup{}
-	sql := "select * from statusgroup where id=(select bugsid from jobs where id=(select jid from user where id=?))"
+	sql := "select * from statusgroup where id=(select sgid from jobs where id=(select jid from user where id=?))"
 	err := db.Mconn.Select(&sg, sql, uid)
 	if err != nil {
 		return nil, err

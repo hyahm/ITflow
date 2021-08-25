@@ -1,10 +1,10 @@
 package midware
 
 import (
-	"fmt"
 	"itflow/response"
 	"net/http"
 
+	"github.com/hyahm/goconfig"
 	"github.com/hyahm/xmux"
 )
 
@@ -19,22 +19,22 @@ type UserChecker interface {
 	CheckUser(uid int64) error
 }
 
-func CheckUser(w http.ResponseWriter, r *http.Request) bool {
+// func CheckUser(w http.ResponseWriter, r *http.Request) bool {
 
-	uid := xmux.GetInstance(r).Get("uid").(int64)
-	resp := response.Response{}
-	if xmux.GetInstance(r).Data == nil {
-		err := fmt.Sprintf("must be bind data first %s", r.URL.RequestURI())
-		w.Write(resp.Error(err))
-		return true
-	}
-	err := xmux.GetInstance(r).Data.(UserChecker).CheckUser(uid)
-	if err != nil {
-		w.Write(resp.ErrorE(err))
-		return true
-	}
-	return false
-}
+// 	uid := xmux.GetInstance(r).Get("uid").(int64)
+// 	resp := response.Response{}
+// 	if xmux.GetInstance(r).Data == nil {
+// 		err := fmt.Sprintf("must be bind data first %s", r.URL.RequestURI())
+// 		w.Write(resp.Error(err))
+// 		return true
+// 	}
+// 	err := xmux.GetInstance(r).Data.(UserChecker).CheckUser(uid)
+// 	if err != nil {
+// 		w.Write(resp.ErrorE(err))
+// 		return true
+// 	}
+// 	return false
+// }
 
 // func EnvPermModule(w http.ResponseWriter, r *http.Request) bool {
 // 	resp := response.Response{}
@@ -132,3 +132,12 @@ func CheckUser(w http.ResponseWriter, r *http.Request) bool {
 // 	xmux.GetInstance(r).Set("perm", op)
 // 	return false
 // }
+
+func MustBeSuperAdmin(w http.ResponseWriter, r *http.Request) bool {
+	uid := xmux.GetInstance(r).Get("uid").(int64)
+	if uid != goconfig.ReadInt64("adminid", 1) {
+		w.Write(response.Error("no permission"))
+		return true
+	}
+	return false
+}
