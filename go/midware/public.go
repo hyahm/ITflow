@@ -3,6 +3,7 @@ package midware
 import (
 	"encoding/json"
 	"io/ioutil"
+	"itflow/cache"
 	"itflow/jwt"
 	"itflow/model"
 	"itflow/response"
@@ -65,7 +66,7 @@ func CheckToken(w http.ResponseWriter, r *http.Request) bool {
 
 func CheckRole(w http.ResponseWriter, r *http.Request) bool {
 	uid := xmux.GetInstance(r).Get("uid").(int64)
-	if uid == goconfig.ReadInt64("adminid", 1) {
+	if uid == cache.SUPERID {
 		// 超级管理员有任何权限
 		return false
 	}

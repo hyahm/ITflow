@@ -2,6 +2,7 @@ package cache
 
 import (
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/hyahm/goconfig"
@@ -38,14 +39,20 @@ var (
 )
 
 func LoadConfig() {
-	SUPERID = goconfig.ReadInt64("adminid", 1)
+	var err error
+	SUPERID, err = strconv.ParseInt(goconfig.ReadEnv("ADMINID"), 10, 64)
+	if err != nil {
+		SUPERID = goconfig.ReadInt64("adminid", 1)
+	}
+
 	ImgDir = goconfig.ReadString("imgdir", "/data/bugimg/")
-	err := os.MkdirAll(ImgDir, 0755)
+	err = os.MkdirAll(ImgDir, 0755)
 	if err != nil {
 		panic(err)
 	}
-	ShowBaseUrl = goconfig.ReadWithEndSlash("showbaseurl", " http://127.0.0.1:10001/showimg/")
-	Salt = goconfig.ReadString("salt", "hjkkaksjdhfryuooweqzmbvc")
+	ShowBaseUrl = goconfig.ReadEnv("SHOW_URL",
+		goconfig.ReadWithEndSlash("showbaseurl", " http://127.0.0.1:10001/showimg/"))
+	Salt = goconfig.ReadEnv("SALT", goconfig.ReadString("salt", "hjkkaksjdhfryuooweqzmbvc"))
 	ShareDir = goconfig.ReadString("sharedir", "/share/")
 	// 创建共享文件夹
 	err = os.MkdirAll(ShareDir, 0755)

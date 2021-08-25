@@ -28,7 +28,7 @@ func (job *Job) Insert() error {
 }
 
 func DeleteJob(id, uid interface{}) (err error) {
-	if uid == goconfig.ReadInt64("adminid", 1) {
+	if uid == cache.SUPERID {
 		_, err = db.Mconn.Delete("delete from jobs where id=?", id)
 	} else {
 		_, err = db.Mconn.Delete("delete from jobs where id=? and hypo=?", id, uid)

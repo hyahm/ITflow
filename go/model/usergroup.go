@@ -4,7 +4,6 @@ import (
 	"itflow/cache"
 	"itflow/db"
 
-	"github.com/hyahm/goconfig"
 	"github.com/hyahm/golog"
 )
 
@@ -52,14 +51,14 @@ func (ug *UserGroup) Create() error {
 func GetUserGroupList(uid int64) ([]UserGroup, error) {
 	ug := make([]UserGroup, 0)
 	gsql := "select * from usergroup where uid=? or uid=? or json_contains(uids,json_array(?))"
-	err := db.Mconn.Select(&ug, gsql, uid, goconfig.ReadInt64("adminid", 1), uid)
+	err := db.Mconn.Select(&ug, gsql, uid, cache.SUPERID, uid)
 	return ug, err
 }
 
 func GetUserGroupIds(uid int64) ([]int64, error) {
 
 	gsql := "select id from usergroup where uid=? or uid=? or json_contains(uids,json_array(?))"
-	rows, err := db.Mconn.GetRows(gsql, uid, goconfig.ReadInt64("adminid", 1), uid)
+	rows, err := db.Mconn.GetRows(gsql, uid, cache.SUPERID, uid)
 	if err != nil {
 		return nil, err
 	}

@@ -41,7 +41,7 @@ func main() {
 	if goconfig.ReadBool("debug", false) {
 		golog.Level = golog.DEBUG
 	} else {
-		golog.InitLogger(goconfig.ReadString("log.path", ""),
+		golog.InitLogger(goconfig.ReadEnv("LOG_PATH", goconfig.ReadString("log.path", "")),
 			goconfig.ReadInt64("log.size", 0),
 			goconfig.ReadBool("log.everyday", false))
 	}

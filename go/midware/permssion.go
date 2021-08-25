@@ -1,10 +1,10 @@
 package midware
 
 import (
+	"itflow/cache"
 	"itflow/response"
 	"net/http"
 
-	"github.com/hyahm/goconfig"
 	"github.com/hyahm/xmux"
 )
 
@@ -135,7 +135,7 @@ type UserChecker interface {
 
 func MustBeSuperAdmin(w http.ResponseWriter, r *http.Request) bool {
 	uid := xmux.GetInstance(r).Get("uid").(int64)
-	if uid != goconfig.ReadInt64("adminid", 1) {
+	if uid != cache.SUPERID {
 		w.Write(response.Error("no permission"))
 		return true
 	}
