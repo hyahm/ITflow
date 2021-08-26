@@ -1,56 +1,39 @@
 package model
 
 import (
-	"encoding/json"
 	"itflow/db"
 
 	"github.com/hyahm/golog"
 )
 
 type Important struct {
-	Id   int64  `json:"id"`
-	Name string `json:"name"`
+	Id   int64  `json:"id" db:"id,default"`
+	Name string `json:"name" db:"name"`
 }
 
-func GetImportantKeyNameByUid() ([]KeyName, error) {
-	rows, err := db.Mconn.GetRows("select id,name from importants")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	kns := make([]KeyName, 0)
-	for rows.Next() {
-		kn := KeyName{}
-		err = rows.Scan(&kn.ID, &kn.Name)
-		if err != nil {
-			golog.Error(err)
-			continue
-		}
-		kns = append(kns, kn)
-	}
-	return kns, nil
+// 获取的就是表的所有字段
+func GetAllImportant() ([]Important, error) {
+	importants := make([]Important, 0)
+	err := db.Mconn.Select(&importants, "select * from importants")
+	return importants, err
 }
 
-type ResposeImportant struct {
-	ImportantList []*Important `json:"importantlist"`
-	Code          int          `json:"code"`
-	Msg           string       `json:"msg"`
-}
-
-func (li *ResposeImportant) Marshal() []byte {
-	send, err := json.Marshal(li)
+func (important *Important) Create() error {
+	ids, err := db.Mconn.InsertInterfaceWithID(important, "insert into importants($key) values($value)")
 	if err != nil {
 		golog.Error(err)
+		return err
 	}
-	return send
-}
-func (li *ResposeImportant) Error(msg string) []byte {
-	li.Code = 1
-	li.Msg = msg
-	return li.Marshal()
+	important.Id = ids[0]
+	return nil
 }
 
-func (li *ResposeImportant) ErrorE(err error) []byte {
+func (important *Important) Update() error {
+	_, err := db.Mconn.UpdateInterface(important, "update importants set $set where id=?", important.Id)
+	return err
+}
 
-	return li.Error(err.Error())
+func DeleteImportant(id interface{}) error {
+	_, err := db.Mconn.Delete("delete from importants where id=?", id)
+	return err
 }

@@ -40,14 +40,6 @@ func (perm *Perm) Update() error {
 	return err
 }
 
-// func NewPerm(id interface{}) (*Perm, error) {
-// 	var err error
-// 	perm := &Perm{}
-// 	err = db.Mconn.GetOne("select id,rid, find, remove,revise, increase from perm where id=?", id).Scan(
-// 		&perm.Id, &perm.Rid, &perm.Find, &perm.Remove, &perm.Revise, &perm.Increase)
-// 	return perm, err
-// }
-
 func DeletePerms(ids ...int64) error {
 	_, err := db.Mconn.DeleteIn("delete from perm where id in (?)", ids)
 	return err
@@ -71,4 +63,23 @@ func GetPermsionPageAndPVById(permids []int64) (map[string]uint8, error) {
 		pagekey[name] = pv
 	}
 	return pagekey, nil
+}
+
+func GetPermsionByIds(permids []int64) ([]string, error) {
+	rows, err := db.Mconn.GetRowsIn("select name from perm join roles on perm.rid=roles.id and perm.id in (?) and pv>0 ", permids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	names := make([]string, 0)
+	for rows.Next() {
+		var name string
+		err = rows.Scan(&name)
+		if err != nil {
+			golog.Error(err)
+			continue
+		}
+		names = append(names, name)
+	}
+	return names, nil
 }

@@ -1,4 +1,4 @@
-package handle
+package position
 
 import (
 	"itflow/model"
@@ -9,7 +9,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-func PositionList(w http.ResponseWriter, r *http.Request) {
+func Read(w http.ResponseWriter, r *http.Request) {
 	jobs, err := model.GetAllPositions()
 	if err != nil {
 		golog.Error(err)
@@ -57,7 +57,7 @@ func PositionGet(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func PositionAdd(w http.ResponseWriter, r *http.Request) {
+func Create(w http.ResponseWriter, r *http.Request) {
 
 	// errorcode := &response.Response{}
 
@@ -75,7 +75,7 @@ func PositionAdd(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func PositionDel(w http.ResponseWriter, r *http.Request) {
+func Delete(w http.ResponseWriter, r *http.Request) {
 
 	// errorcode := &response.Response{}
 	id := r.FormValue("id")
@@ -91,7 +91,7 @@ func PositionDel(w http.ResponseWriter, r *http.Request) {
 	w.Write(response.Success())
 }
 
-func PositionUpdate(w http.ResponseWriter, r *http.Request) {
+func Update(w http.ResponseWriter, r *http.Request) {
 
 	job := xmux.GetInstance(r).Data.(*model.Job)
 	err := job.Update()

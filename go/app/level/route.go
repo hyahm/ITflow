@@ -1,14 +1,12 @@
-package setting
+package level
 
 import (
-	"itflow/handle"
 	"itflow/midware"
 	"itflow/model"
 
 	"github.com/hyahm/xmux"
 )
 
-// Level bug级别路由
 var Level *xmux.GroupRoute
 
 func init() {
@@ -19,14 +17,13 @@ func init() {
 	Level.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	Level.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
-	Level.Post("/level/get", handle.LevelGet)
+	Level.Post("/level/get", Read)
 
-	Level.Post("/level/add", handle.LevelAdd).
-		Bind(&model.RequestLevel{}).AddModule(midware.JsonToStruct)
+	Level.Post("/level/add", Create).
+		Bind(&model.Level{}).AddModule(midware.JsonToStruct)
 
-	Level.Get("/level/del", handle.LevelDel)
+	Level.Get("/level/del", Delete)
 
-	Level.Post("/level/update", handle.LevelUpdate).
-		Bind(&model.Update_level{}).AddModule(midware.JsonToStruct)
-	Level.Post("/get/levels", handle.GetLevels)
+	Level.Post("/level/update", Update).
+		Bind(&model.Level{}).AddModule(midware.JsonToStruct)
 }

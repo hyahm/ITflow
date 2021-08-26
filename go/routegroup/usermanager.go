@@ -25,7 +25,7 @@ func init() {
 	UserManager.AddGroup(usermanager.UserGroupPage)
 
 	// 修改密码页面
-	UserManager.Post("/password/reset", handle.ResetPwd).Bind(&user.ResetPassword{}).AddModule(midware.UserPerm).
+	UserManager.Post("/password/reset", handle.ResetPwd).Bind(&user.ResetPassword{}).
 		AddModule(midware.JsonToStruct).ApiDescribe("修改密码")
 	// 修改邮箱页面
 	UserManager.AddGroup(usermanager.UpdateEmailPage)
@@ -38,8 +38,7 @@ func init() {
 	UserManager.AddGroup(usermanager.UserListPage)
 	// 用户创建
 	// 添加用户操作
-	UserManager.Post("/user/create", handle.CreateUser).
-		Bind(&model.User{}).AddModule(midware.UserPerm).
-		AddModule(midware.JsonToStruct).AddPageKeys("admin", "user").AddModule(midware.CheckRole)
+	UserManager.Post("/user/create", handle.Create).
+		BindJson(&model.User{}).AddPageKeys("admin", "user").AddModule(midware.CheckRole)
 
 }

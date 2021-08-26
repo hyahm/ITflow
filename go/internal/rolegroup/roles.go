@@ -1,23 +1,19 @@
 package rolegroup
 
-import (
-	"itflow/model"
-)
+// type PermRole struct {
+// 	Add    bool   `json:"add"`
+// 	Remove bool   `json:"remove"`
+// 	Select bool   `json:"select"`
+// 	Update bool   `json:"update"`
+// 	Info   string `json:"info"`
+// 	Name   string `json:"name"`
+// }
 
-type PermRole struct {
-	Add    bool   `json:"add"`
-	Remove bool   `json:"remove"`
-	Select bool   `json:"select"`
-	Update bool   `json:"update"`
-	Info   string `json:"info"`
-	Name   string `json:"name"`
-}
-
-type ReqRoleGroup struct {
-	Id    int64        `json:"id" type:"int" need:"是" default:"" information:"id"`
-	Name  string       `json:"name" type:"string" need:"是" default:"" information:"角色组名"`
-	Perms []model.Perm `json:"rolelist" type:"array" need:"是" default:"" information:"角色组成员"`
-}
+// type ReqRoleGroup struct {
+// 	Id    int64        `json:"id" type:"int" need:"是" default:"" information:"id"`
+// 	Name  string       `json:"name" type:"string" need:"是" default:"" information:"角色组名"`
+// 	Perms []model.Perm `json:"rolelist" type:"array" need:"是" default:"" information:"角色组成员"`
+// }
 
 // type RoleGroupList struct {
 // 	DataList []*ReqRoleGroup `json:"datalist" type:"array" need:"否" default:"" information:"角色组列表"`

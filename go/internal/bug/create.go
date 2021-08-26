@@ -1,93 +1,83 @@
 package bug
 
-import (
-	"encoding/json"
-	"html"
-	"itflow/cache"
-	"itflow/db"
-	"strings"
-
-	"github.com/hyahm/golog"
-)
-
 // 前端编辑时需要的数据结构
-type EditBug struct {
-	Title       string   `json:"title,omitempty"`
-	Content     string   `json:"content,omitempty"`
-	Id          int64    `json:"id"`
-	Selectusers []string `json:"selectuser,omitempty"`
-	Important   string   `json:"important,omitempty"`
-	Level       string   `json:"level,omitempty"`
-	Projectname string   `json:"projectname,omitempty"`
-	Envname     string   `json:"envname,omitempty"`
-	Version     string   `json:"version,omitempty"`
-	Code        int      `json:"code"`
-	Msg         string   `json:"msg,omitempty"`
-	Typ         int      `json:"typ"`
-}
+// type EditBug struct {
+// 	Title       string   `json:"title,omitempty"`
+// 	Content     string   `json:"content,omitempty"`
+// 	Id          int64    `json:"id"`
+// 	Selectusers []string `json:"selectuser,omitempty"`
+// 	Important   string   `json:"important,omitempty"`
+// 	Level       string   `json:"level,omitempty"`
+// 	Projectname string   `json:"projectname,omitempty"`
+// 	Envname     string   `json:"envname,omitempty"`
+// 	Version     string   `json:"version,omitempty"`
+// 	Code        int      `json:"code"`
+// 	Msg         string   `json:"msg,omitempty"`
+// 	Typ         int      `json:"typ"`
+// }
 
-func (reb *EditBug) Marshal() []byte {
-	send, err := json.Marshal(reb)
-	if err != nil {
-		golog.Error(err)
-	}
-	return send
-}
+// func (reb *EditBug) Marshal() []byte {
+// 	send, err := json.Marshal(reb)
+// 	if err != nil {
+// 		golog.Error(err)
+// 	}
+// 	return send
+// }
 
-func (reb *EditBug) Error(msg string) []byte {
-	reb.Code = 1
-	reb.Msg = msg
-	return reb.Marshal()
-}
+// func (reb *EditBug) Error(msg string) []byte {
+// 	reb.Code = 1
+// 	reb.Msg = msg
+// 	return reb.Marshal()
+// }
 
-func (reb *EditBug) ErrorE(err error) []byte {
-	return reb.Error(err.Error())
-}
+// func (reb *EditBug) ErrorE(err error) []byte {
+// 	return reb.Error(err.Error())
+// }
 
-func BugById(id string, uid int64) []byte {
-	reb := &EditBug{}
-	golog.Info(id)
-	alsql := `select b.tid,ifnull(i.name, ''),title,
-	ifnull(l.name, ''), ifnull(p.name, ''), ifnull(e.name, ''),spusers,ifnull(v.name, ''),content, b.uid 
-	from bug.bugs as b 
-	left join bug.importants as i on i.id=b.iid
-	left join bug.level as l on l.id=b.lid
-	left join bug.project as p  on p.id=b.pid
-	left join bug.environment as e  on e.id=b.eid
-	left join version as v  on v.id=b.vid
-	where b.id=? `
-	var spids string
-	var bugUid int64
-	err := db.Mconn.GetOne(alsql, id).Scan(&reb.Typ, &reb.Important, &reb.Title, &reb.Level, &reb.Projectname,
-		&reb.Envname, &spids, &reb.Version, &reb.Content, &bugUid)
-	if err != nil {
-		golog.Error(err)
-		return reb.ErrorE(err)
-	}
-	golog.Info(reb.Typ)
-	if bugUid != uid && uid != cache.SUPERID {
-		return reb.Error("没有权限")
-	}
-	rows, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
-		strings.Split(spids, ","))
-	if err != nil {
-		golog.Error(err)
-		return reb.ErrorE(err)
-	}
+// func BugById(id string, uid int64) []byte {
+// 	reb := &EditBug{}
+// 	golog.Info(id)
+// 	alsql := `select b.tid,ifnull(i.name, ''),title,
+// 	ifnull(l.name, ''), ifnull(p.name, ''), ifnull(e.name, ''),spusers,ifnull(v.name, ''),content, b.uid
+// 	from bug.bugs as b
+// 	left join bug.importants as i on i.id=b.iid
+// 	left join bug.level as l on l.id=b.lid
+// 	left join bug.project as p  on p.id=b.pid
+// 	left join bug.environment as e  on e.id=b.eid
+// 	left join version as v  on v.id=b.vid
+// 	where b.id=? `
+// 	var spids string
+// 	var bugUid int64
+// 	err := db.Mconn.GetOne(alsql, id).Scan(&reb.Typ, &reb.Important, &reb.Title, &reb.Level, &reb.Projectname,
+// 		&reb.Envname, &spids, &reb.Version, &reb.Content, &bugUid)
+// 	if err != nil {
+// 		golog.Error(err)
+// 		return reb.ErrorE(err)
+// 	}
+// 	golog.Info(reb.Typ)
+// 	if bugUid != uid && uid != cache.SUPERID {
+// 		return reb.Error("没有权限")
+// 	}
+// 	rows, err := db.Mconn.GetRowsIn("select realname from user where id in (?)",
+// 		strings.Split(spids, ","))
+// 	if err != nil {
+// 		golog.Error(err)
+// 		return reb.ErrorE(err)
+// 	}
 
-	for rows.Next() {
-		var name string
-		err = rows.Scan(&name)
-		if err != nil {
-			golog.Info(err)
-			continue
-		}
-		reb.Selectusers = append(reb.Selectusers, name)
-	}
-	rows.Close()
-	reb.Content = html.UnescapeString(reb.Content)
-	return reb.Marshal()
-}
+// 	for rows.Next() {
+// 		var name string
+// 		err = rows.Scan(&name)
+// 		if err != nil {
+// 			golog.Info(err)
+// 			continue
+// 		}
+// 		reb.Selectusers = append(reb.Selectusers, name)
+// 	}
+// 	rows.Close()
+// 	reb.Content = html.UnescapeString(reb.Content)
+// 	return reb.Marshal()
+// }
 
 // func (reb *EditBug) CheckBug() (*model.Bug, error) {
 // 	// 将获取的数据转为可以存表的数据

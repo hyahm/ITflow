@@ -1,15 +1,14 @@
 package model
 
 import (
-	"encoding/json"
 	"itflow/db"
 
 	"github.com/hyahm/golog"
 )
 
 type Level struct {
-	Id   int64  `json:"id"`
-	Name string `json:"name"`
+	Id   int64  `json:"id" db:"id,default"`
+	Name string `json:"name" db:"name"`
 }
 
 func GetLevelKeyNameByUid() ([]KeyName, error) {
@@ -31,38 +30,22 @@ func GetLevelKeyNameByUid() ([]KeyName, error) {
 	return kns, nil
 }
 
-type RequestLevel struct {
-	Id   int64  `json:"id"`
-	Name string `json:"name"`
-	Code int    `json:"code"`
-}
-
-type Levels struct {
-	Levels []*Level `json:"levels"`
-	Code   int      `json:"code"`
-	Msg    string   `json:"msg"`
-}
-
-type Update_level struct {
-	Id      int64  `json:"id"`
-	Name    string `json:"name"`
-	OldName string `json:"oldname"`
-}
-
-func (ll *Levels) Marshal() []byte {
-	send, err := json.Marshal(ll)
+func (level *Level) Create() error {
+	ids, err := db.Mconn.InsertInterfaceWithID(level, "insert into level($key) values($value)")
 	if err != nil {
 		golog.Error(err)
+		return err
 	}
-	return send
+	level.Id = ids[0]
+	return nil
 }
 
-func (ll *Levels) Error(msg string) []byte {
-	ll.Code = 1
-	ll.Msg = msg
-	return ll.Marshal()
+func (level *Level) Update() error {
+	_, err := db.Mconn.UpdateInterface(level, "update level set $set where id=?", level.Id)
+	return err
 }
 
-func (ll *Levels) ErrorE(err error) []byte {
-	return ll.Error(err.Error())
+func DeleteLevel(id interface{}) error {
+	_, err := db.Mconn.Delete("delete from level where id=?", id)
+	return err
 }

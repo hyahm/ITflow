@@ -110,7 +110,7 @@ func CheckRole(w http.ResponseWriter, r *http.Request) bool {
 		}
 	}
 	if !hasPerm {
-		w.Write([]byte("没有页面权限"))
+		w.Write(response.Error("没有页面权限"))
 		return true
 	}
 
@@ -119,7 +119,7 @@ func CheckRole(w http.ResponseWriter, r *http.Request) bool {
 	handleName := xmux.GetInstance(r).Get(xmux.CURRFUNCNAME).(string)
 	// 这个值就是判断有没有这个操作权限
 	if !result[permissionMap[handleName]] {
-		w.Write([]byte("没有权限"))
+		w.Write(response.Error("没有权限"))
 		return true
 	}
 	return false

@@ -9,7 +9,7 @@ import (
 )
 
 func GetEnvKeyName(w http.ResponseWriter, r *http.Request) {
-	pkns, err := model.GetEnvKeyNameByUid()
+	pkns, err := model.GetAllEnv()
 	if err != nil {
 		golog.Error(err)
 		w.Write(response.ErrorE(err))

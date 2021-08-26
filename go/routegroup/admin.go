@@ -2,7 +2,6 @@ package routegroup
 
 import (
 	"itflow/handle"
-	"itflow/internal/user"
 	"itflow/midware"
 
 	"github.com/hyahm/xmux"
@@ -18,7 +17,7 @@ func init() {
 	curl http://127.0.0.1:10001/admin/reset?password=123
 	`).DelModule(midware.CheckToken)
 
-	Admin.Post("/info/update", handle.UpdateInfo).Bind(&user.UserInfo{}).
-		AddModule(midware.JsonToStruct).ApiDescribe("只做保留，没有用到")
+	// Admin.Post("/info/update", handle.UpdateInfo).Bind(&user.UserInfo{}).
+	// 	AddModule(midware.JsonToStruct).ApiDescribe("只做保留，没有用到")
 
 }

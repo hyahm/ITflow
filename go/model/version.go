@@ -93,3 +93,8 @@ func GetVersionKeyNameByProjectId(pid interface{}) ([]KeyName, error) {
 	}
 	return kns, nil
 }
+
+func DeleteVersion(id interface{}) error {
+	_, err := db.Mconn.Delete("delete from version where id=?", id)
+	return err
+}

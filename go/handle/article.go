@@ -67,33 +67,6 @@ func (el *envList) ErrorE(err error) []byte {
 	return el.Error(err.Error())
 }
 
-func GetEnv(w http.ResponseWriter, r *http.Request) {
-	el := &envList{
-		EnvList: make([]string, 0),
-	}
-
-	rows, err := db.Mconn.GetRows("select name from environment")
-	if err != nil {
-		golog.Error(err)
-		w.Write(el.ErrorE(err))
-		return
-	}
-
-	for rows.Next() {
-		var name string
-		err = rows.Scan(&name)
-		if err != nil {
-			golog.Info(err)
-			continue
-		}
-		el.EnvList = append(el.EnvList, name)
-	}
-	rows.Close()
-	w.Write(el.Marshal())
-	return
-
-}
-
 type senduserinfo struct {
 	Nickname string `json:"nickname"`
 	Realname string `json:"realname"`
@@ -210,21 +183,6 @@ func GetProjectUser(w http.ResponseWriter, r *http.Request) {
 type versionList struct {
 	VersionList []string `json:"versionlist"`
 	Code        int      `json:"code"`
-}
-
-func GetVersion(w http.ResponseWriter, r *http.Request) {
-
-	vl := &versionList{
-		VersionList: make([]string, 0),
-	}
-
-	// for _, v := range cache.CacheVidVersion {
-	// 	vl.VersionList = append(vl.VersionList, v)
-	// }
-	send, _ := json.Marshal(vl)
-	w.Write(send)
-	return
-
 }
 
 type uploadImage struct {

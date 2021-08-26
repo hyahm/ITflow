@@ -4,6 +4,7 @@ import (
 	"itflow/classify"
 	"itflow/internal/user"
 	"itflow/model"
+	"itflow/response"
 	"net/http"
 	"sync/atomic"
 
@@ -52,14 +53,18 @@ func UserInfo(w http.ResponseWriter, r *http.Request) {
 	userinfo := &user.UserInfo{}
 	userinfo.NickName = xmux.GetInstance(r).Get("nickname").(string)
 	uid := xmux.GetInstance(r).Get("uid").(int64)
+	golog.Info(uid)
 	err := userinfo.GetUserInfo(uid)
 	if err != nil {
 		golog.Error(err)
-		userinfo.Msg = err.Error()
-		userinfo.Code = 1
 		w.Write(userinfo.Json())
 		return
 	}
-	w.Write(userinfo.Json())
-	return
+	if len(userinfo.Roles) == 0 {
+		userinfo.Roles = append(userinfo.Roles, "test")
+	}
+	res := response.Response{
+		Data: userinfo,
+	}
+	w.Write(res.Marshal())
 }

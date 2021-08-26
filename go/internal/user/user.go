@@ -8,6 +8,7 @@ import (
 	"itflow/db"
 	"itflow/encrypt"
 	"itflow/jwt"
+	"itflow/model"
 	"strings"
 
 	"github.com/hyahm/golog"
@@ -58,15 +59,16 @@ func (login *Login) Check() (*RespLogin, error) {
 }
 
 type User struct {
-	Id          int    `json:"id"`
-	Createtime  int64  `json:"createtime"`
-	Realname    string `json:"realname"`
-	Nickname    string `json:"nickname"`
-	Email       string `json:"email"`
-	Disable     int    `json:"disable"`
-	StatusGroup string `json:"statusgroup"`
-	RoleGroup   string `json:"rolegroup"`
-	Position    string `json:"position"`
+	Id         int     `json:"id" db:"id,default"`
+	Createtime int64   `json:"createtime" db:"createtime,default"`
+	Realname   string  `json:"realname" db:"realname,default"`
+	Nickname   string  `json:"nickname" db:"nickname,default"`
+	Email      string  `json:"email" db:"email,default"`
+	Headmg     string  `json:"headimg" db:"headimg,default"`
+	Disable    bool    `json:"disable" db:"disable"`
+	JobId      int64   `json:"jid" db:"jid"`
+	ShowStatus []int64 `json:"showstatus" db:"showstatus"`
+	CreateUid  int64   `json:"createuid" db:"createuid"`
 }
 type UserList struct {
 	Userlist []*User `json:"userlist"`
@@ -75,18 +77,17 @@ type UserList struct {
 
 type UserInfo struct {
 	Roles    []string `json:"roles" type:"array" need:"否" default:"" information:"角色组"`
-	Code     int      `json:"code" type:"string" need:"是" default:"" information:"状态码， 0为成功"`
 	Avatar   string   `json:"avatar" type:"string" need:"否" default:"" information:"个人头像地址"`
 	NickName string   `json:"name" type:"string" need:"否" default:"" information:"用户昵称"`
-	Msg      string   `json:"msg,omitempty" type:"string" need:"否" default:"" information:"错误信息"`
-	Realname string   `json:"realname,omitempty" type:"string" need:"否" default:"" information:"真实姓名"`
-	Email    string   `json:"email,omitempty" type:"string" need:"否" default:"" information:"邮箱地址"`
-	Uid      int64    `json:"uid,omitempty" type:"int" need:"否" default:"" information:"用户id"`
+	// Realname string   `json:"realname,omitempty" type:"string" need:"否" default:"" information:"真实姓名"`
+	// Email string `json:"email,omitempty" type:"string" need:"否" default:"" information:"邮箱地址"`
+	// Uid int64 `json:"uid,omitempty" type:"int" need:"否" default:"" information:"用户id"`
 }
 
 func (ui *UserInfo) GetUserInfo(uid int64) error {
 	ui.Roles = make([]string, 0)
-	err := db.Mconn.GetOne("select nickname, headimg from user where id=?", uid).Scan(&ui.NickName, &ui.Avatar)
+	var jid int64
+	err := db.Mconn.GetOne("select nickname, headimg, jid from user where id=?", uid).Scan(&ui.NickName, &ui.Avatar, &jid)
 	if err != nil {
 		golog.Error(err)
 		return err
@@ -97,82 +98,52 @@ func (ui *UserInfo) GetUserInfo(uid int64) error {
 		return nil
 	}
 
-	var permids string
-	golog.Info(uid)
-	err = db.Mconn.GetOne("select permids from rolegroup where id = (select rgid from jobs where id=(select jid from user where id=?))", uid).Scan(&permids)
+	permids, err := model.GetPermIdsByUid(uid)
 	if err != nil {
 		golog.Error(err)
 		return err
 	}
-	rows, err := db.Mconn.GetRowsIn("select r.name from perm as p join roles as r on p.id in (?) and p.find=true and p.rid=r.id",
-		strings.Split(permids, ","))
-
-	if err != nil {
-		golog.Error(err)
-		return err
-	}
-	for rows.Next() {
-		role := new(string)
-		err = rows.Scan(role)
-		if err != nil {
-			golog.Error(err)
-			continue
-		}
-		ui.Roles = append(ui.Roles, *role)
-	}
-
-	rows.Close()
-	var manager_count int
-	golog.Info(uid)
-	err = db.Mconn.GetOne("select count(id) from jobs where hypo=(select jid from user where id=?)", uid).Scan(&manager_count)
-	if err != nil {
-		golog.Error(err)
-	}
-	golog.Info(manager_count)
-	if len(ui.Roles) == 0 {
+	if len(permids) == 0 {
 		ui.Roles = append(ui.Roles, "test")
-	} else {
-		if manager_count > 0 {
-			ui.Roles = append(ui.Roles, "user")
-		}
+		return nil
 	}
-
-	return nil
+	ui.Roles, err = model.GetPermsionByIds(permids)
+	return err
 }
 
-func (ui *UserInfo) Update() error {
-	sql := "select rid, headimg from user where nickname=?"
-	var rid string
-	err := db.Mconn.GetOne(sql, ui.NickName).Scan(&rid, &ui.Avatar)
-	if err != nil {
-		golog.Error(err)
-		return err
-	}
+// func (ui *UserInfo) Update() error {
+// 	sql := "select rid, headimg from user where nickname=?"
+// 	var rid string
+// 	err := db.Mconn.GetOne(sql, ui.NickName).Scan(&rid, &ui.Avatar)
+// 	if err != nil {
+// 		golog.Error(err)
+// 		return err
+// 	}
 
-	// 管理员
-	if ui.Uid == cache.SUPERID {
-		ui.Roles = append(ui.Roles, ui.NickName)
-	} else {
-		getrole := "select name from roles where id in (select rolelist from rolegroup where id=?)"
-		rows, err := db.Mconn.GetRows(getrole, rid)
-		if err != nil {
-			golog.Error(err)
-			return err
-		}
-		for rows.Next() {
-			role := new(string)
-			err = rows.Scan(role)
-			if err != nil {
-				golog.Error(err)
-				continue
-			}
-			ui.Roles = append(ui.Roles, *role)
-		}
-		rows.Close()
-	}
+// 	// 管理员
+// 	if ui.Uid == cache.SUPERID {
+// 		ui.Roles = append(ui.Roles, ui.NickName)
+// 	} else {
+// 		getrole := "select name from roles where id in (select rolelist from rolegroup where id=?)"
+// 		rows, err := db.Mconn.GetRows(getrole, rid)
+// 		if err != nil {
+// 			golog.Error(err)
+// 			return err
+// 		}
+// 		for rows.Next() {
+// 			role := new(string)
+// 			err = rows.Scan(role)
+// 			if err != nil {
+// 				golog.Error(err)
+// 				continue
+// 			}
+// 			ui.Roles = append(ui.Roles, *role)
+// 		}
+// 		rows.Close()
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 func (ui *UserInfo) Json() []byte {
 	send, err := json.Marshal(ui)

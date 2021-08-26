@@ -17,7 +17,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func Create(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 
 	getuser := xmux.GetInstance(r).Data.(*model.User)
@@ -45,7 +45,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	w.Write(res.Marshal())
 }
 
-func RemoveUser(w http.ResponseWriter, r *http.Request) {
+func Delete(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("id")
 	err := model.DeleteUser(id)
@@ -124,7 +124,7 @@ func DisableUser(w http.ResponseWriter, r *http.Request) {
 }
 
 // 显示自己能管理的权限，不显示自己的
-func UserList(w http.ResponseWriter, r *http.Request) {
+func Read(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 	us, err := model.GetAllUsers(uid)
 	if err != nil {
@@ -138,7 +138,7 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 	w.Write(res.Marshal())
 }
 
-func UserUpdate(w http.ResponseWriter, r *http.Request) {
+func Update(w http.ResponseWriter, r *http.Request) {
 	// 跟 userlist 一样，
 	// 根据uid 查找
 	errorcode := &response.Response{}

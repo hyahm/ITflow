@@ -72,3 +72,30 @@ func GetMyStatusList(id interface{}) ([]string, error) {
 	}
 	return strings.Split(sids, ","), nil
 }
+
+// 获取的就是表的所有字段
+func GetAllStatus() ([]Status, error) {
+	statuss := make([]Status, 0)
+	err := db.Mconn.Select(&statuss, "select * from status")
+	return statuss, err
+}
+
+func (status *Status) Create() error {
+	ids, err := db.Mconn.InsertInterfaceWithID(status, "insert into status($key) values($value)")
+	if err != nil {
+		golog.Error(err)
+		return err
+	}
+	status.ID = ids[0]
+	return nil
+}
+
+func (status *Status) Update() error {
+	_, err := db.Mconn.UpdateInterface(status, "update status set $set where id=?", status.ID)
+	return err
+}
+
+func DeleteStatus(id interface{}) error {
+	_, err := db.Mconn.Delete("delete from status where id=?", id)
+	return err
+}

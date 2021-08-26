@@ -9,7 +9,7 @@ import (
 )
 
 func GetImportantKeyName(w http.ResponseWriter, r *http.Request) {
-	pkns, err := model.GetImportantKeyNameByUid()
+	pkns, err := model.GetAllImportant()
 	if err != nil {
 		golog.Error(err)
 		w.Write(response.ErrorE(err))

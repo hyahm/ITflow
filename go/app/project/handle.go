@@ -1,4 +1,4 @@
-package handle
+package project
 
 import (
 	"itflow/db"
@@ -10,7 +10,7 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-func ProjectList(w http.ResponseWriter, r *http.Request) {
+func Read(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 	projects, err := model.GetAllProjects(uid)
 	if err != nil {
@@ -25,7 +25,7 @@ func ProjectList(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func AddProject(w http.ResponseWriter, r *http.Request) {
+func Create(w http.ResponseWriter, r *http.Request) {
 
 	project := xmux.GetInstance(r).Data.(*model.Project)
 	uid := xmux.GetInstance(r).Get("uid").(int64)
@@ -43,7 +43,7 @@ func AddProject(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func UpdateProject(w http.ResponseWriter, r *http.Request) {
+func Update(w http.ResponseWriter, r *http.Request) {
 	project := xmux.GetInstance(r).Data.(*model.Project)
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 	err := project.Update(uid)
@@ -71,7 +71,7 @@ func ProjectKeys(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func DeleteProject(w http.ResponseWriter, r *http.Request) {
+func Delete(w http.ResponseWriter, r *http.Request) {
 
 	errorcode := &response.Response{}
 	id := r.FormValue("id")
@@ -100,6 +100,4 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(errorcode.Success())
-	return
-
 }

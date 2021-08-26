@@ -2,9 +2,8 @@ package system
 
 import (
 	"itflow/handle"
-	"itflow/internal/rolegroup"
 	"itflow/midware"
-	"itflow/response"
+	"itflow/model"
 
 	"github.com/hyahm/xmux"
 )
@@ -21,14 +20,10 @@ func init() {
 	RoleGroup.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	RoleGroup.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
-	RoleGroup.Post("/rolegroup/add", handle.AddRoleGroup).Bind(&rolegroup.ReqRoleGroup{}).
-		AddModule(midware.JsonToStruct).
-		ApiDescribe("添加角色组").ApiReqStruct(&rolegroup.ReqRoleGroup{}).ApiResStruct(&response.Response{})
-
-	RoleGroup.Post("/rolegroup/edit", handle.EditRoleGroup).Bind(&rolegroup.ReqRoleGroup{}).
-		AddModule(midware.JsonToStruct).
-		ApiDescribe("修改角色组").ApiReqStruct(&rolegroup.ReqRoleGroup{}).ApiResStruct(&response.Response{})
-
+	RoleGroup.Post("/rolegroup/add", handle.AddRoleGroup).Bind(&model.RoleGroup{}).
+		AddModule(midware.JsonToStruct)
+	RoleGroup.Post("/rolegroup/edit", handle.EditRoleGroup).Bind(&model.RoleGroup{}).
+		AddModule(midware.JsonToStruct)
 	RoleGroup.Post("/rolegroup/list", handle.RoleGroupList)
 
 	RoleGroup.Post("/rolegroup/get", handle.GetRoleGroupName)
@@ -39,7 +34,7 @@ func init() {
 	// 获取编辑组的权限
 	RoleGroup.Get("/rolegroup/perm/get", handle.GetRoleGroupPerm)
 
-	RoleGroup.Post("/rolegroup/template", handle.RoleTemplate)
+	// RoleGroup.Post("/rolegroup/template", handle.RoleTemplate)
 
 	// RoleGroup.Pattern("/rolegroup/name").Get(handle.GetRoleGroup)
 }

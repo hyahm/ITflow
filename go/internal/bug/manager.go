@@ -1,6 +1,5 @@
 package bug
 
-
 type BugManager struct {
 	Page   int    `json:"page"`
 	Limit  int    `json:"limit"`

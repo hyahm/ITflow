@@ -6,8 +6,6 @@ import (
 	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/bug"
-	"itflow/internal/role"
-	"itflow/internal/user"
 	"itflow/model"
 	"itflow/response"
 	"net/http"
@@ -106,65 +104,41 @@ func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func GetInfo(w http.ResponseWriter, r *http.Request) {
+// func GetInfo(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
+// 	errorcode := &response.Response{}
 
-	sl := &user.UserInfo{}
-	sl.NickName = xmux.GetInstance(r).Get("nickname").(string)
-	err := db.Mconn.GetOne("select email,realname from user where nickname=?", sl.NickName).Scan(&sl.Email, &sl.Realname)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+// 	sl := &user.UserInfo{}
+// 	sl.NickName = xmux.GetInstance(r).Get("nickname").(string)
+// 	err := db.Mconn.GetOne("select email,realname from user where nickname=?", sl.NickName).Scan(&sl.Email, &sl.Realname)
+// 	if err != nil {
+// 		golog.Error(err)
+// 		w.Write(errorcode.ErrorE(err))
+// 		return
+// 	}
 
-	send, _ := json.Marshal(sl)
-	w.Write(send)
+// 	send, _ := json.Marshal(sl)
+// 	w.Write(send)
 
-}
+// }
 
-func UpdateInfo(w http.ResponseWriter, r *http.Request) {
-	errorcode := &response.Response{}
-	sl := xmux.GetInstance(r).Data.(*user.UserInfo)
-	uid := xmux.GetInstance(r).Get("uid").(int64)
-	// 修改用户信息
-	_, err := db.Mconn.Update("update user set email=?,realname=?,nickname=? where id=?", sl.Email, sl.Realname, sl.NickName, uid)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
+// func UpdateInfo(w http.ResponseWriter, r *http.Request) {
+// 	errorcode := &response.Response{}
+// 	sl := xmux.GetInstance(r).Data.(*user.UserInfo)
+// 	uid := xmux.GetInstance(r).Get("uid").(int64)
+// 	// 修改用户信息
+// 	_, err := db.Mconn.Update("update user set email=?,realname=?,nickname=? where id=?", sl.Email, sl.Realname, sl.NickName, uid)
+// 	if err != nil {
+// 		golog.Error(err)
+// 		w.Write(errorcode.ErrorE(err))
+// 		return
+// 	}
 
-	send, _ := json.Marshal(sl)
-	w.Write(send)
-	return
+// 	send, _ := json.Marshal(sl)
+// 	w.Write(send)
+// 	return
 
-}
-
-func UpdateRoles(w http.ResponseWriter, r *http.Request) {
-
-	errorcode := &response.Response{}
-
-	sl := xmux.GetInstance(r).Data.(*role.Role)
-	var rid int64
-	err := model.CheckRoleNameInGroup(sl.Name, &rid)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	_, err = db.Mconn.Update("update user set rid=? where id=?", rid, sl.Id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-
-	w.Write(errorcode.Success())
-
-}
+// }
 
 func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 

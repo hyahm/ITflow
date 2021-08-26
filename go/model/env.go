@@ -6,26 +6,34 @@ import (
 	"github.com/hyahm/golog"
 )
 
-type environment struct {
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
+type Env struct {
+	ID   int64  `json:"id" db:"id,default"`
+	Name string `json:"name" db:"name"`
 }
 
-func GetEnvKeyNameByUid() ([]KeyName, error) {
-	rows, err := db.Mconn.GetRows("select id,name from environment")
+// 获取的就是表的所有字段
+func GetAllEnv() ([]Env, error) {
+	envs := make([]Env, 0)
+	err := db.Mconn.Select(&envs, "select * from environment")
+	return envs, err
+}
+
+func (env *Env) Create() error {
+	ids, err := db.Mconn.InsertInterfaceWithID(env, "insert into environment($key) values($value)")
 	if err != nil {
-		return nil, err
+		golog.Error(err)
+		return err
 	}
-	defer rows.Close()
-	kns := make([]KeyName, 0)
-	for rows.Next() {
-		kn := KeyName{}
-		err = rows.Scan(&kn.ID, &kn.Name)
-		if err != nil {
-			golog.Error(err)
-			continue
-		}
-		kns = append(kns, kn)
-	}
-	return kns, nil
+	env.ID = ids[0]
+	return nil
+}
+
+func (env *Env) Update() error {
+	_, err := db.Mconn.UpdateInterface(env, "update environment set $set where id=?", env.ID)
+	return err
+}
+
+func DeleteEnv(id interface{}) error {
+	_, err := db.Mconn.Delete("delete from environment where id=?", id)
+	return err
 }
