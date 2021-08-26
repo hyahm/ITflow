@@ -102,3 +102,12 @@ export function delBug(id) {
     params: { id }
   })
 }
+
+export function updateBug(data) {
+  return request({
+    url: '/bug/update',
+    method: 'post',
+    data
+  })
+}
+

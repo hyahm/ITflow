@@ -7,7 +7,7 @@
         <!--<SourceUrlDropdown v-model="postForm.source_uri" />-->
         <el-button
           :disabled="ispub"
-          style="margin-left: 10px;"
+          style="margin-left: 10px"
           type="success"
           @click="submitForm"
           >发布
@@ -18,9 +18,7 @@
         <el-row>
           <el-form-item label="任务类型: ">
             <el-radio-group v-model="typ">
-              <el-radio v-for="(t, key) in ts" :key="key" :label="key">{{
-                t
-              }}</el-radio>
+              <el-radio v-for="(t, key) in ts" :key="key" :label="key">{{ t }}</el-radio>
             </el-radio-group>
           </el-form-item>
           <!--<el-col :span="24" >-->
@@ -30,20 +28,13 @@
               :maxlength="100"
               placeholder="请输入标题"
               clearable
-              style="width: 80%;"
+              style="width: 80%"
             />
           </el-form-item>
         </el-row>
 
-        <el-form-item
-          style="display: inline-block;width: 400px"
-          label="项目名称："
-        >
-          <el-select
-            v-model="postForm.pid"
-            @change="changeProject"
-            placeholder="请选择"
-          >
+        <el-form-item style="display: inline-block; width: 400px" label="项目名称：">
+          <el-select v-model="postForm.pid" @change="changeProject" placeholder="请选择">
             <el-option
               v-for="item in projects"
               :key="item.id"
@@ -55,7 +46,7 @@
 
         <el-form-item
           v-if="typ == 1"
-          style="display: inline-block;width: 400px"
+          style="display: inline-block; width: 400px"
           label="运行环境："
         >
           <el-select v-model="postForm.eid" placeholder="请选择">
@@ -70,7 +61,7 @@
 
         <el-form-item
           v-if="typ == 1"
-          style="display: inline-block;width: 400px"
+          style="display: inline-block; width: 400px"
           label="应用版本："
         >
           <el-select v-model="postForm.vid" placeholder="请选择">
@@ -85,7 +76,7 @@
 
         <el-form-item
           v-if="typ == 1"
-          style="display: inline-block;width: 400px"
+          style="display: inline-block; width: 400px"
           label="优先级别："
         >
           <el-select v-model="postForm.lid" placeholder="请选择">
@@ -103,7 +94,7 @@
         <!--</el-form-item>-->
         <el-form-item
           v-if="typ == 1"
-          style="display: inline-block;width: 400px"
+          style="display: inline-block; width: 400px"
           label="重要性："
         >
           <el-select v-model="postForm.iid" placeholder="请选择">
@@ -116,10 +107,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item
-          style="display: inline-block;width: 400px"
-          label="分配任务："
-        >
+        <el-form-item style="display: inline-block; width: 400px" label="分配任务：">
           <el-select v-model="postForm.spusers" multiple placeholder="分配任务">
             <el-option
               v-for="item in users"
@@ -134,11 +122,7 @@
 
         <el-form-item>
           <div id="main">
-            <mavon-editor
-              ref="md"
-              v-model="postForm.content"
-              @imgAdd="imgAdd"
-            />
+            <mavon-editor ref="md" v-model="postForm.content" @imgAdd="imgAdd" />
           </div>
           <!-- <div class="editor-container">
             <Tinymce ref="editor" v-model="postForm.content" />
@@ -151,7 +135,7 @@
 
 <script>
 import Sticky from "@/components/Sticky"; // 粘性header组件
-import { fetchBug, createBug } from "@/api/bugs";
+import { fetchBug, createBug, updateBug } from "@/api/bugs";
 import { uploadImg } from "@/api/uploadimg";
 import {
   getEnvKeyName,
@@ -160,7 +144,7 @@ import {
   getImportants,
   getTyp,
   getUserKeyNameByProject,
-  getVersionKeyNameByProject
+  getVersionKeyNameByProject,
 } from "@/api/get";
 
 const defaultForm = {
@@ -174,20 +158,20 @@ const defaultForm = {
   eid: undefined,
   iid: undefined,
   vid: undefined,
-  tid: 1
+  tid: 1,
 };
 
 export default {
   name: "ArticleDetail",
   components: {
     // Tinymce,
-    Sticky
+    Sticky,
   },
   props: {
     isEdit: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {
@@ -201,7 +185,7 @@ export default {
       projects: [],
       envnames: [],
       ts: [],
-      typ: "1"
+      typ: "1",
     };
   },
   activated() {
@@ -226,17 +210,17 @@ export default {
   },
   methods: {
     getversionMap(projectid) {
-      getVersionKeyNameByProject({ project_id: projectid }).then(resp => {
+      getVersionKeyNameByProject({ project_id: projectid }).then((resp) => {
         this.versions = resp.data.data;
       });
     },
     getuserMap(projectid) {
-      getUserKeyNameByProject({ project_id: projectid }).then(resp => {
+      getUserKeyNameByProject({ project_id: projectid }).then((resp) => {
         this.users = resp.data.data;
       });
     },
     gettyp() {
-      getTyp().then(resp => {
+      getTyp().then((resp) => {
         this.ts = resp.data.ts;
       });
     },
@@ -247,28 +231,28 @@ export default {
     },
 
     getimportants() {
-      getImportants().then(resp => {
+      getImportants().then((resp) => {
         this.importants = resp.data.data;
       });
     },
     getlevels() {
-      getLevels().then(resp => {
+      getLevels().then((resp) => {
         this.levels = resp.data.data;
       });
     },
     getenv() {
-      getEnvKeyName().then(resp => {
+      getEnvKeyName().then((resp) => {
         this.envnames = resp.data.data;
       });
     },
     getproject() {
-      getProjectKeyName().then(resp => {
+      getProjectKeyName().then((resp) => {
         this.projects = resp.data.data;
       });
     },
 
     fetchData(id) {
-      fetchBug(id).then(resp => {
+      fetchBug(id).then((resp) => {
         const dd = resp.data.data;
         this.postForm = dd;
         this.getuserMap(this.postForm.pid);
@@ -281,7 +265,7 @@ export default {
       if (this.postForm.title.length > 40) {
         this.$message({
           message: "标题长度必须小于40位",
-          type: "error"
+          type: "error",
         });
         this.ispub = false;
         return;
@@ -289,7 +273,7 @@ export default {
       if (this.postForm.spusers.length < 1) {
         this.$message({
           message: "请选择指定给谁",
-          type: "error"
+          type: "error",
         });
         this.ispub = false;
         return;
@@ -297,7 +281,7 @@ export default {
       if (this.postForm.pid == undefined) {
         this.$message({
           message: "请选择项目名称",
-          type: "error"
+          type: "error",
         });
         this.ispub = false;
         return;
@@ -305,7 +289,7 @@ export default {
       if (this.typ === 1 && this.postForm.lid == undefined) {
         this.$message({
           message: "请选择项目级别",
-          type: "error"
+          type: "error",
         });
         this.ispub = false;
         return;
@@ -313,7 +297,7 @@ export default {
       if (this.typ === 1 && this.postForm.iid == undefined) {
         this.$message({
           message: "请选择项目严重程度",
-          type: "error"
+          type: "error",
         });
         this.ispub = false;
         return;
@@ -321,7 +305,7 @@ export default {
       if (this.postForm.content.length < 1) {
         this.$message({
           message: "请填写内容",
-          type: "error"
+          type: "error",
         });
         this.ispub = false;
         return;
@@ -329,7 +313,7 @@ export default {
       if (this.typ === 1 && this.postForm.eid == undefined) {
         this.$message({
           message: "请选择运行环境",
-          type: "error"
+          type: "error",
         });
         this.ispub = false;
         return;
@@ -337,30 +321,40 @@ export default {
       if (this.typ === 1 && this.postForm.vid == undefined) {
         this.$message({
           message: "请选择版本",
-          type: "error"
+          type: "error",
         });
         this.ispub = false;
         return;
       }
-      this.$refs.postForm.validate(valid => {
+      this.$refs.postForm.validate((valid) => {
         if (valid) {
-          this.postForm.tid = parseInt(this.tid);
-          createBug(this.postForm).then(resp => {
-            if (this.postForm.id === 0) {
-              this.$notify({
-                title: "成功",
-                message: "发布成功",
-                type: "success"
-              });
-              this.$router.push({ path: "/bug/edit/" + resp.data.id });
-            } else {
+          if (this.isEdit) {
+            this.postForm.tid = parseInt(this.tid);
+            updateBug(this.postForm).then(() => {
               this.$notify({
                 title: "成功",
                 message: "修改成功",
-                type: "success"
+                type: "success",
               });
-            }
-          });
+            });
+          } else {
+            createBug(this.postForm).then((resp) => {
+              if (this.postForm.id === 0) {
+                this.$notify({
+                  title: "成功",
+                  message: "发布成功",
+                  type: "success",
+                });
+                this.$router.push({ path: "/bug/edit/" + resp.data.id });
+              } else {
+                this.$notify({
+                  title: "成功",
+                  message: "修改成功",
+                  type: "success",
+                });
+              }
+            });
+          }
         }
         this.ispub = false;
       });
@@ -369,28 +363,25 @@ export default {
       // 第一步.将图片上传到服务器.
       var formdata = new FormData();
       formdata.append("image", $file);
-      uploadImg(formdata).then(resp => {
+      uploadImg(formdata).then((resp) => {
         this.$refs.md.$img2Url(pos, resp.data.url);
       });
     },
     draftForm() {
-      if (
-        this.postForm.content.length === 0 ||
-        this.postForm.title.length === 0
-      ) {
+      if (this.postForm.content.length === 0 || this.postForm.title.length === 0) {
         this.$message({
           message: "请填写必要的标题和内容",
-          type: "warning"
+          type: "warning",
         });
         return;
       }
       this.$message({
         message: "保存成功",
         type: "success",
-        duration: 1000
+        duration: 1000,
       });
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -42,3 +42,17 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	w.Write(res.Marshal())
 
 }
+
+// 添加
+func Update(w http.ResponseWriter, r *http.Request) {
+	bug := xmux.GetInstance(r).Data.(*model.Bug)
+	// 判断是否有默认值
+	err := bug.Update()
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
+		return
+	}
+	w.Write(response.Success())
+
+}

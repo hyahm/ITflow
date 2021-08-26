@@ -17,4 +17,6 @@ func init() {
 		AddModule(midware.JsonToStruct)
 
 	TaskManager.Get("/bug/edit", taskcontroller.Get)
+	TaskManager.Post("/bug/update", taskcontroller.Update).Bind(&model.Bug{}).
+		AddModule(midware.JsonToStruct)
 }

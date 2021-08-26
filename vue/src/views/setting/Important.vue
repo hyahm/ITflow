@@ -1,8 +1,6 @@
 <template>
   <div style="padding-left: 20px">
-    <p class="warn-content">
-      bug重要性
-    </p>
+    <p class="warn-content">bug重要性</p>
     <el-table :data="tableData" height="250" style="width: 100%">
       <el-table-column label="Id" width="180">
         <template slot-scope="scope">
@@ -16,13 +14,8 @@
       </el-table-column>
       <el-table-column width="200" label="操作">
         <template slot-scope="scope">
-          <el-button size="mini" @click="handleUpdate(scope.row)"
-            >修改</el-button
-          >
-          <el-button
-            size="mini"
-            type="danger"
-            @click="handleDelete(scope.row.id)"
+          <el-button size="mini" @click="handleUpdate(scope.row)">修改</el-button>
+          <el-button size="mini" type="danger" @click="handleDelete(scope.row.id)"
             >删除</el-button
           >
         </template>
@@ -56,7 +49,7 @@ import {
   getImportant,
   addImportant,
   delImportant,
-  updateImportant
+  updateImportant,
 } from "@/api/important";
 export default {
   name: "Important",
@@ -68,8 +61,8 @@ export default {
       status: "",
       form: {
         id: 0,
-        name: ""
-      }
+        name: "",
+      },
     };
   },
   activated() {
@@ -80,20 +73,20 @@ export default {
   },
   methods: {
     getimportant() {
-      getImportant().then(resp => {
-        this.tableData = resp.data.importantlist;
+      getImportant().then((resp) => {
+        this.tableData = resp.data.data;
       });
     },
     confirm() {
       if (this.form.id === 0) {
-        addImportant(this.form).then(resp => {
+        addImportant(this.form).then((resp) => {
           this.tableData.push({
             id: resp.data.id,
-            name: this.form.name
+            name: this.form.name,
           });
         });
       } else {
-        updateImportant(this.form).then(resp => {
+        updateImportant(this.form).then((resp) => {
           const l = this.tableData.length;
           for (let i = 0; i < l; i++) {
             if (this.tableData[i].id === this.form.id) {
@@ -111,10 +104,10 @@ export default {
       this.$confirm("此操作将关闭bug, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
-          delImportant(id).then(resp => {
+          delImportant(id).then((resp) => {
             const l = this.tableData.length;
             for (let i = 0; i < l; i++) {
               if (this.tableData[i].id === id) {
@@ -127,7 +120,7 @@ export default {
         .catch(() => {
           this.$message({
             type: "info",
-            message: "已取消删除"
+            message: "已取消删除",
           });
         });
     },
@@ -140,8 +133,8 @@ export default {
       this.dialogFormVisible = true;
       this.form.id = row.id;
       this.form.name = row.name;
-    }
-  }
+    },
+  },
 };
 </script>
 

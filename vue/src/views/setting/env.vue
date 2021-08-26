@@ -1,8 +1,6 @@
 <template>
   <div style="padding-left: 20px">
-    <p class="warn-content">
-      正常的，一般至少有个测试环境，和一个生产环境
-    </p>
+    <p class="warn-content">正常的，一般至少有个测试环境，和一个生产环境</p>
     <el-table :data="tableData" height="250" style="width: 100%">
       <el-table-column label="Id" width="180">
         <template slot-scope="scope">
@@ -11,26 +9,19 @@
       </el-table-column>
       <el-table-column label="环境名" width="180">
         <template slot-scope="scope">
-          <span style="margin-left: 10px">{{ scope.row.envname }}</span>
+          <span style="margin-left: 10px">{{ scope.row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="180">
         <template slot-scope="scope">
           <el-button size="mini" @click="updatep(scope.row)">修改</el-button>
-          <el-button
-            size="mini"
-            type="danger"
-            @click="handleDelete(scope.row.id)"
+          <el-button size="mini" type="danger" @click="handleDelete(scope.row.id)"
             >删除</el-button
           >
         </template>
       </el-table-column>
     </el-table>
-    <el-button
-      style="margin: 20px"
-      type="success"
-      size="mini"
-      @click="handleAdd"
+    <el-button style="margin: 20px" type="success" size="mini" @click="handleAdd"
       >添加环境</el-button
     >
     <el-dialog
@@ -41,7 +32,7 @@
     >
       <el-form :model="form">
         <el-form-item label="环境名">
-          <el-input v-model="form.envname" auto-complete="off" />
+          <el-input v-model="form.name" auto-complete="off" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -53,12 +44,7 @@
 </template>
 
 <script>
-import {
-  getEnvName,
-  addEnvName,
-  updateEnvName,
-  deleteEnvName
-} from "@/api/env";
+import { getEnvName, addEnvName, updateEnvName, deleteEnvName } from "@/api/env";
 
 export default {
   name: "Env",
@@ -66,12 +52,12 @@ export default {
     return {
       dialogFormVisible: false,
       form: {
-        envname: "",
+        name: "",
         delivery: false,
-        id: 0
+        id: 0,
       },
       formLabelWidth: "120px",
-      tableData: []
+      tableData: [],
     };
   },
   created() {
@@ -79,23 +65,23 @@ export default {
   },
   methods: {
     getenvname() {
-      getEnvName().then(resp => {
-        this.tableData = resp.data.envlist;
+      getEnvName().then((resp) => {
+        this.tableData = resp.data.data;
       });
     },
     handleAdd() {
       this.form.id = 0;
-      this.form.envname = "";
+      this.form.name = "";
       this.dialogFormVisible = true;
     },
     handleDelete(id) {
       this.$confirm("此操作将关闭bug, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
-          deleteEnvName(id).then(resp => {
+          deleteEnvName(id).then((resp) => {
             const fl = this.tableData.length;
             for (let i = 0; i < fl; i++) {
               if (this.tableData[i].id === id) {
@@ -109,31 +95,31 @@ export default {
         .catch(() => {
           this.$message({
             type: "info",
-            message: "已取消删除"
+            message: "已取消删除",
           });
         });
     },
     updatep(row) {
       this.dialogFormVisible = true;
       this.form.id = row.id;
-      this.form.envname = row.envname;
+      this.form.name = row.name;
     },
     confirm() {
       this.dialogFormVisible = false;
       if (this.form.id === 0) {
-        addEnvName(this.form.envname).then(resp => {
+        addEnvName(this.form.envname).then((resp) => {
           this.tableData.push({
             id: resp.data.id,
-            envname: this.form.envname
+            name: this.form.name,
           });
           this.$message.success("添加成功");
         });
       } else {
-        updateEnvName(this.form).then(resp => {
+        updateEnvName(this.form).then((resp) => {
           const fl = this.tableData.length;
           for (let i = 0; i < fl; i++) {
             if (this.tableData[i].id === this.form.id) {
-              this.tableData[i].envname = this.form.envname;
+              this.tableData[i].name = this.form.name;
               break;
             }
           }
@@ -143,10 +129,10 @@ export default {
     },
     cancel() {
       this.dialogFormVisible = false;
-      this.form.envname = "";
+      this.form.name = "";
       this.form.id = 0;
-    }
-  }
+    },
+  },
 };
 </script>
 
