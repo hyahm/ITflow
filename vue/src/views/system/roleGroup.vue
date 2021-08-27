@@ -131,7 +131,6 @@ export default {
     getroles() {
       getRoles().then((resp) => {
         this.pages = resp.data.data;
-        console.log(this.pages);
         for (let v of this.pages) {
           this.templateperm.push({
             id: 0,
@@ -154,7 +153,6 @@ export default {
       // 请求拿到权限数据
       // 请求权限
       getRoleGroupPerm(row.id).then((resp) => {
-        console.log(resp.data);
         this.permlist = resp.data.data;
         this.form.name = row.name;
         this.form.id = row.id;
@@ -212,7 +210,6 @@ export default {
       }
 
       // 计算每一行的值， 填充到form里面
-      // console.log(this.permlist);
       // return
       if (this.form.id > 0) {
         editRole(this.form).then((_) => {

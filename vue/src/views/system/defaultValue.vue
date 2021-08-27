@@ -118,7 +118,6 @@ export default {
       this.form.defaultlevel = e;
     },
     handleSave() {
-      console.log(this.form);
       save(this.form).then((_) => {
         this.$message.success("保存成功");
       });

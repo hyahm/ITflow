@@ -274,7 +274,6 @@ export default {
         this.$message.error("至少选择一个处理人");
         return;
       }
-      console.log(this.temp);
       passBug(this.temp).then((resp) => {
         const data = resp.data;
         this.temp.remark = "";
