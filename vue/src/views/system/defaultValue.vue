@@ -71,7 +71,7 @@ export default {
     };
   },
   created() {
-    this.getdefaultstatus();
+    this.getdefaultValue();
     this.getstatuslist();
   },
   methods: {
