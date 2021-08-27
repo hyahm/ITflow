@@ -8,11 +8,11 @@ import (
 )
 
 type Information struct {
-	ID   int64
-	Uid  int64
-	Bid  int64
-	Info string
-	Time int64
+	ID   int64  `json:"id" db:"id,default"`
+	Uid  int64  `json:"uid" db:"uid"`
+	Bid  int64  `json:"bid" db:"bid"`
+	Info string `json:"info" db:"info"`
+	Time int64  `json:"time" db:"time"`
 }
 
 func NewInformationsByBid(bid interface{}, cms []*comment.Informations) error {
@@ -32,4 +32,8 @@ func NewInformationsByBid(bid interface{}, cms []*comment.Informations) error {
 	}
 	rows.Close()
 	return nil
+}
+
+func (info *Information) Insert() error {
+	return db.Mconn.InsertInterfaceWithoutID(info, "insert into informations($key) values($value)")
 }

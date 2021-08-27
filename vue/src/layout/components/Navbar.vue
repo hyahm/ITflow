@@ -22,10 +22,7 @@
         </el-tooltip> -->
       </template>
 
-      <el-dropdown
-        class="avatar-container right-menu-item hover-effect"
-        trigger="click"
-      >
+      <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
           <img :src="avatar + '?imageView2/1/w/80/h/80'" class="user-avatar" />
           <i class="el-icon-caret-bottom" />
@@ -43,8 +40,11 @@
           <a target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/#/">
             <el-dropdown-item>Docs</el-dropdown-item>
           </a> -->
+
+          <el-dropdown-item>版本:v1.0.4</el-dropdown-item>
+
           <el-dropdown-item divided @click.native="logout">
-            <span style="display:block;">Log Out</span>
+            <span style="display: block">Log Out</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -68,10 +68,10 @@ export default {
     // ErrorLog,
     // Screenfull,
     // SizeSelect,
-    Search
+    Search,
   },
   computed: {
-    ...mapGetters(["sidebar", "avatar", "device"])
+    ...mapGetters(["sidebar", "avatar", "device"]),
   },
   methods: {
     toggleSideBar() {
@@ -81,13 +81,13 @@ export default {
       this.$store
         .dispatch("user/logout")
         .then((location.href = `/login`))
-        .catch(err => {
+        .catch((err) => {
           alert(err);
         });
 
       //
-    }
-  }
+    },
+  },
 };
 </script>
 

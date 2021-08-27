@@ -109,7 +109,6 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 		sql = " and " + sql
 	}
 	countsql := "select count(id) from bugs where dustbin=false " + sql
-	golog.Info(countsql)
 	// 获取总数
 	count, err := model.GetCount(countsql, args...)
 	if err != nil {
@@ -132,7 +131,6 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 	res.Page = page
 	pager := fmt.Sprintf(" limit %d,%d", start, end)
 	listsql := "select * from bugs where dustbin=false " + sql + pager
-	golog.Info(listsql)
 
 	bugs, err := model.GetAllBug(listsql, args...)
 	if err != nil {

@@ -34,7 +34,8 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		w.Write(response.ErrorE(err))
 		return
 	}
-	cache.CacheEmail.SendMail("成功创建用户",
+
+	model.CacheEmail.SendMail("成功创建用户",
 		fmt.Sprintf(`<html><body><h1>已成功创建用户<h1>登录网址:<a href="%s">%s</a></br>用户名: %s</br> 密码: %s</br>邮箱: %s</body></html>`,
 			r.Referer(), r.Referer(), getuser.NickName, getuser.Password, getuser.Email),
 		getuser.Email)

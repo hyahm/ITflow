@@ -2,9 +2,9 @@ package handle
 
 import (
 	"encoding/json"
-	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/dashboard"
+	"itflow/model"
 	"itflow/response"
 	"net/http"
 
@@ -68,9 +68,9 @@ func ProjectCount(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	if cache.DefaultCompleteSid > 0 {
+	if model.Default.Completed > 0 {
 		completesql := "select count(id) from bugs where sid=?"
-		err := db.Mconn.GetOne(completesql, cache.DefaultCompleteSid).Scan(&pc.CountComplete)
+		err := db.Mconn.GetOne(completesql, model.Default.Completed).Scan(&pc.CountComplete)
 		if err != nil {
 			golog.Error(err)
 			w.Write(errorcode.ErrorE(err))

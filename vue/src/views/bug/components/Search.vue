@@ -4,7 +4,7 @@
       <el-input
         v-model="listQuery.title"
         placeholder="标题"
-        style="width: 200px;"
+        style="width: 200px"
         class="filter-item"
       />
       <el-select
@@ -46,7 +46,7 @@
         :hide-on-click="false"
         :show-timeout="100"
         trigger="click"
-        style="vertical-align: top;"
+        style="vertical-align: top"
       >
         <el-button plain>
           状态({{ statuslength }})
@@ -55,7 +55,7 @@
         <el-dropdown-menu slot="dropdown" class="no-border">
           <el-checkbox-group
             v-model="showstatus"
-            style="padding-left: 15px;"
+            style="padding-left: 15px"
             @change="HandleChange"
           >
             <el-checkbox
@@ -94,32 +94,22 @@
 </template>
 
 <script>
-import {
-  bugFilter,
-  searchMyBugs,
-  searchAllBugs,
-  searchMyTasks
-} from "@/api/search"; // 水波纹指令
+import { bugFilter, searchMyBugs, searchAllBugs, searchMyTasks } from "@/api/search"; // 水波纹指令
 import { resumeBug } from "@/api/bugs";
 import { statusFilter } from "@/api/status";
 import Show from "./Bug/Show";
-import {
-  getProjectKeyName,
-  getLevels,
-  getShowStatus,
-  getStatus
-} from "@/api/get";
+import { getProjectKeyName, getLevels, getShowStatus, getStatus } from "@/api/get";
 export default {
   name: "BugSearch",
   components: {
-    Show
+    Show,
   },
   props: {
     // 1, 2, 3, 4  对应5种类型页面
     pageType: {
       type: Number,
-      default: 1
-    }
+      default: 1,
+    },
   },
   data() {
     return {
@@ -130,7 +120,7 @@ export default {
         level_id: undefined,
         project_id: undefined,
         showstatus: [],
-        title: ""
+        title: "",
       },
       showstatus: [],
       total: 0,
@@ -142,7 +132,7 @@ export default {
       showstatus: [],
       statusMap: new Map(),
       statusidMap: new Map(),
-      statuslength: 0
+      statuslength: 0,
     };
   },
   activated() {
@@ -157,7 +147,7 @@ export default {
   },
   methods: {
     getstatus() {
-      getStatus().then(resp => {
+      getStatus().then((resp) => {
         this.allStatus = resp.data.data;
         this.statusMap.clear();
         for (let v of this.allStatus) {
@@ -165,7 +155,7 @@ export default {
           this.statusidMap.set(v.id, v.name);
         }
       });
-      getShowStatus().then(resp => {
+      getShowStatus().then((resp) => {
         this.showstatus = [];
         for (let v of resp.data.data) {
           this.showstatus.push(this.statusidMap.get(v));
@@ -175,7 +165,7 @@ export default {
       });
     },
     getlevels() {
-      getLevels().then(resp => {
+      getLevels().then((resp) => {
         this.levels = resp.data.data;
         this.levelMap.clear();
         for (let v of this.levels) {
@@ -184,7 +174,7 @@ export default {
       });
     },
     getpname() {
-      getProjectKeyName().then(resp => {
+      getProjectKeyName().then((resp) => {
         this.projectnames = resp.data.data;
         this.projectMap.clear();
         for (let v of this.projectnames) {
@@ -201,13 +191,9 @@ export default {
     },
     HandleChange() {
       let sids = this.getSidByShowStatus();
-      if (sids.length == 0) {
-        this.$message.error("至少选中一个状态");
-        return;
-      }
       this.statuslength = this.showstatus.length;
       const data = {
-        showstatus: sids
+        showstatus: sids,
       };
       statusFilter(data).then(() => {});
     },
@@ -216,7 +202,7 @@ export default {
       switch (this.pageType) {
         case 1:
           // 垃圾箱
-          bugFilter(this.listQuery).then(resp => {
+          bugFilter(this.listQuery).then((resp) => {
             this.list = resp.data.data;
             this.total = resp.data.total;
             this.listQuery.page = resp.data.page;
@@ -224,7 +210,7 @@ export default {
           break;
         case 2:
           // 我创建的bug
-          searchMyBugs(this.listQuery).then(resp => {
+          searchMyBugs(this.listQuery).then((resp) => {
             this.list = resp.data.data;
             this.total = resp.data.total;
             this.listQuery.page = resp.data.page;
@@ -232,7 +218,7 @@ export default {
           break;
         case 3:
           // 所有的bug
-          searchAllBugs(this.listQuery).then(resp => {
+          searchAllBugs(this.listQuery).then((resp) => {
             this.list = resp.data.data;
             this.total = resp.data.total;
             this.listQuery.page = resp.data.page;
@@ -240,7 +226,7 @@ export default {
           break;
         case 4:
           // 我的任务
-          searchMyTasks(this.listQuery).then(resp => {
+          searchMyTasks(this.listQuery).then((resp) => {
             this.list = resp.data.data;
             this.total = resp.data.total;
             this.listQuery.page = resp.data.page;
@@ -260,7 +246,7 @@ export default {
       this.handleFilter();
     },
     resume(id) {
-      resumeBug(id).then(_ => {
+      resumeBug(id).then((_) => {
         const l = this.list.length;
         for (var i = 0; i < l; i++) {
           if (this.list[i].id === id) {
@@ -270,7 +256,7 @@ export default {
           }
         }
       });
-    }
-  }
+    },
+  },
 };
 </script>

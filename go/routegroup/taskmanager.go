@@ -19,4 +19,8 @@ func init() {
 	TaskManager.Get("/bug/edit", taskcontroller.Get)
 	TaskManager.Post("/bug/update", taskcontroller.Update).Bind(&model.Bug{}).
 		AddModule(midware.JsonToStruct)
+
+	TaskManager.Post("/bug/receive", taskcontroller.Receive).Bind(&model.Bug{}).
+		AddModule(midware.JsonToStruct)
+	// 1630339320
 }

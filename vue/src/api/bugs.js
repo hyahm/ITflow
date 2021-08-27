@@ -64,6 +64,16 @@ export function passBug(data) {
   })
 }
 
+
+
+export function receiveBug(data) {
+  return request({
+    url: '/bug/receive',
+    method: 'post',
+    data
+  })
+}
+
 export function taskList() {
   return request({
     url: '/task/list',

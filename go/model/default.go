@@ -5,8 +5,10 @@ import (
 )
 
 type DefaultValue struct {
-	Created   int64 `json:"created" db:"created"`     // statusid`json:"created"`
-	Completed int64 `json:"completed" db:"completed"` // statusid
+	Created   int64 `json:"created" db:"created,default"`     // statusid`json:"created"`
+	Completed int64 `json:"completed" db:"completed,default"` // statusid
+	Pass      int64 `json:"pass" db:"pass,default"`           // statusid
+	Receive   int64 `json:"receive" db:"receive,default"`     // statusid
 
 }
 

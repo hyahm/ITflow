@@ -32,6 +32,7 @@ service.interceptors.request.use(
   }
 );
 
+
 // response interceptor
 service.interceptors.response.use(
   /**
@@ -44,12 +45,18 @@ service.interceptors.response.use(
    * Here is just an example
    * You can also judge the status by HTTP Status Code
    */
-  response => {
+   response => {
     if (response.data.code === -1) {
       removeToken();
       location.href = "/login";
     }
-
+    if (response.data.code === 2) {
+          Message({
+            message: response.data.msg,
+            type: "error",
+            duration: 3 * 1000
+          });
+    }
     if (response.data.code != 0) {
       Message({
         message: response.data.msg,
@@ -60,15 +67,6 @@ service.interceptors.response.use(
     }
     return response;
   },
-  error => {
-    "err" + error; // for debug
-    Message({
-      message: error.message,
-      type: "error",
-      duration: 5 * 1000
-    });
-    return Promise.reject(error);
-  }
 );
 
 export default service;

@@ -5,7 +5,6 @@ import (
 	"itflow/internal/bug"
 	"itflow/internal/search"
 	"itflow/midware"
-	"itflow/model"
 
 	"github.com/hyahm/xmux"
 )
@@ -21,8 +20,7 @@ func init() {
 	Bug.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
 	///  -------
-	Bug.Post("/bug/pass", handle.PassBug).Bind(&model.Bug{}).
-		AddModule(midware.JsonToStruct).ApiDescribe("转交bug").ApiReqStruct(&bug.PassBug{})
+	Bug.Post("/bug/pass", handle.PassBug).Bind(&handle.RequestPass{}).AddModule(midware.JsonToStruct)
 
 	Bug.Post("/bug/mybugs", handle.GetMyBugs).Bind(&search.ReqMyBugFilter{})
 
@@ -30,16 +28,7 @@ func init() {
 	Bug.Post("/bug/changestatus", handle.ChangeBugStatus).Bind(&bug.ChangeStatus{}).
 		AddModule(midware.JsonToStruct)
 
-	Bug.Get("/bug/show", handle.BugShow).
-		ApiDescribe("获取此bug信息").ApiReqParams("id", "6").ApiResponseTemplate(`{
-			"title": "sdfsdf",
-			"content": "<p>sdfajsdjfsdfsaf</p>",
-			"appversion": "v1.2",
-			"comment": [],
-			"status": "need133",
-			"id": 2,
-			"code": 0
-		}`).ApiResStruct(bug.RespShowBug{})
+	Bug.Get("/bug/show", handle.BugShow)
 
 	Bug.Get("/bug/resume", handle.ResumeBug)
 

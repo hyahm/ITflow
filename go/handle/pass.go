@@ -4,14 +4,41 @@ import (
 	"itflow/model"
 	"itflow/response"
 	"net/http"
+	"time"
 
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
 
+type RequestPass struct {
+	Bid     int64   `json:"bid" `     // bugid
+	Remark  string  `json:"remark" `  // bugid
+	SpUsers []int64 `json:"spusers" ` // bugid
+}
+
 func PassBug(w http.ResponseWriter, r *http.Request) {
-	bug := xmux.GetInstance(r).Data.(*model.Bug)
+	rp := xmux.GetInstance(r).Data.(*RequestPass)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
+	// 更新bug表
+	bug := model.Bug{
+		ID:   rp.Bid,
+		Uids: rp.SpUsers,
+		Sid:  model.Default.Pass, // 转交的默认状态
+	}
 	err := bug.Update()
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
+		return
+	}
+	// 新增information表
+	information := model.Information{
+		Uid:  uid,
+		Bid:  rp.Bid,
+		Info: rp.Remark,
+		Time: time.Now().Unix(),
+	}
+	err = information.Insert()
 	if err != nil {
 		golog.Error(err)
 		w.Write(response.ErrorE(err))

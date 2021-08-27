@@ -2,6 +2,7 @@ package midware
 
 import (
 	"itflow/cache"
+	"itflow/model"
 	"itflow/response"
 	"net/http"
 
@@ -15,123 +16,18 @@ const (
 	CREATE = 8
 )
 
-type UserChecker interface {
-	CheckUser(uid int64) error
+// 状态码是2
+func CheckSetDefault(w http.ResponseWriter, r *http.Request) bool {
+	// 检查是否设置全了默认值， 否则无法打开bug任务管理菜单
+	if model.Default.Completed == 0 ||
+		model.Default.Created == 0 ||
+		model.Default.Pass == 0 ||
+		model.Default.Receive == 0 {
+		w.Write([]byte(`{"code": 2, "msg": "必须先让管理员设置默认值"}`))
+		return true
+	}
+	return false
 }
-
-// func CheckUser(w http.ResponseWriter, r *http.Request) bool {
-
-// 	uid := xmux.GetInstance(r).Get("uid").(int64)
-// 	resp := response.Response{}
-// 	if xmux.GetInstance(r).Data == nil {
-// 		err := fmt.Sprintf("must be bind data first %s", r.URL.RequestURI())
-// 		w.Write(resp.Error(err))
-// 		return true
-// 	}
-// 	err := xmux.GetInstance(r).Data.(UserChecker).CheckUser(uid)
-// 	if err != nil {
-// 		w.Write(resp.ErrorE(err))
-// 		return true
-// 	}
-// 	return false
-// }
-
-// func EnvPermModule(w http.ResponseWriter, r *http.Request) bool {
-// 	resp := response.Response{}
-// 	uid := xmux.GetInstance(r).Get("uid").(int64)
-// 	op, err := perm.EnvPerm(uid)
-// 	if err != nil {
-// 		w.Write(resp.ErrorE(err))
-// 		return true
-// 	}
-// 	xmux.GetInstance(r).Set("perm", op)
-// 	return false
-// }
-
-// func ImportantPermModule(w http.ResponseWriter, r *http.Request) bool {
-// 	resp := response.Response{}
-// 	uid := xmux.GetInstance(r).Get("uid").(int64)
-// 	op, err := perm.ImportantPerm(uid)
-// 	if err != nil {
-// 		w.Write(resp.ErrorE(err))
-// 		return true
-// 	}
-// 	golog.Info(op)
-// 	xmux.GetInstance(r).Set("perm", op)
-// 	return false
-// }
-
-// func LevelPermModule(w http.ResponseWriter, r *http.Request) bool {
-// 	resp := response.Response{}
-// 	uid := xmux.GetInstance(r).Get("uid").(int64)
-// 	op, err := perm.LevelPerm(uid)
-// 	if err != nil {
-// 		w.Write(resp.ErrorE(err))
-// 		return true
-// 	}
-// 	xmux.GetInstance(r).Set("perm", op)
-// 	return false
-// }
-
-// func PositionPermModule(w http.ResponseWriter, r *http.Request) bool {
-// 	resp := response.Response{}
-// 	uid := xmux.GetInstance(r).Get("uid").(int64)
-// 	op, err := perm.PositionPerm(uid)
-// 	if err != nil {
-// 		w.Write(resp.ErrorE(err))
-// 		return true
-// 	}
-// 	xmux.GetInstance(r).Set("perm", op)
-// 	return false
-// }
-
-// func ProjectPermModule(w http.ResponseWriter, r *http.Request) bool {
-// 	resp := response.Response{}
-// 	uid := xmux.GetInstance(r).Get("uid").(int64)
-// 	op, err := perm.ProjectPerm(uid)
-// 	if err != nil {
-// 		w.Write(resp.ErrorE(err))
-// 		return true
-// 	}
-// 	xmux.GetInstance(r).Set("perm", op)
-// 	return false
-// }
-
-// func StatusPermModule(w http.ResponseWriter, r *http.Request) bool {
-// 	resp := response.Response{}
-// 	uid := xmux.GetInstance(r).Get("uid").(int64)
-// 	op, err := perm.StatusPerm(uid)
-// 	if err != nil {
-// 		w.Write(resp.ErrorE(err))
-// 		return true
-// 	}
-// 	xmux.GetInstance(r).Set("perm", op)
-// 	return false
-// }
-
-// func StatusgroupPermModule(w http.ResponseWriter, r *http.Request) bool {
-// 	resp := response.Response{}
-// 	uid := xmux.GetInstance(r).Get("uid").(int64)
-// 	op, err := perm.StatusgroupPerm(uid)
-// 	if err != nil {
-// 		w.Write(resp.ErrorE(err))
-// 		return true
-// 	}
-// 	xmux.GetInstance(r).Set("perm", op)
-// 	return false
-// }
-
-// func VersionPermModule(w http.ResponseWriter, r *http.Request) bool {
-// 	resp := response.Response{}
-// 	uid := xmux.GetInstance(r).Get("uid").(int64)
-// 	op, err := perm.VersionPerm(uid)
-// 	if err != nil {
-// 		w.Write(resp.ErrorE(err))
-// 		return true
-// 	}
-// 	xmux.GetInstance(r).Set("perm", op)
-// 	return false
-// }
 
 func MustBeSuperAdmin(w http.ResponseWriter, r *http.Request) bool {
 	uid := xmux.GetInstance(r).Get("uid").(int64)

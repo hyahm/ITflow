@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-export function status() {
+export function defaultValue() {
   return request({
     url: '/default/status',
     method: 'post'

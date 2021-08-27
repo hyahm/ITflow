@@ -99,6 +99,7 @@ CREATE TABLE `bugs` (
   `pid` bigint(20) DEFAULT '0',
   `updatetime` bigint(20) DEFAULT '0',
   `dustbin` tinyint(1) DEFAULT '0',
+  `deadline` int not null default 0,
   PRIMARY KEY (`id`),
   KEY `uid` (`uid`),
   KEY `sid` (`sid`),
@@ -132,6 +133,8 @@ UNLOCK TABLES;
 CREATE TABLE `defaultvalue` (
   `created` int(11) NOT NULL DEFAULT '0',
   `completed` int(11) NOT NULL DEFAULT '0',
+  `pass` int(11) NOT NULL DEFAULT '0',
+  `receive` int(11) NOT NULL DEFAULT '0',
   `level` bigint(20) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;

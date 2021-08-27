@@ -4,6 +4,8 @@ import (
 	"html"
 	"itflow/cache"
 	"itflow/db"
+
+	"github.com/hyahm/golog"
 )
 
 type Bug struct {
@@ -21,6 +23,7 @@ type Bug struct {
 	Tid        int64   `json:"tid" db:"tid"`         // type id
 	Pid        int64   `json:"pid" db:"pid"`         // project id
 	UpdateTime int64   `json:"updatetime" db:"updatetime"`
+	DeadLine   int64   `json:"deadline" db:"deadline"`
 	Dustbin    bool    `json:"dustbin" db:"dustbin"`
 }
 
@@ -54,6 +57,7 @@ func (bug *Bug) Resume(id interface{}) error {
 }
 
 func (bug *Bug) Update() error {
+	golog.Infof("%#v", *bug)
 	getlistsql := "update bugs set $set where id=?"
 	_, err := db.Mconn.UpdateInterface(bug, getlistsql, bug.ID)
 	return err

@@ -25,16 +25,12 @@
           </el-col>
         </el-row>
       </el-card>
-      <el-card
-        class="box-card"
-        v-if="bug.typ == 1"
-        style="background-color: #8cbda4"
-      >
+      <el-card class="box-card" v-if="bug.typ == 1" style="background-color: #8cbda4">
         <span style="padding-top: 20px">URL：{{ bug.url }}</span>
       </el-card>
       <div id="main">
         <mavon-editor
-          style="width: 100%;min-height:10px"
+          style="width: 100%; min-height: 10px"
           :value="bug.content"
           :box-shadow="false"
           :subfield="false"
@@ -44,23 +40,18 @@
           :scroll-style="true"
         />
       </div>
-      <div
-        v-for="(cc, index) in bug.comments"
-        :key="index"
-        style="margin-bottom: 5px"
-      >
+      <div v-for="(cc, index) in bug.comments" :key="index" style="margin-bottom: 5px">
         <el-card class="box-card">
           <p>
-            {{ cc.date | parseTime("{y}-{m}-{d} {h}:{i}") }}由{{
-              cc.user
-            }}转交给{{ cc.passuser }}
+            {{ cc.date | parseTime("{y}-{m}-{d} {h}:{i}") }}, 处理人:{{ cc.user }}，
+            事件：{{ cc.info }}
           </p>
-          <span>转交原因：{{ cc.info }}</span>
+          <!-- <span>转交原因：{{ cc.info }}</span> -->
         </el-card>
       </div>
     </div>
 
-    <el-dialog
+    <!-- <el-dialog
       :close-on-click-modal="false"
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
@@ -71,14 +62,10 @@
         :model="temp"
         label-position="left"
         label-width="70px"
-        style="width: 400px; margin-left:50px;"
+        style="width: 400px; margin-left: 50px"
       >
         <el-form-item label="状态">
-          <el-select
-            v-model="bug.status"
-            class="filter-item"
-            placeholder="Please select"
-          >
+          <el-select v-model="bug.status" class="filter-item" placeholder="Please select">
             <el-option
               v-for="(item, index) in statusOptions"
               :key="index"
@@ -87,12 +74,8 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item style="margin-bottom: 40px;" label="任务给：">
-          <el-select
-            v-model="temp.selectusers"
-            multiple
-            placeholder="请选择指定的用户"
-          >
+        <el-form-item style="margin-bottom: 40px" label="任务给：">
+          <el-select v-model="temp.selectusers" multiple placeholder="请选择指定的用户">
             <el-option
               v-for="(item, index) in users"
               :key="index"
@@ -114,7 +97,7 @@
         <el-button @click="dialogFormVisible = false">取消</el-button>
         <el-button type="primary" @click="updateData">确认</el-button>
       </div>
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 
@@ -132,20 +115,20 @@ export default {
         title: "",
         appversion: "",
         status: "",
-        comments: []
+        comments: [],
       },
       statusOptions: [],
       dialogFormVisible: false,
       textMap: {
         update: "Edit",
-        create: "Create"
+        create: "Create",
       },
       dialogStatus: "",
       temp: {
         id: undefined,
         remark: "",
         status: "",
-        selectusers: ""
+        selectusers: "",
       },
       myBackToTopStyle: {
         right: "50px",
@@ -154,24 +137,20 @@ export default {
         height: "40px",
         "border-radius": "4px",
         "line-height": "45px", // 请保持与高度一致以垂直居中 Please keep consistent with height to center vertically
-        background: "#e7eaf1" // 按钮的背景颜色 The background color of the button
+        background: "#e7eaf1", // 按钮的背景颜色 The background color of the button
       },
       rules: {
-        type: [
-          { required: true, message: "type is required", trigger: "change" }
-        ],
+        type: [{ required: true, message: "type is required", trigger: "change" }],
         timestamp: [
           {
             type: "date",
             required: true,
             message: "timestamp is required",
-            trigger: "change"
-          }
+            trigger: "change",
+          },
         ],
-        title: [
-          { required: true, message: "title is required", trigger: "blur" }
-        ]
-      }
+        title: [{ required: true, message: "title is required", trigger: "blur" }],
+      },
     };
   },
   created() {
@@ -184,43 +163,44 @@ export default {
       const id = ul[ul.length - 1];
       if (id % 1 === 0) {
         this.temp.id = parseInt(id);
-        showBug(id).then(resp => {
+        showBug(id).then((resp) => {
           this.bug = resp.data;
+          document.title = this.bug.title;
         });
       }
     },
-    updateData() {
-      this.dialogFormVisible = true;
-      this.temp.status = this.bug.status;
-      passBug(this.temp).then(resp => {
-        const data = resp.data;
-        this.bug.comment.push({
-          date: data.date,
-          info: data.remark,
-          user: data.user,
-          passuser: data.selectusers
-        });
-        this.temp.remark = "";
-        this.temp.status = data.status;
-        this.temp.selectusers = "";
-        this.$message({
-          message: "操作成功",
-          type: "success"
-        });
-      });
-      this.dialogFormVisible = false;
-    },
-    handleDelete(row) {
-      this.$notify({
-        title: "成功",
-        message: "删除成功",
-        type: "success",
-        duration: 2000
-      });
-      const index = this.list.indexOf(row);
-      this.list.splice(index, 1);
-    }
-  }
+    // updateData() {
+    //   this.dialogFormVisible = true;
+    //   this.temp.status = this.bug.status;
+    //   passBug(this.temp).then(resp => {
+    //     const data = resp.data;
+    //     this.bug.comment.push({
+    //       date: data.date,
+    //       info: data.remark,
+    //       user: data.user,
+    //       passuser: data.selectusers
+    //     });
+    //     this.temp.remark = "";
+    //     this.temp.status = data.status;
+    //     this.temp.selectusers = "";
+    //     this.$message({
+    //       message: "操作成功",
+    //       type: "success"
+    //     });
+    //   });
+    //   this.dialogFormVisible = false;
+    // },
+    // handleDelete(row) {
+    //   this.$notify({
+    //     title: "成功",
+    //     message: "删除成功",
+    //     type: "success",
+    //     duration: 2000
+    //   });
+    //   const index = this.list.indexOf(row);
+    //   this.list.splice(index, 1);
+    // }
+  },
 };
 </script>
 

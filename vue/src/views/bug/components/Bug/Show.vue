@@ -17,9 +17,13 @@
 
       <el-table-column label="日期" width="150px" align="center">
         <template slot-scope="scope">
-          <span>{{
-            scope.row.createtime | parseTime("{y}-{m}-{d} {h}:{i}")
-          }}</span>
+          <span>{{ scope.row.createtime | parseTime("{y}-{m}-{d} {h}:{i}") }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="完成时间" width="150px" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.deadline | parseTime("{y}-{m}-{d} {h}:{i}") }}</span>
         </template>
       </el-table-column>
 
@@ -47,44 +51,16 @@
         </template>
       </el-table-column>
 
-      <el-table-column
-        label="状态"
-        v-if="pageType != 4"
-        align="center"
-        width="110"
-      >
+      <el-table-column label="状态" align="center" width="110">
         <template slot-scope="scope">
-          <span>{{ scope.row.sid | toStatusName(statusMap) }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column
-        label="状态"
-        v-if="pageType == 4"
-        class-name="status-col"
-        width="120"
-      >
-        <template slot-scope="scope">
-          <el-select
-            v-model="scope.row.status"
-            class="filter-item"
-            placeholder="修改状态"
-            @change="changestatus(scope.row)"
-          >
-            <el-option
-              v-for="item in statusMap"
-              :key="item[0]"
-              :label="item[1]"
-              :value="item[0]"
-            />
-          </el-select>
-          <!--<el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>-->
+          <el-tag>{{ scope.row.sid | toStatusName(statusMap) }}</el-tag>
         </template>
       </el-table-column>
 
       <el-table-column label="标题" min-width="300px" align="center">
         <template slot-scope="scope">
           <router-link
+            target="_blank"
             :to="'/showbug/' + scope.row.id"
             class="link-type"
             align="center"
@@ -103,9 +79,7 @@
       >
         <template slot-scope="scope">
           <el-button type="primary" size="mini" v-if="pageType == 2"
-            ><router-link :to="'/bug/edit/' + scope.row.id"
-              >编辑</router-link
-            ></el-button
+            ><router-link :to="'/bug/edit/' + scope.row.id">编辑</router-link></el-button
           >
 
           <el-button
@@ -115,6 +89,14 @@
             @click="resume(scope.row.id)"
             >恢复</el-button
           >
+          <el-button
+            type="success"
+            size="mini"
+            v-if="pageType == 4"
+            @click="Receive(scope.row)"
+            >领取</el-button
+          >
+
           <el-button
             type="danger"
             v-if="pageType == 2"
@@ -144,23 +126,9 @@
         :model="temp"
         label-position="left"
         label-width="70px"
-        style="width: 400px; margin-left:50px;"
+        style="width: 400px; margin-left: 50px"
       >
-        <el-form-item label="状态:">
-          <el-select
-            v-model="temp.status"
-            class="filter-item"
-            placeholder="Please select"
-          >
-            <el-option
-              v-for="item in statusMap"
-              :key="item[0]"
-              :label="item[1]"
-              :value="item[0]"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item style="margin-bottom: 40px;" label="任务给：">
+        <el-form-item style="margin-bottom: 40px" label="任务给：">
           <el-select
             v-model="temp.spusers"
             filterable
@@ -191,17 +159,37 @@
         <el-button type="primary" @click="updateData">确认</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog
+      v-if="pageType == 4"
+      :close-on-click-modal="false"
+      title="领取任务"
+      :visible.sync="openReceive"
+    >
+      <el-form>
+        <el-form-item label="完成时间:">
+          <el-date-picker
+            v-model="receive.deadline"
+            type="datetime"
+            value-format="timestamp"
+            placeholder="选择日期时间"
+          >
+          </el-date-picker>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="openReceive = false">取消</el-button>
+        <el-button type="primary" @click="receiveHandle">确认</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import {
-  getImportants,
-  getUserKeyName,
-  getUserKeyNameByProject
-} from "@/api/get";
-import { passBug, delBug } from "@/api/bugs";
-
+import { getImportants, getUserKeyName, getUserKeyNameByProject } from "@/api/get";
+import { defaultValue } from "@/api/defaultvalue";
+import { passBug, delBug, receiveBug } from "@/api/bugs";
+// pageType:    1： 垃圾箱   2： 我创建的bug    3： 所有bug     4: 我的任务
 export default {
   name: "Show",
   filters: {
@@ -223,31 +211,31 @@ export default {
         names.push(userMap.get(id));
       }
       return names.join(", ");
-    }
+    },
   },
   props: {
     // 数据
     list: {
       type: Array,
-      default: []
+      default: [],
     },
     // project 映射关系
     projectMap: {
       type: Map,
-      require: true
+      require: true,
     },
     levelMap: {
       type: Map,
-      require: true
+      require: true,
     },
     statusMap: {
       type: Map,
-      require: true
+      require: true,
     },
     pageType: {
       type: Number,
-      require: true
-    }
+      require: true,
+    },
   },
   data() {
     return {
@@ -255,13 +243,20 @@ export default {
       listLoading: false,
       importantMap: new Map(),
       userMap: new Map(),
+      default: {
+        created: 0,
+        pass: 0,
+      },
       temp: {
-        id: undefined,
+        bid: undefined, // bugid
         remark: "",
-        status: "新建",
         spusers: "",
-        projectname: ""
-      }
+      },
+      receive: {
+        id: 0,
+        deadline: 0,
+      },
+      openReceive: false,
     };
   },
   created() {
@@ -270,8 +265,8 @@ export default {
   },
   methods: {
     handleRemove(id) {
-      delBug(id).then(resp => {
-        this.list = this.list.filter(m => m.id != id);
+      delBug(id).then((resp) => {
+        this.list = this.list.filter((m) => m.id != id);
       });
     },
     updateData() {
@@ -279,40 +274,42 @@ export default {
         this.$message.error("至少选择一个处理人");
         return;
       }
-      passBug(this.temp).then(resp => {
+      console.log(this.temp);
+      passBug(this.temp).then((resp) => {
         const data = resp.data;
         this.temp.remark = "";
         this.temp.status = data.status;
         this.temp.spusers = "";
         this.$message({
           message: "操作成功",
-          type: "success"
+          type: "success",
         });
       });
       this.dialogFormVisible = false;
     },
     getImportant() {
-      getImportants().then(resp => {
+      getImportants().then((resp) => {
         for (let v of resp.data.data) {
           this.importantMap.set(v.id, v.name);
         }
       });
+      defaultValue().then((resp) => {
+        this.default = resp.data.data;
+      });
     },
     getUsers() {
-      getUserKeyName().then(resp => {
+      getUserKeyName().then((resp) => {
         for (let v of resp.data.data) {
           this.userMap.set(v.id, v.name);
         }
       });
     },
     handlePass(row) {
-      this.temp.id = parseInt(row.id); // copy obj
-      this.temp.status = row.status;
-      this.temp.projectname = row.projectname;
+      this.temp.bid = parseInt(row.id); // copy obj
       this.temp.spusers = [];
       this.users = [];
-      getUserKeyNameByProject(row.projectname).then(resp => {
-        this.users = resp.data.name;
+      getUserKeyNameByProject(row.projectname).then((resp) => {
+        this.users = resp.data.data;
         for (var i = 0; i < this.users.length; i++) {
           for (var j = 0; j < row.handle.length; j++) {
             if (this.temp.spusers[j] === this.users[i]) {
@@ -322,7 +319,37 @@ export default {
         }
       });
       this.dialogFormVisible = true;
-    }
-  }
+    },
+    Receive(row) {
+      if (row.sid != this.default.pass || row.sid != this.default.created) {
+        this.$message({
+          message: "此状态无法领取",
+          type: "success",
+        });
+        return;
+      }
+      this.openReceive = true;
+      this.receive.id = row.id;
+      this.receive.deadline = new Date().getTime();
+    },
+    receiveHandle(id) {
+      // 确认领取任务
+      this.receive.deadline = parseInt(this.receive.deadline / 1000);
+      receiveBug(this.receive).then((resp) => {
+        for (let v of this.list) {
+          if (v.id == id) {
+            v.spusers = resp.data.user_ids;
+            v.deadline = parseInt(this.deadline / 1000);
+            break;
+          }
+        }
+        this.$message({
+          message: "领取成功",
+          type: "success",
+        });
+      });
+      this.openReceive = false;
+    },
+  },
 };
 </script>

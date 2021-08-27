@@ -6,6 +6,7 @@ import (
 	"itflow/cache"
 	"itflow/db"
 	"itflow/httpserver"
+	"itflow/model"
 	"log"
 	"os"
 
@@ -50,7 +51,7 @@ func main() {
 	// // // 初始化缓存表
 	// db.InitCacheTable()
 	cache.LoadConfig()
-
+	model.InitCache()
 	// // // 初始化日志
 
 	httpserver.RunHttp()

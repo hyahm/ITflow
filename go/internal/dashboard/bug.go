@@ -3,7 +3,6 @@ package dashboard
 import (
 	"encoding/json"
 	"fmt"
-	"itflow/cache"
 	"itflow/model"
 	"log"
 	"sync"
@@ -41,8 +40,8 @@ func GetCount() []byte {
 			wg.Done()
 		}(count, i)
 		go func(count, i int) {
-			if cache.DefaultCompleteSid > 0 {
-				bc.Completed[count], err = model.GetCompletedCountByTime(start[i], start[i]+24*60*60-1, cache.DefaultCompleteSid)
+			if model.Default.Completed > 0 {
+				bc.Completed[count], err = model.GetCompletedCountByTime(start[i], start[i]+24*60*60-1, model.Default.Completed)
 				if err != nil {
 					golog.Error(err)
 				}

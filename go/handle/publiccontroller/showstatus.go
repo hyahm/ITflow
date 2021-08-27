@@ -20,7 +20,6 @@ func ShowStatus(w http.ResponseWriter, r *http.Request) {
 		w.Write(response.ErrorE(err))
 		return
 	}
-	golog.Info(ss)
 	res := response.Response{
 		Data: ss,
 	}

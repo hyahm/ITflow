@@ -3,10 +3,10 @@ package handle
 import (
 	"encoding/json"
 	"fmt"
-	"itflow/cache"
 	"itflow/db"
 	"itflow/internal/email"
 	"itflow/mail"
+	"itflow/model"
 	"itflow/response"
 	"net/http"
 	"strings"
@@ -59,13 +59,13 @@ func SaveEmail(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	cache.CacheEmail.Enable = getemail.Enable
-	cache.CacheEmail.Host = getemail.Host
-	cache.CacheEmail.Password = getemail.Password
-	cache.CacheEmail.EmailAddr = getemail.EmailAddr
-	cache.CacheEmail.Port = getemail.Port
-	cache.CacheEmail.Nickname = getemail.Nickname
-	cache.CacheEmail.Id = errorcode.ID
+	model.CacheEmail.Enable = getemail.Enable
+	model.CacheEmail.Host = getemail.Host
+	model.CacheEmail.Password = getemail.Password
+	model.CacheEmail.Email = getemail.EmailAddr
+	model.CacheEmail.Port = getemail.Port
+	model.CacheEmail.NickName = getemail.Nickname
+	model.CacheEmail.Id = errorcode.ID
 	errorcode.ID = getemail.Id
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
@@ -89,9 +89,7 @@ func GetEmail(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 	send := fmt.Sprintf(`{"code": 0, "email": "%s", "id": %d, "password": "%s", "port": %d, "enable": %t, "host":"%s", "nickname": "%s"}`,
-		cache.CacheEmail.EmailAddr, cache.CacheEmail.Id, cache.CacheEmail.Password,
-		cache.CacheEmail.Port, cache.CacheEmail.Enable, cache.CacheEmail.Host, cache.CacheEmail.Nickname)
+		model.CacheEmail.Email, model.CacheEmail.Id, model.CacheEmail.Password,
+		model.CacheEmail.Port, model.CacheEmail.Enable, model.CacheEmail.Host, model.CacheEmail.NickName)
 	w.Write([]byte(send))
-	return
-
 }

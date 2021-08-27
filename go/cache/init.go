@@ -29,13 +29,9 @@ type UG struct {
 
 // cached
 var (
-	DefaultCreateSid   int64
-	DefaultCompleteSid int64
-
-	CacheEmail *Email
-
-	DEADLINE time.Duration
-	SUPERID  int64
+	CacheRoleID map[int64]PageInfo
+	DEADLINE    time.Duration
+	SUPERID     int64
 )
 
 func LoadConfig() {
@@ -64,8 +60,7 @@ func LoadConfig() {
 
 	Expirontion = goconfig.ReadDuration("expiration", 120*time.Minute)
 	golog.Info("cookie过期时间为：", Expirontion)
-	initCache()
+
 	// 添加一个admin 用户的权限，默认全是1
-	cacheemail()
 
 }
