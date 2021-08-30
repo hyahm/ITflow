@@ -64,6 +64,13 @@ export function passBug(data) {
   })
 }
 
+export function completeBug(data) {
+  return request({
+    url: '/bug/complete',
+    method: 'post',
+    data
+  })
+}
 
 
 export function receiveBug(data) {

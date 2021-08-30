@@ -111,6 +111,14 @@
             @click="handlePass(scope.row)"
             >转交</el-button
           >
+
+           <el-button
+            type="primary"
+            v-if="pageType == 4 && scope.row.spusers.indexOf(scope.row.ownerid)"
+            size="mini"
+            @click="handleComplete(scope.row)"
+            >完成</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -188,7 +196,7 @@
 <script>
 import { getImportants, getUserKeyName, getUserKeyNameByProject } from "@/api/get";
 import { defaultValue } from "@/api/defaultvalue";
-import { passBug, delBug, receiveBug } from "@/api/bugs";
+import { passBug, delBug, receiveBug,completeBug } from "@/api/bugs";
 // pageType:    1： 垃圾箱   2： 我创建的bug    3： 所有bug     4: 我的任务
 export default {
   name: "Show",
@@ -264,9 +272,15 @@ export default {
     this.getUsers();
   },
   methods: {
+    handleComplete(row) {
+      completeBug({id: row.id, ownerid: row.ownerid}).then(()=>{
+        console.log('completeBug')
+      })
+    },
     handleRemove(id) {
       delBug(id).then((resp) => {
         this.list = this.list.filter((m) => m.id != id);
+        
       });
     },
     updateData() {
@@ -287,6 +301,7 @@ export default {
       this.dialogFormVisible = false;
     },
     getImportant() {
+      console.log(this.list)
       getImportants().then((resp) => {
         for (let v of resp.data.data) {
           this.importantMap.set(v.id, v.name);

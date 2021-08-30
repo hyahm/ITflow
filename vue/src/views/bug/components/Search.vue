@@ -94,11 +94,21 @@
 </template>
 
 <script>
-import { bugFilter, searchMyBugs, searchAllBugs, searchMyTasks } from "@/api/search"; // 水波纹指令
+import {
+  bugFilter,
+  searchMyBugs,
+  searchAllBugs,
+  searchMyTasks,
+} from "@/api/search"; // 水波纹指令
 import { resumeBug } from "@/api/bugs";
 import { statusFilter } from "@/api/status";
 import Show from "./Bug/Show";
-import { getProjectKeyName, getLevels, getShowStatus, getStatus } from "@/api/get";
+import {
+  getProjectKeyName,
+  getLevels,
+  getShowStatus,
+  getStatus,
+} from "@/api/get";
 export default {
   name: "BugSearch",
   components: {
@@ -137,42 +147,41 @@ export default {
   },
   activated() {
     this.getpname();
-    this.getlevels();
     this.getstatus();
   },
   created() {
     this.getpname();
-    this.getlevels();
     this.getstatus();
   },
   methods: {
     getstatus() {
-      getStatus().then((resp) => {
-        this.allStatus = resp.data.data;
+      const status = getStatus();
+      const level = getLevels();
+      const show = getShowStatus();
+
+      Promise.all([status, level, show]).then((values) => {
+        this.allStatus = values[0].data.data;
         this.statusMap.clear();
         for (let v of this.allStatus) {
           this.statusMap.set(v.name, v.id);
           this.statusidMap.set(v.id, v.name);
         }
-      });
-      getShowStatus().then((resp) => {
+
+        this.levels = values[1].data.data;
+        this.levelMap.clear();
+        for (let v of this.levels) {
+          this.levelMap.set(v.id, v.name);
+        }
         this.showstatus = [];
-        for (let v of resp.data.data) {
+        for (let v of values[2].data.data) {
           this.showstatus.push(this.statusidMap.get(v));
         }
         this.statuslength = this.showstatus.length;
         this.handleFilter();
       });
+      
     },
-    getlevels() {
-      getLevels().then((resp) => {
-        this.levels = resp.data.data;
-        this.levelMap.clear();
-        for (let v of this.levels) {
-          this.levelMap.set(v.id, v.name);
-        }
-      });
-    },
+
     getpname() {
       getProjectKeyName().then((resp) => {
         this.projectnames = resp.data.data;
