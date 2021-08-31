@@ -88,11 +88,20 @@ func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 
 func EditRoleGroup(w http.ResponseWriter, r *http.Request) {
 
-	rolegroup := xmux.GetInstance(r).Data.(*model.RoleGroup)
-	// uid := xmux.GetInstance(r).Get("uid").(int64)
-	// w.Write(data.Update(uid))
-	// 先修改perm表里面的
-
+	rr := xmux.GetInstance(r).Data.(*RequestRoleGroup)
+	ids := make([]int64, 0, len(rr.PermIds))
+	for _, v := range rr.PermIds {
+		err := v.Update()
+		if err != nil {
+			golog.Error(err)
+		}
+		ids = append(ids, v.Id)
+	}
+	rolegroup := model.RoleGroup{
+		ID:      rr.ID,
+		Name:    rr.Name,
+		PermIds: ids,
+	}
 	err := rolegroup.Update()
 	if err != nil {
 		golog.Error(err)
@@ -102,11 +111,27 @@ func EditRoleGroup(w http.ResponseWriter, r *http.Request) {
 	w.Write(response.Success())
 }
 
+type RequestRoleGroup struct {
+	ID      int64        `json:"id" db:"id,default"`
+	Name    string       `json:"name" db:"name,default"`
+	PermIds []model.Perm `json:"rolelist" db:"rolelist"`
+}
+
 func AddRoleGroup(w http.ResponseWriter, r *http.Request) {
 
-	rolegroup := xmux.GetInstance(r).Data.(*model.RoleGroup)
-
-	err := rolegroup.Insert()
+	rr := xmux.GetInstance(r).Data.(*RequestRoleGroup)
+	ids, err := model.InsertManyPerm(rr.PermIds)
+	if err != nil {
+		golog.Error(err)
+		w.Write(response.ErrorE(err))
+		return
+	}
+	rolegroup := model.RoleGroup{
+		ID:      rr.ID,
+		Name:    rr.Name,
+		PermIds: ids,
+	}
+	err = rolegroup.Insert()
 	if err != nil {
 		golog.Error(err)
 		w.Write(response.ErrorE(err))
@@ -118,42 +143,3 @@ func AddRoleGroup(w http.ResponseWriter, r *http.Request) {
 	w.Write(res.Marshal())
 
 }
-
-// type ResponseRoleTemplate struct {
-// 	Code     int                   `json:"code"`
-// 	Msg      string                `json:"msg"`
-// 	Template []*rolegroup.PermRole `json:"template,omitempty"`
-// }
-
-// func (rrt *ResponseRoleTemplate) Marshal() []byte {
-// 	send, err := json.Marshal(rrt)
-// 	if err != nil {
-// 		golog.Error(err)
-// 		return nil
-// 	}
-// 	return send
-// }
-
-// func RoleTemplate(w http.ResponseWriter, r *http.Request) {
-// 	errorcode := &response.Response{}
-// 	data := &ResponseRoleTemplate{
-// 		Template: make([]*rolegroup.PermRole, 0),
-// 	}
-// 	rows, err := db.Mconn.GetRows("select name, info from roles")
-// 	if err != nil {
-// 		golog.Error(err)
-// 		w.Write(errorcode.ErrorE(err))
-// 		return
-// 	}
-// 	for rows.Next() {
-// 		role := &rolegroup.PermRole{}
-// 		err = rows.Scan(&role.Name, &role.Info)
-// 		if err != nil {
-// 			golog.Info(err)
-// 			continue
-// 		}
-// 		data.Template = append(data.Template, role)
-// 	}
-// 	rows.Close()
-// 	w.Write(data.Marshal())
-// }

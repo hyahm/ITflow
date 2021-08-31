@@ -3,7 +3,6 @@ package system
 import (
 	"itflow/handle"
 	"itflow/midware"
-	"itflow/model"
 
 	"github.com/hyahm/xmux"
 )
@@ -20,9 +19,9 @@ func init() {
 	RoleGroup.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
 	RoleGroup.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 
-	RoleGroup.Post("/rolegroup/add", handle.AddRoleGroup).Bind(&model.RoleGroup{}).
+	RoleGroup.Post("/rolegroup/add", handle.AddRoleGroup).Bind(&handle.RequestRoleGroup{}).
 		AddModule(midware.JsonToStruct)
-	RoleGroup.Post("/rolegroup/edit", handle.EditRoleGroup).Bind(&model.RoleGroup{}).
+	RoleGroup.Post("/rolegroup/edit", handle.EditRoleGroup).Bind(&handle.RequestRoleGroup{}).
 		AddModule(midware.JsonToStruct)
 	RoleGroup.Post("/rolegroup/list", handle.RoleGroupList)
 
