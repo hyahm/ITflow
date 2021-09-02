@@ -22,7 +22,6 @@ const SHOWDAY = 7
 
 func GetCount() []byte {
 	start := getTime()
-	golog.Info(start)
 	bc := &BugCount{
 		Created:   make([]int, SHOWDAY),
 		Completed: make([]int, SHOWDAY),
@@ -59,7 +58,6 @@ func getTime() []int64 {
 	start := make([]int64, SHOWDAY)
 	now := time.Now()
 	start[0] = zeroTimeUnix(now)
-	golog.Infof("start: %d", start[0])
 	for i := 1; i < SHOWDAY; i++ {
 		start[i] = zeroTimeUnix(now.AddDate(0, 0, -i))
 	}

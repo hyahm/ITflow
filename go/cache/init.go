@@ -18,7 +18,7 @@ var (
 	ShowBaseUrl string
 	Salt        string
 	Expirontion time.Duration
-	ShareDir    string
+	// ShareDir    string
 )
 
 type UG struct {
@@ -49,12 +49,12 @@ func LoadConfig() {
 	ShowBaseUrl = goconfig.ReadEnv("SHOW_URL",
 		goconfig.ReadWithEndSlash("showbaseurl", " http://127.0.0.1:10001/showimg/"))
 	Salt = goconfig.ReadEnv("SALT", goconfig.ReadString("salt", "hjkkaksjdhfryuooweqzmbvc"))
-	ShareDir = goconfig.ReadString("sharedir", "/share/")
-	// 创建共享文件夹
-	err = os.MkdirAll(ShareDir, 0755)
-	if err != nil {
-		panic(err)
-	}
+	// ShareDir = goconfig.ReadString("sharedir", "/share/")
+	// // 创建共享文件夹
+	// err = os.MkdirAll(ShareDir, 0755)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	// CacheRoleRid = make(map[string]int64, 0)
 

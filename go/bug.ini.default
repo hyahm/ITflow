@@ -15,7 +15,7 @@ adminid = 1
 # 默认头像地址
 defaulthead = 
 # 跨域字段
-cross = http://127.0.0.1:9527
+cross = *
 # token 过期时间
 expiration = 120m
 
