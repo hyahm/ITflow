@@ -30,7 +30,10 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		w.Write(response.ErrorE(err))
 		return
 	}
-	w.Write(response.Success())
+	res := response.Response{
+		ID: status.ID,
+	}
+	w.Write(res.Marshal())
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {

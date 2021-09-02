@@ -31,7 +31,7 @@ func DefaultSave(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	model.Default.Created = sl.Created
-	model.Default.Created = sl.Created
+	model.Default.Completed = sl.Completed
 	model.Default.Pass = sl.Pass
 	model.Default.Receive = sl.Receive
 	w.Write(errorcode.Success())
