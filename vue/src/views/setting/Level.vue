@@ -84,6 +84,7 @@ export default {
             id: resp.data.id,
             name: this.form.name,
           });
+          this.$message.success('添加成功')
         });
       } else {
         updateLevel(this.form).then((resp) => {
@@ -93,6 +94,7 @@ export default {
               this.tableData[i].name = this.form.name;
             }
           }
+          this.$message.success('更新成功')
         });
       }
       this.dialogFormVisible = false;

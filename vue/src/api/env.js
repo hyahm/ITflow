@@ -7,11 +7,11 @@ export function getEnvName() {
   })
 }
 
-export function addEnvName(name) {
+export function addEnvName(data) {
   return request({
     url: '/env/add',
-    method: 'get',
-    params: { name }
+    method: 'post',
+    data
   })
 }
 
@@ -19,7 +19,7 @@ export function updateEnvName(data) {
   return request({
     url: '/env/update',
     method: 'post',
-    data: data
+    data
   })
 }
 

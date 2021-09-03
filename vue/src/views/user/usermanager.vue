@@ -168,20 +168,9 @@ export default {
   },
   created() {
     // 获取项目名
-
     this.getuserList();
-    this.getPosition();
   },
   methods: {
-    getPosition() {
-      getPositionKeyName().then((resp) => {
-        this.positionlist = resp.data.data;
-        for (let v of this.positionlist) {
-          this.positionMap.set(v.id, v.name);
-        }
-      });
-    },
-
     cancel() {
       this.dialogVisible = false;
     },
@@ -200,7 +189,13 @@ export default {
     handleClose() {
       this.dialogVisible = false;
     },
-    getuserList() {
+    async getuserList() {
+      const position = await getPositionKeyName()
+      this.positionlist = position.data.data;
+      for (let v of this.positionlist) {
+        this.positionMap.set(v.id, v.name);
+      }
+     
       userList().then((resp) => {
         this.userlist = resp.data.data;
       });

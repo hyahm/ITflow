@@ -11,11 +11,12 @@ import (
 var Env *xmux.GroupRoute
 
 func init() {
-	Env = xmux.NewGroupRoute()
+	Env = xmux.NewGroupRoute().AddPageKeys("env")
 
 	Env.Post("/env/list", Read)
 
-	Env.Get("/env/add", Create)
+	Env.Post("/env/add", Create).Bind(&model.Env{}).
+		AddModule(midware.JsonToStruct)
 
 	Env.Post("/env/update", Update).Bind(&model.Env{}).
 		AddModule(midware.JsonToStruct)

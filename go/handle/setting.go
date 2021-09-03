@@ -21,6 +21,10 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 
 	getuser := xmux.GetInstance(r).Data.(*model.User)
+	if getuser.Jobid == 0 {
+		w.Write(response.Error("职位不能为空"))
+		return
+	}
 	if strings.Contains(getuser.NickName, "@") {
 		w.Write(response.Error("昵称不能包含@符号"))
 		return

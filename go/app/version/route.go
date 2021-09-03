@@ -17,7 +17,7 @@ func init() {
 	// 请求头
 	// 后面是api接口的次要处理
 	// 最后是错误码
-	Version = xmux.NewGroupRoute()
+	Version = xmux.NewGroupRoute().AddPageKeys("version")
 	Version.Post("/version/add", Create).Bind(&model.Version{}).AddModule(midware.JsonToStruct)
 
 	Version.Post("/version/list", Read)

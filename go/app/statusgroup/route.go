@@ -11,7 +11,7 @@ import (
 var StatusGroup *xmux.GroupRoute
 
 func init() {
-	StatusGroup = xmux.NewGroupRoute()
+	StatusGroup = xmux.NewGroupRoute().AddPageKeys("statusgroup")
 
 	StatusGroup.Post("/statusgroup/add", Create).BindJson(&model.StatusGroup{})
 

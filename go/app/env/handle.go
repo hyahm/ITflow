@@ -25,16 +25,11 @@ func Read(w http.ResponseWriter, r *http.Request) {
 
 func Create(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
-
-	envname := r.FormValue("name")
-	env := model.Env{
-		Name: envname,
-	}
+	env := xmux.GetInstance(r).Data.(*model.Env)
 	err := env.Create()
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		w.Write(response.ErrorE(err))
 		return
 	}
 	res := response.Response{

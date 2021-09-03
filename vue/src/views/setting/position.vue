@@ -203,6 +203,18 @@ export default {
       });
     },
     confirm() {
+      if (!this.form.name) {
+        this.$message.error('必须添加职位名称')
+        return
+      }
+       if (!this.form.statusgroup) {
+        this.$message.error('必须添加状态组')
+        return
+      }
+       if (!this.form.rolegroup) {
+        this.$message.error('必须添加角色组')
+        return
+      }
       if (this.form.id === 0) {
         addPosition(this.form).then((resp) => {
           this.tableData.push({
@@ -215,6 +227,7 @@ export default {
           if (this.form.level === 1) {
             this.manager.push(this.form.name);
           }
+          this.$message.success('添加成功')
         });
       } else {
         updatePosition(this.form).then((resp) => {
@@ -233,6 +246,7 @@ export default {
               }
             }
           }
+          this.$message.success('更新成功')
         });
       }
       this.dialogFormVisible = false;

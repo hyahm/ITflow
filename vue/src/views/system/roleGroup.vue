@@ -211,6 +211,7 @@ export default {
 
       // 计算每一行的值， 填充到form里面
       // return
+      console.log(this.form)
       if (this.form.id > 0) {
         editRole(this.form).then((_) => {
           // 成功后赋值到源数据

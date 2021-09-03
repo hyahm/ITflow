@@ -4,6 +4,7 @@ import (
 	"itflow/model"
 	"itflow/response"
 	"net/http"
+	"strings"
 
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
@@ -62,6 +63,18 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	// errorcode := &response.Response{}
 
 	job := xmux.GetInstance(r).Data.(*model.Job)
+	if strings.Trim(job.Name, " ") == "" {
+		w.Write(response.Error("职位名不能为空"))
+		return
+	}
+	if job.RoleGroup <= 0 {
+		w.Write(response.Error("角色组不能为空"))
+		return
+	}
+	if job.StatusGroup <= 0 {
+		w.Write(response.Error("状态组不能为空"))
+		return
+	}
 	err := job.Insert()
 	if err != nil {
 		golog.Error(err)

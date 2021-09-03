@@ -10,7 +10,7 @@ import (
 var Important *xmux.GroupRoute
 
 func init() {
-	Important = xmux.NewGroupRoute()
+	Important = xmux.NewGroupRoute().AddPageKeys("important")
 
 	Important.Post("/important/get", Read)
 

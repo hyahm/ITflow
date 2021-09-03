@@ -41,7 +41,7 @@
             <el-dropdown-item>Docs</el-dropdown-item>
           </a> -->
 
-          <el-dropdown-item>版本:v1.0.4</el-dropdown-item>
+          <el-dropdown-item>版本:v1.0.5</el-dropdown-item>
 
           <el-dropdown-item divided @click.native="logout">
             <span style="display: block">Log Out</span>

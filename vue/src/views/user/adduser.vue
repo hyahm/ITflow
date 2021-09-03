@@ -99,7 +99,7 @@ export default {
         password: "",
         repassword: "",
         realname: "",
-        level: 2,
+        jid: undefined,
       },
       number: {
         one: 1,
@@ -149,7 +149,7 @@ export default {
         });
         return;
       }
-      if (this.postForm.position === "") {
+      if (!this.postForm.jid) {
         this.$message({
           message: "请选择职位",
           type: "error",

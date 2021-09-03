@@ -30,7 +30,7 @@
       width="60%"
       title="运行环境"
     >
-      <el-form :model="form">
+      <el-form>
         <el-form-item label="环境名">
           <el-input v-model="form.name" auto-complete="off" />
         </el-form-item>
@@ -53,7 +53,6 @@ export default {
       dialogFormVisible: false,
       form: {
         name: "",
-        delivery: false,
         id: 0,
       },
       formLabelWidth: "120px",
@@ -105,9 +104,14 @@ export default {
       this.form.name = row.name;
     },
     confirm() {
+      console.log(this.form.name)
+      if (!this.form.name) {
+        this.$message.warning('名称不能为空')
+        return
+      }
       this.dialogFormVisible = false;
       if (this.form.id === 0) {
-        addEnvName(this.form.envname).then((resp) => {
+        addEnvName({name: this.form.name}).then((resp) => {
           this.tableData.push({
             id: resp.data.id,
             name: this.form.name,

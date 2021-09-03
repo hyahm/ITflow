@@ -11,7 +11,7 @@ import (
 var Status *xmux.GroupRoute
 
 func init() {
-	Status = xmux.NewGroupRoute()
+	Status = xmux.NewGroupRoute().AddPageKeys("status")
 
 	Status.Post("/status/list", Read)
 

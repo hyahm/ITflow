@@ -10,7 +10,7 @@ import (
 var Position *xmux.GroupRoute
 
 func init() {
-	Position = xmux.NewGroupRoute()
+	Position = xmux.NewGroupRoute().AddPageKeys("position")
 
 	Position.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 	Position.Post("/position/list", Read)
