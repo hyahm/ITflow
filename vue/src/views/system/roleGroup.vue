@@ -194,6 +194,7 @@ export default {
     HandlerAddGroup() {
       if (this.form.name.length < 1) {
         this.$message.error("name no be need");
+        return
       }
       this.form.rolelist = [];
       for (let v of this.permlist) {

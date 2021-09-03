@@ -11,6 +11,7 @@ salt = hjkkaksjdhfryuooweqzmbvc
 # 共享文件夹根目录(已经废弃)
 sharedir = /share/
 # 默认管理员id
+# 默认管理员id
 adminid = 1
 # 默认头像地址
 defaulthead = 
