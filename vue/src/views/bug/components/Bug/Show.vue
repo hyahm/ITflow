@@ -335,7 +335,10 @@ export default {
       this.dialogFormVisible = true;
     },
     Receive(row) {
-      if (row.sid != this.default.pass || row.sid != this.default.created) {
+      console.log(row.sid)
+      console.log(this.default.pass)
+      console.log(this.default.created)
+      if (row.sid != this.default.pass && row.sid != this.default.created) {
         this.$message({
           message: "此状态无法领取",
           type: "success",
