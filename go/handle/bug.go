@@ -43,8 +43,7 @@ func (sl *statusList) ErrorE(err error) []byte {
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
 	// 获取状态名
-	uid := xmux.GetInstance(r).Get("uid").(int64)
-	status, err := model.GetStatusIDsByUid(uid)
+	status, err := model.GetStatusList()
 	if err != nil {
 		golog.Error(err)
 		w.Write(response.ErrorE(err))

@@ -35,11 +35,11 @@
           <span>{{ scope.row.rolegroup | toRoleName(roleMap) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态组" width="110px" align="center">
+      <!-- <el-table-column label="状态组" width="110px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.statusgroup | toStatusName(statusMap) }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column width="200" label="操作">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleUpdate(scope.row)">修改</el-button>
@@ -66,16 +66,6 @@
           <el-input v-model="form.name" />
         </el-form-item>
 
-        <el-form-item style="margin-bottom: 40px" label="状态组:">
-          <el-select v-model="form.statusgroup" class="filter-item" style="width: 130px">
-            <el-option
-              v-for="statusgroup in statusgroups"
-              :key="statusgroup.id"
-              :label="statusgroup.name"
-              :value="statusgroup.id"
-            />
-          </el-select>
-        </el-form-item>
         <el-form-item style="margin-bottom: 40px" label="角色组:">
           <el-select v-model="form.rolegroup" class="filter-item" style="width: 130px">
             <el-option
@@ -161,7 +151,7 @@ export default {
         level: 2,
         hypo: undefined,
         rolegroup: undefined,
-        statusgroup: undefined,
+        // statusgroup: undefined,
       },
     };
   },
@@ -182,12 +172,12 @@ export default {
         this.roleMap.set(v.id, v.name);
       }
 
-      const status = await getStatusGroupName();
-      this.statusgroups = status.data.data;
+      // const status = await getStatusGroupName();
+      // this.statusgroups = status.data.data;
 
-      for (let v of this.statusgroups) {
-        this.statusMap.set(v.id, v.name);
-      }
+      // for (let v of this.statusgroups) {
+      //   this.statusMap.set(v.id, v.name);
+      // }
 
       const mg = await getManagerKeyName();
       this.manager = mg.data.data;
@@ -205,10 +195,6 @@ export default {
     confirm() {
       if (!this.form.name) {
         this.$message.error('必须添加职位名称')
-        return
-      }
-       if (!this.form.statusgroup) {
-        this.$message.error('必须添加状态组')
         return
       }
        if (!this.form.rolegroup) {

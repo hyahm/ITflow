@@ -58,8 +58,8 @@ func (bug *Bug) Resume(id interface{}) error {
 
 func (bug *Bug) Update() error {
 	golog.Infof("%#v", *bug)
-	getlistsql := "update bugs set $set where id=?"
-	_, err := db.Mconn.UpdateInterface(bug, getlistsql, bug.ID)
+	getlistsql := "update bugs set $set where id=? and ownerid=?"
+	_, err := db.Mconn.UpdateInterface(bug, getlistsql, bug.ID, bug.OwnerId)
 	return err
 }
 

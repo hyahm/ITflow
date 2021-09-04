@@ -509,7 +509,6 @@ INSERT INTO `roles` VALUES (1,'env','环境页面'),
 (4,'position','职位页面'),
 (5,'project','项目页面'),
 (6,'status','bug状态流程页面'),
-(7,'statusgroup','状态组页面'),
 (8,'version','版本页面');
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -567,34 +566,6 @@ LOCK TABLES `status` WRITE;
 /*!40000 ALTER TABLE `status` DISABLE KEYS */;
 /*!40000 ALTER TABLE `status` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `statusgroup`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `statusgroup` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(30) NOT NULL DEFAULT '',
-  `sids` json,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `statusgroup`
---
-
-LOCK TABLES `statusgroup` WRITE;
-/*!40000 ALTER TABLE `statusgroup` DISABLE KEYS */;
-/*!40000 ALTER TABLE `statusgroup` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `types`
---
 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -759,7 +730,6 @@ CREATE TABLE `jobs` (
   `name` varchar(30) NOT NULL DEFAULT '',
   `level` bigint(20) NOT NULL DEFAULT '2',
   `hypo` varchar(30) NOT NULL DEFAULT '0',
-  `sgid` int(11) NOT NULL DEFAULT '0',
   `rgid` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)

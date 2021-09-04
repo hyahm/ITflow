@@ -71,10 +71,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		w.Write(response.Error("角色组不能为空"))
 		return
 	}
-	if job.StatusGroup <= 0 {
-		w.Write(response.Error("状态组不能为空"))
-		return
-	}
+
 	err := job.Insert()
 	if err != nil {
 		golog.Error(err)

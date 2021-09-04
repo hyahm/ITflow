@@ -41,16 +41,16 @@ const setting = {
         roles: ["admin", "version"]
       }
     },
-    {
-      path: "buggroup",
-      component: () => import("@/views/setting/bugGroup"),
-      name: "buggroup",
-      meta: {
-        title: "bug状态组",
-        icon: "user",
-        roles: ["admin", "statusgroup"]
-      }
-    },
+    // {
+    //   path: "buggroup",
+    //   component: () => import("@/views/setting/bugGroup"),
+    //   name: "buggroup",
+    //   meta: {
+    //     title: "bug状态组",
+    //     icon: "user",
+    //     roles: ["admin", "statusgroup"]
+    //   }
+    // },
 
     {
       path: "project",

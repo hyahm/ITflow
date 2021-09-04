@@ -17,7 +17,7 @@
 
       <app-main />
     <div class="version">
-                版本: v1.0.6
+                版本: v1.1.0
     </div>
       <!-- <right-panel v-if="showSettings">
         <settings />
