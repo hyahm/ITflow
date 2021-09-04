@@ -16,6 +16,9 @@
       </div>
 
       <app-main />
+    <div class="version">
+                版本: v1.0.6
+    </div>
       <!-- <right-panel v-if="showSettings">
         <settings />
       </right-panel> -->
@@ -105,5 +108,13 @@ export default {
 
 .mobile .fixed-header {
   width: 100%;
+}
+
+.version {
+  background-color: #1F2D3D;
+  font-size: 18px;
+  text-align: right;
+  color: white;
+  padding-right: 20px;
 }
 </style>

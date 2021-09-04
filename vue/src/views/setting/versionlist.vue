@@ -109,6 +109,7 @@
 <script>
 import { getVersion, removeVersion, updateVersion, addVersion } from "@/api/version";
 import { getProjectKeyName } from "@/api/get";
+import { deepClone } from '@/utils';
 export default {
   name: "Versionlist",
   filters: {
@@ -154,11 +155,12 @@ export default {
       });
     },
     add() {
+      console.log(11111)
       this.form.id = 0;
       this.form.name = "";
-      this.form.url = "";
-      this.form.bakurl = "";
-      this.form.project = "";
+      this.form.urlone = "";
+      this.form.urltwo = "";
+      this.form.pid = undefined;
       this.dialogFormVisible = true;
     },
     getversionlist() {
@@ -184,10 +186,10 @@ export default {
           .then((response) => {
             this.form.id = response.data.id;
             this.form.createtime = response.data.create_time;
-            this.list.push(this.form);
+            this.list.push(deepClone(this.form));
             this.$message.success("添加成功");
           })
-          .catch();
+    
       } else {
         updateVersion(this.form).then((_) => {
           this.$message.success("修改成功");

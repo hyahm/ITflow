@@ -159,9 +159,9 @@ export default {
         id: 0,
         name: "",
         level: 2,
-        hypo: 0,
-        rolegroup: 0,
-        statusgroup: 0,
+        hypo: undefined,
+        rolegroup: undefined,
+        statusgroup: undefined,
       },
     };
   },
@@ -222,12 +222,16 @@ export default {
             name: this.form.name,
             hypo: this.form.hypo,
             level: this.form.level,
+            rolegroup: this.form.rolegroup,
+            statusgroup: this.form.statusgroup
           });
 
           if (this.form.level === 1) {
             this.manager.push(this.form.name);
+            this.managerMap.set(resp.data.id, this.form.name);
           }
           this.$message.success('添加成功')
+
         });
       } else {
         updatePosition(this.form).then((resp) => {
@@ -290,10 +294,10 @@ export default {
       this.dialogFormVisible = true;
       this.form.id = 0;
       this.form.level = 2;
-      this.form.hypo = 0;
+      this.form.hypo = undefined;
       this.form.name = "";
-      this.form.rolegroup = 0;
-      this.form.statusgroup = 0;
+      this.form.rolegroup = undefined;
+      this.form.statusgroup = undefined;
     },
     handleUpdate(row) {
       this.form = row;
