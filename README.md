@@ -83,15 +83,15 @@ go build main.go
 ```
 cd vue
 
-优先使用cnpm 安装 
+优先使用cnpm 安装 https://github.com/hyahm/ITflow/blob/master/README.md
 npm install  --registry=https://registry.npm.taobao.org  cnpm -g
 cnpm install
 或 npm 安装
 npm install  --registry=https://registry.npm.taobao.org  # 安装依赖
 
 或 yarm 安装
-npm install  --registry=https://registry.npm.taobao.org  yarm -g
-yarm install
+npm install  --registry=https://registry.npm.taobao.org  yarn -g
+yarn install
 ```
 > 修改配置文件  .env.production
 ```
