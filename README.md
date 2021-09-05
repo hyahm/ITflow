@@ -101,7 +101,7 @@ VUE_APP_PASSWORD = ''   # 设置为空
 ```
 > 打包
 ```
-npm run build:prod
+npm run build
 
 ```
 >  使用nginx 部署    
