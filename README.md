@@ -95,9 +95,12 @@ yarn install
 ```
 > 修改配置文件  .env.production
 ```
-VUE_APP_BASE_API = 'http://120.26.164.125:10001'  # 改为后端服务器外网地址
-VUE_APP_USERNAME = ''  # 设置为空
-VUE_APP_PASSWORD = ''   # 设置为空
+  # 改为后端服务器外网地址
+VUE_APP_BASE_API = 'http://120.26.164.125:10001'
+ # 设置为空
+VUE_APP_USERNAME = '' 
+   # 设置为空
+VUE_APP_PASSWORD = ''
 ```
 > 打包
 ```
