@@ -23,7 +23,8 @@ func Complete(w http.ResponseWriter, r *http.Request) {
 	bug.UpdateTime = time.Now().Unix()
 	bug.OwnerId = uid
 	// 判断是否有默认值
-	err := bug.Update()
+	golog.Infof("%#v", *bug)
+	err := bug.UpdateStatus()
 	if err != nil {
 		golog.Error(err)
 		w.Write(response.ErrorE(err))

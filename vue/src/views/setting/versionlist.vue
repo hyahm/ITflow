@@ -155,7 +155,6 @@ export default {
       });
     },
     add() {
-      console.log(11111)
       this.form.id = 0;
       this.form.name = "";
       this.form.urlone = "";

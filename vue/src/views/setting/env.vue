@@ -104,7 +104,6 @@ export default {
       this.form.name = row.name;
     },
     confirm() {
-      console.log(this.form.name)
       if (!this.form.name) {
         this.$message.warning('名称不能为空')
         return

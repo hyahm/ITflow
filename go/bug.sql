@@ -135,7 +135,6 @@ CREATE TABLE `defaultvalue` (
   `completed` int(11) NOT NULL DEFAULT '0',
   `pass` int(11) NOT NULL DEFAULT '0',
   `receive` int(11) NOT NULL DEFAULT '0',
-  `level` bigint(20) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -143,7 +142,7 @@ CREATE TABLE `defaultvalue` (
 --
 
 LOCK TABLES `defaultvalue` WRITE;
-insert into defaultvalue(created, completed) values(0,0);
+insert into defaultvalue(created, completed,pass, `receive`) values(1, 2, 4, 3);
 /*!40000 ALTER TABLE `defaultvalue` DISABLE KEYS */;
 /*!40000 ALTER TABLE `defaultvalue` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -564,6 +563,7 @@ CREATE TABLE `status` (
 
 LOCK TABLES `status` WRITE;
 /*!40000 ALTER TABLE `status` DISABLE KEYS */;
+insert into status values(1, '新建'), (2, '已完成'),(3, '领取中'),(4, '处理中');
 /*!40000 ALTER TABLE `status` ENABLE KEYS */;
 UNLOCK TABLES;
 

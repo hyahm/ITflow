@@ -19,13 +19,16 @@ type RequestPass struct {
 func PassBug(w http.ResponseWriter, r *http.Request) {
 	rp := xmux.GetInstance(r).Data.(*RequestPass)
 	uid := xmux.GetInstance(r).Get("uid").(int64)
+
 	// 更新bug表
 	bug := model.Bug{
-		ID:   rp.Bid,
-		Uids: rp.SpUsers,
-		Sid:  model.Default.Pass, // 转交的默认状态
+		ID:      rp.Bid,
+		Uids:    rp.SpUsers,
+		Sid:     model.Default.Pass, // 转交的默认状态
+		OwnerId: uid,
 	}
-	err := bug.Update()
+	golog.Infof("%#v", bug)
+	err := bug.UpdateStatus()
 	if err != nil {
 		golog.Error(err)
 		w.Write(response.ErrorE(err))

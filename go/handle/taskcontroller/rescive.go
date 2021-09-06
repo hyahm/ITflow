@@ -16,19 +16,21 @@ func Receive(w http.ResponseWriter, r *http.Request) {
 	// 需要
 
 	bug := xmux.GetInstance(r).Data.(*model.Bug)
+	uid := xmux.GetInstance(r).Get("uid").(int64)
 	// 判断是否有默认值
 	if model.Default.Receive <= 0 {
 		w.Write([]byte("not set default status"))
 		return
 	}
+	bug.OwnerId = uid
 	bug.Sid = model.Default.Receive
-	err := bug.Update()
+	golog.Infof("%#v", *bug)
+	err := bug.UpdateStatus()
 	if err != nil {
 		golog.Error(err)
 		w.Write(response.ErrorE(err))
 		return
 	}
-	uid := xmux.GetInstance(r).Get("uid").(int64)
 	bug.Uids = []int64{uid}
 	// 还要增加information
 	information := model.Information{

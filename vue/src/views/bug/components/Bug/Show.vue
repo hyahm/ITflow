@@ -114,7 +114,7 @@
 
            <el-button
             type="primary"
-            v-if="pageType == 2"
+            v-if="pageType == 4 && scope.row.spusers.indexOf(scope.row.ownerid) >= 0"
             size="mini"
             @click="handleComplete(scope.row)"
             >完成</el-button
@@ -288,20 +288,14 @@ export default {
         this.$message.error("至少选择一个处理人");
         return;
       }
-      console.log(this.temp)
       passBug(this.temp).then((resp) => {
-        this.$router.go(0)
-        //  for (let i =0 ; i <this.list.length;i++ ) {
-        //   if (this.list[i].id == id) {
-        //     this.list[i].spusers = this.temp.spusers;
-        //     this.$set(this.list[i],sid,this.default.pass)
-        //     break;
-        //   }
-        // }
-        // this.$message({
-        //   message: "操作成功",
-        //   type: "success",
-        // });
+        this.$message({
+          message: "操作成功",
+          type: "success",
+        });
+        setTimeout(()=>{
+          this.$router.go(0)
+        }, 2000)
       });
       this.dialogFormVisible = false;
     },
@@ -352,23 +346,17 @@ export default {
     },
     receiveHandle(id) {
       // 确认领取任务
-      console.log(id)
       this.receive.deadline = parseInt(this.receive.deadline / 1000);
       receiveBug(this.receive).then((resp) => {
-        this.$router.go(0)
-        // for (let i = 0 ; i <this.list.length;i++ ) {
-        //   if (this.list[i].id == id) {
-        //     console.log(this.list[i])
-        //     this.list[i].spusers = resp.data.user_ids;
-        //     this.list[i].deadline = parseInt(this.deadline / 1000);
-        //     this.list[i].sid = this.default.receive
-        //     break;
-        //   }
-        // }
-        // this.$message({
-        //   message: "领取成功",
-        //   type: "success",
-        // });
+        
+ 
+        this.$message({
+          message: "领取成功",
+          type: "success",
+        });
+        setTimeout(()=>{
+          this.$router.go(0)
+        },2000)
       });
       this.openReceive = false;
     },
