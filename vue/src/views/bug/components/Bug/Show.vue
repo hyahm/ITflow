@@ -320,10 +320,10 @@ export default {
       this.temp.bid = parseInt(row.id); // copy obj
       this.temp.spusers = [];
       this.users = [];
-      getUserKeyNameByProject(row.projectname).then((resp) => {
+      getUserKeyNameByProject({project_id: row.pid}).then((resp) => {
         this.users = resp.data.data;
         for (var i = 0; i < this.users.length; i++) {
-          for (var j = 0; j < row.handle.length; j++) {
+          for (var j = 0; j < row.spusers.length; j++) {
             if (this.temp.spusers[j] === this.users[i]) {
               this.temp.spusers.push(this.users[i]);
             }

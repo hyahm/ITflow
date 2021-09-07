@@ -15,6 +15,7 @@ type RequestProject struct {
 
 func GetVersionKeyNameByProject(w http.ResponseWriter, r *http.Request) {
 	rvkn := xmux.GetInstance(r).Data.(*RequestProject)
+
 	vkns, err := model.GetVersionKeyNameByProjectId(rvkn.ProjectId)
 	if err != nil {
 		golog.Error(err)
