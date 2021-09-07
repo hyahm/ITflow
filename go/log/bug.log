@@ -1,0 +1,87 @@
+2021-09-05 12:25:07 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/cache/init.go:62 - cookie过期时间为：2h0m0s
+2021-09-05 12:25:28 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/cache/init.go:62 - cookie过期时间为：2h0m0s
+2021-09-05 12:44:10 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:56 - 1
+2021-09-05 12:44:53 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:56 - 1
+2021-09-05 12:45:03 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:56 - 1
+2021-09-05 22:04:07 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/cache/init.go:62 - cookie过期时间为：2h0m0s
+2021-09-05 22:04:32 - [ERROR] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:34 - 账号或密码错误
+2021-09-05 22:04:53 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:56 - 1
+2021-09-05 22:13:25 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/model/init.go:60 - model.Email{Host:"", Enable:false, Id:0, Port:0, Email:"", Password:"", NickName:""}
+2021-09-05 22:20:28 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/defaultvalue.go:26 - &model.DefaultValue{Created:1, Completed:2, Pass:3, Receive:4}
+2021-09-05 22:21:31 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/publiccontroller/user.go:21 - &{1}
+2021-09-05 22:21:45 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:56 - 1
+2021-09-05 22:22:24 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/publiccontroller/user.go:21 - &{1}
+2021-09-05 22:22:39 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/article.go:207 - upload image
+2021-09-05 22:22:39 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/article.go:210 - /data/bugimg/1630851759827445000.png
+2021-09-05 22:22:45 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/publiccontroller/user.go:21 - &{1}
+2021-09-05 22:23:12 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:74 - select count(id) from bugs where dustbin=false  and  ownerid=? 
+2021-09-05 22:23:12 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:97 - select * from bugs where dustbin=false  and  ownerid=?  limit 0,1
+2021-09-05 22:23:17 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:56 - 1
+2021-09-05 22:23:17 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/article.go:298 - 1
+2021-09-05 22:23:17 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/article.go:317 - &{Status: Title:第一个bug Content:第一个bug
+![image.png](http://127.0.0.1:10001/showimg/1630851759827445000.png) Id:1 Selectusers:[] Important:一般 Level:一般 Projectname:itflow Envname:测试 Version:v1.0.5 Code:0 Msg: Comments:[] Url:[] Typ:1}
+2021-09-05 22:23:33 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:74 - select count(id) from bugs where dustbin=false  and  ownerid=? 
+2021-09-05 22:23:33 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:97 - select * from bugs where dustbin=false  and  ownerid=?  limit 0,1
+2021-09-05 22:23:39 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:74 - select count(id) from bugs where dustbin=false  and  ownerid=? 
+2021-09-05 22:23:39 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:97 - select * from bugs where dustbin=false  and  ownerid=?  limit 0,1
+2021-09-05 22:23:46 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/publiccontroller/user.go:21 - &{1}
+2021-09-05 22:24:02 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:56 - 2
+2021-09-05 22:24:08 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:74 - select count(id) from bugs where dustbin=false  and  ownerid=? 
+2021-09-05 22:24:30 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:56 - 2
+2021-09-05 22:24:30 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/article.go:298 - 1
+2021-09-05 22:24:30 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/article.go:317 - &{Status: Title:第一个bug Content:第一个bug
+![image.png](http://127.0.0.1:10001/showimg/1630851759827445000.png) Id:1 Selectusers:[] Important:一般 Level:一般 Projectname:itflow Envname:测试 Version:v1.0.5 Code:0 Msg: Comments:[] Url:[] Typ:1}
+2021-09-05 22:24:51 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:56 - 2
+2021-09-05 22:24:52 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/article.go:298 - 1
+2021-09-05 22:24:52 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/article.go:317 - &{Status: Title:第一个bug Content:第一个bug
+![image.png](http://127.0.0.1:10001/showimg/1630851759827445000.png) Id:1 Selectusers:[] Important:一般 Level:一般 Projectname:itflow Envname:测试 Version:v1.0.5 Code:0 Msg: Comments:[] Url:[] Typ:1}
+2021-09-05 22:25:12 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/model/bugs.go:60 - model.Bug{ID:1, Title:"", Sid:4, Content:"", OwnerId:0, Iid:0, CreateTime:0, Uids:[]int64(nil), Vid:0, Lid:0, Eid:0, Tid:0, Pid:0, UpdateTime:0, DeadLine:1630938298, Dustbin:false}
+2021-09-05 22:25:13 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:56 - 2
+2021-09-05 22:25:18 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:56 - 2
+2021-09-05 22:25:32 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:56 - 2
+2021-09-05 22:25:45 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/model/bugs.go:60 - model.Bug{ID:1, Title:"", Sid:4, Content:"", OwnerId:0, Iid:0, CreateTime:0, Uids:[]int64(nil), Vid:0, Lid:0, Eid:0, Tid:0, Pid:0, UpdateTime:0, DeadLine:1630938340, Dustbin:false}
+2021-09-05 22:25:45 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:56 - 2
+2021-09-05 22:25:48 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:56 - 2
+2021-09-05 22:26:12 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/publiccontroller/user.go:21 - &{0}
+2021-09-05 22:26:32 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/model/bugs.go:60 - model.Bug{ID:1, Title:"", Sid:3, Content:"", OwnerId:0, Iid:0, CreateTime:0, Uids:[]int64{1}, Vid:0, Lid:0, Eid:0, Tid:0, Pid:0, UpdateTime:0, DeadLine:0, Dustbin:false}
+2021-09-05 22:26:32 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:56 - 2
+2021-09-05 22:26:34 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:56 - 2
+2021-09-05 22:27:25 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:24 - select count(id) from bugs where dustbin=false 
+2021-09-05 22:27:25 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:47 - select * from bugs where dustbin=false  limit 0,1
+2021-09-05 22:27:38 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:56 - 1
+2021-09-05 22:27:39 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/article.go:298 - 1
+2021-09-05 22:27:39 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/article.go:317 - &{Status: Title:第一个bug Content:第一个bug
+![image.png](http://127.0.0.1:10001/showimg/1630851759827445000.png) Id:1 Selectusers:[] Important:一般 Level:一般 Projectname:itflow Envname:测试 Version:v1.0.5 Code:0 Msg: Comments:[] Url:[] Typ:1}
+2021-09-05 22:28:26 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:24 - select count(id) from bugs where dustbin=false  and  sid in (2)
+2021-09-05 22:28:32 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:24 - select count(id) from bugs where dustbin=false  and  sid in (2,4,3,1)
+2021-09-05 22:28:32 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:47 - select * from bugs where dustbin=false  and  sid in (2,4,3,1) limit 0,1
+2021-09-05 22:28:37 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:24 - select count(id) from bugs where dustbin=false  and  sid in (1)
+2021-09-05 22:28:37 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:47 - select * from bugs where dustbin=false  and  sid in (1) limit 0,1
+2021-09-05 22:28:54 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:24 - select count(id) from bugs where dustbin=false  and  pid=?  and sid in (1)
+2021-09-05 22:28:54 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:47 - select * from bugs where dustbin=false  and  pid=?  and sid in (1) limit 0,1
+2021-09-07 21:26:46 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/cache/init.go:62 - cookie过期时间为：2h0m0s
+2021-09-07 21:27:33 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:56 - 1
+2021-09-07 21:28:42 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:56 - 1
+2021-09-07 21:28:42 - [ERROR] -  - DESKTOP-7A64FQC - F:/ITflow/go/internal/user/user.go:92 - Error 1146: Table 'itflow.user' doesn't exist
+2021-09-07 21:28:42 - [ERROR] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:59 - Error 1146: Table 'itflow.user' doesn't exist
+2021-09-07 21:32:54 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/cache/init.go:62 - cookie过期时间为：2h0m0s
+2021-09-07 21:35:19 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/cache/init.go:62 - cookie过期时间为：2h0m0s
+2021-09-07 21:36:13 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/cache/init.go:62 - cookie过期时间为：2h0m0s
+2021-09-07 21:37:25 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/cache/init.go:62 - cookie过期时间为：2h0m0s
+2021-09-07 21:37:30 - [ERROR] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:34 - 账号或密码错误
+2021-09-07 21:38:37 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/cache/init.go:62 - cookie过期时间为：2h0m0s
+2021-09-07 21:38:56 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/cache/init.go:62 - cookie过期时间为：2h0m0s
+2021-09-07 21:39:00 - [ERROR] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/login.go:34 - 账号或密码错误
+2021-09-07 21:39:30 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:24 - select count(id) from bugs where dustbin=false 
+2021-09-07 21:41:32 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/model/init.go:60 - model.Email{Host:"", Enable:false, Id:0, Port:0, Email:"", Password:"", NickName:""}
+2021-09-07 21:43:58 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/model/init.go:60 - model.Email{Host:"", Enable:false, Id:0, Port:0, Email:"", Password:"", NickName:""}
+2021-09-07 21:46:17 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/publiccontroller/user.go:21 - &{1}
+2021-09-07 21:46:47 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/article.go:207 - upload image
+2021-09-07 21:46:47 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/article.go:210 - /data/bugimg/1631022407865266100.png
+2021-09-07 21:47:07 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/publiccontroller/user.go:21 - &{1}
+2021-09-07 21:47:09 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:74 - select count(id) from bugs where dustbin=false  and  ownerid=? 
+2021-09-07 21:47:09 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:97 - select * from bugs where dustbin=false  and  ownerid=?  limit 0,1
+2021-09-07 21:47:32 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:74 - select count(id) from bugs where dustbin=false  and  ownerid=? 
+2021-09-07 21:47:32 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/search.go:97 - select * from bugs where dustbin=false  and  ownerid=?  limit 0,1
+2021-09-07 21:47:47 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/publiccontroller/user.go:21 - &{1}
+2021-09-07 21:48:58 - [INFO] -  - DESKTOP-7A64FQC - F:/ITflow/go/handle/taskcontroller/rescive.go:27 - model.Bug{ID:1, Title:"", Sid:3, Content:"", OwnerId:3, Iid:0, CreateTime:0, Uids:[]int64(nil), Vid:0, Lid:0, Eid:0, Tid:0, Pid:0, UpdateTime:0, DeadLine:1631627331, Dustbin:false}

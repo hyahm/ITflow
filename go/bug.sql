@@ -1,87 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.7.15, for Linux (x86_64)
 --
--- Host: 172.19.0.9    Database: project
--- ------------------------------------------------------
--- Server version	5.7.27-log
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
--- Table structure for table `apilist`
---
-
--- /*!40101 SET @saved_cs_client     = @@character_set_client */;
--- /*!40101 SET character_set_client = utf8 */;
--- CREATE TABLE `apilist` (
---   `id` bigint(20) NOT NULL AUTO_INCREMENT,
---   `name` varchar(100) DEFAULT NULL,
---   `pid` bigint(20) DEFAULT NULL,
---   `url` varchar(200) DEFAULT NULL,
---   `information` varchar(255) DEFAULT NULL,
---   `opts` varchar(100) DEFAULT NULL,
---   `methods` varchar(100) DEFAULT NULL,
---   `resp` text,
---   `result` text,
---   `uid` bigint(20) DEFAULT NULL,
---   `hid` bigint(20) DEFAULT NULL,
---   `calltype` varchar(20) DEFAULT NULL,
---   PRIMARY KEY (`id`)
--- ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
--- /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `apilist`
---
-
--- LOCK TABLES `apilist` WRITE;
--- /*!40000 ALTER TABLE `apilist` DISABLE KEYS */;
--- /*!40000 ALTER TABLE `apilist` ENABLE KEYS */;
--- UNLOCK TABLES;
-
---
--- Table structure for table `apiproject`
--- --
-
--- /*!40101 SET @saved_cs_client     = @@character_set_client */;
--- /*!40101 SET character_set_client = utf8 */;
--- CREATE TABLE `apiproject` (
---   `id` bigint(20) NOT NULL AUTO_INCREMENT,
---   `name` varchar(50) NOT NULL DEFAULT '',
---   `ownerid` varchar(100) DEFAULT '0',
---   `auth` tinyint(1) DEFAULT '0',
---   `readuser` tinyint(1) DEFAULT '0',
---   `edituser` tinyint(1) DEFAULT '0',
---   `rid` tinyint(1) DEFAULT '0',
---   `eid` tinyint(1) DEFAULT '0',
---   PRIMARY KEY (`id`),
---   UNIQUE KEY `name` (`name`)
--- ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
--- /*!40101 SET character_set_client = @saved_cs_client */;
-
--- --
--- -- Dumping data for table `apiproject`
--- --
-
--- LOCK TABLES `apiproject` WRITE;
--- /*!40000 ALTER TABLE `apiproject` DISABLE KEYS */;
--- /*!40000 ALTER TABLE `apiproject` ENABLE KEYS */;
--- UNLOCK TABLES;
-
---
--- Table structure for table `bugs`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `bugs` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `uid` bigint(20) NOT NULL DEFAULT '0',
@@ -113,39 +32,24 @@ CREATE TABLE `bugs` (
   KEY `dustbin` (`dustbin`),
   KEY `updatetime` (`updatetime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 --
 -- Dumping data for table `bugs`
 --
 
-LOCK TABLES `bugs` WRITE;
-/*!40000 ALTER TABLE `bugs` DISABLE KEYS */;
-/*!40000 ALTER TABLE `bugs` ENABLE KEYS */;
-UNLOCK TABLES;
 
---
--- Table structure for table `defaultvalue`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `defaultvalue` (
   `created` int(11) NOT NULL DEFAULT '0',
   `completed` int(11) NOT NULL DEFAULT '0',
   `pass` int(11) NOT NULL DEFAULT '0',
-  `receive` int(11) NOT NULL DEFAULT '0',
+  `receive` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 
 --
 
-LOCK TABLES `defaultvalue` WRITE;
-insert into defaultvalue(created, completed,pass, `receive`) values(1, 2, 4, 3);
-/*!40000 ALTER TABLE `defaultvalue` DISABLE KEYS */;
-/*!40000 ALTER TABLE `defaultvalue` ENABLE KEYS */;
-UNLOCK TABLES;
+insert into defaultvalue values(1, 2, 3, 4);
 
 --
 -- Table structure for table `email`
@@ -161,12 +65,8 @@ CREATE TABLE `typ` (
 
 LOCK TABLES `typ` WRITE;
 insert into typ(name) values('bug'), ('需求');
-/*!40000 ALTER TABLE `typ` DISABLE KEYS */;
-/*!40000 ALTER TABLE `typ` ENABLE KEYS */;
 UNLOCK TABLES;
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `email` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `email` varchar(50) NOT NULL,
@@ -178,7 +78,6 @@ CREATE TABLE `email` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `email`
@@ -193,15 +92,12 @@ UNLOCK TABLES;
 -- Table structure for table `environment`
 --
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `environment` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `environment`
@@ -216,8 +112,6 @@ UNLOCK TABLES;
 -- Table structure for table `header`
 --
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `header` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL DEFAULT '',
@@ -226,23 +120,18 @@ CREATE TABLE `header` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `header`
 --
 
 LOCK TABLES `header` WRITE;
-/*!40000 ALTER TABLE `header` DISABLE KEYS */;
-/*!40000 ALTER TABLE `header` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
 -- Table structure for table `headerlist`
 --
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `headerlist` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `k` varchar(200) NOT NULL,
@@ -250,30 +139,24 @@ CREATE TABLE `headerlist` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `k` (`k`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `headerlist`
 --
 
 LOCK TABLES `headerlist` WRITE;
-/*!40000 ALTER TABLE `headerlist` DISABLE KEYS */;
-/*!40000 ALTER TABLE `headerlist` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
 -- Table structure for table `importants`
 --
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `importants` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(40) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoD DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `importants`
@@ -288,8 +171,6 @@ UNLOCK TABLES;
 -- Table structure for table `informations`
 --
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `informations` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `uid` bigint(20) NOT NULL DEFAULT '0',
@@ -298,7 +179,6 @@ CREATE TABLE `informations` (
   `time` bigint(20) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `informations`
@@ -315,15 +195,12 @@ UNLOCK TABLES;
 -- Table structure for table `level`
 --
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `level` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `level`
@@ -338,8 +215,6 @@ UNLOCK TABLES;
 -- Table structure for table `log`
 --
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `log` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `exectime` bigint(20) DEFAULT '0',
@@ -349,7 +224,6 @@ CREATE TABLE `log` (
   `action` varchar(50) DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `log`
@@ -364,8 +238,6 @@ UNLOCK TABLES;
 -- Table structure for table `options`
 --
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `options` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
@@ -375,30 +247,25 @@ CREATE TABLE `options` (
   `need` varchar(10) DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `options`
 --
 
 LOCK TABLES `options` WRITE;
-/*!40000 ALTER TABLE `options` DISABLE KEYS */;
-/*!40000 ALTER TABLE `options` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
 -- Table structure for table `perm`
 --
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `perm` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `pv` int(8) NOT NULL DEFAULT '0',
   `rid` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 --
 -- Dumping data for table `perm`
@@ -423,7 +290,7 @@ CREATE TABLE `project` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 --
 -- Dumping data for table `project`
@@ -446,7 +313,7 @@ CREATE TABLE `restfulname` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 --
 -- Dumping data for table `restfulname`
@@ -470,7 +337,7 @@ CREATE TABLE `rolegroup` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 --
 -- Dumping data for table `rolegroup`
@@ -494,7 +361,7 @@ CREATE TABLE `roles` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 --
 -- Dumping data for table `roles`
@@ -532,7 +399,7 @@ CREATE TABLE `sharefile` (
   `name` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 --
 -- Dumping data for table `sharefile`
@@ -555,7 +422,7 @@ CREATE TABLE `status` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 --
 -- Dumping data for table `status`
@@ -579,7 +446,7 @@ CREATE TABLE `types` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 --
 -- Dumping data for table `types`
@@ -616,7 +483,7 @@ CREATE TABLE `user` (
   KEY `jid` (`jid`),
   KEY `createuid` (`createuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 --
 -- Dumping data for table `user`
@@ -643,23 +510,19 @@ CREATE TABLE `usergroup` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 --
 -- Dumping data for table `usergroup`
 --
 
 LOCK TABLES `usergroup` WRITE;
-/*!40000 ALTER TABLE `usergroup` DISABLE KEYS */;
-/*!40000 ALTER TABLE `usergroup` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
 -- Table structure for table `version`
 --
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `version` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
@@ -671,27 +534,14 @@ CREATE TABLE `version` (
   PRIMARY KEY (`id`),
   KEY `idx_version` (`pid`,`name`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 --
 -- Dumping data for table `version`
 --
 
 LOCK TABLES `version` WRITE;
-/*!40000 ALTER TABLE `version` DISABLE KEYS */;
-/*!40000 ALTER TABLE `version` ENABLE KEYS */;
 UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2020-07-13  9:37:37
 
 
 CREATE TABLE `auth` (
@@ -722,7 +572,7 @@ CREATE TABLE `doc` (
   `kid` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=112 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `jobs` (
