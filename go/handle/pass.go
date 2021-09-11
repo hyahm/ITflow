@@ -22,10 +22,9 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 
 	// 更新bug表
 	bug := model.Bug{
-		ID:      rp.Bid,
-		Uids:    rp.SpUsers,
-		Sid:     model.Default.Pass, // 转交的默认状态
-		OwnerId: uid,
+		ID:   rp.Bid,
+		Uids: rp.SpUsers,
+		Sid:  model.Default.Pass, // 转交的默认状态
 	}
 	golog.Infof("%#v", bug)
 	err := bug.UpdateStatus()

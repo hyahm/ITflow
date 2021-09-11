@@ -11,8 +11,6 @@ import (
 
 func GetUserKeyNameByProject(w http.ResponseWriter, r *http.Request) {
 	rvkn := xmux.GetInstance(r).Data.(*RequestProject)
-	golog.Info(111)
-	golog.Info(rvkn)
 	vkns, err := model.GetUserKeyNameByProjectId(rvkn.ProjectId)
 	if err != nil {
 		golog.Error(err)

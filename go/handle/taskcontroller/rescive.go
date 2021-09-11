@@ -22,10 +22,8 @@ func Receive(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("not set default status"))
 		return
 	}
-	bug.OwnerId = uid
 	bug.Sid = model.Default.Receive
-	golog.Infof("%#v", *bug)
-	err := bug.UpdateStatus()
+	err := bug.UpdateStatus(model.Default.Created, model.Default.Pass)
 	if err != nil {
 		golog.Error(err)
 		w.Write(response.ErrorE(err))

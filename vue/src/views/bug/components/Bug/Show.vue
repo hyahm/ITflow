@@ -114,7 +114,7 @@
 
            <el-button
             type="primary"
-            v-if="pageType == 4 && scope.row.spusers.indexOf(scope.row.ownerid) >= 0"
+            v-if="pageType == 4 && scope.row.uid == $store.getters.uid"
             size="mini"
             @click="handleComplete(scope.row)"
             >完成</el-button
@@ -336,7 +336,7 @@ export default {
       if (row.sid != this.default.pass && row.sid != this.default.created) {
         this.$message({
           message: "此状态无法领取",
-          type: "success",
+          type: "error",
         });
         return;
       }

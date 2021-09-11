@@ -63,7 +63,7 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 
 	// 必须包含此用户
 
-	search.Condition = append(search.Condition, " ownerid=? ")
+	search.Condition = append(search.Condition, " uid=? ")
 	search.Args = append(search.Args, uid)
 
 	sql, args := search.GetUsefulCondition(uid)
@@ -112,8 +112,8 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 	search := xmux.GetInstance(r).Data.(*search.ReqMyBugFilter)
 	// 必须包含此用户
 
-	search.Condition = append(search.Condition, " json_contains(spusers, json_array(?)) ")
-	search.Args = append(search.Args, uid)
+	search.Condition = append(search.Condition, " (json_contains(spusers, json_array(?)) or uid=? )")
+	search.Args = append(search.Args, uid, uid)
 	sql, args := search.GetUsefulCondition(uid)
 	if len(sql) > 0 {
 		sql = " and " + sql

@@ -53,6 +53,7 @@ func UserInfo(w http.ResponseWriter, r *http.Request) {
 	userinfo := &user.UserInfo{}
 	userinfo.NickName = xmux.GetInstance(r).Get("nickname").(string)
 	uid := xmux.GetInstance(r).Get("uid").(int64)
+	userinfo.Uid = uid
 	err := userinfo.GetUserInfo(uid)
 	if err != nil {
 		golog.Error(err)

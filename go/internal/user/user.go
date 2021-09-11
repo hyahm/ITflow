@@ -81,7 +81,7 @@ type UserInfo struct {
 	NickName string   `json:"name" type:"string" need:"否" default:"" information:"用户昵称"`
 	// Realname string   `json:"realname,omitempty" type:"string" need:"否" default:"" information:"真实姓名"`
 	// Email string `json:"email,omitempty" type:"string" need:"否" default:"" information:"邮箱地址"`
-	// Uid int64 `json:"uid,omitempty" type:"int" need:"否" default:"" information:"用户id"`
+	Uid int64 `json:"uid,omitempty" type:"int" need:"否" default:"" information:"用户id"`
 }
 
 func (ui *UserInfo) GetUserInfo(uid int64) error {

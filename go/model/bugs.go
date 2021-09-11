@@ -10,9 +10,9 @@ type Bug struct {
 	ID         int64   `json:"id" db:"id,default"`
 	Title      string  `json:"title" db:"title"`
 	Sid        int64   `json:"sid" db:"sid"` // bug状态id
+	Uid        int64   `json:"uid" db:"uid"` // 创建者
 	Content    string  `json:"content" db:"content"`
-	OwnerId    int64   `json:"ownerid" db:"ownerid"` // 创建者
-	Iid        int64   `json:"iid" db:"iid"`         // import id
+	Iid        int64   `json:"iid" db:"iid"` // import id
 	CreateTime int64   `json:"createtime" db:"createtime"`
 	Uids       []int64 `json:"spusers" db:"spusers"` // users id
 	Vid        int64   `json:"vid" db:"vid"`         // version id
@@ -27,7 +27,7 @@ type Bug struct {
 
 func GetBugById(id interface{}, uid int64) (*Bug, error) {
 	bug := &Bug{}
-	err := db.Mconn.Select(&bug, "select * from bugs where id=? and ownerid=?", id, uid)
+	err := db.Mconn.Select(&bug, "select * from bugs where id=? and uid=?", id, uid)
 	if err != nil {
 		return nil, err
 	}
@@ -55,14 +55,14 @@ func (bug *Bug) Resume(id interface{}) error {
 }
 
 func (bug *Bug) Update() error {
-	getlistsql := "update bugs set $set where id=? and ownerid=?"
-	_, err := db.Mconn.UpdateInterface(bug, getlistsql, bug.ID, bug.OwnerId)
+	getlistsql := "update bugs set $set where id=? and uid=?"
+	_, err := db.Mconn.UpdateInterface(bug, getlistsql, bug.ID, bug.Uid)
 	return err
 }
 
-func (bug *Bug) UpdateStatus() error {
-	getlistsql := "update bugs set $set where id=? and json_contains(spusers, json_array(?))"
-	_, err := db.Mconn.UpdateInterface(bug, getlistsql, bug.ID, bug.OwnerId)
+func (bug *Bug) UpdateStatus(sids ...int64) error {
+	getlistsql := "update bugs set $set where id=? and uid=? and sid not in (?)"
+	_, err := db.Mconn.UpdateInterfaceIn(bug, getlistsql, bug.ID, bug.Uid, sids)
 	return err
 }
 
@@ -72,7 +72,7 @@ func (bug *Bug) Delete(uid, id interface{}) error {
 		_, err := db.Mconn.Update(getlistsql, id)
 		return err
 	} else {
-		getlistsql := "delete from bugs  where id=? and ownerid=?"
+		getlistsql := "delete from bugs  where id=? and uid=?"
 		_, err := db.Mconn.Update(getlistsql, id, uid)
 		return err
 	}

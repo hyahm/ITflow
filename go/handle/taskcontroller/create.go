@@ -27,7 +27,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	bug.Sid = dv.Created
-	bug.OwnerId = uid
+	bug.Uid = uid
 	bug.CreateTime = time.Now().Unix()
 	err = bug.CreateBug()
 	if err != nil {

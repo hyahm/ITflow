@@ -21,7 +21,7 @@ func Complete(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 	bug.Sid = model.Default.Completed
 	bug.UpdateTime = time.Now().Unix()
-	bug.OwnerId = uid
+	bug.Uid = uid
 	// 判断是否有默认值
 	golog.Infof("%#v", *bug)
 	err := bug.UpdateStatus()
