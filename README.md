@@ -79,6 +79,10 @@ db = itflow
 go build main.go
 ./main
 ```
+> 测试运行
+```
+go run main.go
+```
 ###### 前端(最新版node, 保证有npm命令)
 ```
 cd vue
@@ -101,6 +105,10 @@ VUE_APP_BASE_API = 'http://120.26.164.125:10001'
 VUE_APP_USERNAME = '' 
    # 设置为空
 VUE_APP_PASSWORD = ''
+```
+> 测试运行
+```
+npm run dev
 ```
 > 打包
 ```
