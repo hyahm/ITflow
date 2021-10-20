@@ -84,6 +84,7 @@ go build main.go
 go run main.go
 ```
 ###### 前端(最新版node, 保证有npm命令)
+> 安装依赖
 ```
 cd vue
 
