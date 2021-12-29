@@ -31,16 +31,16 @@ type Article struct {
 }
 
 type articledetail struct {
-	ID          int    `json:"id"`
-	Importance  string `json:"importance"`
-	Status      string `json:"status"`
-	Title       string `json:"title"`
-	Spusers     string `json:"spusers"`
-	Selectoses  string `json:"selectoses"`
-	AppVersion  string `json:"appversion"`
-	Content     string `json:"content"`
-	Level       string `json:"level"`
-	Projectname string `json:"projectname"`
+	ID          int     `json:"id"`
+	Importance  string  `json:"importance"`
+	Status      string  `json:"status"`
+	Title       string  `json:"title"`
+	Spusers     []int64 `json:"spusers"`
+	Selectoses  string  `json:"selectoses"`
+	AppVersion  string  `json:"appversion"`
+	Content     string  `json:"content"`
+	Level       string  `json:"level"`
+	Projectname string  `json:"projectname"`
 }
 
 type envList struct {

@@ -10,7 +10,7 @@ CREATE TABLE `bugs` (
   `iid` bigint(20) DEFAULT '0',
   `createtime` bigint(20) DEFAULT '0',
   `vid` bigint(20) DEFAULT '0',
-  `spusers` varchar(255) DEFAULT '',
+  `spusers` json,
   `lid` bigint(20) DEFAULT '0',
   `eid` bigint(20) DEFAULT '0',
   `tid` bigint(20) DEFAULT '0',

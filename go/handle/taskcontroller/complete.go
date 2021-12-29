@@ -22,6 +22,7 @@ func Complete(w http.ResponseWriter, r *http.Request) {
 	bug.Sid = model.Default.Completed
 	bug.UpdateTime = time.Now().Unix()
 	bug.Uid = uid
+
 	// 判断是否有默认值
 	golog.Infof("%#v", *bug)
 	err := bug.UpdateStatus()

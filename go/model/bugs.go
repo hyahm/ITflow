@@ -61,7 +61,7 @@ func (bug *Bug) Update() error {
 }
 
 func (bug *Bug) UpdateStatus(sids ...int64) error {
-	getlistsql := "update bugs set $set where id=? and uid=? and sid not in (?)"
+	getlistsql := "update bugs set $set where id=? and json_contains(spusers, json_array(?)) and sid not in (?)"
 	_, err := db.Mconn.UpdateInterfaceIn(bug, getlistsql, bug.ID, bug.Uid, sids)
 	return err
 }

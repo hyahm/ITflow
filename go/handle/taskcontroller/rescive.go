@@ -22,8 +22,9 @@ func Receive(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("not set default status"))
 		return
 	}
+	bug.Uid = xmux.GetInstance(r).Get("uid").(int64)
 	bug.Sid = model.Default.Receive
-	err := bug.UpdateStatus(model.Default.Created, model.Default.Pass)
+	err := bug.UpdateStatus(model.Default.Receive, model.Default.Pass, model.Default.Completed)
 	if err != nil {
 		golog.Error(err)
 		w.Write(response.ErrorE(err))

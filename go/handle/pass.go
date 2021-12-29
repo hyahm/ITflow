@@ -26,7 +26,8 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 		Uids: rp.SpUsers,
 		Sid:  model.Default.Pass, // 转交的默认状态
 	}
-	golog.Infof("%#v", bug)
+	bug.Sid = model.Default.Pass
+	bug.Uid = uid
 	err := bug.UpdateStatus()
 	if err != nil {
 		golog.Error(err)
