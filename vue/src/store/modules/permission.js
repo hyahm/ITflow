@@ -20,13 +20,16 @@ function hasPermission(roles, route) {
  */
 export function filterAsyncRoutes(routes, roles) {
     const res = []
-
+    
     routes.forEach(route => {
         const tmp = {...route }
         if (hasPermission(roles, tmp)) {
+            console.log(roles)
+            console.log(tmp)
             if (tmp.children) {
                 tmp.children = filterAsyncRoutes(tmp.children, roles)
             }
+            res.push(tmp)
         }
     })
 
@@ -47,6 +50,7 @@ const mutations = {
 
 const actions = {
     generateRoutes({ commit }, roles) {
+        console.log(roles)
         return new Promise(resolve => {
             let accessedRoutes
             
