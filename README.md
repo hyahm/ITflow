@@ -58,11 +58,19 @@ export GOPROXY=https://goproxy.cn   // 国内的机器需要执行代理， 国�
 
 > 修改配置文件   
 
+#### 自动生成默认配置文件到本目录
 ```
-go run .\main.exe -c bug.ini   # 自动生成默认配置文件到本目录   bug.ini
-showbaseurl = http://127.0.0.1:10001/showimg/    #  127.0.0.1 换成外网的IP地址
-salt = hjkkakoweqzmbvc   # 修改salt值后   服务启动后用 curl http://127.0.0.1:10001/admin/reset?password=123 修改admin 密码
-cross=*   # 设置跨域的域名   eg:  http://127.0.0.1
+go run .\main.exe -c bug.ini     
+```
+
+#### bug.ini 需要修改的地方
+```
+#  127.0.0.1 换成外网的IP地址
+showbaseurl = http://127.0.0.1:10001/showimg/    
+ # 修改salt值后   服务启动后用 curl http://127.0.0.1:10001/admin/reset?password=123 修改admin 密码
+salt = hjkkakoweqzmbvc  
+ eg:  http://127.0.0.1
+cross=*   # 设置跨域的域名  
 
 # mysql 配置必须正确， 会自动创建表
 [mysql]

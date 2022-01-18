@@ -1,7 +1,5 @@
-增加 go 后台的docker镜像
-
-docker run -it -p 10001:10001  -v D:\share\image:/data/bugimg -e MYSQL_USER=root  -e MYSQL_HOST=172.19.64.1  itflow-go:v1.0.2
-
+### bug.ini配置文件说明
+```ini
 
 暂时只有下面的环境变量定义
 MYSQL_USER
@@ -60,3 +58,5 @@ db = itflow
 [scs]
 domain=http://127.0.0.1:11111
 path = D:\myproject\ITflow\go
+
+```
