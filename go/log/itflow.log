@@ -1,0 +1,9 @@
+2022-01-18 15:21:15 - [ERROR] -  - DESKTOP-NENB5CA - C:/work/ITflow/go/db/sql.go:39 - dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.
+2022-01-18 15:22:27 - [ERROR] -  - DESKTOP-NENB5CA - C:/work/ITflow/go/db/sql.go:39 - dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.
+2022-01-18 15:23:00 - [ERROR] -  - DESKTOP-NENB5CA - C:/work/ITflow/go/db/sql.go:39 - dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.
+2022-01-18 15:24:12 - [ERROR] -  - DESKTOP-NENB5CA - C:/work/ITflow/go/db/sql.go:39 - dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.
+2022-01-18 15:24:39 - [ERROR] -  - DESKTOP-NENB5CA - C:/work/ITflow/go/db/sql.go:39 - dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.
+2022-01-18 15:26:17 - [ERROR] -  - DESKTOP-NENB5CA - C:/work/ITflow/go/db/sql.go:39 - dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.
+2022-01-18 15:27:39 - [ERROR] -  - DESKTOP-NENB5CA - C:/work/ITflow/go/db/sql.go:39 - dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.
+2022-01-18 15:32:24 - [ERROR] -  - DESKTOP-NENB5CA - C:/work/ITflow/go/db/sql.go:39 - dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.
+2022-01-18 15:32:58 - [ERROR] -  - DESKTOP-NENB5CA - C:/work/ITflow/go/db/sql.go:39 - dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.

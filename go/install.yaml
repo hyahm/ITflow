@@ -1,0 +1,15 @@
+- name: itflow_api
+  env:
+    MYSQL_USER: root
+    MYSQL_PASSWORD: 123456
+    MYSQL_HOST: 127.0.0.1
+    MYSQL_PORT: 3306
+    MYSQL_DB: itflow
+    LOG_PATH: log/itflow.log
+  preStart:
+    - path: bug.ini
+      template: bug.ini.tpl
+    - path: main
+      install: go build main.go
+  command: ./main
+  update: go build main.go
