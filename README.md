@@ -46,11 +46,17 @@
 git clone https://github.com/hyahm/ITflow.git
 cd ITflow
 ```
+
 ###### 后端(安装最新版的go >= 1.16.0， 并将其目录下的bin目录添加进环境变量, 保证有go命令),  有安装好mysql数据库   
+
+> 将后端服务挂载至scs
+```
+scsctl install -f go/sc.yaml
+```
+
 ```shell
 cd go
 ```
-
 > 设置代理
 ```
 export GOPROXY=https://goproxy.cn   // 国内的机器需要执行代理， 国外的机器不需要
