@@ -214,7 +214,7 @@ git clone https://github.com/hyahm/ITflow.git
 
 > 后端go打包
 
-1. 修改配置文件
+1. 修改配置文件   go/sc_build.yaml
 
    ```
    # linux | windows | darwin, 设置打包后对应的系统
@@ -245,7 +245,7 @@ git clone https://github.com/hyahm/ITflow.git
 
 
 
-1. 修改配置文件  sc_build.yaml
+1. 修改配置文件  vue/sc_build.yaml
 
    ```
    API_DOMAIN: http://127.0.0.1:10001  # 主要是修改为后端的地址
