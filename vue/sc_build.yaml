@@ -1,0 +1,11 @@
+# scs: https://github.com/hyahm/scs
+# scs 通过docker打包   scsctl install -f sc_build_centos.yaml
+- name: build_vue
+  env:
+    API_DOMAIN: http://127.0.0.1:10001
+  preStart:
+    - path: .env.production
+      template: production.tpl
+    - command: docker
+      install: yum -y install docker && systemctl start docker
+  command: docker container run -i -v {{ .PROJECT_HOME }}:/opt/vue --rm node:14.17.5 /bin/bash -c "cd /opt/vue; npm i && npm run build"

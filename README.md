@@ -40,113 +40,220 @@
    展示页面会更新为最新可使用的代码  
    [ITflow](http://bug.hyahm.com "ITflow")  
 
-### 部署  
-需要 mysql >= 5.7   node 和go 最近即可，  然后还需要nginx 代理前端代码
+
+
+### 获取源码
+
 ```
 git clone https://github.com/hyahm/ITflow.git
-cd ITflow
-```
-###### 后端(安装最新版的go >= 1.16.0， 并将其目录下的bin目录添加进环境变量, 保证有go命令),  有安装好mysql数据库   
-```shell
-cd go
 ```
 
-> 设置代理
-```
-export GOPROXY=https://goproxy.cn   // 国内的机器需要执行代理， 国外的机器不需要
-```
 
-> 修改配置文件   
 
-#### 自动生成默认配置文件到本目录
-```
-go run .\main.exe -c bug.ini     
-```
+### 依赖服务
 
-#### bug.ini 需要修改的地方
-```
-#  127.0.0.1 换成外网的IP地址
-showbaseurl = http://127.0.0.1:10001/showimg/    
- # 修改salt值后   服务启动后用 curl http://127.0.0.1:10001/admin/reset?password=123 修改admin 密码
-salt = hjkkakoweqzmbvc  
- eg:  http://127.0.0.1
-cross=*   # 设置跨域的域名  
+- mysql >= 5.7
+- nginx 或 apache(生产环境)
 
-# mysql 配置必须正确， 会自动创建表
-[mysql]
-user = root
-pwd = "123456"
-host = 127.0.0.1
-port = 3306
-db = itflow
 
-```
-> 启动后端服务  
 
-```
-go build main.go
-./main
-```
-> 测试运行
-```
-go run main.go
-```
-###### 前端(最新版node, 保证有npm命令)
-> 安装依赖
-```
-cd vue
+### 本地测试
 
-优先使用cnpm 安装 https://github.com/hyahm/ITflow/blob/master/README.md
-npm install  --registry=https://registry.npm.taobao.org  cnpm -g
-cnpm install
-或 npm 安装
-npm install  --registry=https://registry.npm.taobao.org  # 安装依赖
+- 需要 mysql >= 5.7   node 和go 最近即可
 
-或 yarm 安装
-npm install  --registry=https://registry.npm.taobao.org  yarn -g
-yarn install
-```
-> 修改配置文件  .env.production
-```
-  # 改为后端服务器外网地址
-VUE_APP_BASE_API = 'http://120.26.164.125:10001'
- # 设置为空
-VUE_APP_USERNAME = '' 
+- 后端启动
+
+  ```
+  cd ITflow/go
+  ```
+
+  > 设置代理(国外不需要)
+
+  ```
+  export GOPROXY=https://goproxy.cn   // 国内的机器需要执行代理， 国外的机器不需要
+  ```
+
+  > 生成默认配置文件模板   
+
+  ```
+  go run .\main.exe -c bug.ini     
+  ```
+
+  >  bug.ini 修改mysql配置文件
+
+  ```
+  # mysql 配置必须正确， 会自动创建表
+  [mysql]
+  user = root
+  pwd = "123456"
+  host = 127.0.0.1
+  port = 3306
+  db = itflow
+  
+  ```
+
+  > 启动
+
+  ```
+  go run main.go
+  ```
+
+- 前端启动
+
+  > 安装依赖
+
+  ```
+  cd vue
+  
+  优先使用cnpm 安装 https://github.com/hyahm/ITflow/blob/master/README.md
+  npm install  --registry=https://registry.npm.taobao.org  cnpm -g
+  cnpm install
+  或 npm 安装
+  npm install  --registry=https://registry.npm.taobao.org  # 安装依赖
+  
+  或 yarm 安装
+  npm install  --registry=https://registry.npm.taobao.org  yarn -g
+  yarn install
+  ```
+
+  > 启动
+
+  ```
+  npm run dev
+  ```
+
+  
+
+### 打包运行（生产环境）
+
+- 需要 mysql >= 5.7   node 和go 最近即可
+
+- nginx 或 apache
+
+- 后端打包成二进制。 打包后的二进制文件只能是打包相同系统的能运行， 如果想要打包成不同系统需要设置GOOS为 linux | windows | darwin
+
+  > 配置文件需要修改的地方
+
+  ```
+  #  127.0.0.1 换成外网的IP地址
+  showbaseurl = http://127.0.0.1:10001/showimg/    
+   # 修改salt值后   服务启动后用 curl http://127.0.0.1:10001/admin/reset?password=123 修改admin 密码
+  salt = hjkkakoweqzmbvc  
+   eg:  http://127.0.0.1
+  cross=*   # 设置跨域的域名  
+  
+  # mysql 配置必须正确， 会自动创建表
+  [mysql]
+  user = root
+  pwd = "123456"
+  host = 127.0.0.1
+  port = 3306
+  db = itflow
+  ```
+
+  > 后端编译成2进制文件
+
+  ```
+  go run main.go
+  ```
+
+  >  运行
+
+  ```
+  ./main
+  ```
+
+
+
+- 前端
+
+  > 配置文件需要修改的地方
+
+  ```
+    # 改为后端服务器外网地址
+  VUE_APP_BASE_API = 'http://120.26.164.125:10001'
    # 设置为空
-VUE_APP_PASSWORD = ''
-```
-> 测试运行
-```
-npm run dev
-```
-> 打包
-```
-npm run build
+  VUE_APP_USERNAME = '' 
+     # 设置为空
+  VUE_APP_PASSWORD = ''
+  ```
 
-```
->  使用nginx 部署    
+  > 打包成静态文件
 
-```
-server {
-        listen 80;
-        server_name 127.0.0.1;
-        root <ITflow_dir>/vue/dist;
-        index index.html;
+  ```
+  npm run build
+  ```
+
+  > nginx 配置文件参考
+
+  ```
+  server {
+          listen 80;
+          server_name 127.0.0.1;
+          root <ITflow_dir>/vue/dist;
+          index index.html;
+  
+  
+          location / {
+                  try_files $uri $uri/ @router;
+                  index index.html;
+          }
+  
+  
+          location @router {
+                  rewrite ^.*$ /index.html last;
+          }
+  }
+  ```
+
+  
+
+### 使用[scsctl](https://github.com/hyahm/scs 'scs')通过docker打包(生产环境)， 推荐使用
+
+- 确保已经安装docker并启动了docker, 安装了scs
+
+> 后端go打包
+
+1. 修改配置文件
+
+   ```
+   # linux | windows | darwin, 设置打包后对应的系统
+   GOOS: linux
+   ```
+
+   
+
+2. 打包并将服务托管给scs管理
+
+   ```
+   scsctl install -f go/sc_build.yaml
+   # 执行完成后等待生成 dist 打包的文件
+   ```
+
+   
 
 
-        location / {
-                try_files $uri $uri/ @router;
-                index index.html;
-        }
+
+> vue 打包
+1. 修改配置文件  sc_build.yaml
+
+   ```
+   API_DOMAIN: http://127.0.0.1:10001  # 主要是修改为后端的地址
+   ```
+
+   
+
+2. 打包
+
+   ```
+   cd ITflow
+   scsctl install -f vue/sc_build.yaml
+   # 执行完成后等待生成 dist 打包的文件
+   ```
 
 
-        location @router {
-                rewrite ^.*$ /index.html last;
-        }
-}
-```
 
-然后通过  http://<server_name>:port  访问
+
 
 ### 项目优势   
  部署简单, 使用简单, 高定制, 永久开源  可以自己二次开发   
