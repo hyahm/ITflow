@@ -1,0 +1,24 @@
+# scs 通过docker打包   scsctl install -f sc_build_centos.yaml
+# 打包并运行， 自动生成默认配置文件， 第一次配置文件有问题，肯定失败，修改配置文件后 scsctl start 即可启动
+- name: itflow_go
+  env:
+    # linux | windows | darwin, 设置打包后对应的系统
+    GOOS: windows
+    # 国内设置代理
+    GOPROXY: https://goproxy.cn
+    # 
+    LOG_PATH: log/itflow.log
+    MYSQL_USER: root
+    MYSQL_PASSWORD: 123456
+    MYSQL_HOST: 127.0.0.1
+    MYSQL_PORT: 3306
+    MYSQL_DB: test
+    SCS_TPL_OUT: '{{ if eq .OS "windows" }}main.exe{{ else }} main{{ end}}'
+  preStart:
+    - path: bug.ini
+      template: bug.ini.tpl
+    - command: docker
+      install: yum -y install docker && systemctl start docker
+    - path: "{{ .SCS_TPL_OUT }}"
+      install: docker container run -i -e GOOS="{{ .GOOS }}" -e GOPROXY="{{ .GOPROXY }}" -v {{ .PROJECT_HOME }}:/opt/build --rm golang:1.17.6 /bin/bash -c "cd /opt/build; go build -o {{ .SCS_TPL_OUT }} main.go"
+  command: ./{{ .SCS_TPL_OUT }}
