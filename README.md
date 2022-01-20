@@ -234,7 +234,7 @@ git clone https://github.com/hyahm/ITflow.git
 
    ```
    scsctl install -f go/sc_build.yaml
-   # 执行完成后等待生成 dist 打包的文件
+   # 执行完成后等待生成 二进制文件
    ```
 
    
@@ -242,6 +242,9 @@ git clone https://github.com/hyahm/ITflow.git
 
 
 > vue 打包
+
+
+
 1. 修改配置文件  sc_build.yaml
 
    ```
@@ -258,7 +261,7 @@ git clone https://github.com/hyahm/ITflow.git
    # 执行完成后等待生成 dist 打包的文件
    ```
 
-
+3.  部署参考上面nginx配置
 
 
 
