@@ -6,7 +6,7 @@
     GOOS: windows
     # 国内设置代理
     GOPROXY: https://goproxy.cn
-    # 
+    # 部分配置文件
     LOG_PATH: log/itflow.log
     MYSQL_USER: root
     MYSQL_PASSWORD: 123456

@@ -126,7 +126,7 @@ git clone https://github.com/hyahm/ITflow.git
 
 ### 打包运行（生产环境）
 
-- 需要 mysql >= 5.7   node 和go 最近即可
+- 需要 mysql >= 5.7   node 和go 最新即可
 
 - nginx 或 apache
 
@@ -219,6 +219,13 @@ git clone https://github.com/hyahm/ITflow.git
    ```
    # linux | windows | darwin, 设置打包后对应的系统
    GOOS: linux
+   # 部分配置文件
+   LOG_PATH: log/itflow.log
+   MYSQL_USER: root
+   MYSQL_PASSWORD: 123456
+   MYSQL_HOST: 127.0.0.1
+   MYSQL_PORT: 3306
+   MYSQL_DB: test
    ```
 
    
