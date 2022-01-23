@@ -13,7 +13,7 @@
     MYSQL_HOST: 127.0.0.1
     MYSQL_PORT: 3306
     MYSQL_DB: test
-    SCS_TPL_OUT: '{{ if eq .OS "windows" }}main.exe{{ else }} main{{ end}}'
+    SCS_TPL_OUT: '{{ if eq .OS "windows" }}main.exe{{ else }}main{{ end}}'
   preStart:
     - path: bug.ini
       template: bug.ini.tpl
