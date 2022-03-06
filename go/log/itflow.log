@@ -10,3 +10,4 @@
 2022-01-20 16:44:02 - [ERROR] -  - DESKTOP-NENB5CA - /opt/build/db/sql.go:39 - dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.
 2022-03-06 20:50:30 - [ERROR] -  - canderdeMacBook-Air.local - /opt/build/db/sql.go:39 - dial tcp 127.0.0.1:3306: connect: connection refused
 2022-03-06 20:50:50 - [ERROR] -  - canderdeMacBook-Air.local - /opt/build/db/sql.go:39 - dial tcp 127.0.0.1:3306: connect: connection refused
+2022-03-06 21:18:23 - [ERROR] -  - canderdeMacBook-Air.local - /opt/build/db/sql.go:39 - dial tcp 127.0.0.1:3306: connect: connection refused
