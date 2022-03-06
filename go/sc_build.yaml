@@ -3,7 +3,7 @@
 - name: itflow_go
   env:
     # linux | windows | darwin, 设置打包后对应的系统
-    GOOS: windows
+    GOOS: darwin
     # 国内设置代理
     GOPROXY: https://goproxy.cn
     # 部分配置文件

@@ -234,7 +234,7 @@ git clone https://github.com/hyahm/ITflow.git
 
    ```
    scsctl install -f go/sc_build.yaml
-   # 执行完成后等待生成 二进制文件
+   # 执行完成后等待生成 二进制文件 go/main
    ```
 
    
