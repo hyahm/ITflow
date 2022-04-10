@@ -2,18 +2,14 @@ package model
 
 import (
 	"errors"
-	"fmt"
 	"itflow/db"
 	"itflow/dockercompose"
-	"itflow/utils"
 	"os"
 	"path/filepath"
 	"time"
 
 	"github.com/hyahm/goconfig"
 	"github.com/hyahm/golog"
-	"github.com/hyahm/scs/client"
-	"github.com/hyahm/scs/server"
 )
 
 const BASEPORT = 4000
@@ -141,41 +137,41 @@ func (d *Doc) MaxPort() (err error) {
 	return db.Mconn.GetOne("select port from doc order by port desc limit 1").Scan(&d.Port)
 }
 
-func (d *Doc) Startup() error {
-	cli := client.NewClient()
-	cli.Domain = goconfig.ReadWithoutEndSlash("scs.domain", "https://127.0.0.1:11111")
-	// 获取最大使用的端口号
-	err := d.MaxPort()
-	if err != nil || d.Port == 0 {
-		d.Port = BASEPORT
-	}
-	golog.Info(d.Port)
-	for {
-		if err := utils.CheckPort(d.Port); err == nil {
-			break
-		}
-		d.Port++
-	}
+// func (d *Doc) Startup() error {
+// 	cli := client.NewClient()
+// 	cli.Domain = goconfig.ReadWithoutEndSlash("scs.domain", "https://127.0.0.1:11111")
+// 	// 获取最大使用的端口号
+// 	err := d.MaxPort()
+// 	if err != nil || d.Port == 0 {
+// 		d.Port = BASEPORT
+// 	}
+// 	golog.Info(d.Port)
+// 	for {
+// 		if err := utils.CheckPort(d.Port); err == nil {
+// 			break
+// 		}
+// 		d.Port++
+// 	}
 
-	script := &server.Script{
-		Name:    d.Name,
-		Dir:     filepath.Join(goconfig.ReadPath("scs.path"), d.Name, d.Dir),
-		Command: fmt.Sprintf(" docsify serve . --port %d ", d.Port),
-		Env:     map[string]string{"Path": goconfig.ReadString("scs.docsify")},
-	}
-	out, err := cli.AddScript(script)
-	golog.Info(string(out))
-	return err
-}
+// 	script := &server.Script{
+// 		Name:    d.Name,
+// 		Dir:     filepath.Join(goconfig.ReadPath("scs.path"), d.Name, d.Dir),
+// 		Command: fmt.Sprintf(" docsify serve . --port %d ", d.Port),
+// 		Env:     map[string]string{"Path": goconfig.ReadString("scs.docsify")},
+// 	}
+// 	out, err := cli.AddScript(script)
+// 	golog.Info(string(out))
+// 	return err
+// }
 
-func (d *Doc) StopServer() error {
-	cli := client.NewClient()
-	cli.Domain = goconfig.ReadWithoutEndSlash("scs.domain", "https://127.0.0.1:11111")
-	// 获取最大使用的端口号
-	cli.Pname = d.Name
-	_, err := cli.RemovePnameScrip()
-	return err
-}
+// func (d *Doc) StopServer() error {
+// 	cli := client.NewClient()
+// 	cli.Domain = goconfig.ReadWithoutEndSlash("scs.domain", "https://127.0.0.1:11111")
+// 	// 获取最大使用的端口号
+// 	cli.Pname = d.Name
+// 	_, err := cli.RemovePnameScrip()
+// 	return err
+// }
 
 func CheckKid(kid interface{}) error {
 	var docCount int

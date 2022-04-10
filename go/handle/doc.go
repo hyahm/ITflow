@@ -124,13 +124,12 @@ func DocCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	//如果存在配置文件就 newpath 是 git的根目录, 创建目录
 	golog.Info("start docsify server")
-	err = doc.Startup()
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
-		return
-	}
-	golog.Info("insert into mysql")
+	// err = doc.Startup()
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	w.Write(errorcode.ErrorE(err))
+	// 	return
+	// }
 	err = doc.Insert(uid)
 	if err != nil {
 		golog.Error(err)

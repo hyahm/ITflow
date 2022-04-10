@@ -5,21 +5,19 @@ import (
 	"errors"
 	"itflow/db"
 	"time"
-
-	"github.com/hyahm/golog"
 )
 
 type Auth struct {
-	ID       int64  `json:"id,omitempty"`
-	Name     string `json:"name,omitempty"`
-	Uid      int64  `json:"uid,omitempty"`
-	Created  int64  `json:"created,omitempty"`
-	Pri      string `json:"pri"` // git 的地址
-	UpTime   int64  `json:"uptime"`
-	Pub      string `json:"pub"`      // docfiy 文档目录
-	Typ      int    `json:"typ"`      // 认证  0： 不需要认证   1： 用户密码认证  2： 密钥认证
-	User     string `json:"user"`     // 用户名
-	Password string `json:"password"` // 密码
+	ID       int64  `json:"id,omitempty" db:"id,default"`
+	Name     string `json:"name,omitempty" db:"name,default"`
+	Uid      int64  `json:"uid,omitempty" db:"uid,default"`
+	Created  int64  `json:"created,omitempty" db:"created,default"`
+	Pri      string `json:"pri" db:"pri"` // git 的地址
+	UpTime   int64  `json:"uptime" db:"uptime"`
+	Pub      string `json:"pub" db:"pub,default"`           // docfiy 文档目录
+	Typ      int    `json:"typ" db:"typ,default"`           // 认证  0： 不需要认证   1： 用户密码认证  2： 密钥认证
+	User     string `json:"user" db:"user,default"`         // 用户名
+	Password string `json:"password" db:"password,default"` // 密码
 }
 
 type Auths struct {
@@ -34,33 +32,13 @@ func (as *Auths) Marshal() []byte {
 	return send
 }
 
-func GetAllAuths(uid int64) ([]*Auth, error) {
-	getcategorysql := "select id,name,uid,created,typ,uptime,pub,pri,user,password from auth"
-	rows, err := db.Mconn.GetRows(getcategorysql)
-	if err != nil {
-		golog.Error(err)
-		return nil, err
-	}
-
-	docs := make([]*Auth, 0)
-	for rows.Next() {
-		auth := &Auth{}
-		err := rows.Scan(&auth.ID, &auth.Name, &auth.Uid, &auth.Created, &auth.Typ,
-			&auth.UpTime, &auth.Pub, &auth.Pri, &auth.User, &auth.Password)
-		if err != nil {
-			return nil, err
-		}
-		if auth.Uid != uid {
-			continue
-		}
-		docs = append(docs, auth)
-	}
-
-	return docs, nil
+func GetAllAuths(uid int64) ([]Auth, error) {
+	auths := make([]Auth, 0)
+	result := db.Mconn.Select(&auths, "select id,name,uid,created,typ,uptime,pub,pri,user,password from auth where uid=?", uid)
+	return auths, result.Err
 }
 
 func (a *Auth) Insert(uid int64) (int64, error) {
-	//
 	if err := ChecKeyName(a.Name); err != nil {
 		return 0, err
 	}
