@@ -46,6 +46,8 @@ func main() {
 			goconfig.ReadInt64("log.size", 0),
 			goconfig.ReadBool("log.everyday", false))
 	}
+
+	golog.Format = "{{ .Ctime }} - [{{ .Level }}] - {{.Msg}}"
 	// //初始化mysql
 	db.InitMysql(bugsql)
 	// // // 初始化缓存表
