@@ -11,13 +11,7 @@ import (
 var RoleGroup *xmux.GroupRoute
 
 func init() {
-	RoleGroup = xmux.NewGroupRoute().
-		ApiCreateGroup("rolegroup", "角色组相关", "rolegroup").ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxx")
-	RoleGroup.ApiCodeField("code").ApiCodeMsg("0", "成功")
-	RoleGroup.ApiCodeField("code").ApiCodeMsg("20", "token过期")
-	RoleGroup.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
-	RoleGroup.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
-	RoleGroup.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
+	RoleGroup = xmux.NewGroupRoute()
 
 	RoleGroup.Post("/rolegroup/add", handle.AddRoleGroup).Bind(&handle.RequestRoleGroup{}).
 		AddModule(midware.JsonToStruct)

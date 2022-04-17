@@ -14,26 +14,26 @@ type Important struct {
 // 获取的就是表的所有字段
 func GetAllImportant() ([]Important, error) {
 	importants := make([]Important, 0)
-	err := db.Mconn.Select(&importants, "select * from importants")
-	return importants, err
+	result := db.Mconn.Select(&importants, "select * from importants")
+	return importants, result.Err
 }
 
 func (important *Important) Create() error {
-	ids, err := db.Mconn.InsertInterfaceWithID(important, "insert into importants($key) values($value)")
-	if err != nil {
-		golog.Error(err)
-		return err
+	result := db.Mconn.InsertInterfaceWithID(important, "insert into importants($key) values($value)")
+	if result.Err != nil {
+		golog.Error(result.Err)
+		return result.Err
 	}
-	important.Id = ids[0]
+	important.Id = result.LastInsertId
 	return nil
 }
 
 func (important *Important) Update() error {
-	_, err := db.Mconn.UpdateInterface(important, "update importants set $set where id=?", important.Id)
-	return err
+	result := db.Mconn.UpdateInterface(important, "update importants set $set where id=?", important.Id)
+	return result.Err
 }
 
 func DeleteImportant(id interface{}) error {
-	_, err := db.Mconn.Delete("delete from importants where id=?", id)
-	return err
+	result := db.Mconn.Delete("delete from importants where id=?", id)
+	return result.Err
 }

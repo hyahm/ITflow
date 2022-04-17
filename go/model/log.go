@@ -28,10 +28,10 @@ type Log struct {
 
 func InsertLog(classify classify.Classify, ip, action string, uid int64) {
 	ip = strings.Split(ip, ":")[0]
-	_, err := db.Mconn.Insert("insert into log(exectime,classify,ip, uid,action) values(?,?,?,?,?)",
+	result := db.Mconn.Insert("insert into log(exectime,classify,ip, uid,action) values(?,?,?,?,?)",
 		time.Now().Unix(), classify, ip, uid, action,
 	)
-	if err != nil {
-		golog.Error(err)
+	if result.Err != nil {
+		golog.Error(result.Err)
 	}
 }

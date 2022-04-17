@@ -92,9 +92,9 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 
 	getaritclesql := "delete from project where id=?"
 
-	_, err = db.Mconn.Delete(getaritclesql, id)
-	if err != nil {
-		golog.Error(err)
+	result := db.Mconn.Delete(getaritclesql, id)
+	if result.Err != nil {
+		golog.Error(result.Err)
 		w.Write(errorcode.ErrorE(err))
 		return
 	}

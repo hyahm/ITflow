@@ -26,16 +26,16 @@ type User struct {
 
 func (user *User) UpdatePassword(old string) error {
 
-	_, err := db.Mconn.Update("update user set password=? where password=? and id=?", user.Password, old, user.ID)
+	result := db.Mconn.Update("update user set password=? where password=? and id=?", user.Password, old, user.ID)
 
-	return err
+	return result.Err
 }
 
 func GetAllUsers(uid int64) ([]User, error) {
 	us := make([]User, 0)
 	if uid == cache.SUPERID {
-		err := db.Mconn.Select(&us, "select * from user")
-		return us, err
+		result := db.Mconn.Select(&us, "select * from user")
+		return us, result.Err
 	}
 	return nil, errors.New("no permission")
 }
@@ -47,12 +47,12 @@ func GetJobIdByUid(uid int64) (int64, error) {
 }
 
 func DeleteUser(id interface{}) error {
-	effect, err := db.Mconn.Delete("delete from user where id=?", id)
-	if err != nil {
-		golog.Error(err)
-		return err
+	result := db.Mconn.Delete("delete from user where id=?", id)
+	if result.Err != nil {
+		golog.Error(result.Err)
+		return result.Err
 	}
-	if effect == 0 {
+	if result.RowsAffected == 0 {
 		return errors.New("delete failed")
 	}
 	return nil
@@ -61,28 +61,29 @@ func DeleteUser(id interface{}) error {
 // 获取所有用户信息
 func GetUsers(jobs []int64) ([]User, error) {
 	users := make([]User, 0)
-	err := db.Mconn.SelectIn(&users, "select * from user where jid in (?)", jobs)
-	return users, err
+	result := db.Mconn.SelectIn(&users, "select * from user where jid in (?)", jobs)
+	return users, result.Err
+
 }
 
 func GetShowStatus(uid int64) ([]int64, error) {
 	user := User{}
-	err := db.Mconn.Select(&user, "select showstatus from user where id=?", uid)
-	if err != nil {
-		golog.Error(err)
-		return nil, err
+	result := db.Mconn.Select(&user, "select showstatus from user where id=?", uid)
+	if result.Err != nil {
+		golog.Error(result.Err)
+		return nil, result.Err
 	}
 	return user.ShowStatus, nil
 }
 
 func (user *User) Create() error {
 	// user.HeadImg = goconfig.ReadString("defaulthead")
-	ids, err := db.Mconn.InsertInterfaceWithID(user, "insert into user($key) values($value)")
-	if err != nil {
-		golog.Error(err)
-		return err
+	result := db.Mconn.InsertInterfaceWithID(user, "insert into user($key) values($value)")
+	if result.Err != nil {
+		golog.Error(result.Err)
+		return result.Err
 	}
-	user.ID = ids[0]
+	user.ID = result.LastInsertId
 	return nil
 }
 
@@ -102,24 +103,24 @@ func (user *User) CheckHaveAdminUser() error {
 
 func (user *User) UpdateAdminPassword(password string) error {
 	// 修改密码
-	_, err := db.Mconn.Update("update user set password=? where id=?", password, cache.SUPERID)
-	return err
+	result := db.Mconn.Update("update user set password=? where id=?", password, cache.SUPERID)
+	return result.Err
 
 }
 
 func (user *User) Update() error {
 	basesql := "update user set $set where id=?"
-	_, err := db.Mconn.UpdateInterface(user, basesql, user.ID)
-	return err
+	result := db.Mconn.UpdateInterface(user, basesql, user.ID)
+	return result.Err
 }
 
 func GetUserKeyNameByProjectId(projectId int64) ([]KeyName, error) {
 	// 获取用户ids
 	ug := UserGroup{}
-	err := db.Mconn.Select(&ug, "select uids from usergroup where id=( select ugid from project where id=?)", projectId)
-	if err != nil {
-		golog.Error(err)
-		return nil, err
+	result := db.Mconn.Select(&ug, "select uids from usergroup where id=( select ugid from project where id=?)", projectId)
+	if result.Err != nil {
+		golog.Error(result.Err)
+		return nil, result.Err
 	}
 	rows, err := db.Mconn.GetRowsIn(" select id,realname from user where id in (?)", ug.Uids)
 	if err != nil {

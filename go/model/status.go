@@ -34,12 +34,9 @@ func (status *Status) Names() ([]string, error) {
 
 func GetStatusList() ([]*Status, error) {
 	ss := make([]*Status, 0)
-	err := db.Mconn.Select(&ss, "select * from status")
-	if err != nil {
-		golog.Error(err)
-		return ss, err
-	}
-	return ss, nil
+	result := db.Mconn.Select(&ss, "select * from status")
+
+	return ss, result.Err
 }
 
 func GetStatusIDsByUid(uid int64) ([]*Status, error) {
@@ -54,12 +51,9 @@ func GetStatusIDsByUid(uid int64) ([]*Status, error) {
 			return nil, err
 		}
 		ss := make([]*Status, 0)
-		err = db.Mconn.SelectIn(&ss, "select * from status where id in (?)", sids)
-		if err != nil {
-			golog.Error(err)
-			return ss, err
-		}
-		return ss, nil
+		result := db.Mconn.SelectIn(&ss, "select * from status where id in (?)", sids)
+
+		return ss, result.Err
 
 	}
 }
@@ -76,26 +70,26 @@ func GetMyStatusList(id interface{}) ([]string, error) {
 // 获取的就是表的所有字段
 func GetAllStatus() ([]Status, error) {
 	statuss := make([]Status, 0)
-	err := db.Mconn.Select(&statuss, "select * from status")
-	return statuss, err
+	result := db.Mconn.Select(&statuss, "select * from status")
+	return statuss, result.Err
 }
 
 func (status *Status) Create() error {
-	ids, err := db.Mconn.InsertInterfaceWithID(status, "insert into status($key) values($value)")
-	if err != nil {
-		golog.Error(err)
-		return err
+	result := db.Mconn.InsertInterfaceWithID(status, "insert into status($key) values($value)")
+	if result.Err != nil {
+		golog.Error(result.Err)
+		return result.Err
 	}
-	status.ID = ids[0]
+	status.ID = result.LastInsertId
 	return nil
 }
 
 func (status *Status) Update() error {
-	_, err := db.Mconn.UpdateInterface(status, "update status set $set where id=?", status.ID)
-	return err
+	result := db.Mconn.UpdateInterface(status, "update status set $set where id=?", status.ID)
+	return result.Err
 }
 
 func DeleteStatus(id interface{}) error {
-	_, err := db.Mconn.Delete("delete from status where id=?", id)
-	return err
+	result := db.Mconn.Delete("delete from status where id=?", id)
+	return result.Err
 }

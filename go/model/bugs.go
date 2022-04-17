@@ -27,11 +27,8 @@ type Bug struct {
 
 func GetBugById(id interface{}, uid int64) (*Bug, error) {
 	bug := &Bug{}
-	err := db.Mconn.Select(&bug, "select * from bugs where id=? and uid=?", id, uid)
-	if err != nil {
-		return nil, err
-	}
-	return bug, nil
+	result := db.Mconn.Select(&bug, "select * from bugs where id=? and uid=?", id, uid)
+	return bug, result.Err
 }
 
 func GetCreatedCountByTime(start, end int64) (int, error) {
@@ -49,51 +46,51 @@ func GetCompletedCountByTime(start, end, statusid int64) (int, error) {
 func (bug *Bug) Resume(id interface{}) error {
 	getlistsql := "update bugs set dustbin=false where id=?"
 
-	_, err := db.Mconn.Update(getlistsql, id)
+	result := db.Mconn.Update(getlistsql, id)
 
-	return err
+	return result.Err
 }
 
 func (bug *Bug) Update() error {
 	getlistsql := "update bugs set $set where id=? and uid=?"
-	_, err := db.Mconn.UpdateInterface(bug, getlistsql, bug.ID, bug.Uid)
-	return err
+	result := db.Mconn.UpdateInterface(bug, getlistsql, bug.ID, bug.Uid)
+	return result.Err
 }
 
 func (bug *Bug) UpdateStatus(sids ...int64) error {
 	getlistsql := "update bugs set $set where id=? and json_contains(spusers, json_array(?)) and sid not in (?)"
-	_, err := db.Mconn.UpdateInterfaceIn(bug, getlistsql, bug.ID, bug.Uid, sids)
-	return err
+	result := db.Mconn.UpdateInterfaceIn(bug, getlistsql, bug.ID, bug.Uid, sids)
+	return result.Err
 }
 
 func (bug *Bug) Delete(uid, id interface{}) error {
 	if uid == cache.SUPERID {
 		getlistsql := "delete from bugs  where id=?"
-		_, err := db.Mconn.Update(getlistsql, id)
-		return err
+		result := db.Mconn.Update(getlistsql, id)
+		return result.Err
 	} else {
 		getlistsql := "delete from bugs  where id=? and uid=?"
-		_, err := db.Mconn.Update(getlistsql, id, uid)
-		return err
+		result := db.Mconn.Update(getlistsql, id, uid)
+		return result.Err
 	}
 
 }
 
 func (bug *Bug) CreateBug() (err error) {
 	insertsql := "insert into bugs($key) values($value)"
-	ids, err := db.Mconn.InsertInterfaceWithID(bug, insertsql)
-	if err != nil {
-		return
+	result := db.Mconn.InsertInterfaceWithID(bug, insertsql)
+	if result.Err != nil {
+		return result.Err
 	}
-	bug.ID = ids[0]
-	return
+	bug.ID = result.LastInsertId
+	return result.Err
 }
 
 func (bug *Bug) EditBug() (err error) {
 	bug.Content = html.EscapeString(bug.Content)
 	insertsql := "update bugs set  $set where id=?"
-	_, err = db.Mconn.UpdateInterface(bug, insertsql, bug.ID)
-	return
+	result := db.Mconn.UpdateInterface(bug, insertsql, bug.ID)
+	return result.Err
 }
 
 func GetCount(sql string, args ...interface{}) (int, error) {
@@ -104,6 +101,6 @@ func GetCount(sql string, args ...interface{}) (int, error) {
 
 func GetAllBug(sql string, args ...interface{}) ([]Bug, error) {
 	bugs := make([]Bug, 0)
-	err := db.Mconn.SelectIn(&bugs, sql, args...)
-	return bugs, err
+	result := db.Mconn.SelectIn(&bugs, sql, args...)
+	return bugs, result.Err
 }

@@ -19,22 +19,22 @@ type Version struct {
 
 func GetAllVersion() ([]Version, error) {
 	vs := make([]Version, 0)
-	err := db.Mconn.Select(&vs, "select * from version")
-	return vs, err
+	result := db.Mconn.Select(&vs, "select * from version")
+	return vs, result.Err
 }
 
 func (v *Version) Update() error {
-	_, err := db.Mconn.UpdateInterface(v, "update version set $set where id=?", v.Id)
-	return err
+	result := db.Mconn.UpdateInterface(v, "update version set $set where id=?", v.Id)
+	return result.Err
 }
 
 func (v *Version) Create() error {
 	v.CreateTime = time.Now().Unix()
-	ids, err := db.Mconn.InsertInterfaceWithID(v, "insert into version($key) values($value)")
-	if err != nil {
-		return err
+	result := db.Mconn.InsertInterfaceWithID(v, "insert into version($key) values($value)")
+	if result.Err != nil {
+		return result.Err
 	}
-	v.Id = ids[0]
+	v.Id = result.LastInsertId
 	return nil
 }
 
@@ -95,6 +95,6 @@ func GetVersionKeyNameByProjectId(pid interface{}) ([]KeyName, error) {
 }
 
 func DeleteVersion(id interface{}) error {
-	_, err := db.Mconn.Delete("delete from version where id=?", id)
-	return err
+	result := db.Mconn.Delete("delete from version where id=?", id)
+	return result.Err
 }

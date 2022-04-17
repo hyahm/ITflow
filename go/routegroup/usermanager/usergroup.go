@@ -21,6 +21,6 @@ func init() {
 	// // 增加所有用户组
 	UserGroupPage.Post("/usergroup/create", usergroup.Create).Bind(&model.UserGroup{}).AddModule(midware.JsonToStruct)
 	// // 删除所有用户组
-	UserGroupPage.Get("/usergroup/delete", usergroup.Delete).ApiDescribe("删除用户组，只有创建者和admin才能操作")
+	UserGroupPage.Get("/usergroup/delete", usergroup.Delete)
 
 }

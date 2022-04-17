@@ -245,7 +245,6 @@ type uploadimage struct {
 
 func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 	url := &uploadimage{}
-	golog.Info("uploading header image")
 	errorcode := &response.Response{}
 	image, header, err := r.FormFile("upload")
 	if err != nil {
@@ -275,10 +274,8 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 	url.Uploaded = 1
 	uploadimg := "update user set headimg = ? where id=?"
 	uid := xmux.GetInstance(r).Get("uid").(int64)
-	golog.Info(uid)
-	_, err = db.Mconn.Update(uploadimg, url.Url, uid)
-	if err != nil {
-		golog.Error(err)
+	result := db.Mconn.Update(uploadimg, url.Url, uid)
+	if result.Err != nil {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}

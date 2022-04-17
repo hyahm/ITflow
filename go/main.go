@@ -38,7 +38,7 @@ func main() {
 	defer golog.Sync()
 
 	// 初始化配置文件
-	goconfig.InitConf(conf, goconfig.INI)
+	goconfig.InitConf(conf)
 	if goconfig.ReadBool("debug", false) {
 		golog.Level = golog.DEBUG
 	} else {

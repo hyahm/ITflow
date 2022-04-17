@@ -154,10 +154,10 @@ func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 
 	basesql := "update bugs set sid=(select id from status where name=?),updatetime=? where id=?"
 
-	_, err := db.Mconn.Update(basesql, param.Status, time.Now().Unix(), param.Id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+	result := db.Mconn.Update(basesql, param.Status, time.Now().Unix(), param.Id)
+	if result.Err != nil {
+		golog.Error(result.Err)
+		w.Write(errorcode.ErrorE(result.Err))
 		return
 	}
 
@@ -324,10 +324,10 @@ func CloseBug(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.Error("没有权限"))
 		return
 	}
-	_, err = db.Mconn.Update("update bugs set dustbin=true where id=?", id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+	result := db.Mconn.Update("update bugs set dustbin=true where id=?", id)
+	if result.Err != nil {
+		golog.Error(result.Err)
+		w.Write(errorcode.ErrorE(result.Err))
 		return
 	}
 

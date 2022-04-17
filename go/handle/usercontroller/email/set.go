@@ -17,9 +17,9 @@ func Set(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorcode.ErrorE(err))
 		return
 	}
-	_, err = db.Mconn.Update("update user set email=? where id=?", string(b), id)
-	if err != nil {
-		w.Write(errorcode.ErrorE(err))
+	result := db.Mconn.Update("update user set email=? where id=?", string(b), id)
+	if result.Err != nil {
+		w.Write(errorcode.ErrorE(result.Err))
 		return
 	}
 	w.Write(errorcode.Success())

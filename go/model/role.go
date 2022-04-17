@@ -12,6 +12,7 @@ type Role struct {
 
 func AllRole() ([]Role, error) {
 	roles := make([]Role, 0)
-	err := db.Mconn.Select(&roles, "select * from roles")
-	return roles, err
+
+	result := db.Mconn.Select(&roles, "select * from roles")
+	return roles, result.Err
 }

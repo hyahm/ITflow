@@ -32,17 +32,18 @@ type Perm struct {
 // }
 
 func InsertManyPerm(perms []Perm) ([]int64, error) {
-	return db.Mconn.InsertInterfaceWithID(perms, "insert into perm($key) values($value)")
+	result := db.Mconn.InsertInterfaceWithID(perms, "insert into perm($key) values($value)")
+	return result.LastInsertIds, result.Err
 }
 
 func (perm *Perm) Update() error {
-	_, err := db.Mconn.UpdateInterface(perm, "update perm set $set where id=?", perm.Id)
-	return err
+	result := db.Mconn.UpdateInterface(perm, "update perm set $set where id=?", perm.Id)
+	return result.Err
 }
 
 func DeletePerms(ids ...int64) error {
-	_, err := db.Mconn.DeleteIn("delete from perm where id in (?)", ids)
-	return err
+	result := db.Mconn.DeleteIn("delete from perm where id in (?)", ids)
+	return result.Err
 }
 
 func GetPermsionPageAndPVById(permids []int64) (map[string]uint8, error) {

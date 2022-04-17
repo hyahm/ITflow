@@ -42,20 +42,20 @@ func SaveEmail(w http.ResponseWriter, r *http.Request) {
 	getemail := xmux.GetInstance(r).Data.(*email.Email)
 
 	if getemail.Id < 1 {
-		var err error
-		errorcode.ID, err = db.Mconn.Insert("insert into email(email,password,port,host,enable,nickname) values(?,?,?,?,?,?)", getemail.EmailAddr,
+		result := db.Mconn.Insert("insert into email(email,password,port,host,enable,nickname) values(?,?,?,?,?,?)", getemail.EmailAddr,
 			getemail.Password, getemail.Port, getemail.Host, getemail.Enable, getemail.Nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
+		if result.Err != nil {
+			golog.Error(result.Err)
+			w.Write(errorcode.ErrorE(result.Err))
 			return
 		}
+		errorcode.ID = result.LastInsertId
 	} else {
-		_, err := db.Mconn.Update("update email set email=?,password=?,port=?,host=?,enable=?,nickname=? where id=?", getemail.EmailAddr,
+		result := db.Mconn.Update("update email set email=?,password=?,port=?,host=?,enable=?,nickname=? where id=?", getemail.EmailAddr,
 			getemail.Password, getemail.Port, getemail.Host, getemail.Enable, getemail.Id, getemail.Nickname)
-		if err != nil {
-			golog.Error(err)
-			w.Write(errorcode.ErrorE(err))
+		if result.Err != nil {
+			golog.Error(result.Err)
+			w.Write(errorcode.ErrorE(result.Err))
 			return
 		}
 	}

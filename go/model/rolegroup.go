@@ -42,12 +42,13 @@ func GetRoleKeyName() ([]KeyName, error) {
 }
 
 func (rg *RoleGroup) Delete() error {
-	_, err := db.Mconn.Delete("delete from rolegroup where id=?", rg.ID)
-	return err
+	result := db.Mconn.Delete("delete from rolegroup where id=?", rg.ID)
+	return result.Err
 }
 
 func (rg *RoleGroup) GetRoleGroupById(id interface{}) error {
-	return db.Mconn.Select(&rg, "select * from rolegroup where id=?", id)
+	result := db.Mconn.Select(&rg, "select * from rolegroup where id=?", id)
+	return result.Err
 }
 
 func (rg *RoleGroup) GetEditDataById(id interface{}) (interface{}, error) {
@@ -102,25 +103,22 @@ func (rg *RoleGroup) GetEditDataById(id interface{}) (interface{}, error) {
 func RoleGroupList() ([]RoleGroup, error) {
 	// 通过uid 来获取rid
 	rg := make([]RoleGroup, 0)
-	err := db.Mconn.Select(&rg, "select * from rolegroup")
-	return rg, err
+	result := db.Mconn.Select(&rg, "select * from rolegroup")
+	return rg, result.Err
 }
 
 func (rg *RoleGroup) Insert() error {
-	ids, err := db.Mconn.InsertInterfaceWithID(rg, "insert into rolegroup($key) values($value)")
-	if err != nil {
-		return err
+	result := db.Mconn.InsertInterfaceWithID(rg, "insert into rolegroup($key) values($value)")
+	if result.Err != nil {
+		return result.Err
 	}
-	rg.ID = ids[0]
+	rg.ID = result.LastInsertId
 	return nil
 }
 
-func (rg *RoleGroup) Update() (err error) {
-	_, err = db.Mconn.UpdateInterface(rg, "update rolegroup set $set where id=?", rg.ID)
-	if err != nil {
-		return
-	}
-	return
+func (rg *RoleGroup) Update() error {
+	result := db.Mconn.UpdateInterface(rg, "update rolegroup set $set where id=?", rg.ID)
+	return result.Err
 }
 
 func CheckRoleNameInGroup(name string, rid *int64) error {

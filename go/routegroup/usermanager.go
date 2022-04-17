@@ -15,18 +15,14 @@ import (
 var UserManager *xmux.GroupRoute
 
 func init() {
-	UserManager = xmux.NewGroupRoute().ApiCreateGroup("usermanager", "用户管理相关接口", "用户管理").
-		ApiCodeField("code").ApiCodeMsg("0", "成功").
-		ApiCodeField("code").ApiCodeMsg("20", "token过期").
-		ApiCodeField("code").ApiCodeMsg("1", "其他错误,请查看返回的msg").
-		ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
+	UserManager = xmux.NewGroupRoute()
 
 	// 用户组页面
 	UserManager.AddGroup(usermanager.UserGroupPage)
 
 	// 修改密码页面
 	UserManager.Post("/password/reset", handle.ResetPwd).Bind(&user.ResetPassword{}).
-		AddModule(midware.JsonToStruct).ApiDescribe("修改密码")
+		AddModule(midware.JsonToStruct)
 	// 修改邮箱页面
 	UserManager.AddGroup(usermanager.UpdateEmailPage)
 	// 上传头像页面

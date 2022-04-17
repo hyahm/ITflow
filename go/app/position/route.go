@@ -12,7 +12,6 @@ var Position *xmux.GroupRoute
 func init() {
 	Position = xmux.NewGroupRoute().AddPageKeys("position")
 
-	Position.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
 	Position.Post("/position/list", Read)
 	Position.Post("/position/add", Create).Bind(&model.Job{}).AddModule(midware.JsonToStruct)
 

@@ -14,8 +14,7 @@ var DefaultValue *xmux.GroupRoute
 func init() {
 	DefaultValue = xmux.NewGroupRoute().DelModule(midware.MustBeSuperAdmin)
 
-	DefaultValue.Post("/default/status", handle.DefaultStatus).ApiDescribe("获取默认值(已完成)")
-
+	DefaultValue.Post("/default/status", handle.DefaultStatus)
 	DefaultValue.Post("/default/save", handle.DefaultSave).BindJson(&model.DefaultValue{})
 
 }

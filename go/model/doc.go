@@ -120,17 +120,20 @@ func (d *Doc) Insert(uid int64) (err error) {
 
 	base := goconfig.ReadPath("scs.path")
 	tmp := filepath.Clean(filepath.Join(base, d.Dir))
-	golog.Info(tmp[:len(base)])
-	golog.Info(base)
+
 	if base != "." && tmp[:len(base)] != base {
 		err = errors.New("please input valid dir")
 		return
 	}
 	d.Created = time.Now().Unix()
-	d.ID, err = db.Mconn.Insert("insert into doc(name, uid,created,giturl,dir,port,kid) values(?,?,?,?,?,?,?)",
+	result := db.Mconn.Insert("insert into doc(name, uid,created,giturl,dir,port,kid) values(?,?,?,?,?,?,?)",
 		d.Name, uid, d.Created, d.GitUrl, d.Dir, d.Port, d.KID,
 	)
-	return
+	if result.Err != nil {
+		return result.Err
+	}
+	d.ID = result.LastInsertId
+	return nil
 }
 
 func (d *Doc) MaxPort() (err error) {

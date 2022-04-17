@@ -14,45 +14,44 @@ type UserGroup struct {
 	Uid  int64   `json:"uid" db:"uid"`
 }
 
-func (ug *UserGroup) Delete(id interface{}) (err error) {
-
+func (ug *UserGroup) Delete(id interface{}) error {
+	var gsql string
 	if cache.SUPERID == ug.Uid {
-		gsql := "delete from usergroup where id=? "
-		_, err = db.Mconn.Delete(gsql, id)
+		gsql = "delete from usergroup where id=? "
 	} else {
-		gsql := "delete from  usergroup where id=? and uid=?"
-		_, err = db.Mconn.Delete(gsql, id, ug.Uid)
+		gsql = "delete from  usergroup where id=? and uid=?"
 	}
-	return
+	result := db.Mconn.Delete(gsql, id, ug.Uid)
+	return result.Err
 }
 
 func (ug *UserGroup) Update() (err error) {
-
+	var gsql string
 	if cache.SUPERID == ug.Uid {
-		gsql := "update usergroup set $set where id=? "
-		_, err = db.Mconn.UpdateInterface(ug, gsql, ug.Id)
+		gsql = "update usergroup set $set where id=? "
 	} else {
-		gsql := "update usergroup set $set where id=? and uid=?"
-		_, err = db.Mconn.UpdateInterface(ug, gsql, ug.Id, ug.Uid)
+		gsql = "update usergroup set $set where id=? and uid=?"
+
 	}
-	return
+	result := db.Mconn.UpdateInterface(ug, gsql, ug.Id, ug.Uid)
+	return result.Err
 }
 
 func (ug *UserGroup) Create() error {
 	gsql := "insert into usergroup($key) values($value) "
-	ids, err := db.Mconn.InsertInterfaceWithID(ug, gsql)
-	if err != nil {
-		return err
+	result := db.Mconn.InsertInterfaceWithID(ug, gsql)
+	if result.Err != nil {
+		return result.Err
 	}
-	ug.Id = ids[0]
-	return err
+	ug.Id = result.LastInsertId
+	return nil
 }
 
 func GetUserGroupList(uid int64) ([]UserGroup, error) {
 	ug := make([]UserGroup, 0)
 	gsql := "select * from usergroup where uid=? or uid=? or json_contains(uids,json_array(?))"
-	err := db.Mconn.Select(&ug, gsql, uid, cache.SUPERID, uid)
-	return ug, err
+	result := db.Mconn.Select(&ug, gsql, uid, cache.SUPERID, uid)
+	return ug, result.Err
 }
 
 func GetUserGroupIds(uid int64) ([]int64, error) {
@@ -76,7 +75,8 @@ func GetUserGroupIds(uid int64) ([]int64, error) {
 }
 
 func (ug *UserGroup) GetUserIds() error {
-	return db.Mconn.Select(&ug, "select uids from usergroup where id=?", ug.Id)
+	result := db.Mconn.Select(&ug, "select uids from usergroup where id=?", ug.Id)
+	return result.Err
 }
 
 func GetUserGroupKeyNameByUid() ([]KeyName, error) {

@@ -12,19 +12,12 @@ import (
 var Log *xmux.GroupRoute
 
 func init() {
-	Log = xmux.NewGroupRoute().ApiCreateGroup("log", "日志查询", "日志")
-	Log.ApiReqHeader("X-Token", "asdfasdfasdfasdfsdf")
-	Log.ApiCodeField("code").ApiCodeMsg("0", "成功")
-	Log.ApiCodeField("code").ApiCodeMsg("20", "token过期")
-	Log.ApiCodeField("code").ApiCodeMsg("2", "系统错误")
-	Log.ApiCodeField("code").ApiCodeMsg("", "其他错误,请查看返回的msg")
-	Log.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
+	Log = xmux.NewGroupRoute()
 
 	Log.Post("/search/log", handle.SearchLog).Bind(&log.SearchLog{}).
 		AddModule(midware.JsonToStruct)
 
-	Log.Post("/log/classify", handle.LogClassify).
-		ApiDescribe("获取classify列表")
+	Log.Post("/log/classify", handle.LogClassify)
 
 	// 	Log.Post("/log/list", handle.LogList).Bind(&log.SearchLog{}).
 	// 		AddModule(midware.JsonToStruct).

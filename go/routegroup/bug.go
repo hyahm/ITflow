@@ -13,11 +13,7 @@ import (
 var Bug *xmux.GroupRoute
 
 func init() {
-	Bug = xmux.NewGroupRoute().ApiCreateGroup("bug", "bug相关接口", "bug相关")
-	Bug.ApiCodeField("code").ApiCodeMsg("0", "成功")
-	Bug.ApiCodeField("code").ApiCodeMsg("20", "token过期")
-	Bug.ApiCodeField("code").ApiCodeMsg("1", "其他错误,请查看返回的msg")
-	Bug.ApiReqHeader("X-Token", "xxxxxxxxxxxxxxxxxxxxxxxxxx")
+	Bug = xmux.NewGroupRoute()
 
 	///  -------
 	Bug.Post("/bug/pass", handle.PassBug).Bind(&handle.RequestPass{}).AddModule(midware.JsonToStruct)

@@ -29,9 +29,9 @@ func InsertLog(classify classify.Classify, content string, ipaddr string) error 
 	logsql := "insert into log(exectime,classify,content,ip) values(?,?,?,?)"
 	ip := strings.Split(ipaddr, ":")[0]
 	if ip != "127.0.0.1" {
-		_, err := db.Mconn.Insert(logsql, time.Now().Unix(), classify, content, ip)
-		if err != nil {
-			return err
+		result := db.Mconn.Insert(logsql, time.Now().Unix(), classify, content, ip)
+		if result.Err != nil {
+			return result.Err
 		}
 	}
 

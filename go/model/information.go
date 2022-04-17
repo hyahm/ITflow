@@ -35,5 +35,6 @@ func NewInformationsByBid(bid interface{}, cms []*comment.Informations) error {
 }
 
 func (info *Information) Insert() error {
-	return db.Mconn.InsertInterfaceWithoutID(info, "insert into informations($key) values($value)")
+	result := db.Mconn.InsertInterfaceWithoutID(info, "insert into informations($key) values($value)")
+	return result.Err
 }

@@ -31,21 +31,21 @@ func GetLevelKeyNameByUid() ([]KeyName, error) {
 }
 
 func (level *Level) Create() error {
-	ids, err := db.Mconn.InsertInterfaceWithID(level, "insert into level($key) values($value)")
-	if err != nil {
-		golog.Error(err)
-		return err
+	result := db.Mconn.InsertInterfaceWithID(level, "insert into level($key) values($value)")
+	if result.Err != nil {
+		golog.Error(result.Err)
+		return result.Err
 	}
-	level.Id = ids[0]
+	level.Id = result.LastInsertId
 	return nil
 }
 
 func (level *Level) Update() error {
-	_, err := db.Mconn.UpdateInterface(level, "update level set $set where id=?", level.Id)
-	return err
+	result := db.Mconn.UpdateInterface(level, "update level set $set where id=?", level.Id)
+	return result.Err
 }
 
 func DeleteLevel(id interface{}) error {
-	_, err := db.Mconn.Delete("delete from level where id=?", id)
-	return err
+	result := db.Mconn.Delete("delete from level where id=?", id)
+	return result.Err
 }

@@ -15,9 +15,9 @@ func init() {
 	// 获取所有用户
 	UserListPage.Post("/user/list", handle.Read)
 	// 删除用户
-	UserListPage.Get("/user/remove", handle.Delete).ApiDescribe("删除用户")
+	UserListPage.Get("/user/remove", handle.Delete)
 	// 禁用用户
-	UserListPage.Get("/user/disable", handle.DisableUser).ApiDescribe("禁用用户")
+	UserListPage.Get("/user/disable", handle.DisableUser)
 	// 用户信息修改
 	UserListPage.Post("/user/update", handle.Update).Bind(model.User{}).
 		AddModule(midware.JsonToStruct)

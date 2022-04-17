@@ -31,9 +31,9 @@ func InitCache() {
 	}
 	rolerows.Close()
 	// 	//默认值
-	err = db.Mconn.Select(&Default, "select * from defaultvalue")
-	if err != nil {
-		if err != sql.ErrNoRows {
+	result := db.Mconn.Select(&Default, "select * from defaultvalue")
+	if result.Err != nil {
+		if result.Err != sql.ErrNoRows {
 			panic(err)
 		}
 	}

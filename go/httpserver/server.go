@@ -1,10 +1,12 @@
 package httpserver
 
 import (
+	"encoding/json"
 	"fmt"
 	"itflow/handle"
 	"itflow/midware"
 	"itflow/routegroup"
+	"log"
 	"net/http"
 	"time"
 
@@ -19,9 +21,29 @@ func GetExecTime(handle func(http.ResponseWriter, *http.Request), w http.Respons
 	golog.Infof("url: %s -- addr: %s -- method: %s -- exectime: %f", r.URL.Path, r.RemoteAddr, r.Method, time.Since(start).Seconds())
 }
 
+func exit(start time.Time, w http.ResponseWriter, r *http.Request) {
+	var send []byte
+	var err error
+	if r.Method == http.MethodOptions {
+		return
+	}
+	if xmux.GetInstance(r).Response != nil && xmux.GetInstance(r).Get(xmux.STATUSCODE).(int) == 200 {
+		send, err = json.Marshal(xmux.GetInstance(r).Response)
+		if err != nil {
+			log.Println(err)
+		}
+		w.Write(send)
+	}
+	golog.Infof("connect_id: %d,method: %s\turl: %s\ttime: %f\t status_code: %v, body: %v",
+		xmux.GetInstance(r).Get(xmux.CONNECTID),
+		r.Method,
+		r.URL.Path, time.Since(start).Seconds(), xmux.GetInstance(r).Get(xmux.STATUSCODE),
+		string(send))
+}
+
 func RunHttp() {
 	router := xmux.NewRouter()
-
+	router.Exit = exit
 	router.SetHeader("Access-Control-Allow-Origin", goconfig.ReadEnv("ACAO", goconfig.ReadString("cross", "*")))
 	router.SetHeader("Content-Type", "application/x-www-form-urlencoded,application/json; charset=UTF-8")
 	router.SetHeader("Access-Control-Allow-Headers", "Content-Type,Access-Token,X-Token,smail,authorization")

@@ -12,9 +12,9 @@ import (
 )
 
 type ResponseKeys struct {
-	Code int           `json:"code"`
-	Msg  string        `json:"msg"`
-	Keys []*model.Auth `json:"keys"`
+	Code int          `json:"code"`
+	Msg  string       `json:"msg"`
+	Keys []model.Auth `json:"keys"`
 }
 
 func KeyList(w http.ResponseWriter, r *http.Request) {

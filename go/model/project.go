@@ -4,6 +4,8 @@ import (
 	"errors"
 	"itflow/cache"
 	"itflow/db"
+
+	"github.com/hyahm/gomysql"
 )
 
 type Project struct {
@@ -37,11 +39,11 @@ func GetProjectKeyName(uid int64) ([]KeyName, error) {
 
 func (p *Project) Insert() error {
 
-	ids, err := db.Mconn.InsertInterfaceWithID(p, "insert into project($key) values($value)")
-	if err != nil {
-		return err
+	result := db.Mconn.InsertInterfaceWithID(p, "insert into project($key) values($value)")
+	if result.Err != nil {
+		return result.Err
 	}
-	p.Id = ids[0]
+	p.Id = result.LastInsertId
 	return nil
 }
 
@@ -57,33 +59,34 @@ func GetAllProjects(uid int64) ([]*Project, error) {
 	// 获取此用户的项目组
 	ps := make([]*Project, 0)
 	if uid == cache.SUPERID {
-		err := db.Mconn.Select(&ps, `select * from project`)
-		return ps, err
+		result := db.Mconn.Select(&ps, `select * from project`)
+		return ps, result.Err
 	} else {
 		// 如果是管理员或者创建者，都能看到
-		err := db.Mconn.Select(&ps, `select * from project where uid=? or uid=? or 
+		result := db.Mconn.Select(&ps, `select * from project where uid=? or uid=? or 
 ugid in (select id from usergroup where json_contains(ugid, json_array(?)))`, uid, cache.SUPERID, uid)
 
-		return ps, err
+		return ps, result.Err
 	}
 
 }
 
-func (p *Project) Update(uid int64) (err error) {
+func (p *Project) Update(uid int64) error {
+	var result gomysql.Result
 	if uid == cache.SUPERID {
-		_, err = db.Mconn.UpdateInterface(p, "update project set $set where id=?", p.Id)
+		result = db.Mconn.UpdateInterface(p, "update project set $set where id=?", p.Id)
 	} else {
-		_, err = db.Mconn.UpdateInterface(p, "update project set $set where id=? and uid=?", p.Id, uid)
+		result = db.Mconn.UpdateInterface(p, "update project set $set where id=? and uid=?", p.Id, uid)
 	}
-	return
+	return result.Err
 }
 
 func (p *Project) Delete() error {
-	count, err := db.Mconn.Update("delete from project where id=?", p.Id, p.Uid)
-	if count == 0 {
+	result := db.Mconn.Update("delete from project where id=?", p.Id, p.Uid)
+	if result.RowsAffected == 0 {
 		return errors.New("delete failed")
 	}
-	return err
+	return result.Err
 }
 
 func GetUserGroupId(pid interface{}) (int64, error) {

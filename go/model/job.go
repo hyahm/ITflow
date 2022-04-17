@@ -7,6 +7,7 @@ import (
 
 	"github.com/hyahm/goconfig"
 	"github.com/hyahm/golog"
+	"github.com/hyahm/gomysql"
 )
 
 type Job struct {
@@ -19,33 +20,34 @@ type Job struct {
 }
 
 func (job *Job) Insert() error {
-	ids, err := db.Mconn.InsertInterfaceWithID(job, "insert into jobs($key) values($value)")
-	if err != nil {
-		return err
+	result := db.Mconn.InsertInterfaceWithID(job, "insert into jobs($key) values($value)")
+	if result.Err != nil {
+		return result.Err
 	}
-	job.Id = ids[0]
+	job.Id = result.LastInsertId
 	return nil
 }
 
 func DeleteJob(id, uid interface{}) (err error) {
+	var result gomysql.Result
 	if uid == cache.SUPERID {
-		_, err = db.Mconn.Delete("delete from jobs where id=?", id)
+		result = db.Mconn.Delete("delete from jobs where id=?", id)
 	} else {
-		_, err = db.Mconn.Delete("delete from jobs where id=? and hypo=?", id, uid)
+		result = db.Mconn.Delete("delete from jobs where id=? and hypo=?", id, uid)
 	}
 
-	return
+	return result.Err
 }
 
 func (job *Job) Update() error {
-	_, err := db.Mconn.UpdateInterface(job, "update jobs set $set where id=?", job.Id)
-	return err
+	result := db.Mconn.UpdateInterface(job, "update jobs set $set where id=?", job.Id)
+	return result.Err
 }
 
 func GetAllPositions() ([]Job, error) {
 	jobs := make([]Job, 0)
-	err := db.Mconn.Select(&jobs, "select * from jobs")
-	return jobs, err
+	result := db.Mconn.Select(&jobs, "select * from jobs")
+	return jobs, result.Err
 }
 
 func GetJobIdsByJobId(jid int64) ([]int64, error) {

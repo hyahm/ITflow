@@ -13,5 +13,5 @@ func init() {
 	// 获取自己的邮箱
 	UpdateEmailPage.Post("/my/email", email.Get)
 	// 修改邮箱
-	UpdateEmailPage.Post("/email/update", email.Set).ApiDescribe("修改邮箱")
+	UpdateEmailPage.Post("/email/update", email.Set)
 }

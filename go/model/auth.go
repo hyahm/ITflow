@@ -43,15 +43,18 @@ func (a *Auth) Insert(uid int64) (int64, error) {
 		return 0, err
 	}
 	a.Created = time.Now().Unix()
-	return db.Mconn.Insert("insert into auth(name,uid,created,pri,pub,typ,user,password) values(?,?,?,?,?,?,?,?)",
+	result := db.Mconn.Insert("insert into auth(name,uid,created,pri,pub,typ,user,password) values(?,?,?,?,?,?,?,?)",
 		a.Name, uid, a.Created, a.Pri, a.Pub, a.Typ, a.User, a.Password)
+	return result.LastInsertId, result.Err
 }
 
 func (a *Auth) Update(uid int64) (int64, error) {
 	//
 	a.UpTime = time.Now().Unix()
-	return db.Mconn.Update("update auth set name=?,uptime=?,pri=?,pub=?,typ=?,user=?,password=? where id=? and uid=?",
+	result := db.Mconn.Update("update auth set name=?,uptime=?,pri=?,pub=?,typ=?,user=?,password=? where id=? and uid=?",
 		a.Name, a.UpTime, a.Pri, a.Pub, a.Typ, a.User, a.Password, a.ID, uid)
+
+	return result.RowsAffected, result.Err
 }
 
 func ChecKeyName(name string) error {
@@ -90,8 +93,8 @@ func GetKeyNamesByUid(uid int64) []byte {
 
 func DeleteAuth(id int64) (err error) {
 	//
-	_, err = db.Mconn.Delete("delete from auth where id=?", id)
-	return
+	result := db.Mconn.Delete("delete from auth where id=?", id)
+	return result.Err
 }
 
 func NewAuthById(id int64) (*Auth, error) {

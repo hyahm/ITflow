@@ -109,17 +109,17 @@ func DisableUser(w http.ResponseWriter, r *http.Request) {
 	errorcode := &response.Response{}
 
 	id := r.FormValue("id")
-	var err error
-	_, err = db.Mconn.Update("update user set disable=ABS(disable-1) where id=?", id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+
+	result := db.Mconn.Update("update user set disable=ABS(disable-1) where id=?", id)
+	if result.Err != nil {
+		golog.Error(result.Err)
+		w.Write(errorcode.ErrorE(result.Err))
 		return
 	}
-	_, err = db.Mconn.Update("update bugs set dustbin=ABS(dustbin-1) where uid=?", id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+	result = db.Mconn.Update("update bugs set dustbin=ABS(dustbin-1) where uid=?", id)
+	if result.Err != nil {
+		golog.Error(result.Err)
+		w.Write(errorcode.ErrorE(result.Err))
 		return
 	}
 
@@ -270,15 +270,13 @@ func ResetPwd(w http.ResponseWriter, r *http.Request) {
 	newpassword := encrypt.PwdEncrypt(rp.Password, cache.Salt)
 
 	updatepwdsql := "update user set password=? where id=?"
-	_, err := db.Mconn.Update(updatepwdsql, newpassword, rp.Id)
-	if err != nil {
-		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+	result := db.Mconn.Update(updatepwdsql, newpassword, rp.Id)
+	if result.Err != nil {
+		golog.Error(result.Err)
+		w.Write(errorcode.ErrorE(result.Err))
 		return
 	}
 
 	send, _ := json.Marshal(errorcode)
 	w.Write(send)
-	return
-
 }

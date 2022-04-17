@@ -3,7 +3,6 @@ package routegroup
 import (
 	"itflow/handle"
 	"itflow/handle/publiccontroller"
-	"itflow/internal/user"
 	"itflow/midware"
 	"itflow/model"
 
@@ -36,15 +35,13 @@ func init() {
 	// 用户组
 	Public.Post("/usergroup/keyname", publiccontroller.GetUserGroupKeyName)
 	// 获取用户信息， 所有页面都会用到
-	Public.Get("/user/info", handle.UserInfo).
-		ApiDescribe("获取用户信息").
-		ApiResStruct(user.UserInfo{})
+	Public.Get("/user/info", handle.UserInfo)
 	// 获取自己能管理的bug状态
 	Public.Post("/get/status", handle.GetStatus)
 	// 获取自己先择显示的状态
 	Public.Post("/status/show", publiccontroller.ShowStatus)
 	// 修改显示的状态的bug
 	Bug.Post("/status/save", handle.ChangeShowStatus).Bind(&model.User{}).
-		AddModule(midware.JsonToStruct).ApiDescribe("修改显示bug的状态")
+		AddModule(midware.JsonToStruct)
 
 }
