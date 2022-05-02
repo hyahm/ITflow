@@ -8,10 +8,10 @@ import (
 )
 
 // Admin 管理员组
-var Admin *xmux.GroupRoute
+var Admin *xmux.RouteGroup
 
 func init() {
-	Admin = xmux.NewGroupRoute()
+	Admin = xmux.NewRouteGroup()
 
 	Admin.Get("/admin/reset", handle.Reset).DelModule(midware.CheckToken)
 

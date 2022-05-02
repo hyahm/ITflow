@@ -14,14 +14,11 @@ func GetUserKeyNameByProject(w http.ResponseWriter, r *http.Request) {
 	vkns, err := model.GetUserKeyNameByProjectId(rvkn.ProjectId)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	golog.Info(rvkn)
-	res := response.Response{
-		Data: vkns,
-	}
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = vkns
 }
 
 // 获取用户信息
@@ -31,11 +28,9 @@ func GetUserKeyName(w http.ResponseWriter, r *http.Request) {
 	kns, err := model.GetUserKeyName(uid)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res := response.Response{
-		Data: kns,
-	}
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = kns
 }

@@ -7,10 +7,10 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-var Position *xmux.GroupRoute
+var Position *xmux.RouteGroup
 
 func init() {
-	Position = xmux.NewGroupRoute().AddPageKeys("position")
+	Position = xmux.NewRouteGroup().AddPageKeys("position")
 
 	Position.Post("/position/list", Read)
 	Position.Post("/position/add", Create).Bind(&model.Job{}).AddModule(midware.JsonToStruct)

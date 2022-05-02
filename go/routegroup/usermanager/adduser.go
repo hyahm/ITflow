@@ -4,9 +4,9 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-var AddUserPage *xmux.GroupRoute
+var AddUserPage *xmux.RouteGroup
 
 func init() {
-	AddUserPage = xmux.NewGroupRoute()
+	AddUserPage = xmux.NewRouteGroup()
 
 }

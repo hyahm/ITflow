@@ -14,10 +14,10 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-var SettingCenter *xmux.GroupRoute
+var SettingCenter *xmux.RouteGroup
 
 func init() {
-	SettingCenter = xmux.NewGroupRoute().AddPageKeys("admin").AddModule(midware.CheckRole)
+	SettingCenter = xmux.NewRouteGroup().AddPageKeys("admin").AddModule(midware.CheckRole)
 
 	SettingCenter.AddGroup(position.Position)
 	SettingCenter.AddGroup(env.Env)

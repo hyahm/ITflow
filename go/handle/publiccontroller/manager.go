@@ -10,17 +10,14 @@ import (
 )
 
 func GetManagerKeyName(w http.ResponseWriter, r *http.Request) {
-	res := response.Response{
-		Data: make([]model.KeyName, 0),
-	}
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 
 	kns, err := model.GetManagerKeyName(uid)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res.Data = kns
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = kns
 }

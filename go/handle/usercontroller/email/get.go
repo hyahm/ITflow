@@ -1,8 +1,8 @@
 package email
 
 import (
-	"fmt"
 	"itflow/db"
+	"itflow/response"
 	"net/http"
 
 	"github.com/hyahm/xmux"
@@ -15,10 +15,9 @@ func Get(w http.ResponseWriter, r *http.Request) {
 	var email string
 	err := db.Mconn.GetOne("select email from user where id=?", id).Scan(&email)
 	if err != nil {
-		w.Write([]byte(fmt.Sprintf(`{"code": 2, "msg": "%s"}`, err.Error())))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	w.Write([]byte(fmt.Sprintf(`{"code": 0, "email": "%s"}`, email)))
-	return
-
+	xmux.GetInstance(r).Response.(*response.Response).Data = email
 }

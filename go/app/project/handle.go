@@ -15,13 +15,11 @@ func Read(w http.ResponseWriter, r *http.Request) {
 	projects, err := model.GetAllProjects(uid)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res := response.Response{
-		Data: projects,
-	}
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = projects
 
 }
 
@@ -33,14 +31,11 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	err := project.Insert()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res := response.Response{
-		ID: project.Id,
-	}
-	w.Write(res.Marshal())
-
+	xmux.GetInstance(r).Response.(*response.Response).ID = project.Id
 }
 
 func Update(w http.ResponseWriter, r *http.Request) {
@@ -49,10 +44,10 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	err := project.Update(uid)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	w.Write(response.Success())
 
 }
 
@@ -61,32 +56,30 @@ func ProjectKeys(w http.ResponseWriter, r *http.Request) {
 	pkn, err := model.GetProjectKeyName(uid)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res := response.Response{
-		Data: pkn,
-	}
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = pkn
 
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
 	id := r.FormValue("id")
-	golog.Info(id)
 	// 判断有没有bug在使用这个
 	var count int
 	err := db.Mconn.GetOne("select count(id) from bugs where pid=?", id).Scan(&count)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 
 	if count > 0 {
-		w.Write(errorcode.IsUse())
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "使用中，无法删除"
 		return
 	}
 
@@ -95,9 +88,9 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	result := db.Mconn.Delete(getaritclesql, id)
 	if result.Err != nil {
 		golog.Error(result.Err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 
-	w.Write(errorcode.Success())
 }

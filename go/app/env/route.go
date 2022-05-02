@@ -8,10 +8,10 @@ import (
 )
 
 // Env 环境路由
-var Env *xmux.GroupRoute
+var Env *xmux.RouteGroup
 
 func init() {
-	Env = xmux.NewGroupRoute().AddPageKeys("env")
+	Env = xmux.NewRouteGroup().AddPageKeys("env")
 
 	Env.Post("/env/list", Read)
 

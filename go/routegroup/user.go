@@ -9,10 +9,10 @@ import (
 )
 
 // User 用户操作
-var User *xmux.GroupRoute
+var User *xmux.RouteGroup
 
 func init() {
-	User = xmux.NewGroupRoute()
+	User = xmux.NewRouteGroup()
 	User.Post("/user/login", handle.Login).Bind(&user.Login{}).
 		DelModule(midware.CheckToken).AddModule(midware.JsonToStruct)
 	User.Post("/user/logout", handle.LoginOut)

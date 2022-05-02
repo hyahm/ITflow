@@ -15,14 +15,12 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	err := version.Create()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res := response.Response{
-		ID:         version.Id,
-		CreateTime: version.CreateTime,
-	}
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).ID = version.Id
+	xmux.GetInstance(r).Response.(*response.Response).CreateTime = version.CreateTime
 
 }
 
@@ -30,13 +28,11 @@ func Read(w http.ResponseWriter, r *http.Request) {
 	vs, err := model.GetAllVersion()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res := response.Response{
-		Data: vs,
-	}
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = vs
 
 }
 
@@ -45,10 +41,10 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	err := model.DeleteVersion(id)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	w.Write(response.Success())
 
 }
 
@@ -58,18 +54,12 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	err := version.Update()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	w.Write(response.Success())
 }
 
 func GetVersion(w http.ResponseWriter, r *http.Request) {
 
-	// for _, v := range cache.CacheVidVersion {
-	// 	vl.VersionList = append(vl.VersionList, v)
-	// }
-	// send, _ := json.Marshal(vl)
-	// w.Write(send)
-	w.Write(response.Success())
 }

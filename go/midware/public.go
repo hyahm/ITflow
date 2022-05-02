@@ -13,29 +13,32 @@ import (
 	"github.com/hyahm/goconfig"
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
+	"github.com/hyahm/xmux/auth"
 )
 
 func JsonToStruct(w http.ResponseWriter, r *http.Request) bool {
-	resp := &response.Response{}
 	if goconfig.ReadBool("debug", false) {
 		b, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			golog.Error(err)
-			w.Write(resp.ErrorE(err))
+			xmux.GetInstance(r).Response.(*response.Response).Code = 1
+			xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 			return true
 		}
 		golog.Info(string(b))
 		err = json.Unmarshal(b, xmux.GetInstance(r).Data)
 		if err != nil {
 			golog.Error(err)
-			w.Write(resp.ErrorE(err))
+			xmux.GetInstance(r).Response.(*response.Response).Code = 1
+			xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 			return true
 		}
 	} else {
 		err := json.NewDecoder(r.Body).Decode(xmux.GetInstance(r).Data)
 		if err != nil {
 			golog.Error(err)
-			w.Write(resp.ErrorE(err))
+			xmux.GetInstance(r).Response.(*response.Response).Code = 1
+			xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 			return true
 		}
 
@@ -44,16 +47,19 @@ func JsonToStruct(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func CheckToken(w http.ResponseWriter, r *http.Request) bool {
-	errorcode := &response.Response{}
 	a := r.Header.Get("Authorization")
 	if a == "" {
-		golog.Error("not found token")
-		w.Write(errorcode.TokenNotFound())
+		golog.Error("not found token --------")
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "not found token"
 		return true
 	}
+
 	token := &jwt.Token{}
-	if !token.CheckJwt(strings.Split(a, " ")[1]) {
-		w.Write(errorcode.TokenNotFound())
+	err := auth.GetJwt(strings.Split(a, " ")[1], cache.Salt, token)
+	if err != nil {
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "token error"
 		return true
 	}
 
@@ -89,14 +95,16 @@ func CheckRole(w http.ResponseWriter, r *http.Request) bool {
 	permids, err := model.GetPermIdsByUid(uid)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return true
 	}
 
 	perm, err := model.GetPermsionPageAndPVById(permids)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return true
 	}
 	page := ""
@@ -110,16 +118,18 @@ func CheckRole(w http.ResponseWriter, r *http.Request) bool {
 		}
 	}
 	if !hasPerm {
-		w.Write(response.Error("没有页面权限"))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "没有页面权限"
 		return true
 	}
 
 	// permMap := make(map[string]bool)
 	result := xmux.GetPerm(pl, perm[page])
-	handleName := xmux.GetInstance(r).Get(xmux.CURRFUNCNAME).(string)
+	handleName := xmux.GetInstance(r).GetFuncName()
 	// 这个值就是判断有没有这个操作权限
 	if !result[permissionMap[handleName]] {
-		w.Write(response.Error("没有权限"))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "没有权限"
 		return true
 	}
 	return false

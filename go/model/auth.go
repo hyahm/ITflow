@@ -70,25 +70,22 @@ func ChecKeyName(name string) error {
 	return nil
 }
 
-func GetKeyNamesByUid(uid int64) []byte {
+func GetKeyNamesByUid(uid int64) ([]*Auth, error) {
 	//
-	auths := &Auths{
-		Auths: make([]*Auth, 0),
-	}
+	auths := make([]*Auth, 0)
+
 	rows, err := db.Mconn.GetRows("select id,name from auth where uid=?", uid)
 	if err != nil {
-		auths.Code = 1
-		auths.Msg = err.Error()
-		return auths.Marshal()
+		return auths, err
 	}
 	for rows.Next() {
 		auth := &Auth{}
 		if err := rows.Scan(&auth.ID, &auth.Name); err != nil {
 			continue
 		}
-		auths.Auths = append(auths.Auths, auth)
+		auths = append(auths, auth)
 	}
-	return auths.Marshal()
+	return auths, nil
 }
 
 func DeleteAuth(id int64) (err error) {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"itflow/model"
+	"itflow/response"
 	"net/http"
 
 	"github.com/hyahm/golog"
@@ -72,7 +73,8 @@ func Github(w http.ResponseWriter, r *http.Request) {
 	hook := xmux.GetInstance(r).Get("hook").(string)
 	x, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
 		return
 	}
 	s := hmac.New(sha1.New, []byte(hook))

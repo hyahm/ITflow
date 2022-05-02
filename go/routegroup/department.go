@@ -5,10 +5,10 @@ import (
 )
 
 // Department 部门路由组
-var Department *xmux.GroupRoute
+var Department *xmux.RouteGroup
 
 func init() {
-	Department = xmux.NewGroupRoute()
+	Department = xmux.NewRouteGroup()
 
 	// Department.Post("/department/add", handle.AddBugGroup).
 	// 	Bind(&status.StatusGroup{}).AddModule(midware.JsonToStruct)

@@ -9,10 +9,10 @@ import (
 )
 
 // DefaultValue 默认值
-var DefaultValue *xmux.GroupRoute
+var DefaultValue *xmux.RouteGroup
 
 func init() {
-	DefaultValue = xmux.NewGroupRoute().DelModule(midware.MustBeSuperAdmin)
+	DefaultValue = xmux.NewRouteGroup().DelModule(midware.MustBeSuperAdmin)
 
 	DefaultValue.Post("/default/status", handle.DefaultStatus)
 	DefaultValue.Post("/default/save", handle.DefaultSave).BindJson(&model.DefaultValue{})

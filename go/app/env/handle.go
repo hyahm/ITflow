@@ -14,13 +14,11 @@ func Read(w http.ResponseWriter, r *http.Request) {
 	envs, err := model.GetAllEnv()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res := response.Response{
-		Data: envs,
-	}
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = envs
 }
 
 func Create(w http.ResponseWriter, r *http.Request) {
@@ -29,15 +27,11 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	err := env.Create()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res := response.Response{
-		ID: env.ID,
-	}
-	// 添加缓存
-	w.Write(res.Marshal())
-
+	xmux.GetInstance(r).Response.(*response.Response).ID = env.ID
 }
 
 func Update(w http.ResponseWriter, r *http.Request) {
@@ -47,11 +41,10 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	err := env.Update()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	w.Write(response.Success())
-
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {
@@ -60,9 +53,8 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	err := model.DeleteEnv(id)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	w.Write(response.Success())
-
 }

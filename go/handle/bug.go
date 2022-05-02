@@ -46,13 +46,11 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 	status, err := model.GetStatusList()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res := response.Response{
-		Data: status,
-	}
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = status
 }
 
 func GetPermStatus(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +65,8 @@ func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 		rows, err = db.Mconn.GetRows(`select name from status`)
 		if err != nil {
 			golog.Error(err)
-			w.Write(sl.ErrorE(err))
+			xmux.GetInstance(r).Response.(*response.Response).Code = 1
+			xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 			return
 		}
 
@@ -76,7 +75,8 @@ func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 		err := db.Mconn.GetOne("select sids from statusgroup where id = (select sgid from jobs where id=(select jid from user where id=?))", uid).Scan(&sids)
 		if err != nil {
 			golog.Error(err)
-			w.Write(sl.ErrorE(err))
+			xmux.GetInstance(r).Response.(*response.Response).Code = 1
+			xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 			return
 		}
 
@@ -84,7 +84,8 @@ func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 			strings.Split(sids, ","))
 		if err != nil {
 			golog.Error(err)
-			w.Write(sl.ErrorE(err))
+			xmux.GetInstance(r).Response.(*response.Response).Code = 1
+			xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 			return
 		}
 
@@ -99,70 +100,22 @@ func GetPermStatus(w http.ResponseWriter, r *http.Request) {
 		sl.StatusList = append(sl.StatusList, *statusname)
 	}
 	rows.Close()
-	w.Write(sl.Marshal())
-
+	xmux.GetInstance(r).Response.(*response.Response).Data = sl
 }
-
-// func GetInfo(w http.ResponseWriter, r *http.Request) {
-
-// 	errorcode := &response.Response{}
-
-// 	sl := &user.UserInfo{}
-// 	sl.NickName = xmux.GetInstance(r).Get("nickname").(string)
-// 	err := db.Mconn.GetOne("select email,realname from user where nickname=?", sl.NickName).Scan(&sl.Email, &sl.Realname)
-// 	if err != nil {
-// 		golog.Error(err)
-// 		w.Write(errorcode.ErrorE(err))
-// 		return
-// 	}
-
-// 	send, _ := json.Marshal(sl)
-// 	w.Write(send)
-
-// }
-
-// func UpdateInfo(w http.ResponseWriter, r *http.Request) {
-// 	errorcode := &response.Response{}
-// 	sl := xmux.GetInstance(r).Data.(*user.UserInfo)
-// 	uid := xmux.GetInstance(r).Get("uid").(int64)
-// 	// 修改用户信息
-// 	_, err := db.Mconn.Update("update user set email=?,realname=?,nickname=? where id=?", sl.Email, sl.Realname, sl.NickName, uid)
-// 	if err != nil {
-// 		golog.Error(err)
-// 		w.Write(errorcode.ErrorE(err))
-// 		return
-// 	}
-
-// 	send, _ := json.Marshal(sl)
-// 	w.Write(send)
-// 	return
-
-// }
 
 func ChangeBugStatus(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
-
 	param := xmux.GetInstance(r).Data.(*bug.ChangeStatus)
-
-	// sid := param.Status.Id()
-	// if sid == 0 {
-	// 	golog.Errorf("找不到status id: %s", param.Status)
-	// 	w.Write(errorcode.Errorf("找不到status id: %s", param.Status))
-	// 	return
-	// }
-
 	basesql := "update bugs set sid=(select id from status where name=?),updatetime=? where id=?"
 
 	result := db.Mconn.Update(basesql, param.Status, time.Now().Unix(), param.Id)
 	if result.Err != nil {
 		golog.Error(result.Err)
-		w.Write(errorcode.ErrorE(result.Err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = result.Err.Error()
 		return
 	}
-
-	send, _ := json.Marshal(param)
-	w.Write(send)
+	xmux.GetInstance(r).Response.(*response.Response).Data = param
 }
 
 func ChangeShowStatus(w http.ResponseWriter, r *http.Request) {
@@ -183,10 +136,10 @@ func ChangeShowStatus(w http.ResponseWriter, r *http.Request) {
 	err := user.Update()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	w.Write(response.Success())
 }
 
 func GetMyBugs(w http.ResponseWriter, r *http.Request) {
@@ -286,51 +239,47 @@ func DeleteBug(w http.ResponseWriter, r *http.Request) {
 	err := bug.Delete(uid, id)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	w.Write(response.Success())
 }
 
 func ResumeBug(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
-	errorcode := &response.Response{}
 	bug := &model.Bug{}
 	err := bug.Resume(id)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	w.Write(errorcode.Success())
 }
 
 func CloseBug(w http.ResponseWriter, r *http.Request) {
-
-	errorcode := &response.Response{}
 
 	id := r.FormValue("id")
 	var uid int64
 	err := db.Mconn.GetOne("select uid from bugs where id=?", id).Scan(&uid)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 
 	thisUid := xmux.GetInstance(r).Get("uid").(int64)
 	if uid != thisUid && uid != cache.SUPERID {
-		golog.Debug("没有权限")
-		w.Write(errorcode.Error("没有权限"))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "没有权限"
 		return
 	}
 	result := db.Mconn.Update("update bugs set dustbin=true where id=?", id)
 	if result.Err != nil {
 		golog.Error(result.Err)
-		w.Write(errorcode.ErrorE(result.Err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
 }

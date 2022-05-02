@@ -9,15 +9,16 @@ import (
 
 type Response struct {
 	Code       int         `json:"code"`
-	Msg        string      `json:"msg"`
-	ID         int64       `json:"id"`
-	UpdateTime int64       `json:"update_time"`
-	CreateTime int64       `json:"create_time"`
-	UserIds    []int64     `json:"user_ids"`
-	VersionIds []int64     `json:"version_ids"`
-	Data       interface{} `json:"data"`
-	Count      int         `json:"count,empty"`
-	Page       int         `json:"page,empty"`
+	Msg        string      `json:"msg,omitempty"`
+	ID         int64       `json:"id,omitempty"`
+	UpdateTime int64       `json:"update_time,omitempty"`
+	CreateTime int64       `json:"create_time,omitempty"`
+	UserIds    []int64     `json:"user_ids,omitempty"`
+	VersionIds []int64     `json:"version_ids,omitempty"`
+	Data       interface{} `json:"data,omitempty"`
+	Count      int         `json:"count,omitempty"`
+	Page       int         `json:"page,omitempty"`
+	IsAdmin    bool        `json:"is_admin,omitempty"`
 }
 
 func (r *Response) Marshal() []byte {

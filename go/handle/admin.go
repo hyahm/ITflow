@@ -9,13 +9,14 @@ import (
 	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux"
 )
 
 func Reset(w http.ResponseWriter, r *http.Request) {
-	errorcode := &response.Response{}
 	addr := strings.Split(r.RemoteAddr, ":")
 	if addr[0] != "127.0.0.1" {
-		w.Write(errorcode.Error("only 127.0.0.1 cat request"))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "only 127.0.0.1 cat request"
 		return
 	}
 	password := r.FormValue("password")
@@ -26,11 +27,8 @@ func Reset(w http.ResponseWriter, r *http.Request) {
 	err := user.UpdateAdminPassword(enpassword)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-
-	w.Write([]byte("修改成功 \n"))
-	return
-
 }

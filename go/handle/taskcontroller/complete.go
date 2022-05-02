@@ -13,7 +13,8 @@ import (
 func Complete(w http.ResponseWriter, r *http.Request) {
 
 	if model.Default.Completed <= 0 {
-		w.Write([]byte("no permission"))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "no permission"
 		return
 	}
 	// 需要
@@ -24,17 +25,16 @@ func Complete(w http.ResponseWriter, r *http.Request) {
 	bug.Uid = uid
 
 	// 判断是否有默认值
-	golog.Infof("%#v", *bug)
 	err := bug.UpdateStatus()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 
 	// res := response.Response{
 	// 	UserIds: bug.Uids,
 	// }
-	w.Write(response.Success())
 
 }

@@ -21,7 +21,9 @@
       </el-table-column>
       <el-table-column label="日期" width="150px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.createtime | parseTime("{y}-{m}-{d} {h}:{i}") }}</span>
+          <span>{{
+            scope.row.createtime | parseTime("{y}-{m}-{d} {h}:{i}")
+          }}</span>
         </template>
       </el-table-column>
 
@@ -62,13 +64,22 @@
         class-name="small-padding fixed-width"
       >
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleResetPwd(scope.row)"
+          <el-button
+            type="primary"
+            size="mini"
+            @click="handleResetPwd(scope.row)"
             >修改密码</el-button
           >
-          <el-button size="mini" type="danger" @click="handleChangeInfo(scope.row)"
+          <el-button
+            size="mini"
+            type="danger"
+            @click="handleChangeInfo(scope.row)"
             >更改信息
           </el-button>
-          <el-button size="mini" type="danger" @click="handleRemove(scope.row.id)"
+          <el-button
+            size="mini"
+            type="danger"
+            @click="handleRemove(scope.row.id)"
             >删除
           </el-button>
           <el-button
@@ -78,7 +89,11 @@
             @click="handleDisable(scope.row)"
             >启用
           </el-button>
-          <el-button v-else size="mini" type="danger" @click="handleDisable(scope.row)"
+          <el-button
+            v-else
+            size="mini"
+            type="danger"
+            @click="handleDisable(scope.row)"
             >禁用
           </el-button>
         </template>
@@ -125,7 +140,13 @@
 </template>
 
 <script>
-import { userList, resetPwd, updateUser, userRemove, userDisable } from "@/api/user";
+import {
+  userList,
+  resetPwd,
+  updateUser,
+  userRemove,
+  userDisable,
+} from "@/api/user";
 import { getPositionKeyName } from "@/api/position";
 
 export default {
@@ -190,12 +211,12 @@ export default {
       this.dialogVisible = false;
     },
     async getuserList() {
-      const position = await getPositionKeyName()
+      const position = await getPositionKeyName();
       this.positionlist = position.data.data;
       for (let v of this.positionlist) {
         this.positionMap.set(v.id, v.name);
       }
-     
+
       userList().then((resp) => {
         this.userlist = resp.data.data;
       });
@@ -211,14 +232,18 @@ export default {
         type: "warning",
       })
         .then(() => {
-          userRemove(id).then((_) => {
-            const l = this.userlist.length;
-            for (let i = 0; i < l; i++) {
-              if (this.userlist[i].id === id) {
-                this.userlist.splice(i, 1);
+          userRemove(id).then((response) => {
+            if (response.data.code === 0) {
+              const l = this.userlist.length;
+              for (let i = 0; i < l; i++) {
+                if (this.userlist[i].id === id) {
+                  this.userlist.splice(i, 1);
+                }
               }
+              this.$message.warning("删除成功");
+            } else {
+               this.$message.error(response.data.msg);
             }
-            this.$message.warning("删除成功");
           });
         })
         .catch(() => {

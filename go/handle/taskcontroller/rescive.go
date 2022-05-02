@@ -19,7 +19,8 @@ func Receive(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 	// 判断是否有默认值
 	if model.Default.Receive <= 0 {
-		w.Write([]byte("not set default status"))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "not set default status"
 		return
 	}
 	bug.Uid = xmux.GetInstance(r).Get("uid").(int64)
@@ -27,7 +28,8 @@ func Receive(w http.ResponseWriter, r *http.Request) {
 	err := bug.UpdateStatus(model.Default.Receive, model.Default.Pass, model.Default.Completed)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	bug.Uids = []int64{uid}
@@ -41,13 +43,11 @@ func Receive(w http.ResponseWriter, r *http.Request) {
 	err = information.Insert()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 
-	res := response.Response{
-		UserIds: bug.Uids,
-	}
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).UserIds = bug.Uids
 
 }

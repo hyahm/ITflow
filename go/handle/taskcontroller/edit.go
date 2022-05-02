@@ -13,16 +13,13 @@ import (
 func Get(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 	uid := xmux.GetInstance(r).Get("uid").(int64)
-	// w.Write(bug.BugById(id, uid))
 	bug, err := model.GetBugById(id, uid)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res := response.Response{
-		Data: bug,
-	}
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = bug
 
 }

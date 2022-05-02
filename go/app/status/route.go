@@ -8,10 +8,10 @@ import (
 )
 
 // Status 状态路由组
-var Status *xmux.GroupRoute
+var Status *xmux.RouteGroup
 
 func init() {
-	Status = xmux.NewGroupRoute().AddPageKeys("status")
+	Status = xmux.NewRouteGroup().AddPageKeys("status")
 
 	Status.Post("/status/list", Read)
 

@@ -4,10 +4,10 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-var CreateBugPage *xmux.GroupRoute
+var CreateBugPage *xmux.RouteGroup
 
 func init() {
-	CreateBugPage = xmux.NewGroupRoute()
+	CreateBugPage = xmux.NewRouteGroup()
 	// 添加用户操作
 
 }

@@ -15,13 +15,11 @@ func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 	rgs, err := model.RoleGroupList()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res := &response.Response{
-		Data: rgs,
-	}
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = rgs
 }
 
 func GetRoleGroupName(w http.ResponseWriter, r *http.Request) {
@@ -29,18 +27,14 @@ func GetRoleGroupName(w http.ResponseWriter, r *http.Request) {
 	kns, err := model.GetRoleKeyName()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	errorcode := &response.Response{
-		Data: kns,
-	}
-	w.Write(errorcode.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = kns
 }
 
 func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
-
-	errorcode := &response.Response{}
 
 	id := r.FormValue("id")
 	golog.Info(id)
@@ -49,12 +43,14 @@ func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 	err := db.Mconn.GetOne(ssql, id).Scan(&count)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 
 	if count > 0 {
-		w.Write(errorcode.Error("有用户在使用， 无法删除"))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "有用户在使用， 无法删除"
 		return
 	}
 	// 先删除perm
@@ -63,13 +59,15 @@ func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 	err = rolegroup.GetRoleGroupById(id)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	err = model.DeletePerms(rolegroup.PermIds...)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 
@@ -78,11 +76,10 @@ func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 	// perm 里面的也要删除
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-
-	w.Write(response.Success())
 
 }
 
@@ -105,10 +102,10 @@ func EditRoleGroup(w http.ResponseWriter, r *http.Request) {
 	err := rolegroup.Update()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	w.Write(response.Success())
 }
 
 type RequestRoleGroup struct {
@@ -123,7 +120,8 @@ func AddRoleGroup(w http.ResponseWriter, r *http.Request) {
 	ids, err := model.InsertManyPerm(rr.PermIds)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	rolegroup := model.RoleGroup{
@@ -134,12 +132,10 @@ func AddRoleGroup(w http.ResponseWriter, r *http.Request) {
 	err = rolegroup.Insert()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res := response.Response{
-		ID: rolegroup.ID,
-	}
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).ID = rolegroup.ID
 
 }

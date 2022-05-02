@@ -12,14 +12,10 @@ const (
 	StatusGroup Classify = "statusgroup"
 	Role        Classify = "role"
 	Status      Classify = "status"
-	// Login = "restfulproject"
-	// Login = "api"
-	// Login = "type"
-	UserGroup Classify = "usergroup"
-	// Login = "header"
-	Important Classify = "important"
-	Level     Classify = "level"
-	Position  Classify = "position"
+	UserGroup   Classify = "usergroup"
+	Important   Classify = "important"
+	Level       Classify = "level"
+	Position    Classify = "position"
 )
 
 func (c Classify) String() string {

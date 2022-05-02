@@ -1,7 +1,6 @@
 package dashboard
 
 import (
-	"encoding/json"
 	"fmt"
 	"itflow/model"
 	"log"
@@ -12,15 +11,13 @@ import (
 )
 
 type BugCount struct {
-	Created   []int  `json:"created"`
-	Completed []int  `json:"completed"`
-	Code      int    `json:"code"`
-	Msg       string `json:"msg"`
+	Created   []int `json:"created"`
+	Completed []int `json:"completed"`
 }
 
 const SHOWDAY = 7
 
-func GetCount() []byte {
+func GetCount() *BugCount {
 	start := getTime()
 	bc := &BugCount{
 		Created:   make([]int, SHOWDAY),
@@ -50,8 +47,7 @@ func GetCount() []byte {
 		count++
 	}
 	wg.Wait()
-	send, _ := json.Marshal(bc)
-	return send
+	return bc
 }
 
 func getTime() []int64 {

@@ -10,15 +10,14 @@ import (
 )
 
 func Read(w http.ResponseWriter, r *http.Request) {
-	res := &response.Response{}
 	statuss, err := model.GetAllStatus()
 	if err != nil {
 		golog.Error(err)
-		w.Write(res.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res.Data = statuss
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = statuss
 }
 
 func Create(w http.ResponseWriter, r *http.Request) {
@@ -27,13 +26,11 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	err := status.Create()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res := response.Response{
-		ID: status.ID,
-	}
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).ID = status.ID
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {
@@ -42,10 +39,10 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	err := model.DeleteStatus(id)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	w.Write(response.Success())
 }
 
 func Update(w http.ResponseWriter, r *http.Request) {
@@ -54,20 +51,8 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	err := status.Update()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	// 更新缓存
-	w.Write(response.Success())
 }
-
-// func StatusGroupName(w http.ResponseWriter, r *http.Request) {
-
-// 	sl := &network.List_StatusName{}
-// 	// for _, v := range cache.CacheSgidGroup {
-// 	// 	sl.StatusList = append(sl.StatusList, v)
-// 	// }
-
-// 	send, _ := json.Marshal(sl)
-// 	w.Write(send)
-// }

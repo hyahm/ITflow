@@ -8,10 +8,10 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-var UserGroupPage *xmux.GroupRoute
+var UserGroupPage *xmux.RouteGroup
 
 func init() {
-	UserGroupPage = xmux.NewGroupRoute()
+	UserGroupPage = xmux.NewRouteGroup()
 	// 获取所有用户的信息关系
 	UserGroupPage.Post("/alluser/keyname", usergroup.GetAllUserKeyName)
 	// 获取所有用户组

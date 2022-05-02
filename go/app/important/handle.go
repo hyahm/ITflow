@@ -10,15 +10,14 @@ import (
 )
 
 func Read(w http.ResponseWriter, r *http.Request) {
-	res := response.Response{}
 	importants, err := model.GetAllImportant()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res.Data = importants
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = importants
 }
 
 func Create(w http.ResponseWriter, r *http.Request) {
@@ -26,13 +25,11 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	err := data.Create()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res := response.Response{
-		ID: data.Id,
-	}
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).ID = data.Id
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {
@@ -41,11 +38,10 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	err := model.DeleteImportant(id)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	w.Write(response.Success())
-
 }
 
 func Update(w http.ResponseWriter, r *http.Request) {
@@ -55,9 +51,8 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	err := data.Update()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	w.Write(response.Success())
-
 }

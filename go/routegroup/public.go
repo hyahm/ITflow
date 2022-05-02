@@ -10,10 +10,10 @@ import (
 )
 
 // RoleGroup 角色组路由
-var Public *xmux.GroupRoute
+var Public *xmux.RouteGroup
 
 func init() {
-	Public = xmux.NewGroupRoute()
+	Public = xmux.NewRouteGroup()
 	// 我的project
 	Public.Post("/project/keyname", publiccontroller.GetProjectKeyName)
 	Public.Post("/version/keyname/byproject", publiccontroller.GetVersionKeyNameByProject).BindJson(publiccontroller.RequestProject{})

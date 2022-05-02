@@ -15,15 +15,11 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	err := statusGroup.Insert()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	resp := &response.Response{
-		ID: statusGroup.ID,
-	}
-
-	w.Write(resp.Marshal())
-
+	xmux.GetInstance(r).Response.(*response.Response).ID = statusGroup.ID
 }
 
 func Update(w http.ResponseWriter, r *http.Request) {
@@ -31,10 +27,10 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	err := sg.Update()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	w.Write(response.Success())
 
 }
 
@@ -43,13 +39,11 @@ func Read(w http.ResponseWriter, r *http.Request) {
 	sgs, err := model.GetAllStatusGroup()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res := &response.Response{
-		Data: sgs,
-	}
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = sgs
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {
@@ -59,12 +53,10 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	err := model.DeleteStatusGroup(id)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-
-	//更新缓存
-	w.Write(response.Success())
 }
 
 func GetStatusGroupName(w http.ResponseWriter, r *http.Request) {
@@ -72,11 +64,9 @@ func GetStatusGroupName(w http.ResponseWriter, r *http.Request) {
 	kns, err := model.GetStatusGroupKeyName()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	errorcode := &response.Response{
-		Data: kns,
-	}
-	w.Write(errorcode.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = kns
 }

@@ -9,10 +9,10 @@ import (
 )
 
 // Log 日志路由
-var Log *xmux.GroupRoute
+var Log *xmux.RouteGroup
 
 func init() {
-	Log = xmux.NewGroupRoute()
+	Log = xmux.NewRouteGroup()
 
 	Log.Post("/search/log", handle.SearchLog).Bind(&log.SearchLog{}).
 		AddModule(midware.JsonToStruct)

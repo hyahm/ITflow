@@ -15,14 +15,16 @@ func JobAuth(w http.ResponseWriter, r *http.Request) bool {
 	jid, err := model.GetJobIdByUid(uid)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return true
 	}
 	// jobs: 能管理的这些职位
 	jobs, err := model.GetJobIdsByJobId(jid)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return true
 	}
 	//

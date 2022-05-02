@@ -7,10 +7,10 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-var Level *xmux.GroupRoute
+var Level *xmux.RouteGroup
 
 func init() {
-	Level = xmux.NewGroupRoute().AddPageKeys("level")
+	Level = xmux.NewRouteGroup().AddPageKeys("level")
 
 	Level.Post("/level/get", Read)
 

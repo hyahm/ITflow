@@ -10,10 +10,10 @@ import (
 )
 
 // Bug bug相关操作的路由组
-var Bug *xmux.GroupRoute
+var Bug *xmux.RouteGroup
 
 func init() {
-	Bug = xmux.NewGroupRoute()
+	Bug = xmux.NewRouteGroup()
 
 	///  -------
 	Bug.Post("/bug/pass", handle.PassBug).Bind(&handle.RequestPass{}).AddModule(midware.JsonToStruct)

@@ -1,8 +1,8 @@
 package handle
 
 import (
-	"fmt"
 	"itflow/db"
+	"itflow/response"
 	"net/http"
 
 	"github.com/hyahm/golog"
@@ -14,10 +14,10 @@ func GetExpire(w http.ResponseWriter, r *http.Request) {
 	golog.Info(token)
 	filter, err := db.Table.Filter("Token", token)
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	time := filter.TTL()
-
-	w.Write([]byte(fmt.Sprintf("%f", time)))
+	xmux.GetInstance(r).Response.(*response.Response).UpdateTime = int64(time)
 }

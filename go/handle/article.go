@@ -106,7 +106,8 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	rows, err := db.Mconn.GetRows("select realname from user")
 	if err != nil {
 		golog.Error(err)
-		w.Write(ul.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	for rows.Next() {
@@ -119,29 +120,14 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		}
 		ul.Users = append(ul.Users, *realname)
 	}
-	rows.Close()
-	send, _ := json.Marshal(ul)
-	w.Write(send)
-	return
 
+	xmux.GetInstance(r).Response.(*response.Response).Data = ul
 }
 
 func IsAdmin(w http.ResponseWriter, r *http.Request) {
-	if xmux.GetInstance(r).Get("uid").(int64) == cache.SUPERID {
-		w.Write([]byte(`{"code": 0 , "admin": true}`))
-	} else {
-		w.Write([]byte(`{"code": 0 , "admin": false}`))
-	}
+	xmux.GetInstance(r).Response.(*response.Response).IsAdmin =
+		xmux.GetInstance(r).Get("uid").(int64) == cache.SUPERID
 }
-
-// func GetEmail(w http.ResponseWriter, r *http.Request) {
-// 	if xmux.GetInstance(r).Get("uid").(int64) == cache.SUPERID {
-// 		w.Write([]byte("1"))
-// 	} else {
-// 		w.Write([]byte("0"))
-// 	}
-// 	return
-// }
 
 func GetProjectUser(w http.ResponseWriter, r *http.Request) {
 	// 通过project 来获取所属用户
@@ -149,7 +135,8 @@ func GetProjectUser(w http.ResponseWriter, r *http.Request) {
 	projectId, err := strconv.ParseInt(pid, 10, 64)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	res := response.Response{}
@@ -157,7 +144,8 @@ func GetProjectUser(w http.ResponseWriter, r *http.Request) {
 	res.VersionIds, err = model.GetVersionIdsByProjectId(projectId)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	// 通过project_id 获取对应的user_id
@@ -166,23 +154,19 @@ func GetProjectUser(w http.ResponseWriter, r *http.Request) {
 	ug.Id, err = model.GetUserGroupId(projectId)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 
 	err = ug.GetUserIds()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res.UserIds = ug.Uids
-	w.Write(res.Marshal())
-}
-
-type versionList struct {
-	VersionList []string `json:"versionlist"`
-	Code        int      `json:"code"`
+	xmux.GetInstance(r).Response.(*response.Response).UserIds = ug.Uids
 }
 
 type uploadImage struct {
@@ -195,12 +179,12 @@ type uploadImage struct {
 }
 
 func UploadImgs(w http.ResponseWriter, r *http.Request) {
-	errorcode := &response.Response{}
 
 	file, h, err := r.FormFile("image")
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	ext := filepath.Ext(h.Filename)
@@ -211,7 +195,8 @@ func UploadImgs(w http.ResponseWriter, r *http.Request) {
 	cfile, err := os.OpenFile(p, os.O_CREATE|os.O_RDWR, 0755)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	defer cfile.Close()
@@ -219,7 +204,8 @@ func UploadImgs(w http.ResponseWriter, r *http.Request) {
 	_, err = io.Copy(cfile, file)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 
@@ -230,9 +216,8 @@ func UploadImgs(w http.ResponseWriter, r *http.Request) {
 		Url:        url,
 		Uid:        time.Now().UnixNano(),
 	}
-	send, _ := json.Marshal(sendurl)
-	w.Write(send)
-	return
+
+	xmux.GetInstance(r).Response.(*response.Response).Data = sendurl
 
 }
 
@@ -245,18 +230,19 @@ type uploadimage struct {
 
 func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 	url := &uploadimage{}
-	errorcode := &response.Response{}
 	image, header, err := r.FormFile("upload")
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	imgcode := make([]byte, header.Size)
 	_, err = image.Read(imgcode)
 	if err != nil {
 		golog.Errorf("parse uploadImage struct fail,%v", err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 
@@ -265,7 +251,8 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 	err = ioutil.WriteFile(path.Join(cache.ImgDir, filename), imgcode, 0655) //buffer输出到jpg文件中（不做处理，直接写到文件）
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	url.Url = cache.ShowBaseUrl + filename
@@ -276,13 +263,11 @@ func UploadHeadImg(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 	result := db.Mconn.Update(uploadimg, url.Url, uid)
 	if result.Err != nil {
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	s, _ := json.Marshal(url)
-	w.Write(s)
-	return
-
+	xmux.GetInstance(r).Response.(*response.Response).Data = url
 }
 
 func BugShow(w http.ResponseWriter, r *http.Request) {
@@ -308,7 +293,8 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 	)
 	if err != nil {
 		golog.Error(err)
-		w.Write(sl.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	golog.Infof("%+v", sl)
@@ -322,7 +308,8 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 	rows, err := db.Mconn.GetRows(getinfosql, bid)
 	if err != nil {
 		golog.Error(err)
-		w.Write(sl.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	for rows.Next() {
@@ -333,8 +320,5 @@ func BugShow(w http.ResponseWriter, r *http.Request) {
 		sl.Comments = append(sl.Comments, im)
 	}
 	rows.Close()
-
-	send, _ := json.Marshal(sl)
-	w.Write(send)
-	return
+	xmux.GetInstance(r).Response.(*response.Response).Data = sl
 }

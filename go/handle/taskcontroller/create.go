@@ -18,12 +18,13 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	dv, err := model.GetDefaultValue()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	if dv.Created == 0 {
-		golog.Error("please set default status to create bug ")
-		w.Write(response.Error("please set default status to create bug "))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "please set default status to create bug"
 		return
 	}
 	bug.Sid = dv.Created
@@ -32,14 +33,11 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	err = bug.CreateBug()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	// 创建的id 返回
-	res := response.Response{
-		ID: bug.ID,
-	}
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).ID = bug.ID
 
 }
 
@@ -50,9 +48,8 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	err := bug.Update()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	w.Write(response.Success())
-
 }

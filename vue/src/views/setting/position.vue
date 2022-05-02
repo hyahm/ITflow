@@ -78,7 +78,7 @@
         </el-form-item>
         <!-- <el-form style="margin-top: 10px"> -->
         <!--从属于哪个管理者-->
-        <el-form-item label="从属于:" v-if="isadmin">
+        <el-form-item label="从属于:" >
           <el-select v-model="form.hypo" clearable placeholder="Select">
             <el-option
               v-for="item in manager"

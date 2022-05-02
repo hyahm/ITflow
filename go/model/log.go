@@ -1,37 +1,19 @@
 package model
 
 import (
-	"itflow/classify"
 	"itflow/db"
-	"strings"
-	"time"
-
-	"github.com/hyahm/golog"
 )
 
 type Log struct {
-	Id       int64  `json:"id"`
-	Exectime int64  `json:"exectime"`
-	Classify string `json:"classify"`
-	Ip       string `json:"ip"`
-	Uid      int64  `json:""`
-	Action   string `json:"action"`
+	Id       int64  `json:"id" db:"id"`
+	Exectime int64  `json:"exectime" db:"exectime"`
+	Classify string `json:"classify" db:"classify"`
+	Ip       string `json:"ip" db:"ip"`
+	Uid      int64  `json:"uid" db:"uid"`
+	Action   string `json:"action" db:"action"`
 }
 
-// `id` bigint(20) NOT NULL AUTO_INCREMENT,
-// `exectime` bigint(20) DEFAULT '0',
-// `classify` varchar(30) NOT NULL DEFAULT '',
-// `content` text,
-// `ip` varchar(40) DEFAULT '',
-// `username` varchar(50) DEFAULT '',
-// `action` varchar(50) DEFAULT '',
-
-func InsertLog(classify classify.Classify, ip, action string, uid int64) {
-	ip = strings.Split(ip, ":")[0]
-	result := db.Mconn.Insert("insert into log(exectime,classify,ip, uid,action) values(?,?,?,?,?)",
-		time.Now().Unix(), classify, ip, uid, action,
-	)
-	if result.Err != nil {
-		golog.Error(result.Err)
-	}
+func (log *Log) Insert() error {
+	result := db.Mconn.InsertInterfaceWithoutID(log, "insert into log($key) values($value)")
+	return result.Err
 }

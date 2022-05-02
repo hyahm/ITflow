@@ -19,8 +19,13 @@
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button size="mini" @click="handleUpdate(scope.row)">修改</el-button>
-          <el-button size="mini" type="danger" @click="handleDelete(scope.row.id)"
+          <el-button size="mini" @click="handleUpdate(scope.row)"
+            >修改</el-button
+          >
+          <el-button
+            size="mini"
+            type="danger"
+            @click="handleDelete(scope.row.id)"
             >删除</el-button
           >
         </template>
@@ -128,14 +133,18 @@ export default {
     },
     confirm() {
       if (this.form.id > 0) {
-        updateUserGroup(this.form).then((_) => {
-          const l = this.list.length;
-          for (let i = 0; i < l; i++) {
-            if (this.list[i].id === this.form.id) {
-              this.list[i] = this.form;
+        updateUserGroup(this.form).then((response) => {
+          if (response.data.code === 0) {
+            for (let i =0; i < this.list.length; i++) {
+              if (this.list[i].id == this.form.id) {
+                this.list[i].uids = this.form.uids
+                break
+              }
             }
+            this.$message.success("修改成功");
+          } else {
+            this.$message.error(response.data.msg);
           }
-          this.$message.success("修改成功");
         });
       } else {
         createUserGroups(this.form).then((resp) => {

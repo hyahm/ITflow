@@ -14,28 +14,21 @@ type SearchLog struct {
 
 type Loglist struct {
 	LogList []*LogRow `json:"loglist" type:"int" need:"否" default:"[]" information:"列表"`
-	Code    int       `json:"code" type:"int" need:"是" default:"0" information:"状态码"`
 	Count   int       `json:"count" type:"int" need:"是" default:"0" information:"总个数"`
 	Page    int       `json:"page" type:"int" need:"是" default:"0" information:"页数"`
-	Msg     string    `json:"msg, omitempty" type:"string" need:"否" default:"" information:"错误信息"`
 }
 
 func (ll *Loglist) ErrorE(err error) []byte {
-	ll.Msg = err.Error()
-	ll.Code = 1
 	send, _ := json.Marshal(ll)
 	return send
 }
 
 func (ll *Loglist) NoRows() []byte {
 	ll.LogList = make([]*LogRow, 0)
-	ll.Code = 0
 	send, _ := json.Marshal(ll)
 	return send
 }
 func (ll *Loglist) Error(err string) []byte {
-	ll.Msg = err
-	ll.Code = 1
 	send, _ := json.Marshal(ll)
 	return send
 }

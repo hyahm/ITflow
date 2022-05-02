@@ -7,10 +7,10 @@ import (
 )
 
 // DashBoard 主页上的
-var DashBoard *xmux.GroupRoute
+var DashBoard *xmux.RouteGroup
 
 func init() {
-	DashBoard = xmux.NewGroupRoute()
+	DashBoard = xmux.NewRouteGroup()
 	DashBoard.Post("/dashboard/bugcount", handle.BugCount)
 
 	DashBoard.Post("/dashboard/projectcount", handle.ProjectCount)

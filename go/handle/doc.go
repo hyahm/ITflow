@@ -22,7 +22,8 @@ func Name(w http.ResponseWriter, r *http.Request) {
 	golog.Info(name)
 	err := model.CheckName(name)
 	if err != nil {
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	errorcode.Success()
@@ -37,18 +38,14 @@ type ResponseDocs struct {
 func DocList(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 	var err error
-	resp := &response.Response{}
 	rd := &ResponseDocs{}
 	rd.Doc, err = model.GetAllDocs(uid)
 	if err != nil {
-		w.Write(resp.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	send, err := json.Marshal(rd)
-	if err != nil {
-		golog.Error(err)
-	}
-	w.Write(send)
+	xmux.GetInstance(r).Response.(*response.Response).Data = rd
 }
 
 func Docs(w http.ResponseWriter, r *http.Request) {
@@ -96,30 +93,33 @@ func DocCreate(w http.ResponseWriter, r *http.Request) {
 	// 插入数据到数据库
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 	doc := xmux.GetInstance(r).Data.(*model.Doc)
-	errorcode := &response.Response{}
 	_, err := regexp.MatchString("^[a-z]{1}[a-z0-9]{1,20}$", doc.Name)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	golog.Info("check document name")
 	if err := model.ChecDocName(doc.Name); err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	golog.Info("init a git object")
 	_git, err := doc.NewGit()
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	golog.Info("git clone project")
 	if err := _git.GitClone(); err != nil && err != git.ErrRepositoryAlreadyExists {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	//如果存在配置文件就 newpath 是 git的根目录, 创建目录
@@ -133,7 +133,8 @@ func DocCreate(w http.ResponseWriter, r *http.Request) {
 	err = doc.Insert(uid)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 
@@ -1046,9 +1047,6 @@ func DocCreate(w http.ResponseWriter, r *http.Request) {
 
 func ProxyDoc(w http.ResponseWriter, r *http.Request) {
 	name := xmux.Var(r)["name"]
-	golog.Info(r.URL.RequestURI())
-	golog.Info(r.URL.RawQuery)
-	golog.Info(name)
 	port := model.GetPort(name)
 	if port == 0 {
 		w.WriteHeader(404)
@@ -1079,28 +1077,29 @@ func ProxyDoc(w http.ResponseWriter, r *http.Request) {
 
 func DocUpdate(w http.ResponseWriter, r *http.Request) {
 	// 通过id 获取 name
-	errorcode := &response.Response{}
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 	id := r.URL.Query().Get("id")
 	doc, err := model.NewDocById(id, uid)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
 		return
 	}
 	// 关闭服务
 	_git, err := doc.NewGit()
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
 		return
 	}
 	err = _git.GitPull()
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
 		return
 	}
 
-	w.Write(errorcode.Success())
 }

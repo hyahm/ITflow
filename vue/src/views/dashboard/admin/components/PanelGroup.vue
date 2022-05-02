@@ -79,16 +79,16 @@ export default {
     getlist() {
       getlist().then(response => {
         if (response.data.code === 0) {
-          this.countusers = response.data.countusers
-          this.countgroups = response.data.countgroups
+          this.countusers = response.data.data.countusers
+          this.countgroups = response.data.data.countgroups
         }
       })
     },
     getprojectcount() {
       getprojectlist().then(response => {
         if (response.data.code === 0) {
-          this.countbugs = response.data.countbugs
-          this.countcomplete = response.data.countcomplete
+          this.countbugs = response.data.data.countbugs
+          this.countcomplete = response.data.data.countcomplete
         }
       })
     },

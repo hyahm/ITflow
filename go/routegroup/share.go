@@ -5,10 +5,10 @@ import (
 )
 
 // Share 废弃
-var Share *xmux.GroupRoute
+var Share *xmux.RouteGroup
 
 func init() {
-	Share = xmux.NewGroupRoute()
+	Share = xmux.NewRouteGroup()
 	// Share.Get("/share/list", handle.ShareList)
 	// Share.Post("/share/upload", handle.ShareUpload)
 	// Share.Post("/share/mkdir", handle.ShareMkdir).Bind(&model.Data_sharefile{}).AddModule(midware.JsonToStruct)

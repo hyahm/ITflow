@@ -7,55 +7,44 @@ import (
 	"itflow/cache"
 	"itflow/db"
 	"itflow/encrypt"
-	"itflow/jwt"
 	"itflow/model"
 	"strings"
 
 	"github.com/hyahm/golog"
+	"github.com/hyahm/xmux/auth"
 )
 
 // 用户登录
+type ResponseLogin struct {
+	ID int64 `json:"id"`
+}
 
 type Login struct {
 	Username string `json:"username" type:"string" need:"是" default:"" information:"用户名"`
 	Password string `json:"password"  type:"string" need:"是" default:"" information:"密码"`
 }
 
-func (login *Login) Check() (*RespLogin, error) {
-	resp := &RespLogin{}
+func (login *Login) Check() (string, int64, error) {
+	rl := &ResponseLogin{}
 	login.Username = strings.Trim(login.Username, " ")
 	enpassword := encrypt.PwdEncrypt(login.Password, cache.Salt)
 	getsql := ""
 	if strings.Contains(login.Username, "@") {
-		golog.Info("email login")
-		getsql = "select id,nickname from user where email=? and password=? and disable=0"
+		getsql = "select id from user where email=? and password=? and disable=0"
 	} else {
-		getsql = "select id,nickname from user where nickname=? and password=? and disable=0"
+		getsql = "select id from user where nickname=? and password=? and disable=0"
 	}
 
-	err := db.Mconn.GetOne(getsql, login.Username, enpassword).Scan(&resp.ID, &resp.UserName)
+	err := db.Mconn.GetOne(getsql, login.Username, enpassword).Scan(&rl.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return resp, errors.New("账号或密码错误")
+			return "", 0, errors.New("账号或密码错误")
 		}
 		golog.Error(err)
-		return resp, err
+		return "", 0, err
 	}
-	// 这里登录信息插入缓存表
-
-	resp.Token = jwt.MakeJwt(resp.ID, resp.UserName)
-	// resp.Token = encrypt.Token(resp.UserName, cache.Salt)
-	// token := &db.Token{
-	// 	Token:    tk,
-	// 	NickName: login.Username,
-	// 	Id:       resp.ID,
-	// }
-	// err = db.Table.Add(token, goconfig.ReadDuration("expiration", time.Minute*120))
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	return resp, err
-	// }
-	return resp, nil
+	token, err := auth.MakeJwt(cache.Salt, rl)
+	return token, rl.ID, err
 }
 
 type User struct {

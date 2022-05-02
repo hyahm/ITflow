@@ -1,8 +1,6 @@
 package handle
 
 import (
-	"encoding/json"
-	"fmt"
 	"itflow/db"
 	"itflow/internal/email"
 	"itflow/mail"
@@ -17,8 +15,6 @@ import (
 
 func TestEmail(w http.ResponseWriter, r *http.Request) {
 
-	errorcode := &response.Response{}
-
 	getemail := xmux.GetInstance(r).Data.(*email.Email)
 	if getemail.Nickname == "" {
 		getemail.Nickname = strings.Split(getemail.EmailAddr, "@")[0]
@@ -26,12 +22,10 @@ func TestEmail(w http.ResponseWriter, r *http.Request) {
 	golog.Infof("%#v", *getemail)
 	err := mail.TestMail(getemail.Host, getemail.EmailAddr, getemail.Password, getemail.Port, getemail.To, getemail.Nickname)
 	if err != nil {
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
 		return
 	}
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
-	return
 
 }
 
@@ -46,7 +40,8 @@ func SaveEmail(w http.ResponseWriter, r *http.Request) {
 			getemail.Password, getemail.Port, getemail.Host, getemail.Enable, getemail.Nickname)
 		if result.Err != nil {
 			golog.Error(result.Err)
-			w.Write(errorcode.ErrorE(result.Err))
+			xmux.GetInstance(r).Response.(*response.Response).Msg = result.Err.Error()
+			xmux.GetInstance(r).Response.(*response.Response).Code = 1
 			return
 		}
 		errorcode.ID = result.LastInsertId
@@ -55,7 +50,8 @@ func SaveEmail(w http.ResponseWriter, r *http.Request) {
 			getemail.Password, getemail.Port, getemail.Host, getemail.Enable, getemail.Id, getemail.Nickname)
 		if result.Err != nil {
 			golog.Error(result.Err)
-			w.Write(errorcode.ErrorE(result.Err))
+			xmux.GetInstance(r).Response.(*response.Response).Msg = result.Err.Error()
+			xmux.GetInstance(r).Response.(*response.Response).Code = 1
 			return
 		}
 	}
@@ -66,10 +62,7 @@ func SaveEmail(w http.ResponseWriter, r *http.Request) {
 	model.CacheEmail.Port = getemail.Port
 	model.CacheEmail.NickName = getemail.Nickname
 	model.CacheEmail.Id = errorcode.ID
-	errorcode.ID = getemail.Id
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
-	return
+	xmux.GetInstance(r).Response.(*response.Response).ID = getemail.Id
 }
 
 func GetEmail(w http.ResponseWriter, r *http.Request) {
@@ -88,8 +81,5 @@ func GetEmail(w http.ResponseWriter, r *http.Request) {
 	// 	w.Write(errorcode.ErrorE(err))
 	// 	return
 	// }
-	send := fmt.Sprintf(`{"code": 0, "email": "%s", "id": %d, "password": "%s", "port": %d, "enable": %t, "host":"%s", "nickname": "%s"}`,
-		model.CacheEmail.Email, model.CacheEmail.Id, model.CacheEmail.Password,
-		model.CacheEmail.Port, model.CacheEmail.Enable, model.CacheEmail.Host, model.CacheEmail.NickName)
-	w.Write([]byte(send))
+	xmux.GetInstance(r).Response.(*response.Response).Data = model.CacheEmail
 }

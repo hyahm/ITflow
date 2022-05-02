@@ -12,10 +12,10 @@ import (
 )
 
 // UserManager 用户管理
-var UserManager *xmux.GroupRoute
+var UserManager *xmux.RouteGroup
 
 func init() {
-	UserManager = xmux.NewGroupRoute()
+	UserManager = xmux.NewRouteGroup()
 
 	// 用户组页面
 	UserManager.AddGroup(usermanager.UserGroupPage)

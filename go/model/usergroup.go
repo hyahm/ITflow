@@ -26,15 +26,16 @@ func (ug *UserGroup) Delete(id interface{}) error {
 }
 
 func (ug *UserGroup) Update() (err error) {
-	var gsql string
 	if cache.SUPERID == ug.Uid {
-		gsql = "update usergroup set $set where id=? "
+		gsql := "update usergroup set $set where id=? "
+		result := db.Mconn.UpdateInterface(ug, gsql, ug.Id)
+		return result.Err
 	} else {
-		gsql = "update usergroup set $set where id=? and uid=?"
-
+		gsql := "update usergroup set $set where id=? and uid=?"
+		result := db.Mconn.UpdateInterface(ug, gsql, ug.Id, ug.Uid)
+		return result.Err
 	}
-	result := db.Mconn.UpdateInterface(ug, gsql, ug.Id, ug.Uid)
-	return result.Err
+
 }
 
 func (ug *UserGroup) Create() error {

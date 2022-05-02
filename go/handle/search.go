@@ -21,12 +21,12 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 		sql = " and " + sql
 	}
 	countsql := "select count(id) from bugs where dustbin=false " + sql
-	golog.Info(countsql)
 	// 获取总数
 	count, err := model.GetCount(countsql, args...)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 
@@ -35,25 +35,22 @@ func SearchAllBugs(w http.ResponseWriter, r *http.Request) {
 		Page:  search.Page,
 	}
 	if count == 0 {
-		res.Data = make([]int64, 0)
-		w.Write(res.Marshal())
-		return
+		xmux.GetInstance(r).Response.(*response.Response).Data = make([]int64, 0)
 	}
 	// 获取数据库的limit
 	page, start, end := xmux.GetLimit(count, search.Page, search.Limit)
 	res.Page = page
 	pager := fmt.Sprintf(" limit %d,%d", start, end)
 	listsql := "select * from bugs where dustbin=false " + sql + pager
-	golog.Info(listsql)
 
 	bugs, err := model.GetAllBug(listsql, args...)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res.Data = bugs
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = bugs
 }
 
 func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
@@ -71,12 +68,12 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 		sql = " and " + sql
 	}
 	countsql := "select count(id) from bugs where dustbin=false " + sql
-	golog.Info(countsql)
 	// 获取总数
 	count, err := model.GetCount(countsql, args...)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 
@@ -85,8 +82,7 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 		Page:  search.Page,
 	}
 	if count == 0 {
-		res.Data = make([]int64, 0)
-		w.Write(res.Marshal())
+		xmux.GetInstance(r).Response.(*response.Response).Data = make([]int64, 0)
 		return
 	}
 	// 获取数据库的limit
@@ -99,11 +95,11 @@ func SearchMyBugs(w http.ResponseWriter, r *http.Request) {
 	bugs, err := model.GetAllBug(listsql, args...)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res.Data = bugs
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = bugs
 }
 
 func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
@@ -123,7 +119,8 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 	count, err := model.GetCount(countsql, args...)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 
@@ -132,8 +129,7 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 		Page:  search.Page,
 	}
 	if count == 0 {
-		res.Data = make([]int64, 0)
-		w.Write(res.Marshal())
+		xmux.GetInstance(r).Response.(*response.Response).Data = make([]int64, 0)
 		return
 	}
 	// 获取数据库的limit
@@ -145,11 +141,11 @@ func SearchMyTasks(w http.ResponseWriter, r *http.Request) {
 	bugs, err := model.GetAllBug(listsql, args...)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res.Data = bugs
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = bugs
 
 }
 
@@ -167,7 +163,8 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 	count, err := model.GetCount(countsql, args...)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 
@@ -176,8 +173,8 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 		Page:  search.Page,
 	}
 	if count == 0 {
-		res.Data = make([]int64, 0)
-		w.Write(res.Marshal())
+		xmux.GetInstance(r).Response.(*response.Response).Data = make([]int64, 0)
+
 		return
 	}
 	// 获取数据库的limit
@@ -190,11 +187,11 @@ func SearchBugManager(w http.ResponseWriter, r *http.Request) {
 	bugs, err := model.GetAllBug(listsql, args...)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res.Data = bugs
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = bugs
 }
 
 // 返回搜索的字符串 和 参数

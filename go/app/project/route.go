@@ -8,10 +8,10 @@ import (
 )
 
 //Project 项目路由
-var Project *xmux.GroupRoute
+var Project *xmux.RouteGroup
 
 func init() {
-	Project = xmux.NewGroupRoute().AddPageKeys("project")
+	Project = xmux.NewRouteGroup().AddPageKeys("project")
 	Project.Post("/project/list", Read)
 
 	Project.Post("/project/add", Create).Bind(&model.Project{}).

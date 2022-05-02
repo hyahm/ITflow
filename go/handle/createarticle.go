@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"encoding/json"
 	"net/http"
 	//"strings"
 )
@@ -13,14 +12,14 @@ type projectList struct {
 
 func GetProject(w http.ResponseWriter, r *http.Request) {
 
-	pl := &projectList{}
+	// pl := &projectList{}
 
-	// for _, v := range cache.CachePidProject {
-	// 	pl.ProjectList = append(pl.ProjectList, v.ToString())
-	// }
-	send, _ := json.Marshal(pl)
-	w.Write(send)
-	return
+	// // for _, v := range cache.CachePidProject {
+	// // 	pl.ProjectList = append(pl.ProjectList, v.ToString())
+	// // }
+	// send, _ := json.Marshal(pl)
+	// w.Write(send)
+	// return
 
 }
 

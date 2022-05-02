@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"encoding/json"
 	"itflow/classify"
 	"itflow/db"
 	"itflow/internal/log"
@@ -36,12 +35,14 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 	err := db.Mconn.GetOne(countsql, args...).Scan(&listlog.Count)
 	if err != nil {
 		golog.Error(err)
-		w.Write(listlog.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	if listlog.Count == 0 {
 		golog.Error("no rows")
-		w.Write(listlog.NoRows())
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "no rows"
 		return
 	}
 	page, start, end := xmux.GetLimit(listlog.Count, alllog.Page, alllog.Limit)
@@ -51,7 +52,8 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 	rows, err := db.Mconn.GetRows(basesql+condition+" order by id desc limit ?,?", args...)
 	if err != nil {
 		golog.Error(err)
-		w.Write(listlog.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 
@@ -62,30 +64,16 @@ func SearchLog(w http.ResponseWriter, r *http.Request) {
 		listlog.LogList = append(listlog.LogList, one)
 	}
 	rows.Close()
-	send, _ := json.Marshal(listlog)
-	w.Write(send)
+	xmux.GetInstance(r).Response.(*response.Response).Data = listlog
 
 }
 
 func LogClassify(w http.ResponseWriter, r *http.Request) {
-	data := &struct {
-		Classify []string `json:"classify"`
-		Code     int      `json:"code"`
-		Msg      string   `json:"msg"`
-	}{
-		Classify: classify.CLASSIFY,
-	}
-	send, err := json.Marshal(data)
-	if err != nil {
-		golog.Error(err)
-	}
-	w.Write(send)
+	xmux.GetInstance(r).Response.(*response.Response).Data = classify.CLASSIFY
 
 }
 
 func LogList(w http.ResponseWriter, r *http.Request) {
-
-	errorcode := &response.Response{}
 
 	sl := xmux.GetInstance(r).Data.(*log.SearchLog)
 
@@ -95,7 +83,8 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 	err := db.Mconn.GetOne(countsql).Scan(&count)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 
@@ -109,7 +98,8 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 	rows, err := db.Mconn.GetRows(dsql, start, end)
 	if err != nil {
 		golog.Error(err)
-		w.Write(errorcode.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	for rows.Next() {
@@ -118,8 +108,6 @@ func LogList(w http.ResponseWriter, r *http.Request) {
 		alllog.LogList = append(alllog.LogList, log)
 	}
 	rows.Close()
-	send, _ := json.Marshal(alllog)
-	w.Write(send)
-	return
+	xmux.GetInstance(r).Response.(*response.Response).Data = alllog
 
 }

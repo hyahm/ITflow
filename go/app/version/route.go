@@ -8,7 +8,7 @@ import (
 )
 
 // Version  bug版本
-var Version *xmux.GroupRoute
+var Version *xmux.RouteGroup
 
 func init() {
 	// 所有路由同一格式， 第一行是pattern, method, bind
@@ -17,7 +17,7 @@ func init() {
 	// 请求头
 	// 后面是api接口的次要处理
 	// 最后是错误码
-	Version = xmux.NewGroupRoute().AddPageKeys("version")
+	Version = xmux.NewRouteGroup().AddPageKeys("version")
 	Version.Post("/version/add", Create).Bind(&model.Version{}).AddModule(midware.JsonToStruct)
 
 	Version.Post("/version/list", Read)

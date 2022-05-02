@@ -9,10 +9,10 @@ import (
 )
 
 // Search 搜索相关
-var Search *xmux.GroupRoute
+var Search *xmux.RouteGroup
 
 func init() {
-	Search = xmux.NewGroupRoute().AddModule(midware.CheckSetDefault)
+	Search = xmux.NewRouteGroup().AddModule(midware.CheckSetDefault)
 
 	Search.Post("/search/allbugs", handle.SearchAllBugs).Bind(&search.ReqMyBugFilter{}).AddModule(midware.JsonToStruct)
 	Search.Post("/search/mybugs", handle.SearchMyBugs).Bind(&search.ReqMyBugFilter{}).AddModule(midware.JsonToStruct)

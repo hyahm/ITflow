@@ -7,10 +7,10 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-var Important *xmux.GroupRoute
+var Important *xmux.RouteGroup
 
 func init() {
-	Important = xmux.NewGroupRoute().AddPageKeys("important")
+	Important = xmux.NewRouteGroup().AddPageKeys("important")
 
 	Important.Post("/important/get", Read)
 

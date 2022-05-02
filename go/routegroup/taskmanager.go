@@ -8,10 +8,10 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-var TaskManager *xmux.GroupRoute
+var TaskManager *xmux.RouteGroup
 
 func init() {
-	TaskManager = xmux.NewGroupRoute()
+	TaskManager = xmux.NewRouteGroup()
 	// 创建bug页面
 	TaskManager.Post("/bug/create", taskcontroller.Create).Bind(&model.Bug{}).
 		AddModule(midware.JsonToStruct)

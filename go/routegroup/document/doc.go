@@ -7,10 +7,10 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-var Doc *xmux.GroupRoute
+var Doc *xmux.RouteGroup
 
 func init() {
-	Doc = xmux.NewGroupRoute()
+	Doc = xmux.NewRouteGroup()
 	Doc.Post("/doc/list", handle.DocList)
 	Doc.Get("/doc/check/name", handle.Name)
 	// Doc.Post("/doc/create", handle.DocCreate).Bind(&model.Doc{}).AddModule(midware.JsonToStruct)

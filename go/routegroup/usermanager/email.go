@@ -6,10 +6,10 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-var UpdateEmailPage *xmux.GroupRoute
+var UpdateEmailPage *xmux.RouteGroup
 
 func init() {
-	UpdateEmailPage = xmux.NewGroupRoute()
+	UpdateEmailPage = xmux.NewRouteGroup()
 	// 获取自己的邮箱
 	UpdateEmailPage.Post("/my/email", email.Get)
 	// 修改邮箱

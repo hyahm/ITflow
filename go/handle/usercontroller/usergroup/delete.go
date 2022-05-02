@@ -18,9 +18,9 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	err := ug.Delete((id))
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	w.Write(response.Success())
 
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"itflow/handle"
 	"itflow/midware"
+	"itflow/response"
 	"itflow/routegroup"
 	"log"
 	"net/http"
@@ -22,28 +23,50 @@ func GetExecTime(handle func(http.ResponseWriter, *http.Request), w http.Respons
 }
 
 func exit(start time.Time, w http.ResponseWriter, r *http.Request) {
-	var send []byte
-	var err error
+	// r.Body.Close()
 	if r.Method == http.MethodOptions {
 		return
 	}
+	var send []byte
+	var err error
 	if xmux.GetInstance(r).Response != nil && xmux.GetInstance(r).Get(xmux.STATUSCODE).(int) == 200 {
-		send, err = json.Marshal(xmux.GetInstance(r).Response)
-		if err != nil {
-			log.Println(err)
+		ck := xmux.GetInstance(r).Get(xmux.CacheKey)
+
+		if ck != nil {
+			cacheKey := ck.(string)
+			if xmux.IsUpdate(cacheKey) {
+				// 如果没有设置缓存，还是以前的处理方法
+				send, err = json.Marshal(xmux.GetInstance(r).Response)
+				if err != nil {
+					log.Println(err)
+				}
+				// 如果之前是更新的状态，那么就修改
+			} else {
+				// 如果不是更新的状态， 那么就不用更新，而是直接从缓存取值
+				send = xmux.GetCache(cacheKey)
+			}
+			xmux.SetCache(cacheKey, send)
+			w.Write(send)
+		} else {
+			send, err = json.Marshal(xmux.GetInstance(r).Response)
+			if err != nil {
+				log.Println(err)
+			}
+			w.Write(send)
 		}
-		w.Write(send)
+
 	}
-	golog.Infof("connect_id: %d,method: %s\turl: %s\ttime: %f\t status_code: %v, body: %v",
-		xmux.GetInstance(r).Get(xmux.CONNECTID),
+	log.Printf("connect_id: %d,method: %s\turl: %s\ttime: %f\t status_code: %v, body: %v\n",
+		xmux.GetInstance(r).GetConnectId(),
 		r.Method,
-		r.URL.Path, time.Since(start).Seconds(), xmux.GetInstance(r).Get(xmux.STATUSCODE),
+		r.URL.Path, time.Since(start).Seconds(),
+		xmux.GetInstance(r).Get(xmux.STATUSCODE),
 		string(send))
 }
 
 func RunHttp() {
-	router := xmux.NewRouter()
-	router.Exit = exit
+	resp := &response.Response{}
+	router := xmux.NewRouter().BindResponse(resp)
 	router.SetHeader("Access-Control-Allow-Origin", goconfig.ReadEnv("ACAO", goconfig.ReadString("cross", "*")))
 	router.SetHeader("Content-Type", "application/x-www-form-urlencoded,application/json; charset=UTF-8")
 	router.SetHeader("Access-Control-Allow-Headers", "Content-Type,Access-Token,X-Token,smail,authorization")
@@ -52,7 +75,7 @@ func RunHttp() {
 	// 	// 打印所有接口的执行时间
 	// 	router.MiddleWare(GetExecTime)
 	// }
-
+	router.Exit = exit
 	// 面板菜单
 	router.AddGroup(routegroup.DashBoard)
 	// 系统设置菜单
@@ -82,7 +105,8 @@ func RunHttp() {
 
 	router.Post("/uploadimg", handle.UploadImgs).DelModule(midware.CheckToken)
 
-	router.Get("/showimg/{string:imgname}", handle.ShowImg).SetHeader("Content-Type", "image/png").DelModule(midware.CheckToken)
+	router.Get("/showimg/{string:imgname}", handle.ShowImg).SetHeader("Content-Type", "image/png").
+		DelModule(midware.CheckToken).BindResponse(nil)
 
 	router.Get("/get/expire/{token}", handle.GetExpire).DelModule(midware.CheckToken)
 	// // 生产环境中， 这个要么注释， 要么
@@ -90,9 +114,7 @@ func RunHttp() {
 	// 	doc := router.ShowApi("/docs").DelModule(midware.CheckToken)
 	// 	router.AddGroup(doc)
 	// }
-	router.Get("/", func(rw http.ResponseWriter, r *http.Request) {
-		rw.Write([]byte("hello world"))
-	}).DelModule(midware.CheckToken)
+
 	listenaddr := goconfig.ReadEnv("LISTEN", goconfig.ReadString("listenaddr", ":10001"))
 
 	fmt.Println("listen on " + listenaddr)

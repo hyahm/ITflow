@@ -144,9 +144,13 @@ export default {
 
     handleFilter() {
       searchLog(this.listQuery).then(resp => {
-        this.list = resp.data.loglist;
+        if (resp.data.code == 0) {
+        this.list = resp.data.data.loglist;
         this.count = resp.data.count;
         this.listQuery.page = resp.data.page;
+        } else {
+          this.$message.error(resp.data.msg)
+        }
       });
     }
   }

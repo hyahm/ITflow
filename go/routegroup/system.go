@@ -7,10 +7,10 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-var SystemSetting *xmux.GroupRoute
+var SystemSetting *xmux.RouteGroup
 
 func init() {
-	SystemSetting = xmux.NewGroupRoute().AddPageKeys("admin").AddModule(midware.MustBeSuperAdmin)
+	SystemSetting = xmux.NewRouteGroup().AddPageKeys("admin").AddModule(midware.MustBeSuperAdmin)
 	// 默认状态页面
 	SystemSetting.AddGroup(system.DefaultValue)
 	// 邮箱设置页面

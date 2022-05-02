@@ -6,10 +6,10 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-var Document *xmux.GroupRoute
+var Document *xmux.RouteGroup
 
 func init() {
-	Document = xmux.NewGroupRoute()
+	Document = xmux.NewRouteGroup()
 	Document.AddGroup(document.Key)
 	Document.AddGroup(document.Doc)
 

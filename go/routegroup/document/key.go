@@ -8,10 +8,10 @@ import (
 	"github.com/hyahm/xmux"
 )
 
-var Key *xmux.GroupRoute
+var Key *xmux.RouteGroup
 
 func init() {
-	Key = xmux.NewGroupRoute()
+	Key = xmux.NewRouteGroup()
 	Key.Post("/keys/list", handle.KeyList)
 	Key.Post("/keys/add", handle.AddKey).Bind(&model.Auth{}).AddModule(midware.JsonToStruct)
 	Key.Get("/keys/delete", handle.DeleteKey)

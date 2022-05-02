@@ -47,7 +47,7 @@ func GetJobIdByUid(uid int64) (int64, error) {
 }
 
 func DeleteUser(id interface{}) error {
-	result := db.Mconn.Delete("delete from user where id=?", id)
+	result := db.Mconn.Delete("delete from user where id=? ", id)
 	if result.Err != nil {
 		golog.Error(result.Err)
 		return result.Err

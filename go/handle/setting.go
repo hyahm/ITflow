@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"encoding/json"
 	"fmt"
 	"itflow/cache"
 	"itflow/db"
@@ -10,6 +9,7 @@ import (
 	"itflow/model"
 	"itflow/response"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -22,11 +22,13 @@ func Create(w http.ResponseWriter, r *http.Request) {
 
 	getuser := xmux.GetInstance(r).Data.(*model.User)
 	if getuser.Jobid == 0 {
-		w.Write(response.Error("职位不能为空"))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "职位不能为空"
 		return
 	}
 	if strings.Contains(getuser.NickName, "@") {
-		w.Write(response.Error("昵称不能包含@符号"))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "昵称不能包含@符号"
 		return
 	}
 	getuser.Password = encrypt.PwdEncrypt(getuser.Password, cache.Salt)
@@ -35,7 +37,8 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	err := getuser.Create()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 
@@ -44,87 +47,53 @@ func Create(w http.ResponseWriter, r *http.Request) {
 			r.Referer(), r.Referer(), getuser.NickName, getuser.Password, getuser.Email),
 		getuser.Email)
 
-	res := response.Response{
-		ID: getuser.ID,
-	}
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).ID = getuser.ID
+
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("id")
-	err := model.DeleteUser(id)
-	// 判断是否有bug
-	// var count int
-	// err := db.Mconn.GetOne("select count(id) from bugs where uid=?", id).Scan(&count)
+	id64, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
-		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "id类型错误"
 		return
 	}
-	w.Write(response.Success())
-	// if count > 0 {
-	// 	golog.Error("uid:%v,has bugs,can not remove")
-	// 	w.Write(errorcode.IsUse())
-	// 	return
-	// }
-	// // 查看用户组是否存在此用户
-	// userrows, err := db.Mconn.GetRows("select ids from usergroup")
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(errorcode.ErrorE(err))
-	// 	return
-	// }
-	// var hasgroup bool
-	// for userrows.Next() {
-	// 	var ids string
-	// 	userrows.Scan(&ids)
-	// 	for _, v := range strings.Split(ids, ",") {
-	// 		if v == id {
-	// 			hasgroup = true
-	// 			break
-	// 		}
-	// 	}
-	// 	if hasgroup {
-	// 		w.Write(errorcode.Error("还有group"))
-	// 		return
-	// 	}
-	// }
-	// userrows.Close()
-	// _, err = db.Mconn.Update("delete from user where id=?", id)
-	// if err != nil {
-	// 	golog.Error(err)
-	// 	w.Write(errorcode.ErrorE(err))
-	// 	return
-	// }
-
-	// send, _ := json.Marshal(errorcode)
-	// w.Write(send)
-	// return
+	if id64 == cache.SUPERID {
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "无法删除"
+		return
+	}
+	err = model.DeleteUser(id)
+	// 判断是否有bug
+	if err != nil {
+		golog.Error(err)
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
+		return
+	}
 
 }
 
 func DisableUser(w http.ResponseWriter, r *http.Request) {
-
-	errorcode := &response.Response{}
 
 	id := r.FormValue("id")
 
 	result := db.Mconn.Update("update user set disable=ABS(disable-1) where id=?", id)
 	if result.Err != nil {
 		golog.Error(result.Err)
-		w.Write(errorcode.ErrorE(result.Err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = result.Err.Error()
 		return
 	}
 	result = db.Mconn.Update("update bugs set dustbin=ABS(dustbin-1) where uid=?", id)
 	if result.Err != nil {
 		golog.Error(result.Err)
-		w.Write(errorcode.ErrorE(result.Err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = result.Err.Error()
 		return
 	}
-
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
 
 }
 
@@ -134,22 +103,20 @@ func Read(w http.ResponseWriter, r *http.Request) {
 	us, err := model.GetAllUsers(uid)
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res := response.Response{
-		Data: us,
-	}
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = us
 }
 
 func Update(w http.ResponseWriter, r *http.Request) {
 	// 跟 userlist 一样，
 	// 根据uid 查找
-	errorcode := &response.Response{}
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 	if cache.SUPERID != uid {
-		w.Write(errorcode.ErrorNoPermission())
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "没有权限"
 		return
 	}
 
@@ -158,22 +125,21 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	err := user.Update()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	w.Write(response.Success())
 }
 
 func GetRoles(w http.ResponseWriter, r *http.Request) {
-	res := response.Response{}
 	ar, err := model.AllRole()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	res.Data = ar
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = ar
 }
 
 func GetRoleGroupPerm(w http.ResponseWriter, r *http.Request) {
@@ -184,13 +150,12 @@ func GetRoleGroupPerm(w http.ResponseWriter, r *http.Request) {
 	// ar, err := model.AllRole()
 	if err != nil {
 		golog.Error(err)
-		w.Write(response.ErrorE(err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	// 通过permids 来获取详细权限
-	res := response.Response{}
-	res.Data = data
-	w.Write(res.Marshal())
+	xmux.GetInstance(r).Response.(*response.Response).Data = data
 }
 
 // func GetThisRoles(w http.ResponseWriter, r *http.Request) {
@@ -215,34 +180,18 @@ func GetRoleGroupPerm(w http.ResponseWriter, r *http.Request) {
 
 // }
 
-type sendGroup struct {
-	Groups []string `json:"groups"`
-	Code   int      `json:"code"`
-}
-
 func GetGroup(w http.ResponseWriter, r *http.Request) {
 
-	sg := &sendGroup{}
-
-	send, _ := json.Marshal(sg)
-	w.Write(send)
-	return
-
-}
-
-type sty struct {
-	Ts   map[int]string `json:"ts"`
-	Code int            `json:"code"`
 }
 
 func GetTaskTyp(w http.ResponseWriter, r *http.Request) {
 
-	ts := &sty{
-		Ts: make(map[int]string, 0),
-	}
+	ts := make(map[int]string, 0)
+
 	rows, err := db.Mconn.GetRows("select id,name from typ")
 	if err != nil {
-		w.Write([]byte(fmt.Sprintf(`{"code": 2, "msg": "%s"}`, err.Error())))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
 	for rows.Next() {
@@ -253,17 +202,13 @@ func GetTaskTyp(w http.ResponseWriter, r *http.Request) {
 			golog.Info(err)
 			continue
 		}
-		ts.Ts[id] = t
+		ts[id] = t
 	}
-	send, _ := json.Marshal(ts)
-	w.Write(send)
-	return
+	xmux.GetInstance(r).Response.(*response.Response).Data = ts
 
 }
 
 func ResetPwd(w http.ResponseWriter, r *http.Request) {
-
-	errorcode := &response.Response{}
 
 	rp := xmux.GetInstance(r).Data.(*user.ResetPassword)
 
@@ -273,10 +218,9 @@ func ResetPwd(w http.ResponseWriter, r *http.Request) {
 	result := db.Mconn.Update(updatepwdsql, newpassword, rp.Id)
 	if result.Err != nil {
 		golog.Error(result.Err)
-		w.Write(errorcode.ErrorE(result.Err))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = result.Err.Error()
 		return
 	}
 
-	send, _ := json.Marshal(errorcode)
-	w.Write(send)
 }

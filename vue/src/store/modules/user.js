@@ -41,9 +41,10 @@ const actions = {
       login({ username: username.trim(), password: password })
         .then(response => {
           const { data } = response;
+          console.log(data)
           if (data.code === 0) {
-            commit("SET_TOKEN", data.token);
-            setToken(data.token);
+            commit("SET_TOKEN", data.data);
+            setToken(data.data);
             setTimeout();
             resolve();
           } else {

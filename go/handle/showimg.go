@@ -1,7 +1,7 @@
 package handle
 
 import (
-	"io/ioutil"
+	"io"
 	"itflow/cache"
 	"net/http"
 	"os"
@@ -20,13 +20,6 @@ func ShowImg(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
-	buff, err := ioutil.ReadAll(file)
-
-	if err != nil {
-		golog.Error(err)
-		return
-	}
-
-	w.Write(buff)
+	io.Copy(w, file)
 
 }

@@ -23,7 +23,8 @@ func CheckSetDefault(w http.ResponseWriter, r *http.Request) bool {
 		model.Default.Created == 0 ||
 		model.Default.Pass == 0 ||
 		model.Default.Receive == 0 {
-		w.Write([]byte(`{"code": 2, "msg": "必须先让管理员设置默认值"}`))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "必须先让管理员设置默认值"
 		return true
 	}
 	return false
@@ -32,7 +33,8 @@ func CheckSetDefault(w http.ResponseWriter, r *http.Request) bool {
 func MustBeSuperAdmin(w http.ResponseWriter, r *http.Request) bool {
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 	if uid != cache.SUPERID {
-		w.Write(response.Error("no permission"))
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "没有权限"
 		return true
 	}
 	return false

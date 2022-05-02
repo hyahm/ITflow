@@ -8,10 +8,10 @@ import (
 )
 
 // RoleGroup 角色组路由
-var RoleGroup *xmux.GroupRoute
+var RoleGroup *xmux.RouteGroup
 
 func init() {
-	RoleGroup = xmux.NewGroupRoute()
+	RoleGroup = xmux.NewRouteGroup()
 
 	RoleGroup.Post("/rolegroup/add", handle.AddRoleGroup).Bind(&handle.RequestRoleGroup{}).
 		AddModule(midware.JsonToStruct)
