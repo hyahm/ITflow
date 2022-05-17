@@ -146,6 +146,7 @@ import {
   getUserKeyNameByProject,
   getVersionKeyNameByProject,
 } from "@/api/get";
+import { boolean } from "yargs";
 
 const defaultForm = {
   // status: 'draft',
@@ -221,7 +222,7 @@ export default {
     },
     gettyp() {
       getTyp().then((resp) => {
-        this.ts = resp.data.ts;
+        this.ts = resp.data.data;
       });
     },
     changeProject() {
@@ -278,23 +279,16 @@ export default {
         this.ispub = false;
         return;
       }
-      if (this.postForm.pid == undefined) {
+
+      if (this.typ == 1 && !this.postForm.lid) {
         this.$message({
-          message: "请选择项目名称",
+          message: "请选择优先级别",
           type: "error",
         });
         this.ispub = false;
         return;
       }
-      if (this.typ === 1 && this.postForm.lid == undefined) {
-        this.$message({
-          message: "请选择项目级别",
-          type: "error",
-        });
-        this.ispub = false;
-        return;
-      }
-      if (this.typ === 1 && this.postForm.iid == undefined) {
+      if (this.typ == 1 && !this.postForm.iid) {
         this.$message({
           message: "请选择项目严重程度",
           type: "error",
@@ -310,7 +304,7 @@ export default {
         this.ispub = false;
         return;
       }
-      if (this.typ === 1 && this.postForm.eid == undefined) {
+      if (this.typ == 1 && !this.postForm.eid) {
         this.$message({
           message: "请选择运行环境",
           type: "error",
@@ -318,7 +312,7 @@ export default {
         this.ispub = false;
         return;
       }
-      if (this.typ === 1 && this.postForm.vid == undefined) {
+      if (this.typ == 1 && !this.postForm.vid) {
         this.$message({
           message: "请选择版本",
           type: "error",
@@ -326,8 +320,6 @@ export default {
         this.ispub = false;
         return;
       }
-      this.$refs.postForm.validate((valid) => {
-        if (valid) {
           if (this.isEdit) {
             this.postForm.tid = parseInt(this.tid);
             updateBug(this.postForm).then(() => {
@@ -355,9 +347,7 @@ export default {
               }
             });
           }
-        }
         this.ispub = false;
-      });
     },
     imgAdd(pos, $file) {
       // 第一步.将图片上传到服务器.

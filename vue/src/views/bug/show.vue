@@ -164,9 +164,7 @@ export default {
       if (id % 1 === 0) {
         this.temp.id = parseInt(id);
         showBug(id).then((resp) => {
-
           this.bug = resp.data.data;
-          console.log(this.bug)
           document.title = this.bug.title;
         });
       }
