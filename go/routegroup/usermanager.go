@@ -21,15 +21,13 @@ func init() {
 	UserManager.AddGroup(usermanager.UserGroupPage)
 
 	// 修改密码页面
-	UserManager.Post("/password/reset", handle.ResetPwd).Bind(&user.ResetPassword{}).
-		AddModule(midware.JsonToStruct)
+	UserManager.Post("/password/reset", handle.ResetPwd).BindJson(&user.ResetPassword{})
 	// 修改邮箱页面
 	UserManager.AddGroup(usermanager.UpdateEmailPage)
 	// 上传头像页面
 	UserManager.Post("/upload/headimg", handle.UploadHeadImg)
 	// 修改密码页面
-	UserManager.Post("/password/update", usercontroller.ChangePassword).Bind(&usercontroller.ChangePasswod{}).
-		AddModule(midware.JsonToStruct)
+	UserManager.Post("/password/update", usercontroller.ChangePassword).BindJson(&usercontroller.ChangePasswod{})
 	// 用户列表管理页面
 	UserManager.AddGroup(usermanager.UserListPage)
 	// 用户创建

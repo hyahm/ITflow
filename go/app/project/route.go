@@ -1,7 +1,6 @@
 package project
 
 import (
-	"itflow/midware"
 	"itflow/model"
 
 	"github.com/hyahm/xmux"
@@ -14,11 +13,9 @@ func init() {
 	Project = xmux.NewRouteGroup().AddPageKeys("project")
 	Project.Post("/project/list", Read)
 
-	Project.Post("/project/add", Create).Bind(&model.Project{}).
-		AddModule(midware.JsonToStruct)
+	Project.Post("/project/add", Create).BindJson(&model.Project{})
 
-	Project.Post("/project/update", Update).
-		Bind(&model.Project{}).AddModule(midware.JsonToStruct)
+	Project.Post("/project/update", Update).BindJson(&model.Project{})
 
 	Project.Get("/project/delete", Delete)
 

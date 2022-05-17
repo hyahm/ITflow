@@ -15,7 +15,6 @@ func init() {
 
 	Admin.Get("/admin/reset", handle.Reset).DelModule(midware.CheckToken)
 
-	// Admin.Post("/info/update", handle.UpdateInfo).Bind(&user.UserInfo{}).
-	// 	AddModule(midware.JsonToStruct).ApiDescribe("只做保留，没有用到")
+	// Admin.Post("/info/update", handle.UpdateInfo).BindJson(&user.UserInfo{})
 
 }

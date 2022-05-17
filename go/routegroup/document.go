@@ -14,10 +14,10 @@ func init() {
 	Document.AddGroup(document.Doc)
 
 	// Department.Post("/department/add", handle.AddBugGroup).
-	// 	Bind(&status.StatusGroup{}).AddModule(midware.JsonToStruct)
+	// 	BindJson(&status.StatusGroup{})
 
 	// Department.Post("/department/edit", handle.EditBugGroup).
-	// 	Bind(&status.StatusGroup{}).AddModule(midware.JsonToStruct)
+	// 	BindJson(&status.StatusGroup{})
 	// // Department.Post("/department/list", handle.BugGroupList)
 	// Department.Get("/department/remove", handle.BugGroupDel)
 }

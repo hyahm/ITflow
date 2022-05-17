@@ -204,6 +204,7 @@ func GetTaskTyp(w http.ResponseWriter, r *http.Request) {
 		}
 		ts[id] = t
 	}
+	golog.Error(ts)
 	xmux.GetInstance(r).Response.(*response.Response).Data = ts
 
 }

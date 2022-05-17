@@ -4,7 +4,6 @@ import (
 	"itflow/handle"
 	"itflow/internal/bug"
 	"itflow/internal/search"
-	"itflow/midware"
 
 	"github.com/hyahm/xmux"
 )
@@ -16,13 +15,12 @@ func init() {
 	Bug = xmux.NewRouteGroup()
 
 	///  -------
-	Bug.Post("/bug/pass", handle.PassBug).Bind(&handle.RequestPass{}).AddModule(midware.JsonToStruct)
+	Bug.Post("/bug/pass", handle.PassBug).BindJson(&handle.RequestPass{})
 
-	Bug.Post("/bug/mybugs", handle.GetMyBugs).Bind(&search.ReqMyBugFilter{})
+	Bug.Post("/bug/mybugs", handle.GetMyBugs).BindJson(&search.ReqMyBugFilter{})
 
 	Bug.Get("/bug/close", handle.CloseBug)
-	Bug.Post("/bug/changestatus", handle.ChangeBugStatus).Bind(&bug.ChangeStatus{}).
-		AddModule(midware.JsonToStruct)
+	Bug.Post("/bug/changestatus", handle.ChangeBugStatus).BindJson(&bug.ChangeStatus{})
 
 	Bug.Get("/bug/show", handle.BugShow)
 

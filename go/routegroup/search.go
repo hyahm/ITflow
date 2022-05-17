@@ -14,12 +14,10 @@ var Search *xmux.RouteGroup
 func init() {
 	Search = xmux.NewRouteGroup().AddModule(midware.CheckSetDefault)
 
-	Search.Post("/search/allbugs", handle.SearchAllBugs).Bind(&search.ReqMyBugFilter{}).AddModule(midware.JsonToStruct)
-	Search.Post("/search/mybugs", handle.SearchMyBugs).Bind(&search.ReqMyBugFilter{}).AddModule(midware.JsonToStruct)
+	Search.Post("/search/allbugs", handle.SearchAllBugs).BindJson(&search.ReqMyBugFilter{})
+	Search.Post("/search/mybugs", handle.SearchMyBugs).BindJson(&search.ReqMyBugFilter{})
 
-	Search.Post("/search/mytasks", handle.SearchMyTasks).Bind(&search.ReqMyBugFilter{}).
-		AddModule(midware.JsonToStruct)
+	Search.Post("/search/mytasks", handle.SearchMyTasks).BindJson(&search.ReqMyBugFilter{})
 
-	Search.Post("/search/bugmanager", handle.SearchBugManager).Bind(&search.ReqMyBugFilter{}).
-		AddModule(midware.JsonToStruct)
+	Search.Post("/search/bugmanager", handle.SearchBugManager).BindJson(&search.ReqMyBugFilter{})
 }

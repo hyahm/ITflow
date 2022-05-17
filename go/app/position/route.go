@@ -1,7 +1,6 @@
 package position
 
 import (
-	"itflow/midware"
 	"itflow/model"
 
 	"github.com/hyahm/xmux"
@@ -13,12 +12,11 @@ func init() {
 	Position = xmux.NewRouteGroup().AddPageKeys("position")
 
 	Position.Post("/position/list", Read)
-	Position.Post("/position/add", Create).Bind(&model.Job{}).AddModule(midware.JsonToStruct)
+	Position.Post("/position/add", Create).BindJson(&model.Job{})
 
 	Position.Get("/position/del", Delete)
 
-	Position.Post("/position/update", Update).
-		Bind(&model.Job{}).AddModule(midware.JsonToStruct)
+	Position.Post("/position/update", Update).BindJson(&model.Job{})
 
 	// Position.Post("/get/positions", handle.GetPositions).AddModule(midware.UserPerm)
 }

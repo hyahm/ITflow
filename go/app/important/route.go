@@ -1,7 +1,6 @@
 package important
 
 import (
-	"itflow/midware"
 	"itflow/model"
 
 	"github.com/hyahm/xmux"
@@ -14,13 +13,11 @@ func init() {
 
 	Important.Post("/important/get", Read)
 
-	Important.Post("/important/add", Create).
-		Bind(&model.Important{}).AddModule(midware.JsonToStruct)
+	Important.Post("/important/add", Create).BindJson(&model.Important{})
 
 	Important.Get("/important/del", Delete)
 
-	Important.Post("/important/update", Update).
-		Bind(&model.Important{}).AddModule(midware.JsonToStruct)
+	Important.Post("/important/update", Update).BindJson(&model.Important{})
 
 	// Important.Post("/get/importants", GetImportants)
 
