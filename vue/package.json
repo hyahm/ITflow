@@ -55,8 +55,8 @@
         "last 2 versions"
     ],
     "engines": {
-        "node": ">=8.9",
-        "npm": ">= 3.0.0"
+        "node": ">=22.11",
+        "npm": ">= 10.9"
     },
     "keywords": [
         "bug管理系统",

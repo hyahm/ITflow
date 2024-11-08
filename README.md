@@ -171,7 +171,7 @@ git clone https://github.com/hyahm/ITflow.git
 
   ```
     # 改为后端服务器外网地址
-  VUE_APP_BASE_API = 'http://120.26.164.125:10001'
+  VUE_APP_BASE_API = 'http://127.0.0.1:10001'
    # 设置为空
   VUE_APP_USERNAME = '' 
      # 设置为空
@@ -207,61 +207,6 @@ git clone https://github.com/hyahm/ITflow.git
   ```
 
   
-
-### 使用[scsctl](https://github.com/hyahm/scs 'scs')通过docker打包(生产环境)， 推荐使用
-
-- 确保已经安装docker并启动了docker, 安装了scs
-
-> 后端go打包
-
-1. 修改配置文件   go/sc_build.yaml
-
-   ```
-   # linux | windows | darwin, 设置打包后对应的系统
-   GOOS: linux
-   # 部分配置文件
-   LOG_PATH: log/itflow.log
-   MYSQL_USER: root
-   MYSQL_PASSWORD: 123456
-   MYSQL_HOST: 127.0.0.1
-   MYSQL_PORT: 3306
-   MYSQL_DB: test
-   ```
-
-   
-
-2. 打包并将服务托管给scs管理
-
-   ```
-   scsctl install -f go/sc_build.yaml
-   # 执行完成后等待生成 二进制文件 go/main
-   ```
-
-   
-
-
-
-> vue 打包
-
-
-
-1. 修改配置文件  vue/sc_build.yaml
-
-   ```
-   API_DOMAIN: http://127.0.0.1:10001  # 主要是修改为后端的地址
-   ```
-
-   
-
-2. 打包
-
-   ```
-   cd ITflow
-   scsctl install -f vue/sc_build.yaml
-   # 执行完成后等待生成 dist 打包的文件
-   ```
-
-3.  部署参考上面nginx配置
 
 
 

@@ -1,5 +1,4 @@
 FROM alpine
 WORKDIR /data
-COPY main ./
-COPY bug.ini ./bug.ini
+COPY main .
 CMD ["./main"]
