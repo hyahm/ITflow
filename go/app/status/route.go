@@ -1,7 +1,6 @@
 package status
 
 import (
-	"itflow/midware"
 	"itflow/model"
 
 	"github.com/hyahm/xmux"
@@ -15,11 +14,10 @@ func init() {
 
 	Status.Post("/status/list", Read)
 
-	Status.Post("/status/add", Create).Bind(&model.Status{}).
-		AddModule(midware.JsonToStruct)
+	Status.Post("/status/add", Create).BindJson(&model.Status{})
 
 	Status.Get("/status/remove", Delete)
 
-	Status.Post("/status/update", Update).Bind(&model.Status{}).AddModule(midware.JsonToStruct)
+	Status.Post("/status/update", Update).BindJson(&model.Status{})
 
 }

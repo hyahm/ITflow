@@ -1,7 +1,6 @@
 package version
 
 import (
-	"itflow/midware"
 	"itflow/model"
 
 	"github.com/hyahm/xmux"
@@ -18,7 +17,7 @@ func init() {
 	// 后面是api接口的次要处理
 	// 最后是错误码
 	Version = xmux.NewRouteGroup().AddPageKeys("version")
-	Version.Post("/version/add", Create).Bind(&model.Version{}).AddModule(midware.JsonToStruct)
+	Version.Post("/version/add", Create).BindJson(&model.Version{})
 
 	Version.Post("/version/list", Read)
 
@@ -26,5 +25,5 @@ func init() {
 
 	Version.Post("/get/version", GetVersion)
 
-	Version.Post("/version/update", Update).Bind(&model.Version{}).AddModule(midware.JsonToStruct)
+	Version.Post("/version/update", Update).BindJson(&model.Version{})
 }

@@ -3,7 +3,6 @@ package routegroup
 import (
 	"itflow/handle"
 	"itflow/handle/publiccontroller"
-	"itflow/midware"
 	"itflow/model"
 
 	"github.com/hyahm/xmux"
@@ -41,7 +40,6 @@ func init() {
 	// 获取自己先择显示的状态
 	Public.Post("/status/show", publiccontroller.ShowStatus)
 	// 修改显示的状态的bug
-	Bug.Post("/status/save", handle.ChangeShowStatus).Bind(&model.User{}).
-		AddModule(midware.JsonToStruct)
+	Bug.Post("/status/save", handle.ChangeShowStatus).BindJson(&model.User{})
 
 }

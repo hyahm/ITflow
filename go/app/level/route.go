@@ -1,7 +1,6 @@
 package level
 
 import (
-	"itflow/midware"
 	"itflow/model"
 
 	"github.com/hyahm/xmux"
@@ -14,11 +13,9 @@ func init() {
 
 	Level.Post("/level/get", Read)
 
-	Level.Post("/level/add", Create).
-		Bind(&model.Level{}).AddModule(midware.JsonToStruct)
+	Level.Post("/level/add", Create).BindJson(&model.Level{})
 
 	Level.Get("/level/del", Delete)
 
-	Level.Post("/level/update", Update).
-		Bind(&model.Level{}).AddModule(midware.JsonToStruct)
+	Level.Post("/level/update", Update).BindJson(&model.Level{})
 }

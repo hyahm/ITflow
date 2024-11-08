@@ -2,7 +2,6 @@ package system
 
 import (
 	"itflow/handle"
-	"itflow/midware"
 
 	"github.com/hyahm/xmux"
 )
@@ -13,10 +12,9 @@ var RoleGroup *xmux.RouteGroup
 func init() {
 	RoleGroup = xmux.NewRouteGroup()
 
-	RoleGroup.Post("/rolegroup/add", handle.AddRoleGroup).Bind(&handle.RequestRoleGroup{}).
-		AddModule(midware.JsonToStruct)
-	RoleGroup.Post("/rolegroup/edit", handle.EditRoleGroup).Bind(&handle.RequestRoleGroup{}).
-		AddModule(midware.JsonToStruct)
+	RoleGroup.Post("/rolegroup/add", handle.AddRoleGroup).BindJson(&handle.RequestRoleGroup{})
+	RoleGroup.Post("/rolegroup/edit", handle.EditRoleGroup).BindJson(&handle.RequestRoleGroup{})
+
 	RoleGroup.Post("/rolegroup/list", handle.RoleGroupList)
 
 	RoleGroup.Post("/rolegroup/get", handle.GetRoleGroupName)

@@ -13,8 +13,8 @@ var User *xmux.RouteGroup
 
 func init() {
 	User = xmux.NewRouteGroup()
-	User.Post("/user/login", handle.Login).Bind(&user.Login{}).
-		DelModule(midware.CheckToken).AddModule(midware.JsonToStruct)
+	User.Post("/user/login", handle.Login).BindJson(&user.Login{}).
+		DelModule(midware.CheckToken)
 	User.Post("/user/logout", handle.LoginOut)
 	User.Post("/get/user", handle.GetUser)
 

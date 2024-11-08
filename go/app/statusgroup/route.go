@@ -1,7 +1,6 @@
 package statusgroup
 
 import (
-	"itflow/midware"
 	"itflow/model"
 
 	"github.com/hyahm/xmux"
@@ -15,8 +14,7 @@ func init() {
 
 	StatusGroup.Post("/statusgroup/add", Create).BindJson(&model.StatusGroup{})
 
-	StatusGroup.Post("/statusgroup/edit", Update).Bind(&model.StatusGroup{}).
-		AddModule(midware.JsonToStruct)
+	StatusGroup.Post("/statusgroup/edit", Update).BindJson(&model.StatusGroup{})
 	StatusGroup.Post("/statusgroup/list", Read)
 
 	StatusGroup.Get("/statusgroup/remove", Delete)

@@ -3,7 +3,6 @@ package system
 import (
 	"itflow/handle"
 	"itflow/internal/email"
-	"itflow/midware"
 
 	"github.com/hyahm/xmux"
 )
@@ -14,8 +13,8 @@ var Email *xmux.RouteGroup
 func init() {
 	Email = xmux.NewRouteGroup()
 
-	Email.Post("/email/test", handle.TestEmail).Bind(&email.Email{}).AddModule(midware.JsonToStruct)
-	Email.Post("/email/save", handle.SaveEmail).Bind(&email.Email{}).AddModule(midware.JsonToStruct)
+	Email.Post("/email/test", handle.TestEmail).BindJson(&email.Email{})
+	Email.Post("/email/save", handle.SaveEmail).BindJson(&email.Email{})
 	Email.Post("/email/get", handle.GetEmail)
 
 }

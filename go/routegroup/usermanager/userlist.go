@@ -19,6 +19,5 @@ func init() {
 	// 禁用用户
 	UserListPage.Get("/user/disable", handle.DisableUser)
 	// 用户信息修改
-	UserListPage.Post("/user/update", handle.Update).Bind(model.User{}).
-		AddModule(midware.JsonToStruct)
+	UserListPage.Post("/user/update", handle.Update).BindJson(model.User{})
 }

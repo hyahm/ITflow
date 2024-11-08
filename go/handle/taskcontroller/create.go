@@ -4,6 +4,7 @@ import (
 	"itflow/model"
 	"itflow/response"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/hyahm/golog"
@@ -14,6 +15,19 @@ import (
 func Create(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 	bug := xmux.GetInstance(r).Data.(*model.Bug)
+
+	if strings.Trim(bug.Title, "") == "" || strings.Trim(bug.Content, " ") == "" || len(bug.Uids) == 0 || bug.Pid == 0 {
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "缺少必要字段"
+		return
+	}
+	if bug.Tid == 1 {
+		if bug.Eid == 0 || bug.Vid == 0 || bug.Lid == 0 {
+			xmux.GetInstance(r).Response.(*response.Response).Code = 1
+			xmux.GetInstance(r).Response.(*response.Response).Msg = "缺少必要字段"
+			return
+		}
+	}
 	// 判断是否有默认值
 	dv, err := model.GetDefaultValue()
 	if err != nil {

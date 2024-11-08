@@ -1,7 +1,6 @@
 package env
 
 import (
-	"itflow/midware"
 	"itflow/model"
 
 	"github.com/hyahm/xmux"
@@ -15,10 +14,7 @@ func init() {
 
 	Env.Post("/env/list", Read)
 
-	Env.Post("/env/add", Create).Bind(&model.Env{}).
-		AddModule(midware.JsonToStruct)
-
-	Env.Post("/env/update", Update).Bind(&model.Env{}).
-		AddModule(midware.JsonToStruct)
+	Env.Post("/env/add", Create).BindJson(&model.Env{})
+	Env.Post("/env/update", Update).BindJson(&model.Env{})
 	Env.Get("/env/delete", Delete)
 }
