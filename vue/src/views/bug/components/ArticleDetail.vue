@@ -146,7 +146,6 @@ import {
   getUserKeyNameByProject,
   getVersionKeyNameByProject,
 } from "@/api/get";
-import { boolean } from "yargs";
 
 const defaultForm = {
   // status: 'draft',
@@ -376,7 +375,7 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-@import "src/styles/mixin.scss";
+@use "src/styles/mixin.scss";
 
 .createPost-container {
   position: relative;
@@ -384,7 +383,7 @@ export default {
     padding: 40px 45px 20px 50px;
     .postInfo-container {
       position: relative;
-      @include clearfix;
+      // @include clearfix;
       margin-bottom: 10px;
       .postInfo-container-item {
         float: left;

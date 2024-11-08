@@ -26,10 +26,10 @@ $sideBarWidth: 210px;
 :export {
   menuText: $menuText;
   menuActiveText: $menuActiveText;
-  subMenuActiveText: $subMenuActiveText;
+  subMenuActiveText: #f4f4f5;
   menuBg: $menuBg;
-  menuHover: $menuHover;
-  subMenuBg: $subMenuBg;
-  subMenuHover: $subMenuHover;
-  sideBarWidth: $sideBarWidth;
+  menuHover: #263445;
+  subMenuBg: #1f2d3d;
+  subMenuHover: #001528;
+  sideBarWidth: 210px;
 }
