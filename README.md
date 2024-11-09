@@ -53,15 +53,14 @@ git clone https://github.com/hyahm/ITflow.git
 ### 依赖服务
 
 - mysql >= 5.7
-- nginx 或 apache 或caddy(推荐)
-
+- nginx 或 apache 或 caddy(推荐)
 
 
 ### 本地测试
 
 - 需要 mysql >= 5.7   node 和go 最近即可
 
-- 后端启动
+- 后端启动（注意路径）要在go路径下
 
   ```
   cd ITflow/go
@@ -100,7 +99,7 @@ git clone https://github.com/hyahm/ITflow.git
 
 - 前端启动
 
-  > 安装依赖
+  > 安装依赖（注意路径，在ITflow/vue下）
 
   ```
   cd vue
@@ -122,10 +121,34 @@ git clone https://github.com/hyahm/ITflow.git
   npm run dev
   ```
 
+> 后端接口也可以通过caddy转为https, 参考如下
+
+```
+itflow.api.hyahm.com:443 {
+    reverse_proxy 127.0.0.1:10001
+}
+```
+
+
+
+### 线上部署
+
+
+- 后端
+
+  >  直接在ITflow/go下执行， 会生成 可执行文件
+
+  ```
+  go build main.go
+  ```
+
+  可以直接通过进程管理工具或systemd或者docker启动
+
+  
 
 - 前端
 
-  > 配置文件需要修改的地方 .env.production
+  > 配置文件需要修改的地方 .env.production(需要自己新建一个文件)
 
   ```
     # 改为后端服务器外网地址
@@ -140,6 +163,18 @@ git clone https://github.com/hyahm/ITflow.git
 
   ```
   npm run build
+  ```
+
+  > 会在当前目录下生成dist文件夹， 这个文件夹就是前端的根目录文件
+
+  > caddy 的配置文件参考
+
+  ```
+  itflow.hyahm.com:443 {
+      root * <ITflow_dir>/vue/dist
+      try_files {path} {path}/ /index.html
+      file_server
+  }
   ```
 
   > nginx 配置文件参考
@@ -164,11 +199,15 @@ git clone https://github.com/hyahm/ITflow.git
   }
   ```
 
-  
 
 
+
+### docker 部署
+
+我也很想用docker compose部署， 但是前端打包前配置文件需要修改，不知道怎么弄
 
 ### 项目优势   
+
  部署简单, 使用简单, 高定制, 永久开源  可以自己二次开发   
 
 

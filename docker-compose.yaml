@@ -1,8 +1,8 @@
 version: "3.7"
+name: itflow
 services:
     mysql:
         container_name: mysql
-        command: " --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci "
         image: mysql:5.7.30
         environment:
             MYSQL_ROOT_PASSWORD: 123456
@@ -10,9 +10,32 @@ services:
         volumes:
             - ./mysql/conf:/etc/mysql/conf.d
             - ./mysql/data:/var/lib/mysql
-            - ./go/bug.sql:/bug.sql
         ports:
-        - 3306:3306
-        # entrypoint: "mysql -u root -p${MYSQL_ROOT_PASSWORD} < bug.sql"
+        - 127.0.0.1:3306:3306
         restart: always
+        networks:
+            - bug_network
+    front:
+        container_name: front
+        command: 'npm run dev'
+        image: vue
+        environment:
+            API_DOMAIN: http://127.0.0.1:10001
+        volumes:
+            - E:\\code\\ITflow:/data/dist
+        networks:
+            - bug_network
+        
+    # backend:
+    #     container_name: backend
+    #     image: vue
+    #     volumes:
+    #         - E:\\code\\ITflow\\go:/data/
+
+    #     networks:
+    #         - bug_network
+volumes:
+    - front
+
+    
     
