@@ -38,7 +38,7 @@
 
 ### 展示页面： 
    展示页面会更新为最新可使用的代码  
-   [ITflow](http://bug.hyahm.com "ITflow")  
+   [ITflow](http://itflow.hyahm.com "ITflow")  
 
 
 
@@ -53,7 +53,7 @@ git clone https://github.com/hyahm/ITflow.git
 ### 依赖服务
 
 - mysql >= 5.7
-- nginx 或 apache(生产环境)
+- nginx 或 apache 或caddy(推荐)
 
 
 
@@ -122,52 +122,10 @@ git clone https://github.com/hyahm/ITflow.git
   npm run dev
   ```
 
-  
-
-### 打包运行（生产环境）
-
-- 需要 mysql >= 5.7   node 和go 最新即可
-
-- nginx 或 apache
-
-- 后端打包成二进制。 打包后的二进制文件只能是打包相同系统的能运行， 如果想要打包成不同系统需要设置GOOS为 linux | windows | darwin
-
-  > 配置文件需要修改的地方
-
-  ```
-  #  127.0.0.1 换成外网的IP地址
-  showbaseurl = http://127.0.0.1:10001/showimg/    
-   # 修改salt值后   服务启动后用 curl http://127.0.0.1:10001/admin/reset?password=123 修改admin 密码
-  salt = hjkkakoweqzmbvc  
-   eg:  http://127.0.0.1
-  cross=*   # 设置跨域的域名  
-  
-  # mysql 配置必须正确， 会自动创建表
-  [mysql]
-  user = root
-  pwd = "123456"
-  host = 127.0.0.1
-  port = 3306
-  db = itflow
-  ```
-
-  > 后端编译成2进制文件
-
-  ```
-  go run main.go
-  ```
-
-  >  运行
-
-  ```
-  ./main
-  ```
-
-
 
 - 前端
 
-  > 配置文件需要修改的地方
+  > 配置文件需要修改的地方 .env.production
 
   ```
     # 改为后端服务器外网地址

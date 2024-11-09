@@ -15,4 +15,4 @@ services:
         - 3306:3306
         # entrypoint: "mysql -u root -p${MYSQL_ROOT_PASSWORD} < bug.sql"
         restart: always
-          
+    
