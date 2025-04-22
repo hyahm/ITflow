@@ -22,7 +22,7 @@
         "normalize.css": "7.0.0",
         "nprogress": "0.2.0",
         "script-loader": "0.7.2",
-        "vue": "^2.6.10",
+        "vue": "^3.0.0",
         "vue-image-crop-upload": "^2.5.0",
         "vue-router": "3.0.2",
         "vuex": "3.1.0",
