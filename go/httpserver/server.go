@@ -29,11 +29,11 @@ func exit(start time.Time, w http.ResponseWriter, r *http.Request) {
 	}
 	var send []byte
 	var err error
-	if xmux.GetInstance(r).Response != nil && xmux.GetInstance(r).Get(xmux.STATUSCODE).(int) == 200 {
-		ck := xmux.GetInstance(r).Get(xmux.CacheKey)
+	if xmux.GetInstance(r).Response != nil && xmux.GetInstance(r).StatusCode == 200 {
+		ck := xmux.GetInstance(r).CacheKey
 
-		if ck != nil {
-			cacheKey := ck.(string)
+		if ck != "" {
+			cacheKey := ck
 			if xmux.IsUpdate(cacheKey) {
 				// 如果没有设置缓存，还是以前的处理方法
 				send, err = json.Marshal(xmux.GetInstance(r).Response)
@@ -60,7 +60,7 @@ func exit(start time.Time, w http.ResponseWriter, r *http.Request) {
 		xmux.GetInstance(r).GetConnectId(),
 		r.Method,
 		r.URL.Path, time.Since(start).Seconds(),
-		xmux.GetInstance(r).Get(xmux.STATUSCODE),
+		xmux.GetInstance(r).StatusCode,
 		string(send))
 }
 
