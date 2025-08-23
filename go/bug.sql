@@ -331,7 +331,7 @@ UNLOCK TABLES;
 CREATE TABLE `rolegroup` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL DEFAULT '',
-  `permids` json,
+  `permids` text,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -470,7 +470,7 @@ CREATE TABLE `user` (
   `createtime` bigint(20) DEFAULT '0',
   `createuid` bigint(20) DEFAULT '0',
   `realname` varchar(30) NOT NULL,
-  `showstatus` json,
+  `showstatus` text,
   `disable` tinyint(1) DEFAULT '0',
   `jid` bigint(20) DEFAULT '0',
 
@@ -503,7 +503,7 @@ UNLOCK TABLES;
 CREATE TABLE `usergroup` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL DEFAULT '',
-  `uids` json,
+  `uids` text,
   `uid` bigint(20) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
