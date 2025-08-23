@@ -10,7 +10,7 @@ CREATE TABLE `bugs` (
   `iid` bigint(20) DEFAULT '0',
   `createtime` bigint(20) DEFAULT '0',
   `vid` bigint(20) DEFAULT '0',
-  `spusers` text,
+  `spusers` json,
   `lid` bigint(20) DEFAULT '0',
   `eid` bigint(20) DEFAULT '0',
   `tid` bigint(20) DEFAULT '0',
@@ -331,7 +331,7 @@ UNLOCK TABLES;
 CREATE TABLE `rolegroup` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL DEFAULT '',
-  `permids` text,
+  `permids` json,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -470,7 +470,7 @@ CREATE TABLE `user` (
   `createtime` bigint(20) DEFAULT '0',
   `createuid` bigint(20) DEFAULT '0',
   `realname` varchar(30) NOT NULL,
-  `showstatus` text,
+  `showstatus` json,
   `disable` tinyint(1) DEFAULT '0',
   `jid` bigint(20) DEFAULT '0',
 
@@ -503,7 +503,7 @@ UNLOCK TABLES;
 CREATE TABLE `usergroup` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL DEFAULT '',
-  `uids` text,
+  `uids` json,
   `uid` bigint(20) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
