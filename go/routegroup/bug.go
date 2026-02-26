@@ -3,7 +3,7 @@ package routegroup
 import (
 	"itflow/handle"
 	"itflow/internal/bug"
-	"itflow/internal/search"
+	"itflow/model"
 
 	"github.com/hyahm/xmux"
 )
@@ -17,7 +17,7 @@ func init() {
 	///  -------
 	Bug.Post("/bug/pass", handle.PassBug).BindJson(&handle.RequestPass{})
 
-	Bug.Post("/bug/mybugs", handle.GetMyBugs).BindJson(&search.ReqMyBugFilter{})
+	Bug.Post("/bug/mybugs", handle.GetMyBugs).BindJson(&model.ReqMyBugFilter{})
 
 	Bug.Get("/bug/close", handle.CloseBug)
 	Bug.Post("/bug/changestatus", handle.ChangeBugStatus).BindJson(&bug.ChangeStatus{})

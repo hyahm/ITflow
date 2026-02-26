@@ -2,33 +2,32 @@
 --
 
 CREATE TABLE `bugs` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `uid` bigint(20) NOT NULL DEFAULT '0',
-  `title` varchar(50) DEFAULT NULL,
-  `sid` bigint(20) DEFAULT '0',
-  `content` text,
-  `iid` bigint(20) DEFAULT '0',
-  `createtime` bigint(20) DEFAULT '0',
-  `vid` bigint(20) DEFAULT '0',
-  `spusers` json,
-  `lid` bigint(20) DEFAULT '0',
-  `eid` bigint(20) DEFAULT '0',
-  `tid` bigint(20) DEFAULT '0',
-  `pid` bigint(20) DEFAULT '0',
-  `updatetime` bigint(20) DEFAULT '0',
-  `dustbin` tinyint(1) DEFAULT '0',
-  `deadline` int not null default 0,
+  `id`          BIGINT AUTO_INCREMENT COMMENT '主键',
+  `title`       VARCHAR(255)  NOT NULL DEFAULT '' COMMENT 'Bug标题',
+  `status_id`   BIGINT        NOT NULL DEFAULT 0 COMMENT 'Bug状态ID',
+  `create_id`   BIGINT        NOT NULL DEFAULT 0 COMMENT '创建者ID',
+  `content`     TEXT          COMMENT '正文/Markdown',
+  `important_id`         BIGINT        NOT NULL DEFAULT 0 COMMENT '重要性ID',
+  `create_time`  DATETIME    COMMENT '创建时间',
+  `handle_uid`  BIGINT        NOT NULL DEFAULT 0 COMMENT '被指派人ID（多值时存最小UID）',
+  `level_id`         BIGINT        NOT NULL DEFAULT 0 COMMENT '优先级别ID',
+  `env_id`         BIGINT        NOT NULL DEFAULT 0 COMMENT '运行环境ID',
+  `type_id`         BIGINT        NOT NULL DEFAULT 0 COMMENT '类型ID',
+  `project_id`         BIGINT        NOT NULL DEFAULT 0 COMMENT '项目ID',
+  `update_time`  DATETIME   COMMENT '更新时间',
+  `deadline`    DATETIME   DEFAULT NULL COMMENT '截止时间',
+  `dustbin`     TINYINT(1)    NOT NULL DEFAULT 0 COMMENT '软删除标识 0=正常 1=已删',
   PRIMARY KEY (`id`),
-  KEY `uid` (`uid`),
-  KEY `sid` (`sid`),
-  KEY `iid` (`iid`),
-  KEY `vid` (`vid`),
-  KEY `lid` (`lid`),
-  KEY `eid` (`eid`),
-  KEY `pid` (`pid`),
-  KEY `tid` (`tid`),
-  KEY `dustbin` (`dustbin`),
-  KEY `updatetime` (`updatetime`)
+  KEY `idx_project_id`        (`project_id`),
+  KEY `idx_status_id`  (`status_id`)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci COMMENT='Bug主表';
+
+
+CREATE TABLE `bug_user` (
+  `bug_id` bigint(20) NOT NULL default 0, -- bug id
+  `uid` bigint(20) NOT NULL DEFAULT 0   -- 用户id
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -215,7 +214,7 @@ UNLOCK TABLES;
 
 CREATE TABLE `log` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `exectime` bigint(20) DEFAULT '0',
+  `create_time` datetime,
   `classify` varchar(30) NOT NULL DEFAULT '',
   `ip` varchar(40) DEFAULT '',
   `uid` bigint(20) DEFAULT '0',
@@ -250,54 +249,23 @@ CREATE TABLE `options` (
 -- Dumping data for table `options`
 --
 
-LOCK TABLES `options` WRITE;
-UNLOCK TABLES;
-
---
--- Table structure for table `perm`
---
-
-CREATE TABLE `perm` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `pv` int(8) NOT NULL DEFAULT '0',
-  `rid` bigint(20) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-
---
--- Dumping data for table `perm`
---
-
-LOCK TABLES `perm` WRITE;
-/*!40000 ALTER TABLE `perm` DISABLE KEYS */;
-/*!40000 ALTER TABLE `perm` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `project`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `project` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL DEFAULT '',
-  `ugid` bigint(20) NOT NULL DEFAULT '0',
-  `uid` bigint(20) NOT NULL DEFAULT '0',
+  `created` datetime,
+  `updated` datetime ,
+  `uid` bigint(20) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
---
--- Dumping data for table `project`
---
 
-LOCK TABLES `project` WRITE;
-/*!40000 ALTER TABLE `project` DISABLE KEYS */;
-/*!40000 ALTER TABLE `project` ENABLE KEYS */;
-UNLOCK TABLES;
+CREATE TABLE `project_user_map` (
+  `project_id` bigint(20) NOT NULL default 0,
+  `uid` bigint(20) NOT NULL DEFAULT 0,
+  UNIQUE KEY `name` (`project_id`, `uid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Table structure for table `restfulname`
@@ -313,46 +281,33 @@ CREATE TABLE `restfulname` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
---
--- Dumping data for table `restfulname`
---
-
-LOCK TABLES `restfulname` WRITE;
-/*!40000 ALTER TABLE `restfulname` DISABLE KEYS */;
-/*!40000 ALTER TABLE `restfulname` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `rolegroup`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `rolegroup` (
+CREATE TABLE `role` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL DEFAULT '',
-  `permids` json,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 ;
 
+
+CREATE TABLE `role_perm_map` (
+  `rid` bigint(20) NOT NULL DEFAULT 0 comment '角色组id',
+  `perm_id` bigint(20) NOT NULL DEFAULT 0 comment '页面权限的id',
+  enable boolean not null default false comment '禁用'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
 
 --
 -- Dumping data for table `rolegroup`
 --
 
-LOCK TABLES `rolegroup` WRITE;
-/*!40000 ALTER TABLE `rolegroup` DISABLE KEYS */;
-/*!40000 ALTER TABLE `rolegroup` ENABLE KEYS */;
-UNLOCK TABLES;
+
 
 --
--- Table structure for table `roles`
+-- Table structure for table `page_perm`
 --
 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `roles` (
+CREATE TABLE `page_perm` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL DEFAULT '',
   `info` varchar(50) NOT NULL DEFAULT '',
@@ -362,19 +317,20 @@ CREATE TABLE `roles` (
 
 
 --
--- Dumping data for table `roles`
+-- Dumping data for table `page_perm`
 --
 
-LOCK TABLES `roles` WRITE;
-/*!40000 ALTER TABLE `roles` DISABLE KEYS */;
-INSERT INTO `roles` VALUES (1,'env','环境页面'),
+LOCK TABLES `page_perm` WRITE;
+/*!40000 ALTER TABLE `page_perm` DISABLE KEYS */;
+INSERT INTO `page_perm` VALUES 
+(1,'env','环境页面'),
 (2,'important','重要性页面'),
 (3,'level','优先级别页面'),
 (4,'position','职位页面'),
 (5,'project','项目页面'),
 (6,'status','bug状态流程页面'),
 (8,'version','版本页面');
-/*!40000 ALTER TABLE `roles` ENABLE KEYS */;
+/*!40000 ALTER TABLE `page_perm` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -467,20 +423,25 @@ CREATE TABLE `user` (
   `password` varchar(40) NOT NULL,
   `email` varchar(50) NOT NULL,
   `headimg` varchar(100) DEFAULT '',
-  `createtime` bigint(20) DEFAULT '0',
-  `createuid` bigint(20) DEFAULT '0',
+  `created` datetime DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `create_id` bigint(20) DEFAULT 0,
   `realname` varchar(30) NOT NULL,
-  `showstatus` json,
-  `disable` tinyint(1) DEFAULT '0',
-  `jid` bigint(20) DEFAULT '0',
-
+  `disable` tinyint(1) DEFAULT 0,
+  `position_id` bigint(20) DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `nickname` (`nickname`),
   UNIQUE KEY `email` (`email`),
-  UNIQUE KEY `realname` (`realname`),
-  KEY `jid` (`jid`),
-  KEY `createuid` (`createuid`)
+  UNIQUE KEY `realname` (`realname`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 ;
+
+
+CREATE TABLE `user_status` (
+  `id` bigint(20) NOT NULL default 0,   -- 用户id
+  `status` int(8) NOT NULL default 0   -- 状态id
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
 
 
 --
@@ -489,8 +450,8 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'admin','69ad5117e7553ecfa7f918a223426dd8da08a57f',
-'admin@qq.com','http://120.26.164.125:10001/showimg/1594376285974981434.png',unix_timestamp(now()),0,'admin','[]',0,0);
+INSERT INTO `user` VALUES (1,'admin','6fe722103c3fd788608fa54a531d810f97236175',
+'admin@qq.com','/showimg/1594376285974981434.png',now(),now(),1,'admin',0,0);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -500,33 +461,29 @@ UNLOCK TABLES;
 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `usergroup` (
+CREATE TABLE `user_group` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL DEFAULT '',
-  `uids` json,
-  `uid` bigint(20) DEFAULT '0',
+  `uid` bigint(20) DEFAULT '0',   -- 创建的uid
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE `user_group_map` (
+  `ugid` bigint(20) NOT NULL default 0,   -- 用户组id
+  `uid` bigint(20) DEFAULT '0'  -- 用户id
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4;
 
---
--- Dumping data for table `usergroup`
---
 
-LOCK TABLES `usergroup` WRITE;
-UNLOCK TABLES;
 
---
--- Table structure for table `version`
---
 
 CREATE TABLE `version` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
   `urlone` varchar(255) DEFAULT '',
   `urltwo` varchar(255) DEFAULT '',
-  `createtime` varchar(30) DEFAULT '0',
+  `created` datetime ,
+  `updated` datetime ,
   `createuid` bigint(20) NOT NULL,
   `pid` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
@@ -573,12 +530,15 @@ CREATE TABLE `doc` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
-CREATE TABLE `jobs` (
+CREATE TABLE `position` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL DEFAULT '',
-  `level` bigint(20) NOT NULL DEFAULT '2',
-  `hypo` varchar(30) NOT NULL DEFAULT '0',
-  `rgid` int(11) NOT NULL DEFAULT '0',
+  `level` int(4) NOT NULL DEFAULT 0 COMMENT '0: 普通用户  1：管理者',
+  `hypo` bigint(20) NOT NULL DEFAULT 0 COMMENT '上级id',
+  `role_id` int(11) NOT NULL DEFAULT 0 COMMENT '所属角色组',
+  `uid` bigint(20) NOT NULL DEFAULT 0 COMMENT '创建者',
+  `created` datetime DEFAULT NULL COMMENT '创建时间',
+  `updated` datetime DEFAULT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

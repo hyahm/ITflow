@@ -1,18 +1,32 @@
 package model
 
 import (
+	"errors"
 	"itflow/db"
 )
 
 type Role struct {
-	Id   int64  `json:"id,omitempty" db:"id,default"`
-	Role string `json:"role" db:"role,default"`
-	Info string `json:"info" db:"info,default"`
+	Id   int64  `json:"id,omitempty" gorm:"primaryKey"`
+	Name string `json:"name" gorm:"column:name"`
 }
 
-func AllRole() ([]Role, error) {
-	roles := make([]Role, 0)
+func (Role) TableName() string {
+	return "role"
+}
 
-	result := db.Mconn.Select(&roles, "select * from roles")
-	return roles, result.Err
+func (r *Role) List() ([]Role, error) {
+	roles := make([]Role, 0)
+	err := db.Gorm.Table(r.TableName()).Find(&roles).Error
+	return roles, err
+}
+
+func (r *Role) Create() error {
+	return db.Gorm.Table(r.TableName()).Create(&r).Error
+}
+
+func (r *Role) Delete() error {
+	if r.Id <= 0 {
+		return errors.New("id not found")
+	}
+	return db.Gorm.Table(r.TableName()).Where("id=?", r.Id).Delete(r).Error
 }

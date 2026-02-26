@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"fmt"
 	"itflow/cache"
 	"itflow/db"
 	"itflow/encrypt"
@@ -11,7 +10,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
@@ -21,7 +19,8 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 
 	getuser := xmux.GetInstance(r).Data.(*model.User)
-	if getuser.Jobid == 0 {
+	getuser.CreateId = uid
+	if getuser.PositionId <= 0 {
 		xmux.GetInstance(r).Response.(*response.Response).Code = 1
 		xmux.GetInstance(r).Response.(*response.Response).Msg = "职位不能为空"
 		return
@@ -32,8 +31,6 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	getuser.Password = encrypt.PwdEncrypt(getuser.Password, cache.Salt)
-	getuser.CreateTime = time.Now().Unix()
-	getuser.CreateUId = uid
 	err := getuser.Create()
 	if err != nil {
 		golog.Error(err)
@@ -42,12 +39,12 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	model.CacheEmail.SendMail("成功创建用户",
-		fmt.Sprintf(`<html><body><h1>已成功创建用户<h1>登录网址:<a href="%s">%s</a></br>用户名: %s</br> 密码: %s</br>邮箱: %s</body></html>`,
-			r.Referer(), r.Referer(), getuser.NickName, getuser.Password, getuser.Email),
-		getuser.Email)
+	// model.CacheEmail.SendMail("成功创建用户",
+	// 	fmt.Sprintf(`<html><body><h1>已成功创建用户<h1>登录网址:<a href="%s">%s</a></br>用户名: %s</br> 密码: %s</br>邮箱: %s</body></html>`,
+	// 		r.Referer(), r.Referer(), getuser.NickName, getuser.Password, getuser.Email),
+	// 	getuser.Email)
 
-	xmux.GetInstance(r).Response.(*response.Response).ID = getuser.ID
+	xmux.GetInstance(r).Response.(*response.Response).ID = getuser.Id
 
 }
 
@@ -107,6 +104,7 @@ func Read(w http.ResponseWriter, r *http.Request) {
 		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
+	golog.Info(us)
 	xmux.GetInstance(r).Response.(*response.Response).Data = us
 }
 
@@ -131,8 +129,9 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetRoles(w http.ResponseWriter, r *http.Request) {
-	ar, err := model.AllRole()
+func PagePermList(w http.ResponseWriter, r *http.Request) {
+	pp := model.PagePerm{}
+	ar, err := pp.List()
 	if err != nil {
 		golog.Error(err)
 		xmux.GetInstance(r).Response.(*response.Response).Code = 1
@@ -143,19 +142,19 @@ func GetRoles(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetRoleGroupPerm(w http.ResponseWriter, r *http.Request) {
-	id := r.FormValue("id")
+	// id := r.FormValue("id")
 
-	rg := model.RoleGroup{}
-	data, err := rg.GetEditDataById(id)
-	// ar, err := model.AllRole()
-	if err != nil {
-		golog.Error(err)
-		xmux.GetInstance(r).Response.(*response.Response).Code = 1
-		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
-		return
-	}
+	// rg := model.RoleGroup{}
+	// data, err := rg.GetEditDataById(id)
+	// // ar, err := model.AllRole()
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	xmux.GetInstance(r).Response.(*response.Response).Code = 1
+	// 	xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
+	// 	return
+	// }
 	// 通过permids 来获取详细权限
-	xmux.GetInstance(r).Response.(*response.Response).Data = data
+	// xmux.GetInstance(r).Response.(*response.Response).Data = data
 }
 
 // func GetThisRoles(w http.ResponseWriter, r *http.Request) {
@@ -186,7 +185,7 @@ func GetGroup(w http.ResponseWriter, r *http.Request) {
 
 func GetTaskTyp(w http.ResponseWriter, r *http.Request) {
 
-	ts := make(map[int]string, 0)
+	ts := make([]response.Option, 0)
 
 	rows, err := db.Mconn.GetRows("select id,name from typ")
 	if err != nil {
@@ -196,15 +195,17 @@ func GetTaskTyp(w http.ResponseWriter, r *http.Request) {
 	}
 	for rows.Next() {
 		var t string
-		var id int
+		var id int64
 		err = rows.Scan(&id, &t)
 		if err != nil {
 			golog.Info(err)
 			continue
 		}
-		ts[id] = t
+		ts = append(ts, response.Option{
+			Value: id,
+			Label: t,
+		})
 	}
-	golog.Error(ts)
 	xmux.GetInstance(r).Response.(*response.Response).Data = ts
 
 }

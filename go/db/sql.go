@@ -2,30 +2,31 @@ package db
 
 import (
 	_ "embed"
+	"fmt"
 	"strconv"
 	"time"
 
-	"github.com/go-sql-driver/mysql"
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/hyahm/goconfig"
 	"github.com/hyahm/golog"
-	"github.com/hyahm/gomysql"
+	"github.com/hyahm/gosql"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
-var Mconn *gomysql.Db
+var Mconn *gosql.Db
+var Gorm *gorm.DB
 
-func InitMysql(bugsql string) {
+func InitMysqlDatabase(bugsql string) {
 	var err error
 	port, err := strconv.Atoi(goconfig.ReadEnv("MYSQL_PORT"))
 	if err != nil {
-		port = goconfig.ReadInt("mysql.port", 3306)
+		port = goconfig.ReadInt("db.port", 3306)
 	}
-
-	conf := &gomysql.Sqlconfig{
+	conf := &gosql.Sqlconfig{
 		// DbName:          goconfig.ReadString("mysql.db", "itflow"),
-		Host:            goconfig.ReadEnv("MYSQL_HOST", goconfig.ReadString("mysql.host", "127.0.0.1")),
-		UserName:        goconfig.ReadEnv("MYSQL_USER", goconfig.ReadString("mysql.user", "root")),
-		Password:        goconfig.ReadEnv("MYSQL_PASSWORD", goconfig.ReadPassword("mysql.pwd", "123456")),
+		Host:            goconfig.ReadEnv("MYSQL_HOST", goconfig.ReadString("db.host", "127.0.0.1")),
+		UserName:        goconfig.ReadEnv("MYSQL_USER", goconfig.ReadString("db.user", "root")),
+		Password:        goconfig.ReadEnv("MYSQL_PASSWORD", goconfig.ReadPassword("db.pwd", "123456")),
 		Port:            port,
 		Timeout:         time.Second * 5,
 		ReadTimeout:     time.Second * 30,
@@ -33,25 +34,34 @@ func InitMysql(bugsql string) {
 		MaxOpenConns:    5,
 		MaxIdleConns:    5,
 		MultiStatements: true,
+		ParseTime:       true,
 	}
-	conn, err := conf.NewDb()
+
+	conn, err := conf.NewMysqlDb()
 	if err != nil {
 		golog.Error(err)
 		panic(err)
 	}
-	Mconn, err = conn.Use(goconfig.ReadEnv("MYSQL_DB", goconfig.ReadString("mysql.db", "itflow")))
+	Mconn, err = conn.Use(goconfig.ReadEnv("MYSQL_DB", goconfig.ReadString("db.db", "itflow")))
 	if err != nil {
-		if err.(*mysql.MySQLError).Number != 1050 {
-			panic(err)
-		}
+		golog.Warn(err)
 	}
-	rows, err := Mconn.Query(bugsql)
+	_, err = Mconn.Query(bugsql)
 	if err != nil {
-		if err.(*mysql.MySQLError).Number != 1050 {
-			panic(err)
-		}
-	} else {
-		rows.Close()
+		golog.Warn(err)
 	}
 
+	conf.DbName = goconfig.ReadEnv("MYSQL_DATABASE", goconfig.ReadString("db.db", "itflow"))
+	Gorm, err = gorm.Open(mysql.Open(conf.GetMysqlDataSource()))
+	if err != nil {
+		panic(fmt.Sprintf("连接数据库失败: %v", err))
+	}
+	golog.Info("链接 gorm 成功")
+	// 测试连接
+	Gorm = Gorm.Debug()
+	// if err != nil {
+	// 	panic(fmt.Sprintf("Ping数据库失败: %v", err))
+	// }
+
+	fmt.Println("✅ 数据库连接成功!")
 }

@@ -1,6 +1,7 @@
 package system
 
 import (
+	"itflow/app/service"
 	"itflow/handle"
 
 	"github.com/hyahm/xmux"
@@ -12,8 +13,10 @@ var RoleGroup *xmux.RouteGroup
 func init() {
 	RoleGroup = xmux.NewRouteGroup()
 
-	RoleGroup.Post("/rolegroup/add", handle.AddRoleGroup).BindJson(&handle.RequestRoleGroup{})
-	RoleGroup.Post("/rolegroup/edit", handle.EditRoleGroup).BindJson(&handle.RequestRoleGroup{})
+	RoleGroup.Post("/rolegroup/add", handle.AddRoleGroup).BindJson(&service.RequestRole{})
+	RoleGroup.Post("/role/add", handle.AddRole).BindJson(&service.RequestRole{})
+	RoleGroup.Post("/role/list", handle.RoleList)
+	RoleGroup.Get("/role/delete", handle.DelRole).BindForm(&service.RequestRole{})
 
 	RoleGroup.Post("/rolegroup/list", handle.RoleGroupList)
 
@@ -21,7 +24,7 @@ func init() {
 
 	RoleGroup.Get("/rolegroup/remove", handle.RoleGroupDel)
 
-	RoleGroup.Get("/roles/get", handle.GetRoles)
+	RoleGroup.Get("/page/perm/list", handle.PagePermList)
 	// 获取编辑组的权限
 	RoleGroup.Get("/rolegroup/perm/get", handle.GetRoleGroupPerm)
 

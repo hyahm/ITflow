@@ -33,6 +33,6 @@ func init() {
 	// 用户创建
 	// 添加用户操作
 	UserManager.Post("/user/create", handle.Create).
-		BindJson(&model.User{}).AddPageKeys("admin", "user").AddModule(midware.CheckRole)
+		BindJson(&model.User{}).AddPageKeys("admin", "user").AddModule(midware.CheckPage)
 
 }

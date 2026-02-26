@@ -7,7 +7,7 @@ imgdir = /data/bugimg/
 # 图片显示的地址(用接口的地址)
 showbaseurl = http://127.0.0.1:10001/showimg/
 # 盐值，建议修改，然后用curl http://127.0.0.1:10001/admin/reset?password=123 来修改admin密码
-salt = hjkkaksjdhfryuooweqzmbvc
+salt = your_itflow_jwt_secret_password1
 
 # 默认管理员id
 adminid = 1

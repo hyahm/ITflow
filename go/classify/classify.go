@@ -1,5 +1,7 @@
 package classify
 
+import "itflow/response"
+
 type Classify string
 
 const (
@@ -22,8 +24,54 @@ func (c Classify) String() string {
 	return string(c)
 }
 
-var CLASSIFY = []string{
-	"login", "user", "statusgroup", "role",
-	"bug", "version", "status", "usergroup",
-	"project", "env", "important", "level", "position",
+var CLASSIFY = []response.Option{
+	{
+		Label: "login",
+		Value: 0,
+	},
+	{
+		Label: "user",
+		Value: 1,
+	},
+	{
+		Label: "statusgroup",
+		Value: 2,
+	},
+	{
+		Label: "role",
+		Value: 3,
+	},
+	{
+		Label: "bug",
+		Value: 4,
+	}, {
+		Label: "version",
+		Value: 5,
+	}, {
+		Label: "status",
+		Value: 6,
+	},
+	{
+		Label: "usergroup",
+		Value: 7,
+	},
+
+	{
+		Label: "project",
+		Value: 8,
+	}, {
+		Label: "env",
+		Value: 9,
+	}, {
+		Label: "important",
+		Value: 10,
+	},
+	{
+		Label: "level",
+		Value: 11,
+	},
+	{
+		Label: "position",
+		Value: 012,
+	},
 }

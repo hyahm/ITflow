@@ -166,7 +166,7 @@ func GetProjectUser(w http.ResponseWriter, r *http.Request) {
 		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	xmux.GetInstance(r).Response.(*response.Response).UserIds = ug.Uids
+	// xmux.GetInstance(r).Response.(*response.Response).UserIds = ug.Uids
 }
 
 type uploadImage struct {
@@ -179,7 +179,8 @@ type uploadImage struct {
 }
 
 func UploadImgs(w http.ResponseWriter, r *http.Request) {
-
+	uid := xmux.GetInstance(r).Get("uid").(int64)
+	golog.Info(uid)
 	file, h, err := r.FormFile("image")
 	if err != nil {
 		golog.Error(err)
@@ -188,10 +189,10 @@ func UploadImgs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ext := filepath.Ext(h.Filename)
-	golog.Info("upload image")
+
 	filename := strconv.FormatInt(time.Now().UnixNano(), 10) + ext
 	p := path.Join(cache.ImgDir, filename)
-	golog.Info(p)
+
 	cfile, err := os.OpenFile(p, os.O_CREATE|os.O_RDWR, 0755)
 	if err != nil {
 		golog.Error(err)
@@ -216,7 +217,17 @@ func UploadImgs(w http.ResponseWriter, r *http.Request) {
 		Url:        url,
 		Uid:        time.Now().UnixNano(),
 	}
-
+	user := model.User{
+		Id:      uid,
+		HeadImg: url,
+	}
+	err = user.Update()
+	if err != nil {
+		golog.Error(err)
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
+		return
+	}
 	xmux.GetInstance(r).Response.(*response.Response).Data = sendurl
 
 }

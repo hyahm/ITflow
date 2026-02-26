@@ -3,7 +3,6 @@ package handle
 import (
 	"itflow/db"
 	"itflow/internal/dashboard"
-	"itflow/model"
 	"itflow/response"
 	"net/http"
 
@@ -62,16 +61,16 @@ func ProjectCount(w http.ResponseWriter, r *http.Request) {
 		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	if model.Default.Completed > 0 {
-		completesql := "select count(id) from bugs where sid=?"
-		err := db.Mconn.GetOne(completesql, model.Default.Completed).Scan(&pc.CountComplete)
-		if err != nil {
-			golog.Error(err)
-			xmux.GetInstance(r).Response.(*response.Response).Code = 1
-			xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
-			return
-		}
+	// if model.Default.Completed > 0 {
+	// 	completesql := "select count(id) from bugs where sid=?"
+	// 	err := db.Mconn.GetOne(completesql, model.Default.Completed).Scan(&pc.CountComplete)
+	// 	if err != nil {
+	// 		golog.Error(err)
+	// 		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+	// 		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
+	// 		return
+	// 	}
 
-	}
+	// }
 	xmux.GetInstance(r).Response.(*response.Response).Data = pc
 }

@@ -14,7 +14,7 @@ import (
 	"github.com/hyahm/golog"
 )
 
-//go:embed bug.ini.default
+//go:embed bug.ini
 var configBytes []byte
 
 //go:embed bug.sql
@@ -40,20 +40,27 @@ func main() {
 	// 初始化配置文件
 	goconfig.InitConf(conf)
 	if goconfig.ReadBool("debug", false) {
-		golog.Level = golog.DEBUG
-	} else {
+
 		golog.InitLogger(goconfig.ReadEnv("LOG_PATH", goconfig.ReadString("log.path", "")),
 			goconfig.ReadInt64("log.size", 0),
 			goconfig.ReadBool("log.everyday", false))
 	}
 
-	golog.Format = "{{ .Ctime }} - [{{ .Level }}] - {{.Msg}}"
 	// //初始化mysql
-	db.InitMysql(bugsql)
+	// switch goconfig.ReadString("db.driver") {
+	// case "postgres":
+	// 	db.InitPgDatabase(bugsql)
+	// case "mysql":
+	db.InitMysqlDatabase(bugsql)
+	// default:
+	// log.Fatalf("不支持的数据库类型: %s", goconfig.ReadString("db.driver"))
+	// }
+
 	// // // 初始化缓存表
 	// db.InitCacheTable()
 	cache.LoadConfig()
-	model.InitCache()
+	model.InitPagePermId() // 初始化角色id
+	// model.InitCache()
 	// // // 初始化日志
 
 	httpserver.RunHttp()

@@ -17,5 +17,5 @@ func init() {
 
 	Log.Post("/log/classify", handle.LogClassify)
 
-	// 	Log.Post("/log/list", handle.LogList).BindJson(&log.SearchLog{})
+	// Log.Post("/log/list", handle.LogList).BindJson(&log.SearchLog{})
 }

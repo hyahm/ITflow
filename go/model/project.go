@@ -4,75 +4,83 @@ import (
 	"errors"
 	"itflow/cache"
 	"itflow/db"
+	"time"
 
-	"github.com/hyahm/gomysql"
+	"github.com/hyahm/golog"
+	"github.com/hyahm/gosql"
 )
 
 type Project struct {
-	Id   int64  `json:"id" db:"id,default"`
-	Name string `json:"name" db:"name"`
-	UGid int64  `json:"ugid" db:"ugid"`
-	Uid  int64  `json:"uid" db:"uid"`
+	Id      int64     `json:"id" gorm:"primaryKey" form:"id"`
+	Name    string    `json:"name" gorm:"column:name"`
+	Created time.Time `json:"created" gorm:"column:created"`
+	Updated time.Time `json:"updated" gorm:"column:updated"`
+	Uid     int64     `json:"uid" gorm:"column:uid"`
+}
+
+func (Project) TableName() string {
+	return "project"
 }
 
 func GetProjectKeyName(uid int64) ([]KeyName, error) {
-	ugids, err := GetUserGroupIds(uid)
-	if err != nil {
-		return nil, nil
+	ugm := ProjectUserMap{
+		Uid: uid,
 	}
-	rows, err := db.Mconn.GetRowsIn("select id,name from project where ugid in (?) or uid=?", ugids, uid)
+	projects, err := ugm.GetUserGroupIds()
 	if err != nil {
+		golog.Error(err)
 		return nil, err
 	}
-	defer rows.Close()
-	kns := make([]KeyName, 0)
-	for rows.Next() {
-		kn := KeyName{}
-		err = rows.Scan(&kn.ID, &kn.Name)
-		if err != nil {
-			continue
-		}
-		kns = append(kns, kn)
+	if len(projects) == 0 {
+		return make([]KeyName, 0), nil
 	}
-	return kns, nil
+	kns := make([]KeyName, 0)
+	err = db.Gorm.Table("project").Select("id", "name").Where("id in ?", projects).Find(&kns).Error
+	return kns, err
 }
 
 func (p *Project) Insert() error {
-
-	result := db.Mconn.InsertInterfaceWithID(p, "insert into project($key) values($value)")
-	if result.Err != nil {
-		return result.Err
-	}
-	p.Id = result.LastInsertId
-	return nil
+	p.Created = time.Now()
+	p.Updated = time.Now()
+	return db.Gorm.Create(p).Error
 }
 
 func NewProjectById(id interface{}) (*Project, error) {
 	p := &Project{}
-	err := db.Mconn.GetOne("select id,name,ugid,uid from project where id=?",
-		id).Scan(&p.Id, &p.Name, &p.UGid, &p.Uid)
+	// err := db.Mconn.GetOne("select id,name,ugid,uid from project where id=?",
+	// 	id).Scan(&p.Id, &p.Name, &p.UGid, &p.Uid)
 
-	return p, err
+	return p, nil
 }
 
-func GetAllProjects(uid int64) ([]*Project, error) {
-	// 获取此用户的项目组
-	ps := make([]*Project, 0)
-	if uid == cache.SUPERID {
-		result := db.Mconn.Select(&ps, `select * from project`)
-		return ps, result.Err
-	} else {
-		// 如果是管理员或者创建者，都能看到
-		result := db.Mconn.Select(&ps, `select * from project where uid=? or uid=? or 
-ugid in (select id from usergroup where json_contains(ugid, json_array(?)))`, uid, cache.SUPERID, uid)
-
-		return ps, result.Err
+func (p *Project) GetAllProjects(uid int64) ([]Project, error) {
+	ps := make([]Project, 0)
+	if p.Uid <= 0 {
+		return ps, errors.New("uid not found")
 	}
+	// 获取此用户的项目组
+
+	// query := db.Gorm.Table(p.TableName())
+	query := db.Gorm.Table(p.TableName())
+	if uid != cache.SUPERID {
+		pum := UserGroupMap{}
+		pids, err := pum.GetProjectIdsByUid(uid)
+		if err != nil {
+			return ps, err
+		}
+		if len(pids) == 0 {
+			return ps, err
+		}
+		query = query.Where("id in ?", pids)
+	}
+	err := query.Order("created desc").Find(&ps).Error
+	golog.Error(err)
+	return ps, err
 
 }
 
 func (p *Project) Update(uid int64) error {
-	var result gomysql.Result
+	var result gosql.Result
 	if uid == cache.SUPERID {
 		result = db.Mconn.UpdateInterface(p, "update project set $set where id=?", p.Id)
 	} else {

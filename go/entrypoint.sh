@@ -14,7 +14,7 @@ showbaseurl=${IMG_SERVER_URI:-http://127.0.0.1:10001}/showimg
 # 私钥
 privatekeyfile=pri.key
 # 盐值，建议修改，然后用curl http://ip:10001/admin/reset?password=123 来修改root密码
-salt=hjkkaksjdhfryuooweqzmbvc
+salt=your_itflow_jwt_secret_password1
 # token 过期时间
 redisexpiration=120
 # 共享文件夹根目录

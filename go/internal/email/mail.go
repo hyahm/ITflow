@@ -9,6 +9,4 @@ type Email struct {
 	Nickname  string `json:"nickname"`
 	Password  string `json:"password"`
 	To        string `json:"to"`
-	Code      int    `json:"code"`
-	Msg       int    `json:"msg,omitempty"`
 }

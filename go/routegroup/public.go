@@ -17,11 +17,11 @@ func init() {
 	Public.Post("/project/keyname", publiccontroller.GetProjectKeyName)
 	Public.Post("/version/keyname/byproject", publiccontroller.GetVersionKeyNameByProject).BindJson(publiccontroller.RequestProject{})
 	// 根据项目获取用户
-	Public.Post("/user/keyname/byproject", publiccontroller.GetUserKeyNameByProject).BindJson(publiccontroller.RequestProject{})
+	Public.Post("/user/keyname/byproject", publiccontroller.GetUserKeyNameByProject).BindJson(model.ProjectUserMap{})
 	// 获取用户
 	Public.Post("/user/keyname", publiccontroller.GetUserKeyName)
 	// 获取运行环境
-	Public.Post("/env/keyname", publiccontroller.GetEnvKeyName)
+	// Public.Post("/env/keyname", publiccontroller.GetEnvKeyName)
 	// 获取有限级别
 	Public.Post("/level/keyname", publiccontroller.GetLevelKeyName)
 	// 获取重要性
@@ -40,6 +40,6 @@ func init() {
 	// 获取自己先择显示的状态
 	Public.Post("/status/show", publiccontroller.ShowStatus)
 	// 修改显示的状态的bug
-	Bug.Post("/status/save", handle.ChangeShowStatus).BindJson(&model.User{})
+	Public.Post("/status/save", handle.ChangeShowStatus).BindJson(&model.User{})
 
 }

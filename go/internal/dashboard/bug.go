@@ -2,12 +2,8 @@ package dashboard
 
 import (
 	"fmt"
-	"itflow/model"
 	"log"
-	"sync"
 	"time"
-
-	"github.com/hyahm/golog"
 )
 
 type BugCount struct {
@@ -18,36 +14,36 @@ type BugCount struct {
 const SHOWDAY = 7
 
 func GetCount() *BugCount {
-	start := getTime()
-	bc := &BugCount{
-		Created:   make([]int, SHOWDAY),
-		Completed: make([]int, SHOWDAY),
-	}
-	count := 0
-	wg := &sync.WaitGroup{}
-	for i := SHOWDAY - 1; i >= 0; i-- {
-		var err error
-		wg.Add(2)
-		go func(count, i int) {
-			bc.Created[count], err = model.GetCreatedCountByTime(start[i], start[i]+24*60*60-1)
-			if err != nil {
-				golog.Error(err)
-			}
-			wg.Done()
-		}(count, i)
-		go func(count, i int) {
-			if model.Default.Completed > 0 {
-				bc.Completed[count], err = model.GetCompletedCountByTime(start[i], start[i]+24*60*60-1, model.Default.Completed)
-				if err != nil {
-					golog.Error(err)
-				}
-			}
-			wg.Done()
-		}(count, i)
-		count++
-	}
-	wg.Wait()
-	return bc
+	// start := getTime()
+	// bc := &BugCount{
+	// 	Created:   make([]int, SHOWDAY),
+	// 	Completed: make([]int, SHOWDAY),
+	// }
+	// count := 0
+	// wg := &sync.WaitGroup{}
+	// for i := SHOWDAY - 1; i >= 0; i-- {
+	// 	var err error
+	// 	wg.Add(2)
+	// 	go func(count, i int) {
+	// 		bc.Created[count], err = model.GetCreatedCountByTime(start[i], start[i]+24*60*60-1)
+	// 		if err != nil {
+	// 			golog.Error(err)
+	// 		}
+	// 		wg.Done()
+	// 	}(count, i)
+	// 	go func(count, i int) {
+	// 		if model.Default.Completed > 0 {
+	// 			bc.Completed[count], err = model.GetCompletedCountByTime(start[i], start[i]+24*60*60-1, model.Default.Completed)
+	// 			if err != nil {
+	// 				golog.Error(err)
+	// 			}
+	// 		}
+	// 		wg.Done()
+	// 	}(count, i)
+	// 	count++
+	// }
+	// wg.Wait()
+	return nil
 }
 
 func getTime() []int64 {

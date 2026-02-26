@@ -30,7 +30,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	xmux.GetInstance(r).Response.(*response.Response).ID = status.ID
+	xmux.GetInstance(r).Response.(*response.Response).ID = status.Id
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {

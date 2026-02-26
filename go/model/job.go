@@ -2,34 +2,46 @@ package model
 
 import (
 	"database/sql"
+	"errors"
 	"itflow/cache"
 	"itflow/db"
+	"time"
 
 	"github.com/hyahm/goconfig"
 	"github.com/hyahm/golog"
-	"github.com/hyahm/gomysql"
+	"github.com/hyahm/gosql"
 )
 
-type Job struct {
-	Id          int64  `json:"id" db:"id,default"`
-	Name        string `json:"name" db:"name"`
-	Level       int    `json:"level" db:"level"`      // 1 是管理者， 2 是普通员工
-	HypoName    int64  `json:"hypo" db:"hypo"`        //  管理者id
-	StatusGroup int64  `json:"statusgroup" db:"sgid"` // 状态组
-	RoleGroup   int64  `json:"rolegroup" db:"rgid"`   // 角色组
+type Position struct {
+	Id      int64     `json:"id" gorm:"primaryKey"`
+	Name    string    `json:"name" gorm:"column:name"`
+	Level   int       `json:"level" gorm:"column:level"`     // 1 是管理者， 0 是普通员工
+	Hypo    int64     `json:"hypo" gorm:"column:hypo"`       //  上级id
+	RoleId  int64     `json:"role_id" gorm:"column:role_id"` // 状态组0
+	Uid     int64     `json:"uid" gorm:"column:uid"`         // 创建者
+	Created time.Time `json:"created" gorm:"column:created" `
+	Updated time.Time `json:"updated" gorm:"column:updated" `
 }
 
-func (job *Job) Insert() error {
-	result := db.Mconn.InsertInterfaceWithID(job, "insert into jobs($key) values($value)")
-	if result.Err != nil {
-		return result.Err
-	}
-	job.Id = result.LastInsertId
-	return nil
+func (Position) TableName() string {
+	return "position"
+}
+
+func (p *Position) Create() error {
+	p.Created = time.Now()
+	p.Updated = time.Now()
+	return db.Gorm.Create(p).Error
+}
+
+// 获取所有管理员
+func (p *Position) GetManager() ([]KeyName, error) {
+	ps := make([]KeyName, 0)
+	err := db.Gorm.Table(p.TableName()).Select("id", "name").Where("level=1").Find(&ps).Error
+	return ps, err
 }
 
 func DeleteJob(id, uid interface{}) (err error) {
-	var result gomysql.Result
+	var result gosql.Result
 	if uid == cache.SUPERID {
 		result = db.Mconn.Delete("delete from jobs where id=?", id)
 	} else {
@@ -39,41 +51,31 @@ func DeleteJob(id, uid interface{}) (err error) {
 	return result.Err
 }
 
-func (job *Job) Update() error {
-	result := db.Mconn.UpdateInterface(job, "update jobs set $set where id=?", job.Id)
+func (p *Position) Update() error {
+	result := db.Mconn.UpdateInterface(p, "update jobs set $set where id=?", p.Id)
 	return result.Err
 }
 
-func GetAllPositions() ([]Job, error) {
-	jobs := make([]Job, 0)
-	result := db.Mconn.Select(&jobs, "select * from jobs")
-	return jobs, result.Err
+func (p *Position) GetAllPositions() ([]Position, error) {
+	jobs := make([]Position, 0)
+	err := db.Gorm.Table(p.TableName()).Order("id desc").Find(&jobs).Error
+	return jobs, err
 }
 
-func GetJobIdsByJobId(jid int64) ([]int64, error) {
+func (p *Position) GetJobIdsByJobId() ([]int64, error) {
 	// 通过jid 来获取 能管理的 职位 的id
-	rows, err := db.Mconn.GetRows("select id from jobs where hypo=( select hypo from jobs where id=?)", jid)
-	if err != nil {
-		golog.Error(err)
-		return nil, err
+
+	if p.Id <= 0 {
+		return []int64{}, errors.New("id is zero")
 	}
-	defer rows.Close()
-	jobs := make([]int64, 0)
-	for rows.Next() {
-		var id int64
-		err = rows.Scan(&id)
-		if err != nil {
-			golog.Error(err)
-			continue
-		}
-		jobs = append(jobs, id)
-	}
-	return jobs, nil
+	var ids []int64
+	err := db.Gorm.Table(p.TableName()).Where("hypo=( select hypo from position where id=?)", p.Id).Select("id").Find(&ids).Error
+	return ids, err
 }
 
 type Jobs struct {
-	Positions []*Job `json:"positions"`
-	Code      int    `json:"code"`
+	Positions []*Position `json:"positions"`
+	Code      int         `json:"code"`
 }
 
 func GetJobKeyNameByUid(uid int64) ([]KeyName, error) {

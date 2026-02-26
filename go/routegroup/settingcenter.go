@@ -17,7 +17,7 @@ import (
 var SettingCenter *xmux.RouteGroup
 
 func init() {
-	SettingCenter = xmux.NewRouteGroup().AddPageKeys("admin").AddModule(midware.CheckRole)
+	SettingCenter = xmux.NewRouteGroup().AddPageKeys("admin").AddModule(midware.CheckPage)
 
 	SettingCenter.AddGroup(position.Position)
 	SettingCenter.AddGroup(env.Env)

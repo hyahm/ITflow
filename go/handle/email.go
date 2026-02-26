@@ -4,7 +4,6 @@ import (
 	"itflow/db"
 	"itflow/internal/email"
 	"itflow/mail"
-	"itflow/model"
 	"itflow/response"
 	"net/http"
 	"strings"
@@ -55,13 +54,13 @@ func SaveEmail(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	model.CacheEmail.Enable = getemail.Enable
-	model.CacheEmail.Host = getemail.Host
-	model.CacheEmail.Password = getemail.Password
-	model.CacheEmail.Email = getemail.EmailAddr
-	model.CacheEmail.Port = getemail.Port
-	model.CacheEmail.NickName = getemail.Nickname
-	model.CacheEmail.Id = errorcode.ID
+	// model.CacheEmail.Enable = getemail.Enable
+	// model.CacheEmail.Host = getemail.Host
+	// model.CacheEmail.Password = getemail.Password
+	// model.CacheEmail.Email = getemail.EmailAddr
+	// model.CacheEmail.Port = getemail.Port
+	// model.CacheEmail.NickName = getemail.Nickname
+	// model.CacheEmail.Id = errorcode.ID
 	xmux.GetInstance(r).Response.(*response.Response).ID = getemail.Id
 }
 
@@ -81,5 +80,5 @@ func GetEmail(w http.ResponseWriter, r *http.Request) {
 	// 	w.Write(errorcode.ErrorE(err))
 	// 	return
 	// }
-	xmux.GetInstance(r).Response.(*response.Response).Data = model.CacheEmail
+	// xmux.GetInstance(r).Response.(*response.Response).Data = model.CacheEmail
 }

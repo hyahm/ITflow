@@ -14,6 +14,7 @@ import (
 	"github.com/hyahm/goconfig"
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
+	"golang.org/x/time/rate"
 )
 
 func GetExecTime(handle func(http.ResponseWriter, *http.Request), w http.ResponseWriter, r *http.Request) {
@@ -30,7 +31,7 @@ func exit(start time.Time, w http.ResponseWriter, r *http.Request) {
 	var send []byte
 	var err error
 	if xmux.GetInstance(r).Response != nil && xmux.GetInstance(r).StatusCode == 200 {
-		ck := xmux.GetInstance(r).CacheKey
+		ck := xmux.GetInstance(r).GetCacheKey()
 
 		if ck != "" {
 			cacheKey := ck
@@ -56,17 +57,22 @@ func exit(start time.Time, w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
-	log.Printf("connect_id: %d,method: %s\turl: %s\ttime: %f\t status_code: %v, body: %v\n",
+	golog.Warnf("connect_id: %d,method: %s\turl: %s\ttime: %f\t status_code: %v",
 		xmux.GetInstance(r).GetConnectId(),
 		r.Method,
 		r.URL.Path, time.Since(start).Seconds(),
-		xmux.GetInstance(r).StatusCode,
-		string(send))
+		xmux.GetInstance(r).StatusCode)
+}
+
+func RateLimit(limiter *rate.Limiter) func(w http.ResponseWriter, r *http.Request) bool {
+	return func(w http.ResponseWriter, r *http.Request) bool {
+		return !limiter.Allow()
+	}
 }
 
 func RunHttp() {
 	resp := &response.Response{}
-	router := xmux.NewRouter().BindResponse(resp)
+	router := xmux.NewRouter().BindResponse(resp).AddModule(RateLimit(rate.NewLimiter(100, 200)))
 	router.SetHeader("Access-Control-Allow-Origin", goconfig.ReadEnv("ACAO", goconfig.ReadString("cross", "*")))
 	router.SetHeader("Content-Type", "application/x-www-form-urlencoded,application/json; charset=UTF-8")
 	router.SetHeader("Access-Control-Allow-Headers", "Content-Type,Access-Token,X-Token,smail,authorization")
@@ -103,7 +109,7 @@ func RunHttp() {
 	router.AddGroup(routegroup.Share)
 	// router.AddGroup(routegroup.Api)
 
-	router.Post("/uploadimg", handle.UploadImgs).DelModule(midware.CheckToken)
+	router.Post("/uploadimg", handle.UploadImgs)
 
 	router.Get("/showimg/{string:imgname}", handle.ShowImg).SetHeader("Content-Type", "image/png").
 		DelModule(midware.CheckToken).BindResponse(nil)
@@ -114,9 +120,7 @@ func RunHttp() {
 	// 	doc := router.ShowApi("/docs").DelModule(midware.CheckToken)
 	// 	router.AddGroup(doc)
 	// }
-
 	listenaddr := goconfig.ReadEnv("LISTEN", goconfig.ReadString("listenaddr", ":10001"))
-
 	fmt.Println("listen on " + listenaddr)
 	server := http.Server{
 		Addr:         listenaddr,

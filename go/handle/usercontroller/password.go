@@ -22,7 +22,7 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	oldpassword := encrypt.PwdEncrypt(getuser.Oldpassword, cache.Salt)
 	newpassword := encrypt.PwdEncrypt(getuser.Newpassword, cache.Salt)
 	user := model.User{
-		ID:       uid,
+		Id:       uid,
 		Password: newpassword,
 	}
 	err := user.UpdatePassword(oldpassword)

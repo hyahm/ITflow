@@ -1,7 +1,6 @@
 package db
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/hyahm/cachetable"
@@ -40,6 +39,5 @@ func InitCacheTable() {
 }
 
 func SaveCacheTable() error {
-	fmt.Println("save db")
 	return ct.Save(".token.db")
 }

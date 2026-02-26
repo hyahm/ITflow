@@ -13,7 +13,7 @@ import (
 func DefaultStatus(w http.ResponseWriter, r *http.Request) {
 
 	//如果是管理员的话,所有的都可以
-	xmux.GetInstance(r).Response.(*response.Response).Data = model.Default
+	// xmux.GetInstance(r).Response.(*response.Response).Data = model.Default
 }
 
 func DefaultSave(w http.ResponseWriter, r *http.Request) {
@@ -26,8 +26,8 @@ func DefaultSave(w http.ResponseWriter, r *http.Request) {
 		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	model.Default.Created = sl.Created
-	model.Default.Completed = sl.Completed
-	model.Default.Pass = sl.Pass
-	model.Default.Receive = sl.Receive
+	// model.Default.Created = sl.Created
+	// model.Default.Completed = sl.Completed
+	// model.Default.Pass = sl.Pass
+	// model.Default.Receive = sl.Receive
 }

@@ -14,7 +14,8 @@ func ShowStatus(w http.ResponseWriter, r *http.Request) {
 	// sl := xmux.GetInstance(r).Data.(*status.Status)
 
 	uid := xmux.GetInstance(r).Get("uid").(int64)
-	ss, err := model.GetShowStatus(uid)
+	us := model.UserStatus{}
+	ss, err := us.GetShowStatus(uid)
 	if err != nil {
 		golog.Error(err)
 		xmux.GetInstance(r).Response.(*response.Response).Code = 1

@@ -7,15 +7,19 @@ import (
 )
 
 type Env struct {
-	ID   int64  `json:"id" db:"id,default"`
-	Name string `json:"name" db:"name"`
+	Id   int64  `json:"id" gorm:"primaryKey"`
+	Name string `json:"name" gorm:"column:name"`
+}
+
+func (Env) TableName() string {
+	return "environment"
 }
 
 // 获取的就是表的所有字段
-func GetAllEnv() ([]Env, error) {
+func (e *Env) GetAllEnv() ([]Env, error) {
 	envs := make([]Env, 0)
-	result := db.Mconn.Select(&envs, "select * from environment")
-	return envs, result.Err
+	err := db.Gorm.Table(e.TableName()).Order("id asc").Find(&envs).Error
+	return envs, err
 }
 
 func (env *Env) Create() error {
@@ -24,12 +28,12 @@ func (env *Env) Create() error {
 		golog.Error(result.Err)
 		return result.Err
 	}
-	env.ID = result.LastInsertId
+	env.Id = result.LastInsertId
 	return nil
 }
 
 func (env *Env) Update() error {
-	result := db.Mconn.UpdateInterface(env, "update environment set $set where id=?", env.ID)
+	result := db.Mconn.UpdateInterface(env, "update environment set $set where id=?", env.Id)
 	return result.Err
 }
 

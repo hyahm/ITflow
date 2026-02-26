@@ -31,6 +31,7 @@ func GetLevelKeyNameByUid() ([]KeyName, error) {
 }
 
 func (level *Level) Create() error {
+	golog.Info("1111")
 	result := db.Mconn.InsertInterfaceWithID(level, "insert into level($key) values($value)")
 	if result.Err != nil {
 		golog.Error(result.Err)

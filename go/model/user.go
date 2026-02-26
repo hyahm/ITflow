@@ -5,47 +5,59 @@ import (
 	"errors"
 	"itflow/cache"
 	"itflow/db"
+	"time"
 
 	"github.com/hyahm/goconfig"
 	"github.com/hyahm/golog"
 )
 
+var ErrIdNotFound = errors.New("id not found")
+
 type User struct {
-	ID         int64   `json:"id" db:"id,default"`
-	NickName   string  `json:"nickname" db:"nickname"`
-	Password   string  `json:"password" db:"password"`
-	Email      string  `json:"email" db:"email"`
-	HeadImg    string  `json:"headimg" db:"headimg"`
-	CreateTime int64   `json:"createtime" db:"createtime"`
-	CreateUId  int64   `json:"createuid" db:"createuid"`
-	RealName   string  `json:"realname" db:"realname"`
-	ShowStatus []int64 `json:"showstatus" db:"showstatus"` // 查看的状态
-	Disable    bool    `json:"disable" db:"disable"`       // 是否是垃圾箱
-	Jobid      int64   `json:"jid" db:"jid"`               // 职位
+	Id         int64     `json:"id" gorm:"primaryKey"`
+	NickName   string    `json:"nickname" gorm:"column:nickname"`
+	Password   string    `json:"password" gorm:"column:password"`
+	Email      string    `json:"email" gorm:"column:email"`
+	HeadImg    string    `json:"headimg" gorm:"column:headimg"`
+	Created    time.Time `json:"created" gorm:"column:created"`
+	Updated    time.Time `json:"updated" gorm:"column:updated"`
+	CreateId   int64     `json:"create_id" gorm:"column:create_id"`
+	RealName   string    `json:"realname" gorm:"column:realname"`
+	Disable    bool      `json:"disable" gorm:"column:disable"`         // 是否是垃圾箱
+	PositionId int64     `json:"position_id" gorm:"column:position_id"` // 职位
+}
+
+func (User) TableName() string {
+	return "user"
+}
+
+func (user *User) GetUserKeyName(uid int64) ([]KeyName, error) {
+	kns := make([]KeyName, 0)
+	err := db.Gorm.Table(user.TableName()).Select("id as id", "nickname as name").Find(&kns).Error
+	golog.Info(kns)
+	return kns, err
 }
 
 func (user *User) UpdatePassword(old string) error {
-
-	result := db.Mconn.Update("update user set password=? where password=? and id=?", user.Password, old, user.ID)
-
-	return result.Err
+	return db.Gorm.Table(user.TableName()).Where("password=? and id=?", old, user.Id).Select("password").Updates(user).Error
 }
 
 func GetAllUsers(uid int64) ([]User, error) {
 	us := make([]User, 0)
-	if uid == cache.SUPERID {
-		result := db.Mconn.Select(&us, "select * from user")
-		return us, result.Err
-	}
-	return nil, errors.New("no permission")
+	err := db.Gorm.Find(&us).Error
+	return us, err
 }
 
-func GetJobIdByUid(uid int64) (int64, error) {
-	var jid int64
-	err := db.Mconn.GetOne("select jid from user where id=?", uid).Scan(&jid)
-	return jid, err
+func (user *User) GetKeyNameByUids(uids []int64) ([]KeyName, error) {
+	userinfo := make([]KeyName, 0)
+	err := db.Gorm.Table(user.TableName()).Where("id in ?", uids).Select("id", "realname as name").Find(&userinfo).Error
+	return userinfo, err
 }
-
+func (user *User) GetJobIdByUid(uid int64) (int64, error) {
+	var positionId int64
+	err := db.Gorm.Table(user.TableName()).Select("position_id").Where("id=?", uid).Scan(&positionId).Error
+	return positionId, err
+}
 func DeleteUser(id interface{}) error {
 	result := db.Mconn.Delete("delete from user where id=? ", id)
 	if result.Err != nil {
@@ -66,25 +78,11 @@ func GetUsers(jobs []int64) ([]User, error) {
 
 }
 
-func GetShowStatus(uid int64) ([]int64, error) {
-	user := User{}
-	result := db.Mconn.Select(&user, "select showstatus from user where id=?", uid)
-	if result.Err != nil {
-		golog.Error(result.Err)
-		return nil, result.Err
-	}
-	return user.ShowStatus, nil
-}
-
 func (user *User) Create() error {
 	// user.HeadImg = goconfig.ReadString("defaulthead")
-	result := db.Mconn.InsertInterfaceWithID(user, "insert into user($key) values($value)")
-	if result.Err != nil {
-		golog.Error(result.Err)
-		return result.Err
-	}
-	user.ID = result.LastInsertId
-	return nil
+	user.Created = time.Now()
+	user.Updated = time.Now()
+	return db.Gorm.Table(user.TableName()).Create(user).Error
 }
 
 func (user *User) CheckHaveAdminUser() error {
@@ -109,34 +107,27 @@ func (user *User) UpdateAdminPassword(password string) error {
 }
 
 func (user *User) Update() error {
-	basesql := "update user set $set where id=?"
-	result := db.Mconn.UpdateInterface(user, basesql, user.ID)
-	return result.Err
+	if user.Id <= 0 {
+		return ErrIdNotFound
+	}
+	return db.Gorm.Table(user.TableName()).Where("id=?", user.Id).Update("headimg", user.HeadImg).Error
+	// result := db.Mconn.UpdateInterface(user, basesql, user.Id)
+	// return result.Err
 }
 
-func GetUserKeyNameByProjectId(projectId int64) ([]KeyName, error) {
+func (user *User) GetUserKeyNameByProjectId(projectId int64) ([]KeyName, error) {
 	// 获取用户ids
-	ug := UserGroup{}
-	result := db.Mconn.Select(&ug, "select uids from usergroup where id=( select ugid from project where id=?)", projectId)
-	if result.Err != nil {
-		golog.Error(result.Err)
-		return nil, result.Err
-	}
-	rows, err := db.Mconn.GetRowsIn(" select id,realname from user where id in (?)", ug.Uids)
+	uids := make([]int64, 0)
+	err := db.Gorm.Table(user.TableName()).Where("id=?", projectId).Find(&uids).Error
 	if err != nil {
 		golog.Error(err)
 		return nil, err
 	}
-	defer rows.Close()
 	kns := make([]KeyName, 0)
-	for rows.Next() {
-		kn := KeyName{}
-		err = rows.Scan(&kn.ID, &kn.Name)
-		if err != nil {
-			golog.Error(err)
-			continue
-		}
-		kns = append(kns, kn)
+	err = db.Gorm.Table(user.TableName()).Select("id as value", "nickname as label").Where("id in ?", uids).Find(&kns).Error
+	if err != nil {
+		golog.Error(err)
+		return nil, err
 	}
 	return kns, nil
 }

@@ -1,31 +1,20 @@
 package handle
 
 import (
-	"fmt"
 	"itflow/classify"
 	"itflow/internal/user"
 	"itflow/model"
 	"itflow/response"
 	"net/http"
 	"strings"
-	"sync/atomic"
 	"time"
 
 	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
 
-var loginSign int32
-
 func Login(w http.ResponseWriter, r *http.Request) {
 
-	if loginSign != 0 {
-		xmux.GetInstance(r).Response.(*response.Response).Code = 1
-		xmux.GetInstance(r).Response.(*response.Response).Msg = "正在登录"
-		return
-	}
-	atomic.AddInt32(&loginSign, 1)
-	defer atomic.AddInt32(&loginSign, -1)
 	login := xmux.GetInstance(r).Data.(*user.Login)
 
 	resp, uid, err := login.Check()
@@ -40,11 +29,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		ip = r.RemoteAddr
 	}
 	log := model.Log{
-		Exectime: time.Now().Unix(),
-		Classify: string(classify.Login),
-		Ip:       strings.Split(ip, ":")[0],
-		Uid:      uid,
-		Action:   fmt.Sprintf("用户登录成功， uid: %d", uid),
+		CreateTime: time.Now(),
+		Classify:   string(classify.Login),
+		Ip:         strings.Split(ip, ":")[0],
+		Uid:        uid,
+		Action:     "用户登录",
 	}
 	err = log.Insert()
 	if err != nil {
@@ -62,7 +51,7 @@ func LoginOut(w http.ResponseWriter, r *http.Request) {
 func UserInfo(w http.ResponseWriter, r *http.Request) {
 
 	userinfo := &user.UserInfo{}
-	userinfo.NickName = xmux.GetInstance(r).Get("nickname").(string)
+	// userinfo.NickName = xmux.GetInstance(r).Get("nickname").(string)
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 	userinfo.Uid = uid
 	err := userinfo.GetUserInfo(uid)

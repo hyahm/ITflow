@@ -7,11 +7,11 @@ import (
 	"itflow/cache"
 	"itflow/db"
 	"itflow/encrypt"
+	"itflow/jwt"
 	"itflow/model"
 	"strings"
 
 	"github.com/hyahm/golog"
-	"github.com/hyahm/xmux/auth"
 )
 
 // 用户登录
@@ -28,6 +28,7 @@ func (login *Login) Check() (string, int64, error) {
 	rl := &ResponseLogin{}
 	login.Username = strings.Trim(login.Username, " ")
 	enpassword := encrypt.PwdEncrypt(login.Password, cache.Salt)
+	golog.Info(enpassword)
 	getsql := ""
 	if strings.Contains(login.Username, "@") {
 		getsql = "select id from user where email=? and password=? and disable=0"
@@ -43,7 +44,8 @@ func (login *Login) Check() (string, int64, error) {
 		golog.Error(err)
 		return "", 0, err
 	}
-	token, err := auth.MakeJwt(cache.Salt, rl)
+
+	token, err := jwt.GenerateToken(rl.ID)
 	return token, rl.ID, err
 }
 
@@ -55,7 +57,7 @@ type User struct {
 	Email      string  `json:"email" db:"email,default"`
 	Headmg     string  `json:"headimg" db:"headimg,default"`
 	Disable    bool    `json:"disable" db:"disable"`
-	JobId      int64   `json:"jid" db:"jid"`
+	PositionId int64   `json:"position_id" db:"position_id"`
 	ShowStatus []int64 `json:"showstatus" db:"showstatus"`
 	CreateUid  int64   `json:"createuid" db:"createuid"`
 }
@@ -75,8 +77,8 @@ type UserInfo struct {
 
 func (ui *UserInfo) GetUserInfo(uid int64) error {
 	ui.Roles = make([]string, 0)
-	var jid int64
-	err := db.Mconn.GetOne("select nickname, headimg, jid from user where id=?", uid).Scan(&ui.NickName, &ui.Avatar, &jid)
+	var position_id int64
+	err := db.Mconn.GetOne("select nickname, headimg, position_id from user where id=?", uid).Scan(&ui.NickName, &ui.Avatar, &position_id)
 	if err != nil {
 		golog.Error(err)
 		return err

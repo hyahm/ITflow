@@ -11,7 +11,7 @@ import (
 var UserListPage *xmux.RouteGroup
 
 func init() {
-	UserListPage = xmux.NewRouteGroup().AddModule(midware.JobAuth).AddPageKeys("admin", "user").AddModule(midware.CheckRole)
+	UserListPage = xmux.NewRouteGroup().AddModule(midware.JobAuth).AddPageKeys("admin", "user").AddModule(midware.CheckPage)
 	// 获取所有用户
 	UserListPage.Post("/user/list", handle.Read)
 	// 删除用户

@@ -8,10 +8,13 @@ import (
 )
 
 type UserGroup struct {
-	Id   int64   `json:"id" db:"id,default"`
-	Name string  `json:"name" db:"name"`
-	Uids []int64 `json:"uids" db:"uids"`
-	Uid  int64   `json:"uid" db:"uid"`
+	Id   int64  `json:"id" db:"id,default"`
+	Name string `json:"name" db:"name"`
+	Uid  int64  `json:"uid" db:"uid"`
+}
+
+func (UserGroup) TableName() string {
+	return "user_group"
 }
 
 func (ug *UserGroup) Delete(id interface{}) error {
@@ -50,29 +53,9 @@ func (ug *UserGroup) Create() error {
 
 func GetUserGroupList(uid int64) ([]UserGroup, error) {
 	ug := make([]UserGroup, 0)
-	gsql := "select * from usergroup where uid=? or uid=? or json_contains(uids,json_array(?))"
+	gsql := "select * from user_group where uid=? or uid=? or json_contains(uids,json_array(?))"
 	result := db.Mconn.Select(&ug, gsql, uid, cache.SUPERID, uid)
 	return ug, result.Err
-}
-
-func GetUserGroupIds(uid int64) ([]int64, error) {
-
-	gsql := "select id from usergroup where uid=? or uid=? or json_contains(uids,json_array(?))"
-	rows, err := db.Mconn.GetRows(gsql, uid, cache.SUPERID, uid)
-	if err != nil {
-		return nil, err
-	}
-	ids := make([]int64, 0)
-	defer rows.Close()
-	for rows.Next() {
-		var id int64
-		err = rows.Scan(&id)
-		if err != nil {
-			continue
-		}
-		ids = append(ids, id)
-	}
-	return ids, nil
 }
 
 func (ug *UserGroup) GetUserIds() error {

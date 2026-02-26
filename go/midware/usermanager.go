@@ -11,16 +11,24 @@ import (
 
 func JobAuth(w http.ResponseWriter, r *http.Request) bool {
 	uid := xmux.GetInstance(r).Get("uid").(int64)
+	if uid == 1 {
+		return false
+	}
 	// 根据uid 获取 job_id
-	jid, err := model.GetJobIdByUid(uid)
+	user := model.User{}
+	jid, err := user.GetJobIdByUid(uid)
 	if err != nil {
 		golog.Error(err)
 		xmux.GetInstance(r).Response.(*response.Response).Code = 1
 		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return true
 	}
+
 	// jobs: 能管理的这些职位
-	jobs, err := model.GetJobIdsByJobId(jid)
+	p := model.Position{
+		Id: jid,
+	}
+	jobs, err := p.GetJobIdsByJobId()
 	if err != nil {
 		golog.Error(err)
 		xmux.GetInstance(r).Response.(*response.Response).Code = 1

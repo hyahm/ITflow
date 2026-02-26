@@ -11,9 +11,9 @@ import (
 )
 
 type RequestPass struct {
-	Bid     int64   `json:"bid" `     // bugid
-	Remark  string  `json:"remark" `  // bugid
-	SpUsers []int64 `json:"spusers" ` // bugid
+	Bid     int64  `json:"bid" `     // bugid
+	Remark  string `json:"remark" `  // bugid
+	SpUsers int64  `json:"spusers" ` // bugid
 }
 
 func PassBug(w http.ResponseWriter, r *http.Request) {
@@ -22,12 +22,11 @@ func PassBug(w http.ResponseWriter, r *http.Request) {
 
 	// 更新bug表
 	bug := model.Bug{
-		ID:   rp.Bid,
-		Uids: rp.SpUsers,
-		Sid:  model.Default.Pass, // 转交的默认状态
+		Id:        rp.Bid,
+		HandleUid: rp.SpUsers,
+		// Sid:  model.Default.Pass, // 转交的默认状态
 	}
-	bug.Sid = model.Default.Pass
-	bug.Uid = uid
+	// bug.Sid = model.Default.Pass
 	err := bug.UpdateStatus()
 	if err != nil {
 		golog.Error(err)

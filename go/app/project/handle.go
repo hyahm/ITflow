@@ -10,25 +10,86 @@ import (
 	"github.com/hyahm/xmux"
 )
 
+type ProjectListResponse struct {
+	model.Project
+	UserInfo []model.KeyName `json:"user_info"`
+}
+
 func Read(w http.ResponseWriter, r *http.Request) {
+	// 拿到所有项目
+
 	uid := xmux.GetInstance(r).Get("uid").(int64)
-	projects, err := model.GetAllProjects(uid)
+	project := model.Project{
+		Uid: uid,
+	}
+	projects, err := project.GetAllProjects(uid)
+
+	// projects, err := model.GetAllProjects(uid)
 	if err != nil {
 		golog.Error(err)
 		xmux.GetInstance(r).Response.(*response.Response).Code = 1
 		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	xmux.GetInstance(r).Response.(*response.Response).Data = projects
+	golog.Info(projects)
+	plrs := make([]ProjectListResponse, 0, len(projects))
+	for _, v := range projects {
+		var kvs []model.KeyName
+		pum := model.ProjectUserMap{
+			ProjectId: v.Id,
+		}
+		uids, err := pum.GetUidsByProjectId()
+		if err != nil {
+			golog.Error(err)
+			xmux.GetInstance(r).Response.(*response.Response).Code = 1
+			xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
+			return
+		}
+		if len(uids) > 0 {
+			user := model.User{}
+			kvs, err = user.GetKeyNameByUids(uids)
+			if err != nil {
+				golog.Error(err)
+				xmux.GetInstance(r).Response.(*response.Response).Code = 1
+				xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
+				return
+			}
+		}
 
+		plr := ProjectListResponse{
+			v, kvs,
+		}
+		plrs = append(plrs, plr)
+	}
+	xmux.GetInstance(r).Response.(*response.Response).Data = plrs
+
+}
+
+type ProjectRequest struct {
+	model.Project
+	UIds []int64 `json:"uids"`
 }
 
 func Create(w http.ResponseWriter, r *http.Request) {
 
-	project := xmux.GetInstance(r).Data.(*model.Project)
+	pr := xmux.GetInstance(r).Data.(*ProjectRequest)
 	uid := xmux.GetInstance(r).Get("uid").(int64)
-	project.Uid = uid
+	project := model.Project{
+		Uid:  uid,
+		Name: pr.Name,
+	}
 	err := project.Insert()
+	if err != nil {
+		golog.Error(err)
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
+		return
+	}
+	// 更新用户
+	pgm := model.ProjectUserMap{
+		ProjectId: project.Id,
+	}
+	err = pgm.InsertMany(pr.UIds)
 	if err != nil {
 		golog.Error(err)
 		xmux.GetInstance(r).Response.(*response.Response).Code = 1
@@ -39,7 +100,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func Update(w http.ResponseWriter, r *http.Request) {
-	project := xmux.GetInstance(r).Data.(*model.Project)
+	project := xmux.GetInstance(r).Data.(*ProjectRequest)
 	uid := xmux.GetInstance(r).Get("uid").(int64)
 	err := project.Update(uid)
 	if err != nil {
@@ -48,7 +109,16 @@ func Update(w http.ResponseWriter, r *http.Request) {
 		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-
+	pum := model.ProjectUserMap{
+		ProjectId: project.Id,
+	}
+	err = pum.UpdateUsersByProjectId(project.UIds)
+	if err != nil {
+		golog.Error(err)
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
+		return
+	}
 }
 
 func ProjectKeys(w http.ResponseWriter, r *http.Request) {
@@ -66,10 +136,12 @@ func ProjectKeys(w http.ResponseWriter, r *http.Request) {
 
 func Delete(w http.ResponseWriter, r *http.Request) {
 
-	id := r.FormValue("id")
+	project := xmux.GetInstance(r).Data.(*model.Project)
+	golog.Info(project.Id)
 	// 判断有没有bug在使用这个
-	var count int
-	err := db.Mconn.GetOne("select count(id) from bugs where pid=?", id).Scan(&count)
+	var count int64
+
+	err := db.Gorm.Table("bugs").Where("pid=?", project.Id).Count(&count).Error
 	if err != nil {
 		golog.Error(err)
 		xmux.GetInstance(r).Response.(*response.Response).Code = 1
@@ -83,11 +155,9 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	getaritclesql := "delete from project where id=?"
-
-	result := db.Mconn.Delete(getaritclesql, id)
-	if result.Err != nil {
-		golog.Error(result.Err)
+	err = db.Gorm.Table("project").Where("id=?", project.Id).Delete(project).Error
+	if err != nil {
+		golog.Error(err)
 		xmux.GetInstance(r).Response.(*response.Response).Code = 1
 		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return

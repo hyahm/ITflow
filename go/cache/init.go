@@ -48,7 +48,7 @@ func LoadConfig() {
 	}
 	ShowBaseUrl = goconfig.ReadEnv("SHOW_URL",
 		goconfig.ReadWithEndSlash("showbaseurl", " http://127.0.0.1:10001/showimg/"))
-	Salt = goconfig.ReadEnv("SALT", goconfig.ReadString("salt", "hjkkaksjdhfryuooweqzmbvc"))
+	Salt = goconfig.ReadEnv("SALT", goconfig.ReadString("salt", "your_itflow_jwt_secret_password1"))
 	// ShareDir = goconfig.ReadString("sharedir", "/share/")
 	// // 创建共享文件夹
 	// err = os.MkdirAll(ShareDir, 0755)

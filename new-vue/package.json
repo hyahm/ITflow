@@ -1,0 +1,59 @@
+{
+  "name": "quasar",
+  "version": "0.0.1",
+  "description": "itflow",
+  "productName": "web",
+  "author": "cander <cander_liubiao@126.com>",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "lint": "eslint -c ./eslint.config.js \"./src*/**/*.{ts,js,cjs,mjs,vue}\"",
+    "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
+    "test": "echo \"No test specified\" && exit 0",
+    "dev": "quasar dev",
+    "build": "quasar build",
+    "postinstall": "quasar prepare"
+  },
+  "dependencies": {
+    "@casl/ability": "^6.7.5",
+    "@casl/vue": "^2.2.5",
+    "@kangc/v-md-editor": "^2.3.18",
+    "@quasar/extras": "^1.16.4",
+    "@tiptap/pm": "^3.20.0",
+    "@tiptap/starter-kit": "^3.20.0",
+    "@tiptap/vue-3": "^3.20.0",
+    "axios": "^1.2.1",
+    "bootstrap-icons": "^1.13.1",
+    "echarts": "^6.0.0",
+    "mitt": "^3.0.1",
+    "pinia": "^3.0.1",
+    "quasar": "^2.16.0",
+    "vue": "^3.5.22",
+    "vue-advanced-cropper": "^2.8.9",
+    "vue-cropper": "^1.1.4",
+    "vue-echarts": "^8.0.1",
+    "vue-router": "^4.0.12"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.14.0",
+    "@quasar/app-vite": "^2.1.0",
+    "@types/echarts": "^4.9.22",
+    "@types/node": "^20.5.9",
+    "@vue/eslint-config-prettier": "^10.1.0",
+    "@vue/eslint-config-typescript": "^14.4.0",
+    "autoprefixer": "^10.4.2",
+    "eslint": "^9.14.0",
+    "eslint-plugin-vue": "^10.4.0",
+    "globals": "^16.4.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.9.2",
+    "vite-plugin-checker": "^0.11.0",
+    "vue-eslint-parser": "^10.2.0",
+    "vue-tsc": "^3.0.7"
+  },
+  "engines": {
+    "node": "^28 || ^26 || ^24 || ^22 || ^20",
+    "npm": ">= 6.13.4",
+    "yarn": ">= 1.21.1"
+  }
+}

@@ -10,7 +10,7 @@ import (
 )
 
 type Status struct {
-	ID   int64  `json:"id" db:"id,default"`
+	Id   int64  `json:"id" db:"id,default"`
 	Name string `json:"name" db:"name"`
 }
 
@@ -32,14 +32,13 @@ func (status *Status) Names() ([]string, error) {
 	return names, nil
 }
 
-func GetStatusList() ([]*Status, error) {
-	ss := make([]*Status, 0)
-	result := db.Mconn.Select(&ss, "select * from status")
-
-	return ss, result.Err
+func GetStatusList() ([]Status, error) {
+	ss := make([]Status, 0)
+	err := db.Gorm.Table("status").Find(&ss).Error
+	return ss, err
 }
 
-func GetStatusIDsByUid(uid int64) ([]*Status, error) {
+func GetStatusIDsByUid(uid int64) ([]Status, error) {
 
 	if uid == cache.SUPERID {
 		return GetStatusList()
@@ -50,10 +49,10 @@ func GetStatusIDsByUid(uid int64) ([]*Status, error) {
 			golog.Error(err)
 			return nil, err
 		}
-		ss := make([]*Status, 0)
-		result := db.Mconn.SelectIn(&ss, "select * from status where id in (?)", sids)
+		ss := make([]Status, 0)
+		err = db.Gorm.Table("status").Where("id in ?", sids).Find(&ss).Error
 
-		return ss, result.Err
+		return ss, err
 
 	}
 }
@@ -61,17 +60,14 @@ func GetStatusIDsByUid(uid int64) ([]*Status, error) {
 func GetMyStatusList(id interface{}) ([]string, error) {
 	var sids string
 	err := db.Mconn.GetOne("select showstatus from user where id=?", id).Scan(&sids)
-	if err != nil {
-		return nil, err
-	}
-	return strings.Split(sids, ","), nil
+	return strings.Split(sids, ","), err
 }
 
 // 获取的就是表的所有字段
 func GetAllStatus() ([]Status, error) {
 	statuss := make([]Status, 0)
-	result := db.Mconn.Select(&statuss, "select * from status")
-	return statuss, result.Err
+	err := db.Gorm.Table("status").Order("id asc").Find(&statuss).Error
+	return statuss, err
 }
 
 func (status *Status) Create() error {
@@ -80,12 +76,12 @@ func (status *Status) Create() error {
 		golog.Error(result.Err)
 		return result.Err
 	}
-	status.ID = result.LastInsertId
+	status.Id = result.LastInsertId
 	return nil
 }
 
 func (status *Status) Update() error {
-	result := db.Mconn.UpdateInterface(status, "update status set $set where id=?", status.ID)
+	result := db.Mconn.UpdateInterface(status, "update status set $set where id=?", status.Id)
 	return result.Err
 }
 

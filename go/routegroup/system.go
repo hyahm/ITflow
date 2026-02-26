@@ -16,7 +16,7 @@ func init() {
 	// 邮箱设置页面
 	SystemSetting.AddGroup(system.Email)
 	// 日志页面
-	SystemSetting.AddGroup(system.Log).AddPageKeys("log").DelModule(midware.MustBeSuperAdmin).AddModule(midware.CheckRole)
+	SystemSetting.AddGroup(system.Log).AddPageKeys("log").DelModule(midware.MustBeSuperAdmin).AddModule(midware.CheckPage)
 	// 角色页面
 	SystemSetting.AddGroup(system.RoleGroup)
 }

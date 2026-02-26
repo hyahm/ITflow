@@ -4,56 +4,9 @@
     "description": "A magical vue admin. An out-of-box UI solution for enterprise applications. Newest development stack of vue. Lots of awesome features",
     "author": "Pan <panfree23@gmail.com>",
     "scripts": {
-        "dev": "vue-cli-service serve",
-        "build": "vue-cli-service build"
-    },
-    "dependencies": {
-        "-": "^0.0.1",
-        "axios": "^1.12.0",
-        "cli": "^1.0.1",
-        "clipboard": "^2.0.8",
-        "core-js": "3.6.5",
-        "echarts": "4.2.1",
-        "element-ui": "2.15.14",
-        "fuse.js": "^7.0.0",
-        "g": "^2.0.1",
-        "js-cookie": "2.2.0",
-        "mavon-editor": "^2.9.1",
-        "normalize.css": "7.0.0",
-        "nprogress": "0.2.0",
-        "script-loader": "0.7.2",
-        "vue": "^2.6.10",
-        "vue-image-crop-upload": "^2.5.0",
-        "vue-router": "3.0.2",
-        "vuex": "3.1.0",
-        "yargs": "^17.7.2"
-    },
-    "devDependencies": {
-        "@babel/helper-module-imports": "^7.13.12",
-        "@vue/cli-plugin-babel": "4.4.4",
-        "@vue/cli-plugin-unit-jest": "4.4.4",
-        "@vue/cli-service": "4.4.4",
-        "@vue/test-utils": "1.0.0-beta.29",
-        "autoprefixer": "9.5.1",
-        "babel-jest": "23.6.0",
-        "babel-plugin-component": "^1.1.1",
-        "babel-plugin-dynamic-import-node": "2.3.3",
-        "chalk": "2.4.2",
-        "chokidar": "2.1.5",
-        "codemirror": "5.58.2",
-        "connect": "3.6.6",
-        "driver.js": "0.9.5",
-        "html-webpack-plugin": "3.2.0",
-        "lint-staged": "8.1.5",
-        "plop": "2.3.0",
-        "runjs": "4.3.2",
-        "sass": "1.26.2",
-        "sass-loader": "8.0.2",
-        "script-ext-html-webpack-plugin": "2.1.3",
-        "serve-static": "1.13.2",
-        "svg-sprite-loader": "4.1.3",
-        "svgo": "1.2.0",
-        "vue-template-compiler": "2.6.10"
+       "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
     },
     "browserslist": [
         "> 1%",
@@ -70,5 +23,13 @@
     "repository": {
         "type": "url",
         "url": "https://github.com/hyahm/ITflow"
+    },
+    "dependencies": {
+        "vue": "^3.5.25"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^6.0.2",
+        "vite": "^7.2.4",
+        "vite-plugin-vue-devtools": "^8.0.5"
     }
 }

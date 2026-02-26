@@ -11,14 +11,15 @@ import (
 )
 
 func Read(w http.ResponseWriter, r *http.Request) {
-	jobs, err := model.GetAllPositions()
+	position := model.Position{}
+	positions, err := position.GetAllPositions()
 	if err != nil {
 		golog.Error(err)
 		xmux.GetInstance(r).Response.(*response.Response).Code = 1
 		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	xmux.GetInstance(r).Response.(*response.Response).Data = jobs
+	xmux.GetInstance(r).Response.(*response.Response).Data = positions
 }
 
 func PositionGet(w http.ResponseWriter, r *http.Request) {
@@ -29,24 +30,24 @@ func Create(w http.ResponseWriter, r *http.Request) {
 
 	// errorcode := &response.Response{}
 
-	job := xmux.GetInstance(r).Data.(*model.Job)
-	if strings.Trim(job.Name, " ") == "" {
+	position := xmux.GetInstance(r).Data.(*model.Position)
+	if strings.Trim(position.Name, " ") == "" {
 		xmux.GetInstance(r).Response.(*response.Response).Msg = "职位名不能为空"
 		return
 	}
-	if job.RoleGroup <= 0 {
-		xmux.GetInstance(r).Response.(*response.Response).Msg = "角色组不能为空"
+	if position.RoleId <= 0 {
+		xmux.GetInstance(r).Response.(*response.Response).Msg = "角色不能为空"
 		return
 	}
 
-	err := job.Insert()
+	err := position.Create()
 	if err != nil {
 		golog.Error(err)
 		xmux.GetInstance(r).Response.(*response.Response).Code = 1
 		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	xmux.GetInstance(r).Response.(*response.Response).ID = job.Id
+	xmux.GetInstance(r).Response.(*response.Response).ID = position.Id
 
 }
 
@@ -66,9 +67,22 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func ManagerList(w http.ResponseWriter, r *http.Request) {
+	// errorcode := &response.Response{}
+	position := model.Position{}
+	ps, err := position.GetManager()
+	if err != nil {
+		golog.Error(err)
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
+		return
+	}
+	xmux.GetInstance(r).Response.(*response.Response).Data = ps
+}
+
 func Update(w http.ResponseWriter, r *http.Request) {
 
-	job := xmux.GetInstance(r).Data.(*model.Job)
+	job := xmux.GetInstance(r).Data.(*model.Position)
 	err := job.Update()
 	if err != nil {
 		golog.Error(err)

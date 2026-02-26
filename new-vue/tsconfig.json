@@ -1,0 +1,30 @@
+{
+  "extends": "./.quasar/tsconfig.json",
+  "compilerOptions": {
+    "strict": true, // 确保 strict 模式开启
+    "strictNullChecks": true, // 确保 null 检查开启
+    "noImplicitAny": true,
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    // Vue
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types" // 必须包含自定义类型文件夹
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+     "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue", // Vue 项目需要
+    "quasar.config.ts", // 明确包含根目录的配置文件
+    "env.d.ts" // 通常也需要包含环境声明文件
+  ],
+  "exclude": ["node_modules"]
+}

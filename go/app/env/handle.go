@@ -10,8 +10,8 @@ import (
 )
 
 func Read(w http.ResponseWriter, r *http.Request) {
-
-	envs, err := model.GetAllEnv()
+	env := model.Env{}
+	envs, err := env.GetAllEnv()
 	if err != nil {
 		golog.Error(err)
 		xmux.GetInstance(r).Response.(*response.Response).Code = 1
@@ -31,7 +31,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	xmux.GetInstance(r).Response.(*response.Response).ID = env.ID
+	xmux.GetInstance(r).Response.(*response.Response).ID = env.Id
 }
 
 func Update(w http.ResponseWriter, r *http.Request) {

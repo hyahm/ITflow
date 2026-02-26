@@ -12,7 +12,8 @@ import (
 func UserKeyName(w http.ResponseWriter, r *http.Request) {
 	// 获取用户keyvalue
 	uid := xmux.GetInstance(r).Get("uid").(int64)
-	kns, err := model.GetUserKeyName(uid)
+	user := model.User{}
+	kns, err := user.GetUserKeyName(uid)
 	if err != nil {
 		golog.Error(err)
 		xmux.GetInstance(r).Response.(*response.Response).Code = 1

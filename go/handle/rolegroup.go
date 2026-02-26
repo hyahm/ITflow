@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"itflow/app/service"
 	"itflow/db"
 	"itflow/model"
 	"itflow/response"
@@ -24,14 +25,14 @@ func RoleGroupList(w http.ResponseWriter, r *http.Request) {
 
 func GetRoleGroupName(w http.ResponseWriter, r *http.Request) {
 
-	kns, err := model.GetRoleKeyName()
-	if err != nil {
-		golog.Error(err)
-		xmux.GetInstance(r).Response.(*response.Response).Code = 1
-		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
-		return
-	}
-	xmux.GetInstance(r).Response.(*response.Response).Data = kns
+	// kns, err := model.GetRoleKeyName()
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	xmux.GetInstance(r).Response.(*response.Response).Code = 1
+	// 	xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
+	// 	return
+	// }
+	// xmux.GetInstance(r).Response.(*response.Response).Data = kns
 }
 
 func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
@@ -55,7 +56,7 @@ func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 	}
 	// 先删除perm
 	// 获取 permids
-	rolegroup := model.RoleGroup{}
+	rolegroup := model.RolePermMap{}
 	err = rolegroup.GetRoleGroupById(id)
 	if err != nil {
 		golog.Error(err)
@@ -63,7 +64,6 @@ func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	err = model.DeletePerms(rolegroup.PermIds...)
 	if err != nil {
 		golog.Error(err)
 		xmux.GetInstance(r).Response.(*response.Response).Code = 1
@@ -85,19 +85,18 @@ func RoleGroupDel(w http.ResponseWriter, r *http.Request) {
 
 func EditRoleGroup(w http.ResponseWriter, r *http.Request) {
 
-	rr := xmux.GetInstance(r).Data.(*RequestRoleGroup)
-	ids := make([]int64, 0, len(rr.PermIds))
-	for _, v := range rr.PermIds {
-		err := v.Update()
-		if err != nil {
-			golog.Error(err)
-		}
-		ids = append(ids, v.Id)
-	}
-	rolegroup := model.RoleGroup{
-		ID:      rr.ID,
-		Name:    rr.Name,
-		PermIds: ids,
+	// rr := xmux.GetInstance(r).Data.(*RequestRole)
+	// ids := make([]int64, 0, len(rr.PermIds))
+	// for _, v := range rr.PermIds {
+	// 	err := v.Update()
+	// 	if err != nil {
+	// 		golog.Error(err)
+	// 	}
+	// 	ids = append(ids, v.Id)
+	// }
+	rolegroup := model.RolePermMap{
+		// ID:   rr.ID,
+		// Name: rr.Name,
 	}
 	err := rolegroup.Update()
 	if err != nil {
@@ -108,34 +107,76 @@ func EditRoleGroup(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type RequestRoleGroup struct {
-	ID      int64        `json:"id" db:"id,default"`
-	Name    string       `json:"name" db:"name,default"`
-	PermIds []model.Perm `json:"rolelist" db:"rolelist"`
-}
-
 func AddRoleGroup(w http.ResponseWriter, r *http.Request) {
 
-	rr := xmux.GetInstance(r).Data.(*RequestRoleGroup)
-	ids, err := model.InsertManyPerm(rr.PermIds)
+	// rr := xmux.GetInstance(r).Data.(*RequestRole)
+	// rolegroup := model.RolePermMap{
+	// 	ID:   rr.ID,
+	// 	Name: rr.Name,
+	// }
+	// err := rolegroup.Insert()
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	xmux.GetInstance(r).Response.(*response.Response).Code = 1
+	// 	xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
+	// 	return
+	// }
+	// xmux.GetInstance(r).Response.(*response.Response).ID = rolegroup.ID
+
+}
+
+// 添加角色
+func AddRole(w http.ResponseWriter, r *http.Request) {
+	rr := xmux.GetInstance(r).Data.(*service.RequestRole)
+	id, err := service.CreateRole(rr)
 	if err != nil {
 		golog.Error(err)
 		xmux.GetInstance(r).Response.(*response.Response).Code = 1
 		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	rolegroup := model.RoleGroup{
-		ID:      rr.ID,
-		Name:    rr.Name,
-		PermIds: ids,
-	}
-	err = rolegroup.Insert()
+	// err := rolegroup.Insert()
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	xmux.GetInstance(r).Response.(*response.Response).Code = 1
+	// 	xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
+	// 	return
+	// }
+	xmux.GetInstance(r).Response.(*response.Response).ID = id
+
+}
+
+func DelRole(w http.ResponseWriter, r *http.Request) {
+	rr := xmux.GetInstance(r).Data.(*service.RequestRole)
+	golog.Info(rr.ID)
+	err := service.DeleteRole(rr)
 	if err != nil {
 		golog.Error(err)
 		xmux.GetInstance(r).Response.(*response.Response).Code = 1
 		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
 		return
 	}
-	xmux.GetInstance(r).Response.(*response.Response).ID = rolegroup.ID
+	// err := rolegroup.Insert()
+	// if err != nil {
+	// 	golog.Error(err)
+	// 	xmux.GetInstance(r).Response.(*response.Response).Code = 1
+	// 	xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
+	// 	return
+	// }
+	// xmux.GetInstance(r).Response.(*response.Response).ID = id
+
+}
+
+// 角色列表
+func RoleList(w http.ResponseWriter, r *http.Request) {
+	role := model.Role{}
+	roles, err := role.List()
+	if err != nil {
+		golog.Error(err)
+		xmux.GetInstance(r).Response.(*response.Response).Code = 1
+		xmux.GetInstance(r).Response.(*response.Response).Msg = err.Error()
+		return
+	}
+	xmux.GetInstance(r).Response.(*response.Response).Data = roles
 
 }

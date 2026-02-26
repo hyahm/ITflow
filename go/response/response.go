@@ -16,7 +16,7 @@ type Response struct {
 	UserIds    []int64     `json:"user_ids,omitempty"`
 	VersionIds []int64     `json:"version_ids,omitempty"`
 	Data       interface{} `json:"data,omitempty"`
-	Count      int         `json:"count,omitempty"`
+	Count      int64       `json:"count,omitempty"`
 	Page       int         `json:"page,omitempty"`
 	IsAdmin    bool        `json:"is_admin,omitempty"`
 }
